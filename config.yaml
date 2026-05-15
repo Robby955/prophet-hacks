@@ -1,0 +1,21 @@
+models:
+  triage: cheap-fast-model
+  forecast: strong-model
+  fallback: cheap-fast-model
+policy:
+  max_model_calls_per_tick: 8
+  max_markets_forecasted_per_tick: 5
+  max_trades_per_tick: 3
+  edge_threshold: 0.08
+  max_notional_per_new_position: 100
+  max_notional_per_market: 1000
+  max_open_positions: 30
+  starting_bankroll: 10000
+  tick_interval_min: 15
+  retrieval_enabled: false
+runtime:
+  experiment_slug: ""
+  resume: true
+  log_dir: "logs"
+  trace_dir: "trace"
+variant: baseline-market-price

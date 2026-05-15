@@ -2,10 +2,16 @@
 
 Uses BenchmarkSession from ai-prophet-core for clean lifecycle management.
 
-Lifecycle per tick:
-    claim tick -> load candidates + portfolio -> forecast/skip each candidate
-    -> convert high-edge forecasts to intents -> submit -> finalize
-    -> complete tick -> write JSONL trace
+Lifecycle (Rob's spec, mapped to SDK names):
+    create/resume experiment       -> create_or_get_experiment
+    claim tick                     -> claim_tick
+    load candidates + portfolio    -> get_candidates + get_portfolio
+    forecast/skip each candidate   -> forecaster.forecast(market, llm_clients)
+    convert high-edge -> intents   -> _build_intents
+    submit                         -> submit_trade_intents
+    finalize                       -> finalize_participant
+    complete tick                  -> complete_tick
+    write JSONL trace              -> logger.TraceWriter (per-decision)
 
 Run modes:
     --dry-run           Parse config and exit. No API calls.
@@ -15,8 +21,8 @@ Run modes:
 Auth env vars:
     PA_SERVER_URL       (optional; defaults to https://api.aiprophet.dev)
     PA_SERVER_API_KEY   (required for any write call against the live API)
-    OPENAI_API_KEY      (required for openai model variants)
-    ANTHROPIC_API_KEY   (required for anthropic model variants)
+    ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY (per-provider, for
+        the v2 calibrated-ensemble pipeline)
 """
 from __future__ import annotations
 
@@ -153,6 +159,7 @@ def run_one_tick(
     config: dict,
     slug: str,
     variant: str,
+    llm_clients: dict | None = None,
 ) -> dict:
     """One full tick: load -> forecast -> submit -> finalize -> complete.
 
@@ -192,12 +199,12 @@ def run_one_tick(
 
     for m in eligible:
         try:
-            fcast = forecaster.forecast(m, variant=variant)
-        except NotImplementedError as e:
+            fcast = forecaster.forecast(m, llm_clients=llm_clients)
+        except Exception as e:  # noqa: BLE001
             trace.write(build_decision_record(
                 tick_id=lease.tick_id, market_id=m.market_id, question=m.question,
                 bid=float(m.quote.best_bid), ask=float(m.quote.best_ask),
-                action="SKIP", skip_reason=f"variant not wired: {e}",
+                action="SKIP", skip_reason=f"forecaster error: {e}",
                 config_hash=config_hash,
             ))
             continue
@@ -240,6 +247,17 @@ def run_one_tick(
             cost_estimate_usd=fcast["cost_estimate_usd"],
             evidence_urls=fcast.get("evidence", []),
             notes=fcast.get("confidence_note", ""),
+            # v2 optional fields
+            domain=fcast.get("domain"),
+            evidence_sources=fcast.get("evidence_sources"),
+            decomposition_json=fcast.get("decomposition_json"),
+            p_market=fcast.get("p_market"),
+            p_model_raw=fcast.get("p_model_raw"),
+            p_model_shrunk=fcast.get("p_model_shrunk"),
+            p_final=fcast.get("p_final"),
+            disagreement_stdev=fcast.get("disagreement_stdev"),
+            alpha_vs_market=fcast.get("alpha_vs_market"),
+            skip_reason_detailed=fcast.get("skip_reason_detailed"),
         ))
 
     # Submit intents
@@ -282,6 +300,7 @@ def run_one_tick(
         "accepted": submission.accepted if submission else 0,
         "rejected": submission.rejected if submission else 0,
         "total_cost_usd": round(total_cost, 4),
+        "variant": variant,
     }
 
 
@@ -293,6 +312,7 @@ def run_continuous(
     variant: str,
     model_tag: str,
     once: bool = False,
+    llm_clients: dict | None = None,
 ) -> int:
     """Main tick loop. Runs until experiment completes or shutdown signal."""
     config_hash = _config_hash(config)
@@ -347,6 +367,7 @@ def run_continuous(
                 config=config,
                 slug=slug,
                 variant=variant,
+                llm_clients=llm_clients,
             )
             tick_count += 1
             log.info(
@@ -390,10 +411,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--variant", default=None,
-        help="override variant from config (e.g. model-forecast-no-retrieval)",
+        help="variant tag; v2 default runs the calibrated-ensemble pipeline",
     )
     parser.add_argument(
-        "--model-tag", default="rob-baseline-v0",
+        "--model-tag", default="prophet-v2",
         help="participant model tag, recorded server-side",
     )
     parser.add_argument(
@@ -416,7 +437,7 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config(args.config)
     config.setdefault("runtime", {})
     config["runtime"]["experiment_slug"] = args.slug
-    variant = args.variant or config.get("variant", "baseline-market-price")
+    variant = args.variant or config.get("variant", "calibrated-ensemble-v2")
 
     Path(config["runtime"].get("log_dir", "logs")).mkdir(parents=True, exist_ok=True)
     Path(config["runtime"].get("trace_dir", "trace")).mkdir(parents=True, exist_ok=True)
@@ -438,6 +459,14 @@ def main(argv: list[str] | None = None) -> int:
     signal.signal(signal.SIGINT, _handle_signal)
     signal.signal(signal.SIGTERM, _handle_signal)
 
+    try:
+        llm_clients = forecaster.default_llm_clients()
+    except Exception as e:  # noqa: BLE001
+        log.warning(
+            "could not build LLM clients (%s); pipeline will use market price only", e,
+        )
+        llm_clients = None
+
     session = _build_session()
     try:
         return run_continuous(
@@ -447,6 +476,7 @@ def main(argv: list[str] | None = None) -> int:
             variant=variant,
             model_tag=args.model_tag,
             once=args.once,
+            llm_clients=llm_clients,
         )
     finally:
         session.close()

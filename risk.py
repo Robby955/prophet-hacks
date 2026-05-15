@@ -2,6 +2,10 @@
 
 config.yaml mirrors these for visibility; the code values here are the
 authoritative source. If they disagree, the code values win.
+
+The numeric constants below are LOCKED for the live event. Do not raise
+them without explicit approval; the architecture doc lists them as
+non-negotiable invariants.
 """
 from __future__ import annotations
 
@@ -94,6 +98,27 @@ def position_size_for_notional(notional: float, price: float) -> int:
     return int(Decimal(str(notional)) / Decimal(str(price)))
 
 
+def alpha_vs_market(p_final: float, p_market: float) -> float:
+    """Signed model edge versus the market price.
+
+    Positive when the pipeline thinks YES is underpriced, negative when it
+    thinks YES is overpriced. Pure number; risk logic uses |alpha| compared
+    to EDGE_THRESHOLD when sizing decisions.
+    """
+    return p_final - p_market
+
+
+def executable_edge(p_final: float, bid: float, ask: float) -> float:
+    """Best edge an attacker could realize at the live quote.
+
+    Uses actual top-of-book prices, not the midpoint, so we never get
+    fooled by a wide spread. Returns max(yes_edge_at_ask, no_edge_at_bid).
+    """
+    yes_edge_at_ask = p_final - ask
+    no_edge_at_bid = (1.0 - p_final) - (1.0 - bid)
+    return max(yes_edge_at_ask, no_edge_at_bid)
+
+
 __all__ = [
     "EDGE_THRESHOLD",
     "MAX_MARKETS_ANALYZED_PER_TICK",
@@ -113,4 +138,6 @@ __all__ = [
     "assert_under_position_count",
     "assert_under_trades_per_tick",
     "position_size_for_notional",
+    "alpha_vs_market",
+    "executable_edge",
 ]

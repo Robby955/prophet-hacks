@@ -2,6 +2,12 @@
 
 One file per tick: ``trace/{experiment_slug}/{tick_id}.jsonl``.
 One JSON record per market decision (BUY / SKIP / etc).
+
+The base 21-field schema is locked. v2 added a handful of optional fields
+(domain, evidence_sources, decomposition_json, p_market, p_model_raw,
+p_model_shrunk, p_final, disagreement_stdev, alpha_vs_market,
+skip_reason_detailed). Old rows remain valid because every new field
+defaults to None or an empty list.
 """
 from __future__ import annotations
 
@@ -61,8 +67,20 @@ def build_decision_record(
     cost_estimate_usd: float = 0.0,
     evidence_urls: Optional[list[str]] = None,
     notes: str = "",
+    # ----- v2 optional fields (default to None / empty so old rows stay valid)
+    domain: Optional[str] = None,
+    evidence_sources: Optional[list[dict]] = None,
+    decomposition_json: Optional[dict] = None,
+    p_market: Optional[float] = None,
+    p_model_raw: Optional[float] = None,
+    p_model_shrunk: Optional[float] = None,
+    p_final: Optional[float] = None,
+    disagreement_stdev: Optional[float] = None,
+    alpha_vs_market: Optional[float] = None,
+    skip_reason_detailed: Optional[str] = None,
 ) -> dict[str, Any]:
-    """Construct one decision record. Schema matches the brief verbatim."""
+    """Construct one decision record. Schema matches the brief verbatim,
+    plus optional v2 fields for the calibrated-ensemble pipeline."""
     mid = (bid + ask) / 2.0 if (bid is not None and ask is not None) else None
     return {
         "timestamp": _utcnow_iso(),
@@ -90,6 +108,17 @@ def build_decision_record(
         "cost_estimate_usd": cost_estimate_usd,
         "evidence_urls": evidence_urls or [],
         "notes": notes,
+        # v2 optional fields
+        "domain": domain,
+        "evidence_sources": evidence_sources or [],
+        "decomposition_json": decomposition_json,
+        "p_market": p_market,
+        "p_model_raw": p_model_raw,
+        "p_model_shrunk": p_model_shrunk,
+        "p_final": p_final,
+        "disagreement_stdev": disagreement_stdev,
+        "alpha_vs_market": alpha_vs_market,
+        "skip_reason_detailed": skip_reason_detailed,
     }
 
 

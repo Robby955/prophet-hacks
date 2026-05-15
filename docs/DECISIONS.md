@@ -71,3 +71,29 @@ rationale, who or what made it, and any related commit SHA.
 - Status: deferred. Not in the skeleton. Promote to a separate forecaster variant once the single-model path is proven on a real tick.
 - Decided by: Rob.
 - Commit: not yet wired.
+## 2026-05-15 · BenchmarkSession lifecycle + continuous loop + --once mode
+
+- Wrapped the tick agent in `ai_prophet_core.arena.BenchmarkSession`. Added `run_continuous` main loop that claims ticks until experiment completes; SIGINT/SIGTERM trigger graceful shutdown after the current tick. Added `--once` flag for one-shot CI/smoke runs. Tick failures finalize with `status="FAILED"` and `error_code="TICK_ERROR"` so the experiment advances rather than wedging.
+- Decided by: Rob.
+- Commit: `db25183` (feat/2026-05-15-prep-config-and-coordination).
+
+## 2026-05-15 · agreement-gate ensemble (Gemini baseline)
+
+- Two-model ensemble: `gpt-5.4-mini` triage + `claude-sonnet-4-6` strong. Trades fire only when both models agree on direction AND both have `|p - 0.5| >= 0.10` (meaningful conviction).
+- Rationale: cheap-then-expensive routing keeps cost down; the agreement gate filters out single-model overconfidence.
+- Decided by: Rob.
+- Commit: `db25183`.
+
+## 2026-05-15 · locked v2 architecture (calibrated ensemble forecaster, NOT multi-agent debate)
+
+- Replaced the variant-dispatch placeholder forecaster with a locked seven-stage pipeline: `market_router -> retrieval_gate -> decomposition_forecaster -> ensemble_forecaster -> calibrator -> risk_gate`. The agent is market-aware (every market is routed by domain before forecasting), retrieval-disciplined (one to three high-credibility sources, no broad crawl), and uses median-of-logits ensembling with disagreement gating. The code, not any model, computes the final probability. We explicitly chose this over multi-agent debate, raw LLM confidence, broad web crawling, and fine-tuning. Locked risk constants (EDGE_THRESHOLD=0.08, MAX_TRADES_PER_TICK=3, etc.) carry forward unchanged. Full details and the JSON decomposition schema live in `docs/ARCHITECTURE_V2.md`.
+- Decided by: Rob.
+- Commit: this branch (`feat/2026-05-15-prophet-architecture-v2`).
+
+## 2026-05-15 · v2 rebased on top of Gemini's BenchmarkSession lifecycle
+
+- After Gemini's lifecycle PR merged to main, v2 was rebased so the v2 calibrated-decomposition pipeline runs INSIDE the BenchmarkSession + continuous-loop + `--once` infrastructure. The two PRs are orthogonal layers: Gemini owns control flow (claim/load/finalize/complete + graceful shutdown), v2 owns forecast quality (router → retrieval → decomposition → ensemble → calibrator).
+- Conviction-floor (`|p_final - 0.5| >= 0.10`) preserved from Gemini's agreement-gate as a `meaningful_conviction` skip reason in v2's calibrator stage. Configurable via `PROPHET_CONVICTION_FLOOR`.
+- Pipeline wrapped in try/except returning market-mid fallback; one failing stage never crashes the tick loop.
+- Decision: keep both safety properties even though v2's ensemble disagreement penalty semantically subsumes the agreement gate.
+- Decided by: Rob.

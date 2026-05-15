@@ -32,7 +32,12 @@ kickoff.
 
 ## Smoke
 
+- [ ] `python -m pytest tests/ -v` runs from the repo root and prints all-green; do not proceed if any test fails.
+- [ ] `bash scripts/agent/verify.sh` runs the full gate (config + tests + dry-run) and exits 0.
 - [ ] `python agent.py --slug smoke --dry-run` exits 0 and prints the config hash
+- [ ] `python agent.py --slug smoke --once` runs exactly one tick and exits cleanly (BenchmarkSession lifecycle path)
+- [ ] SIGINT (Ctrl-C) on a running `python agent.py --slug smoke` triggers `received signal ... shutting down after current tick` and exits 0
+- [ ] Live monitor: `bash scripts/run_monitor.sh` renders `traces/live.html` and refreshes every 5s
 - [ ] Once Prophet Arena exposes the live endpoint: `python agent.py --slug smoke-real --variant baseline-market-price` runs one tick
 - [ ] `cat trace/smoke-real/*.jsonl | head -1 | python -m json.tool` confirms the 21-field schema lands cleanly
 - [ ] Re-running `python agent.py --slug smoke-real --variant baseline-market-price` resumes from the next tick (same experiment_id printed)

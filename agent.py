@@ -50,7 +50,7 @@ from dotenv import load_dotenv
 import forecaster
 import market_filter
 import risk
-from logger import TraceWriter, build_decision_record
+from logger import TraceWriter, append_experiment_row, build_decision_record
 
 
 log = logging.getLogger("prophet-hacks")
@@ -268,6 +268,17 @@ def run_one_tick(*, client, config: dict, slug: str, variant: str, model_tag: st
         status="COMPLETED",
     )
     client.complete_tick(experiment_id=exp.experiment_id, tick_id=tick_id)
+
+    append_experiment_row(
+        slug=slug, variant=variant, config_hash=config_hash, tick_count=1,
+        outcome="ok",
+        notes=(
+            f"candidates={candidates.market_count} eligible={len(eligible)} "
+            f"intents={len(intents)} "
+            f"accepted={submission.accepted if submission else 0} "
+            f"rejected={submission.rejected if submission else 0}"
+        ),
+    )
 
     return {
         "status": "ok",

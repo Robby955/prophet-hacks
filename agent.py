@@ -221,7 +221,12 @@ def run_one_tick(*, client, config: dict, slug: str, variant: str, model_tag: st
                 risk.assert_under_trades_per_tick(trades_this_tick)
                 risk.assert_no_conflicting_position(m.market_id, side, positions)
                 risk.assert_under_position_count(len(positions))
-                risk.assert_under_notional_cap(notional)
+                current_market_notional = sum(
+                    float(p.shares) * float(p.avg_entry_price)
+                    for p in positions
+                    if p.market_id == m.market_id
+                )
+                risk.assert_under_notional_cap(notional, current_market_notional)
             except risk.RiskViolation as rv:
                 action, side, size, notional, skip_reason = "SKIP", None, 0, 0.0, str(rv)
 
@@ -260,7 +265,7 @@ def run_one_tick(*, client, config: dict, slug: str, variant: str, model_tag: st
         experiment_id=exp.experiment_id,
         participant_idx=participant.participant_idx,
         tick_id=tick_id,
-        status="ok",
+        status="COMPLETED",
     )
     client.complete_tick(experiment_id=exp.experiment_id, tick_id=tick_id)
 

@@ -56,6 +56,15 @@ rationale, who or what made it, and any related commit SHA.
 - Decided by: Rob.
 - Commit: this branch.
 
+## 2026-05-15 · org-level model access verified
+
+- Anthropic `models.list()`: `claude-opus-4-7`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001` all present. Config left as-is.
+- OpenAI `models.list()`: org has access to the `gpt-5.5` family (`gpt-5.5`, `gpt-5.5-2026-04-23`, `gpt-5.5-pro`, `gpt-5.5-pro-2026-04-23`) AND the full `gpt-5.4` family. Note that the openai-python SDK literal list previously consulted lagged behind production.
+- However, there is still NO `gpt-5.5-mini`. The mini tier tops out at `gpt-5.4-mini`. Triage stays on `gpt-5.4-mini`.
+- Open option: if Rob wants a non-Anthropic forecast variant, `gpt-5.5-pro` is now available as the OpenAI strongest model option.
+- Decided by: org-level `models.list()` call against both providers.
+- Commit: this branch.
+
 ## 2026-05-15 · multi-model agreement gate (stretch goal)
 
 - Considered: only fire a trade when triage and forecast agree on direction (both YES-edge or both NO-edge).

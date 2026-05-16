@@ -23,6 +23,14 @@ def test_healthz_reports_served_variant() -> None:
     assert body["status"] == "ok"
     assert body["team"]
     assert body["variant"] == server._VARIANT_NAME
+    assert "commit" in body
+
+
+def test_build_commit_prefers_deploy_env(monkeypatch) -> None:
+    monkeypatch.setenv("PROPHET_BUILD_COMMIT_SHA", "1234567890abcdef")
+    monkeypatch.setenv("RAILWAY_GIT_COMMIT_SHA", "abcdef1234567890")
+
+    assert server._build_commit_sha() == "12345678"
 
 
 def test_predict_returns_probability_shape(monkeypatch) -> None:

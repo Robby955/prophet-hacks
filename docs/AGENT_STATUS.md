@@ -38,6 +38,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-16T19:58:00Z
 - **Notes:** Deploy is automated and verified-live. Watcher PID 33661 active. Open PRs #1 (calibrator + ensemble — Phase 3 candidate) and #4 (SAE stack — Phase 3 after first PA call). Waiting for first Prophet Arena call.
 
+## codex/cicd-healthz-fix
+
+- **Current task:** Fix `/healthz.commit` returning `dev` after the first deploy-wrapper implementation.
+- **Files owned this session:** `forecast_agent_server.py`, `scripts/agent/deploy.sh`, `scripts/preflight.sh`, `.gitignore`, `.env.example`, `tests/test_forecast_agent_server.py`, `docs/DECISIONS.md`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-16T20:09:08Z
+- **Notes:** Root cause: `.commit_sha` is gitignored and did not survive `railway up`; Railway did not provide `RAILWAY_GIT_COMMIT_SHA` for file-upload deploys. Fix pins `PROPHET_BUILD_COMMIT_SHA` via Railway variable before deploy and makes preflight reject untracked non-ignored files.
+
 ## (template) <agent or worktree name>
 
 - **Current task:** `<one line>`

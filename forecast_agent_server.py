@@ -189,15 +189,24 @@ class PredictionResponse(BaseModel):
 
 
 def _build_commit_sha() -> str:
-    """First short SHA we find from: a .commit_sha file written by the
-    deploy script, then Railway-set RAILWAY_GIT_COMMIT_SHA, then a local
-    git rev-parse fallback. Returns 'dev' if none found.
+    """First short SHA we find from deployment metadata.
+
+    `railway up` file uploads do not reliably expose a git SHA in the runtime,
+    so `scripts/agent/deploy.sh` persists `PROPHET_BUILD_COMMIT_SHA` as a
+    non-secret Railway variable before deploy. Fall back to Railway's own git
+    env var, a local `.commit_sha`, then local git. Returns 'dev' if none found.
 
     Surfaced on /healthz so anyone (curl, Codex, another agent, Rob)
     can verify which code is live without Railway dashboard access.
     Fixes a class of "is the deploy actually current?" confusion that
     burned an hour 2026-05-16.
     """
+    env_sha = os.environ.get("PROPHET_BUILD_COMMIT_SHA", "").strip()
+    if env_sha:
+        return env_sha[:8]
+    env_sha = os.environ.get("RAILWAY_GIT_COMMIT_SHA", "").strip()
+    if env_sha:
+        return env_sha[:8]
     try:
         with open(".commit_sha") as f:
             sha = f.read().strip()
@@ -205,9 +214,6 @@ def _build_commit_sha() -> str:
                 return sha[:8]
     except (FileNotFoundError, OSError):
         pass
-    env_sha = os.environ.get("RAILWAY_GIT_COMMIT_SHA", "").strip()
-    if env_sha:
-        return env_sha[:8]
     try:
         import subprocess
         out = subprocess.run(

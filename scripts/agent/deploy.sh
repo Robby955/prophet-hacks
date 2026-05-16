@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # Single safe path to Railway deploy. Use this instead of raw `railway up`.
 #
-# Runs preflight (tests, upload-size sanity, push check), writes the
-# current commit SHA to .commit_sha so /healthz can surface it, then
-# kicks off railway up. Cleans up .commit_sha afterwards regardless of
-# outcome.
+# Runs preflight (tests, upload-size sanity, push check), writes the current
+# commit SHA to a non-secret Railway variable so /healthz can surface it, then
+# kicks off railway up.
 #
 # Usage: ./scripts/agent/deploy.sh [optional-message]
 #
@@ -22,16 +21,20 @@ MSG="${1:-deploy via scripts/agent/deploy.sh}"
 # Run preflight (exits non-zero on failure)
 "$REPO_ROOT/scripts/preflight.sh"
 
-# Pin commit SHA into the deployed image
+# Pin commit SHA into the Railway runtime metadata. `railway up` file uploads
+# do not reliably expose a git commit SHA, and gitignored `.commit_sha` files
+# do not survive the upload filter.
 SHA=$(git rev-parse --short=8 HEAD)
-echo "$SHA" > "$REPO_ROOT/.commit_sha"
-trap 'rm -f "$REPO_ROOT/.commit_sha"' EXIT
+RAILWAY_CALLER="skill:use-railway@1.2.1" RAILWAY_AGENT_SESSION="deploy-var-$(date +%s)" \
+  railway variable set PROPHET_BUILD_COMMIT_SHA="$SHA" \
+    --service oracles-agent --environment production > /dev/null
 
 echo ""
 echo "=== triggering railway up (detached) for $SHA ==="
 SESSION="deploy-$(date +%s)"
 RAILWAY_CALLER="skill:use-railway@1.2.1" RAILWAY_AGENT_SESSION="$SESSION" \
-  railway up --service oracles-agent --detach 2>&1 | tail -10
+  railway up --service oracles-agent --environment production --detach \
+    -m "$MSG" 2>&1 | tail -10
 
 echo ""
 echo "=== watch with: railway deployment list --service oracles-agent --json | head ==="

@@ -193,9 +193,10 @@ rationale, who or what made it, and any related commit SHA.
 
 ## 2026-05-16 · CI/CD hardening — preflight, deploy wrapper, /healthz commit SHA
 
-- `scripts/preflight.sh`: runs verify gate, checks working tree clean, confirms HEAD = origin/main, sums upload size (warns >10MB), surfaces deployed-SHA vs local HEAD.
-- `scripts/agent/deploy.sh`: single safe path to deploy. Runs preflight, pins commit SHA to `.commit_sha`, calls `railway up --detach`. Use this instead of raw `railway up`.
-- `forecast_agent_server.py:_build_commit_sha()`: reads `.commit_sha` (preferred), then `RAILWAY_GIT_COMMIT_SHA`, then a `git rev-parse` fallback. Surfaced as `"commit"` field on `/healthz`. Now anyone (curl, Codex, future-Rob) can verify which code is live with a single GET.
+- `scripts/preflight.sh`: runs verify gate, checks working tree clean with no untracked non-ignored files, confirms HEAD = origin/main, sums tracked upload size (warns >10MB), surfaces deployed-SHA vs local HEAD.
+- `scripts/agent/deploy.sh`: single safe path to deploy. Runs preflight, pins commit SHA to the non-secret Railway variable `PROPHET_BUILD_COMMIT_SHA`, calls `railway up --detach`. Use this instead of raw `railway up`.
+- `forecast_agent_server.py:_build_commit_sha()`: reads `PROPHET_BUILD_COMMIT_SHA` first, then `RAILWAY_GIT_COMMIT_SHA`, then `.commit_sha`, then a `git rev-parse` fallback. Surfaced as `"commit"` field on `/healthz`. Now anyone (curl, Codex, future-Rob) can verify which code is live with a single GET.
 - Rationale: today the question "is the deploy actually current?" cost ~1 hour of confusion. Each of these three hardens a specific failure mode from the day's incidents.
 - Decided by: Claude, authorized by Rob ("All three now, before next PA call").
+- Correction: first attempt pinned `.commit_sha`, but `railway up` did not upload that gitignored file and `/healthz.commit` returned `dev`. The env-var pin fixes this for file-upload deploys. Preflight also now blocks untracked files rather than merely counting them, because untracked files would make deployed artifacts differ from `origin/main`.
 - Commit: this commit.

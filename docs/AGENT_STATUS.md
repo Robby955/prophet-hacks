@@ -111,11 +111,45 @@ opens, PA will publish resolved outcomes somewhere. When it does, run
 `scripts/analyze_results.py` to compute live Brier vs the public
 leaderboard. Document the gap in `docs/DECISIONS.md`.
 
-**6. Brave reliability monitor.** Silent retrieval degradation is the
-most plausible "we shipped retrieval-less" failure mode and is not
-covered by `scripts/full_check.sh`. Add a check that fires a probe
-query and asserts `len(results) >= 3`. Either a separate
-`scripts/brave_health.sh` or extend `full_check.sh` with step 11.
+**6. Brave reliability monitor.** ~~DONE in `baba9b0`.~~
+`scripts/brave_health.sh` ships, exits 0/1/2 for ok/degraded/unhealthy,
+parses Brave's `x-ratelimit-policy` + `x-ratelimit-remaining` headers
+correctly (the `0` slot is "no cap" on the AI Data tier, not
+exhaustion). **Open follow-up:** wire it into `scripts/full_check.sh`
+as step 11, and ideally into a launchd / cron job that fires hourly
+during the eval window.
+
+**7. Test coverage gaps (real ones, not theoretical):**
+   - `_distribute_p_yes_to_outcomes` (legacy binary adapter used by
+     `single_llm`, `opus_47`, `opus_46` variants) — has a basic happy-path
+     test but no edge cases (zero outcomes, single outcome, very-low p_yes,
+     duplicate outcome labels).
+   - Ensemble variants `predict_ensemble_logit` and
+     `predict_ensemble_leaderboard` — exist in `forecast_track.py`,
+     not in production routing, no tests beyond import.
+   - `predict_hybrid_routed` — exists, no edge tests for the binary↔multi
+     routing boundary (n=2 with weird labels, n=3 hitting both paths).
+   - `predict_multi_outcome_retrieval_sae` (Codex's offline variant) —
+     has `tests/test_forecast_track_sae.py` but tests are integration-
+     style; no unit tests for the shrinkage math itself.
+   - `chat_completions_adapter.py` — 16 tests cover the happy paths;
+     untested: streaming attempts with malformed body, very-long messages
+     past Anthropic context, attempted tool use, role='function' messages.
+   - `forecast_agent_server.py:predict()` handler — covered for happy
+     path + edge cases via `tests/test_predict_edge_cases.py`, but
+     `_PREDICTION_HISTORY` ring buffer behavior (50-record cap, eviction
+     order) is not explicitly tested.
+   - Pipeline trace fields — populated correctly per smoke, but no
+     test that asserts every field is present after a successful call.
+
+**8. Real failure modes not currently monitored beyond Brave:**
+   - Anthropic rate-limit / quota exhaustion (would fall through to
+     uniform; no monitor)
+   - In-memory `_PREDICTION_HISTORY` resets on every Railway restart
+     (observability gap; not Brier-affecting)
+   - Live commit drift from `main` (mitigated by `/healthz.commit` but
+     manual check)
+   - OpenRouter quota for ablations (only matters if we re-run them)
 
 ### Active state (refresh before claiming!)
 

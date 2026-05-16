@@ -29,6 +29,9 @@ KEYS=(
   PA_TEAM_NAME
   OPENAI_API_KEY
   ANTHROPIC_API_KEY
+  BRAVE_SEARCH_API_KEY
+  GROQ_API_KEY
+  TOGETHER_API_KEY
 )
 
 # Build .env with a stable header + each key in order.

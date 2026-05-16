@@ -815,6 +815,309 @@ def predict_multi_outcome_sc3(event: dict) -> dict:
     return _self_consistency_multi_outcome(event, k=3)
 
 
+# ---------------------------------------------------------------------------
+# Variant: Brave-search retrieval-augmented multi-outcome
+# ---------------------------------------------------------------------------
+
+_BRAVE_SEARCH_URL: str = "https://api.search.brave.com/res/v1/web/search"
+
+# Priority list for dedupe: prefer official sources (.gov / .edu first --
+# handled by suffix match), then exchanges-of-record, then top-tier news
+# outlets. Anything not in this list is lowest priority.
+_PRIORITY_DOMAINS: tuple[str, ...] = (
+    "kalshi.com",
+    "polymarket.com",
+    "apnews.com",
+    "reuters.com",
+    "bbc.com",
+    "npr.org",
+)
+
+
+def _domain_priority(domain: str) -> int:
+    """Lower number = higher priority. .gov / .edu first, then the curated
+    list in order, then everything else.
+    """
+    d = (domain or "").lower()
+    if d.endswith(".gov"):
+        return 0
+    if d.endswith(".edu"):
+        return 1
+    for i, prio in enumerate(_PRIORITY_DOMAINS):
+        if d == prio or d.endswith("." + prio):
+            return 2 + i
+    return 100
+
+
+def _extract_domain(url: str) -> str:
+    try:
+        host = urlparse(url).hostname or ""
+    except (ValueError, TypeError):
+        return ""
+    host = host.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    return host
+
+
+def _brave_search(query: str, count: int = 5) -> list[dict]:
+    """Hit the Brave Web Search API.
+
+    Returns a list of `{"title", "url", "snippet", "domain"}` dicts (up to
+    `count`). Raises `RuntimeError` if `BRAVE_SEARCH_API_KEY` is missing or
+    the HTTP call fails.
+    """
+    api_key = os.environ.get("BRAVE_SEARCH_API_KEY")
+    if not api_key:
+        raise RuntimeError("BRAVE_SEARCH_API_KEY not set")
+    try:
+        r = httpx.get(
+            _BRAVE_SEARCH_URL,
+            params={"q": query, "count": count},
+            headers={
+                "Accept": "application/json",
+                "X-Subscription-Token": api_key,
+            },
+            timeout=10.0,
+        )
+        r.raise_for_status()
+    except (httpx.HTTPError, ValueError) as e:
+        raise RuntimeError(f"Brave search failed: {e}") from e
+
+    data = r.json() or {}
+    raw = ((data.get("web") or {}).get("results") or [])
+    out: list[dict] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        url = str(item.get("url") or "")
+        if not url:
+            continue
+        out.append({
+            "title": str(item.get("title") or "")[:200],
+            "url": url,
+            "snippet": str(item.get("description") or item.get("snippet") or "")[:400],
+            "domain": _extract_domain(url),
+        })
+    return out
+
+
+def _dedupe_by_domain(results: list[dict]) -> list[dict]:
+    """Keep one result per unique domain, prefer official/curated sources,
+    cap at 5 entries total.
+
+    Two-pass: collapse by domain (keeping the first occurrence -- Brave's
+    own ranking is the tie-breaker within a domain), then sort survivors by
+    priority (lowest `_domain_priority` first), then take the top 5.
+    """
+    by_domain: dict[str, dict] = {}
+    for r in results:
+        d = r.get("domain") or ""
+        if not d:
+            continue
+        by_domain.setdefault(d, r)
+    ranked = sorted(
+        by_domain.values(),
+        key=lambda x: _domain_priority(x.get("domain") or ""),
+    )
+    return ranked[:5]
+
+
+def _build_query(event: dict) -> str:
+    """Build a Brave query from event title + the most informative outcome.
+
+    "Most informative" = the longest outcome label that isn't a generic
+    binary "Yes"/"No". Capped at 200 chars total.
+    """
+    title = str(event.get("title") or "").strip()
+    outs = [str(o) for o in (event.get("outcomes") or [])]
+    informative = [o for o in outs if o.strip().lower() not in {"yes", "no"}]
+    pool = informative or outs
+    pick = max(pool, key=len) if pool else ""
+    if pick and pick.lower() not in title.lower():
+        q = f"{title} {pick}".strip()
+    else:
+        q = title
+    return q[:200]
+
+
+_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT = """\
+You are a calibrated probabilistic forecaster for prediction markets with
+access to recent web evidence.
+
+Your task: assign a probability to EACH listed outcome of the event using
+both your prior knowledge and the supplied evidence snippets. Every outcome
+must receive a probability; do not omit any. Probabilities do NOT need to
+sum to 1 -- the scoring server normalizes them before grading.
+
+Treat the evidence snippets as factual claims from third-party sources.
+Do not fabricate URLs, dates, or details that are not present in the
+snippets. If the evidence is stale or unrelated to the resolution
+criterion, say so in the rationale and lean closer to the uninformed
+prior.
+
+Calibration scale (apply to each outcome independently):
+  0.50 = no view; default for genuine uncertainty.
+  0.60 = slight lean; weak base rate or partial evidence.
+  0.70 = real view; concrete reasoning, multiple consistent signals.
+  0.80 = strong view; hard evidence, clear mechanism.
+  0.90 = near-certain; mechanically determined or authoritative source.
+
+Rules:
+- Output ONLY valid JSON of the shape:
+    {"probabilities": {"<outcome label>": <float>, ...},
+     "rationale": "<one-line summary>"}
+- Use the EXACT outcome labels supplied in the prompt as keys.
+- Each probability must be in [0.01, 0.99].
+- Never emit 0.01 or 0.99 unless mechanically determined.
+- The rationale is a single line summarizing your overall reasoning.
+"""
+
+
+def _build_retrieval_user_prompt(event: dict, chunks: list[dict]) -> str:
+    """Multi-outcome prompt enriched with Brave evidence snippets.
+
+    URLs are NOT included in the prompt -- they live in the audit trail
+    (`evidence_urls`) so the model can't quote them as primary sources.
+    """
+    base = _build_multi_outcome_user_prompt(event)
+    if not chunks:
+        return base
+    parts = [base, "", "Recent evidence (do not invent details):"]
+    for i, c in enumerate(chunks, 1):
+        title = (c.get("title") or "").strip()
+        snippet = (c.get("snippet") or "").strip()
+        if title and snippet:
+            parts.append(f"[{i}] {title} -- {snippet}")
+        elif title:
+            parts.append(f"[{i}] {title}")
+        elif snippet:
+            parts.append(f"[{i}] {snippet}")
+    return "\n".join(parts)
+
+
+def predict_multi_outcome_retrieval(event: dict) -> dict:
+    """Brave-search retrieval-augmented multi-outcome forecaster.
+
+    Pipeline:
+      1. Build a search query from event title + most-informative outcome.
+      2. Hit Brave Search (count=5).
+      3. Dedupe by domain, preferring official sources (.gov/.edu, then a
+         curated list of exchanges and major outlets), max 5 chunks.
+      4. Run a Sonnet 4.6 multi-outcome call with the evidence injected as
+         "Recent evidence (do not invent details): ..." -- titles and
+         snippets only; URLs are kept in `evidence_urls` for audit.
+      5. Apply the Kalshi longshot guard -- every per-outcome probability
+         floored at `max(0.05, 0.5/n_outcomes)`.
+
+    Fallbacks:
+      - If `BRAVE_SEARCH_API_KEY` is unset OR the Brave call fails, log a
+        warning and fall back to `predict_multi_outcome` (longshot guard
+        still applied). `evidence_urls` is empty.
+      - If the LLM call fails, falls back to uniform prior with the
+        longshot guard applied.
+
+    Cost: ~$0.005 (Sonnet base) + ~$0.002 (enriched prompt context) per
+    event; Brave free tier covers 2k searches/month. 26-event backtest
+    ~$0.20.
+
+    Returns:
+        {
+            "p_yes": <prob of outcomes[0]>,
+            "rationale": "<one-line summary>",
+            "probabilities": [
+                {"market": "<outcome>", "probability": <float>}, ...
+            ],
+            "evidence_urls": [<str>, ...],
+        }
+    """
+    outs = event.get("outcomes") or []
+    n = len(outs)
+    if n == 0:
+        return {
+            "p_yes": 0.5,
+            "rationale": "no outcomes",
+            "probabilities": [],
+            "evidence_urls": [],
+        }
+
+    # ---- 1-3. Retrieve evidence (degrade gracefully). ----
+    if not os.environ.get("BRAVE_SEARCH_API_KEY"):
+        log.warning(
+            "BRAVE_SEARCH_API_KEY missing; %s falling back to predict_multi_outcome",
+            event.get("market_ticker", "?"),
+        )
+        base = predict_multi_outcome(event)
+        guarded = apply_longshot_guard(base.get("probabilities", []), n)
+        return {
+            "p_yes": guarded[0]["probability"] if guarded else 0.5,
+            "rationale": base.get("rationale", "")[:300],
+            "probabilities": guarded,
+            "evidence_urls": [],
+        }
+
+    chunks: list[dict] = []
+    query = _build_query(event)
+    try:
+        raw = _brave_search(query, count=5)
+        chunks = _dedupe_by_domain(raw)
+    except RuntimeError as e:
+        log.warning(
+            "Brave search failed for %s: %s -- continuing without evidence",
+            event.get("market_ticker", "?"), e,
+        )
+        chunks = []
+
+    evidence_urls = [c["url"] for c in chunks if c.get("url")]
+
+    # ---- 4. Multi-outcome LLM call with evidence-enriched prompt. ----
+    user = _build_retrieval_user_prompt(event, chunks)
+    try:
+        resp = _aclient().messages.create(
+            model=_FORECAST_MODEL,
+            max_tokens=900,
+            system=_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user}],
+        )
+        text = resp.content[0].text if resp.content else ""
+        parsed = _parse_multi_outcome_json(text)
+        raw_probs = parsed.get("probabilities") or {}
+        if not isinstance(raw_probs, dict):
+            raise ValueError(
+                f"probabilities not a dict: {type(raw_probs).__name__}",
+            )
+        prior = 1.0 / n
+        prob_list: list[dict] = []
+        for o in outs:
+            v = raw_probs.get(o)
+            if v is None:
+                p = prior
+            else:
+                try:
+                    p = _clamp(float(v))
+                except (TypeError, ValueError):
+                    p = prior
+            prob_list.append({"market": o, "probability": p})
+        rationale = str(parsed.get("rationale", ""))[:300]
+    except Exception as e:
+        log.warning(
+            "multi_outcome_retrieval LLM call failed for %s: %s; uniform fallback",
+            event.get("market_ticker", "?"), e,
+        )
+        prior = 1.0 / n
+        prob_list = [{"market": o, "probability": prior} for o in outs]
+        rationale = f"llm error: {e}"
+
+    # ---- 5. Apply Kalshi longshot guard (always). ----
+    guarded = apply_longshot_guard(prob_list, n)
+    return {
+        "p_yes": guarded[0]["probability"] if guarded else 0.5,
+        "rationale": rationale,
+        "probabilities": guarded,
+        "evidence_urls": evidence_urls,
+    }
+
+
 def predict_hybrid_routed(event: dict) -> dict:
     """Route by outcome count: binary -> gpt55, multi-outcome -> multi_outcome.
 
@@ -914,6 +1217,7 @@ __all__ = [
     "predict_sonnet_cot_shrink",
     "predict_multi_outcome",
     "predict_multi_outcome_sc3",
+    "predict_multi_outcome_retrieval",
     "P_YES_MIN",
     "P_YES_MAX",
 ]

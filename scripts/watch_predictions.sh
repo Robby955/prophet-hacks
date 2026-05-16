@@ -19,7 +19,23 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd -P)"
-PY="$REPO_ROOT/.venv/bin/python"
+if [[ -n "${PYTHON:-}" ]]; then
+  PY="$PYTHON"
+elif [[ -x "$REPO_ROOT/.venv/bin/python" ]]; then
+  PY="$REPO_ROOT/.venv/bin/python"
+elif command -v python3 > /dev/null; then
+  PY="$(command -v python3)"
+elif command -v python > /dev/null; then
+  PY="$(command -v python)"
+else
+  echo "error: no Python interpreter found. Create .venv or set PYTHON=/path/to/python" >&2
+  exit 1
+fi
+
+if ! command -v "$PY" > /dev/null && [[ ! -x "$PY" ]]; then
+  echo "error: configured Python is not executable: $PY" >&2
+  exit 1
+fi
 
 POLL_SEC="${POLL_SEC:-60}"
 STATE_FILE="${STATE_FILE:-/tmp/oracles_watch_state}"

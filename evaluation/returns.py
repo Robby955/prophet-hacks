@@ -9,7 +9,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from statistics import mean, pstdev
-from typing import Iterable, List, Sequence
+from typing import List, Sequence
+
+from evaluation.validation import validate_outcome, validate_probability
 
 
 @dataclass
@@ -28,15 +30,22 @@ def trade_payoff(trade: Trade) -> float:
     `notional` is dollars committed; `fill_price` is the YES probability we
     paid (in $/share). Number of shares = notional / fill_price.
     """
-    if trade.fill_price <= 0:
-        return 0.0
-    shares = trade.notional / trade.fill_price
-    if trade.side.upper() == "YES":
-        wins = trade.outcome == 1
+    if trade.notional <= 0:
+        raise ValueError("notional must be positive")
+    fill_price = validate_probability(trade.fill_price, name="fill_price")
+    outcome = validate_outcome(trade.outcome)
+    side = trade.side.upper()
+    if side == "YES":
+        contract_price = fill_price
+        wins = outcome == 1
+    elif side == "NO":
+        contract_price = 1.0 - fill_price
+        wins = outcome == 0
     else:
-        wins = trade.outcome == 0
-        # NO contract pays $1 if outcome == 0
-        shares = trade.notional / max(1e-6, 1.0 - trade.fill_price)
+        raise ValueError("side must be YES or NO")
+    if contract_price <= 0.0:
+        raise ValueError(f"{side} contract price must be positive")
+    shares = trade.notional / contract_price
     revenue = shares * 1.0 if wins else 0.0
     return revenue - trade.notional
 
@@ -50,8 +59,6 @@ def per_trade_returns(trades: Sequence[Trade]) -> List[float]:
     """Return / notional for each trade. Useful for Sharpe etc."""
     rets = []
     for t in trades:
-        if t.notional <= 0:
-            continue
         rets.append(trade_payoff(t) / t.notional)
     return rets
 
@@ -103,6 +110,9 @@ def pnl_by_price_bucket(trades: Sequence[Trade]) -> List[BucketStats]:
     the [0.00, 0.10) bucket the longshot guard is too loose; if we're
     making money there we're either lucky or have real edge.
     """
+    for t in trades:
+        validate_probability(t.p_market_at_fill, name="p_market_at_fill")
+
     out = []
     for lo, hi in PRICE_BUCKETS:
         bucket = [

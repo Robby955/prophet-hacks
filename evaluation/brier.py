@@ -8,7 +8,15 @@ alone, which conflates calibration with market-mispricing edge).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Sequence, Tuple
+from typing import Sequence
+
+from evaluation.validation import (
+    probability_bin_index,
+    validate_binary_series,
+    validate_n_bins,
+    validate_outcome,
+    validate_probability,
+)
 
 
 def brier_score(p: float, outcome: int) -> float:
@@ -17,12 +25,13 @@ def brier_score(p: float, outcome: int) -> float:
     p in [0, 1], outcome in {0, 1}. Result in [0, 1], lower is better.
     Random baseline = 0.25.
     """
+    p = validate_probability(p)
+    outcome = validate_outcome(outcome)
     return (p - outcome) ** 2
 
 
 def mean_brier(probs: Sequence[float], outcomes: Sequence[int]) -> float:
-    if len(probs) != len(outcomes):
-        raise ValueError("probs and outcomes must have the same length")
+    probs, outcomes = validate_binary_series(probs, outcomes)
     if not probs:
         return 0.0
     total = sum(brier_score(p, o) for p, o in zip(probs, outcomes))
@@ -74,8 +83,8 @@ def murphy_decomposition(
     resolution  = mean_n( n_k * (o_bar_k - o_bar)   ** 2 ) / N
     uncertainty = o_bar * (1 - o_bar)
     """
-    if len(probs) != len(outcomes):
-        raise ValueError("probs and outcomes must have the same length")
+    n_bins = validate_n_bins(n_bins)
+    probs, outcomes = validate_binary_series(probs, outcomes)
     n = len(probs)
     if n == 0:
         return MurphyDecomposition(0.0, 0.0, 0.0, 0.0)
@@ -87,7 +96,7 @@ def murphy_decomposition(
     bins = [[] for _ in range(n_bins)]
     bin_outcomes = [[] for _ in range(n_bins)]
     for p, o in zip(probs, outcomes):
-        idx = min(int(p * n_bins), n_bins - 1)
+        idx = probability_bin_index(p, n_bins)
         bins[idx].append(p)
         bin_outcomes[idx].append(o)
 

@@ -11,6 +11,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
+from evaluation.validation import (
+    probability_bin_index,
+    validate_binary_series,
+    validate_n_bins,
+)
+
 
 def expected_calibration_error(
     probs: Sequence[float],
@@ -22,8 +28,8 @@ def expected_calibration_error(
     ECE = sum_k (n_k / N) * | p_bar_k - o_bar_k |
     Lower is better; 0.0 is perfect calibration.
     """
-    if len(probs) != len(outcomes):
-        raise ValueError("probs and outcomes must have the same length")
+    n_bins = validate_n_bins(n_bins)
+    probs, outcomes = validate_binary_series(probs, outcomes)
     n = len(probs)
     if n == 0:
         return 0.0
@@ -31,7 +37,7 @@ def expected_calibration_error(
     bins = [[] for _ in range(n_bins)]
     bin_outcomes = [[] for _ in range(n_bins)]
     for p, o in zip(probs, outcomes):
-        idx = min(int(p * n_bins), n_bins - 1)
+        idx = probability_bin_index(p, n_bins)
         bins[idx].append(p)
         bin_outcomes[idx].append(o)
 
@@ -53,13 +59,15 @@ def maximum_calibration_error(
 ) -> float:
     """Worst-bin calibration gap. Highlights single-bucket failures
     that ECE might smooth over."""
-    if len(probs) != len(outcomes) or not probs:
+    n_bins = validate_n_bins(n_bins)
+    probs, outcomes = validate_binary_series(probs, outcomes)
+    if not probs:
         return 0.0
 
     bins = [[] for _ in range(n_bins)]
     bin_outcomes = [[] for _ in range(n_bins)]
     for p, o in zip(probs, outcomes):
-        idx = min(int(p * n_bins), n_bins - 1)
+        idx = probability_bin_index(p, n_bins)
         bins[idx].append(p)
         bin_outcomes[idx].append(o)
 
@@ -89,12 +97,12 @@ def reliability_diagram_data(
     """Per-bin data for a reliability diagram. Use the output to render
     a calibration curve in the live monitor or post-event report.
     """
-    if len(probs) != len(outcomes):
-        raise ValueError("probs and outcomes must have the same length")
+    n_bins = validate_n_bins(n_bins)
+    probs, outcomes = validate_binary_series(probs, outcomes)
     bins = [[] for _ in range(n_bins)]
     bin_outcomes = [[] for _ in range(n_bins)]
     for p, o in zip(probs, outcomes):
-        idx = min(int(p * n_bins), n_bins - 1)
+        idx = probability_bin_index(p, n_bins)
         bins[idx].append(p)
         bin_outcomes[idx].append(o)
 
@@ -102,7 +110,14 @@ def reliability_diagram_data(
     for k, (ps, os) in enumerate(zip(bins, bin_outcomes)):
         center = (k + 0.5) / n_bins
         if not ps:
-            out.append(ReliabilityBin(center=center, p_mean=center, outcome_mean=center, count=0))
+            out.append(
+                ReliabilityBin(
+                    center=center,
+                    p_mean=center,
+                    outcome_mean=center,
+                    count=0,
+                )
+            )
             continue
         p_mean = sum(ps) / len(ps)
         o_mean = sum(os) / len(os)

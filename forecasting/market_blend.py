@@ -11,7 +11,8 @@ LLMs love vivid low-probability narratives. The market data says
 those narratives are dangerous. The rules below actively resist
 LLM overreach in those regimes.
 
-See docs/KALSHI_FINDINGS.md for page-cited extracts.
+This module is experimental/offline support. Keep it out of the live path
+until its assumptions are tested against a no-leakage holdout.
 """
 
 from __future__ import annotations

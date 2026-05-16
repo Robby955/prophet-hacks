@@ -56,7 +56,7 @@ from fastapi.responses import (
     Response,
     StreamingResponse,
 )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 load_dotenv()
 
@@ -158,6 +158,8 @@ class EventRequest(BaseModel):
     might send, with extras tolerated. The CLI sends an event dict
     indistinguishable from what `prophet forecast retrieve` writes."""
 
+    model_config = ConfigDict(extra="allow")
+
     event_ticker: str
     market_ticker: str
     title: str
@@ -167,9 +169,6 @@ class EventRequest(BaseModel):
     rules: str | None = None
     close_time: str
     outcomes: list[str] | None = None
-
-    class Config:
-        extra = "allow"  # tolerate any future field the server adds
 
 
 class OutcomeProbability(BaseModel):

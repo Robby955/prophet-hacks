@@ -5,8 +5,8 @@ that wouldn't have been available at forecast time. We REQUIRE every
 source's published_at <= the event's forecast_time before any
 variant is allowed to score against the dataset.
 
-This file's `check_no_leakage(dataset)` MUST be called by
-scripts/run_offline_eval.py before scoring. Violations raise.
+Call `assert_no_leakage(dataset)` in any offline evaluation runner before
+scoring. Violations raise.
 """
 
 from __future__ import annotations

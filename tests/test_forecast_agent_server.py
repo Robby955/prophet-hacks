@@ -108,3 +108,12 @@ def test_predictions_require_dashboard_auth_when_configured(monkeypatch) -> None
 
     assert missing.status_code == 401
     assert present.status_code == 200
+
+
+def test_events_stream_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    client = TestClient(server.app)
+
+    response = client.get("/events")
+
+    assert response.status_code == 401

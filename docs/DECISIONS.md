@@ -157,3 +157,12 @@ rationale, who or what made it, and any related commit SHA.
 - FastAPI Swagger/OpenAPI routes are disabled on this app. The live monitor contains enough internals and a production prediction form that public access is not worth the competition leak/spend risk.
 - Decided by: Codex after Rob asked whether the dashboard was public and whether it should be.
 - Commit: this branch.
+
+## 2026-05-16 · evaluation helpers hardened after review
+
+- Added explicit validation for evaluation probabilities, outcomes, and bin counts so bad offline-eval inputs fail with `ValueError` instead of silently corrupting bins.
+- Fixed simulated NO-contract payoff math to reject impossible zero-price contracts instead of producing huge fake returns.
+- Rewrote `agent_protocol.md` to match the actual Railway production path and corrected the Brier gate to lower-is-better / positive BSS.
+- Added focused tests for Brier/ECE validation, return math, leakage detection, and `/events` dashboard auth.
+- Decided by: Codex after requested code review of commits `2e38088..b5ed6de`.
+- Commit: this branch.

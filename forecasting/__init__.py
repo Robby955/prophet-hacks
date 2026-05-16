@@ -1,9 +1,7 @@
-"""forecasting/ — v3 modular forecasting layer.
+"""Experimental forecasting support modules.
 
-Built on top of the v2 7-stage pipeline and Gemini's BenchmarkSession lifecycle.
-Adds Kalshi-paper-informed rules (longshot guard, favorites no-shrink),
-Hedge-style expert pool, source credibility scoring, bidirectional elicitation.
-
-Locked thesis: train the operating system, NOT the model.
-See docs/V3_OFFLINE_HARNESS.md.
+The live Prophet Arena submission path is still `forecast_track.py` behind
+`forecast_agent_server.py`. Modules in this package should remain offline or
+explicitly experimental until they have tests, documented assumptions, and
+measured improvement over the active baseline.
 """

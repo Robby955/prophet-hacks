@@ -25,10 +25,10 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 
 ## codex/main-orientation
 
-- **Current task:** Private live dashboard, public root status page, and apex DNS verification.
-- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `.env.example`, `README.md`, `docs/STATUS.yaml`, `docs/STATUS.html`, `docs/LIVE_OPERATIONS.md`, `docs/DECISIONS.md`, `docs/AGENT_STATUS.md`
-- **Last updated:** 2026-05-16T18:46:08Z
-- **Notes:** Railway now lists `forecastingpath.com` on `oracles-agent`. Cloudflare authoritative DNS shows apex propagation in progress. `/dashboard`, `/predictions`, and `/events` are moving behind `DASHBOARD_AUTH_TOKEN`; `/predict`, `/healthz`, and `/` stay public.
+- **Current task:** Code-review follow-up for evaluation helpers and agent handoff docs.
+- **Files owned this session:** `agent_protocol.md`, `evaluation/`, `forecasting/`, `scripts/watch_predictions.sh`, `tests/test_evaluation.py`, `tests/test_forecast_agent_server.py`, `docs/DECISIONS.md`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-16T19:19:43Z
+- **Notes:** Review found no critical production-path regression. Important fixes are validation for evaluation metrics, return math for NO contracts, current-state handoff docs, and SSE auth coverage.
 
 ## (template) <agent or worktree name>
 

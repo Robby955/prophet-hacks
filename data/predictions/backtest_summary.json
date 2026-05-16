@@ -1,22 +1,12 @@
 [
   {
-    "variant": "single_llm",
+    "variant": "multi_outcome_retrieval",
     "n_predictions": 26,
-    "brier_local": 0.192912,
+    "brier_local": 0.063939,
     "evaluator_result": {
-      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.192912",
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.063939",
       "n_matched": 26,
-      "brier_score": 0.192912
-    }
-  },
-  {
-    "variant": "multi_outcome",
-    "n_predictions": 26,
-    "brier_local": 0.211096,
-    "evaluator_result": {
-      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.211096",
-      "n_matched": 26,
-      "brier_score": 0.211096
+      "brier_score": 0.063939
     }
   }
 ]

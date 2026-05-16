@@ -12,7 +12,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Python 3.11+ (see `.python-version`).
+Python 3.11+ (see `.python-version`; 3.13 is the dev baseline as of 2026-05-16).
 
 ## Environment variables
 

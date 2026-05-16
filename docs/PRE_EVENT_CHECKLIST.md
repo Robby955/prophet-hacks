@@ -6,7 +6,7 @@ kickoff.
 
 ## Environment
 
-- [ ] `python3.11 --version` returns 3.11.x
+- [ ] `python3 --version` returns 3.11.x or newer (3.13 is the dev baseline as of 2026-05-16)
 - [ ] `git --version` returns 2.x
 - [ ] `gh auth status` shows logged in to GitHub as `Robby955`
 - [ ] `cd ~/Projects/theorempath/prophet-hacks`
@@ -14,9 +14,9 @@ kickoff.
 
 ## Virtualenv
 
-- [ ] `python3.11 -m venv .venv`
+- [ ] `python3 -m venv .venv`
 - [ ] `source .venv/bin/activate`
-- [ ] `python --version` inside the venv returns 3.11.x
+- [ ] `python --version` inside the venv returns 3.11.x or newer
 - [ ] `pip install -r requirements.txt` completes without error
 - [ ] `python -c "import ai_prophet_core; print(ai_prophet_core.__version__)"` prints `0.1.4`
 

@@ -65,6 +65,14 @@ rationale, who or what made it, and any related commit SHA.
 - Decided by: org-level `models.list()` call against both providers.
 - Commit: this branch.
 
+## 2026-05-16 · python baseline bumped from 3.11 to 3.13
+
+- `.python-version` now reads `3.13`. README and `docs/PRE_EVENT_CHECKLIST.md` updated to "3.11+ (3.13 is the dev baseline as of 2026-05-16)".
+- Rationale: kickoff machine has Python 3.13 installed (no 3.11). Every dep in `requirements.txt` supports 3.13 (openai 2.x, anthropic 0.100+, pydantic 2.x, pandas 2.x, matplotlib 3.8+, pyyaml 6.x). The repo code uses `from __future__ import annotations` throughout and has no version-specific features. README's "3.11+" was always the real floor; the strict `.python-version` was the original dev environment, not a hard requirement.
+- Trade-off: ai-prophet-core==0.1.4 was likely developed and tested against 3.11. If it breaks on 3.13, install 3.11 via `brew install python@3.11` then — fallback path is fast because we'd know the trigger.
+- Decided by: Rob (delegated to take initiative; environment reality forced the choice).
+- Commit: this branch.
+
 ## 2026-05-15 · multi-model agreement gate (stretch goal)
 
 - Considered: only fire a trade when triage and forecast agree on direction (both YES-edge or both NO-edge).

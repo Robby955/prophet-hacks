@@ -17,10 +17,10 @@ event:
   primary_track: "forecasting"
 
 production:
-  endpoint_url: "https://oracles-agent-production.up.railway.app/predict"
-  health_url: "https://oracles-agent-production.up.railway.app/healthz"
-  dashboard_url: "https://oracles-agent-production.up.railway.app/dashboard"
-  docs_url: "https://oracles-agent-production.up.railway.app/docs"
+  endpoint_url: "https://agent.forecastingpath.com/predict"  # Railway-backed, custom domain
+  health_url: "https://agent.forecastingpath.com/healthz"
+  dashboard_url: "https://agent.forecastingpath.com/dashboard"
+  docs_url: "https://agent.forecastingpath.com/docs"
   hosting: "Railway (project mindful-unity, service oracles-agent)"
   registered_with_prophet_arena: true
   is_active: true

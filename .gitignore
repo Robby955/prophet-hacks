@@ -16,3 +16,7 @@ dist/
 .mypy_cache/
 .ruff_cache/
 .coverage
+
+# Older monitoring playbook PDFs (superseded by v7; kept locally as reference, not in repo)
+forecasting_agent_monitoring_playbook.pdf
+prophet_hacks_research_monitoring_playbook_v4.pdf

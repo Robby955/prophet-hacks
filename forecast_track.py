@@ -29,6 +29,7 @@ import logging
 import math
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
 from dotenv import load_dotenv
@@ -644,6 +645,114 @@ def predict_multi_outcome(event: dict) -> dict:
         }
 
 
+def _self_consistency_multi_outcome(event: dict, k: int = 3) -> dict:
+    """Run `predict_multi_outcome` k times in parallel and average per-outcome.
+
+    Self-consistency: drawing k independent samples from the same model and
+    averaging is a variance-reduction technique that tends to improve
+    calibration on noisy events (arxiv 2203.11171). We fan out k=3 in
+    parallel via ThreadPoolExecutor (the cached `_aclient()` is thread-safe)
+    and average the per-outcome probabilities returned by each call.
+    Rationales are concatenated and truncated to ~300 chars.
+
+    Robustness:
+    - If any of the k calls raises, that sample is dropped and the average
+      is taken over the surviving samples.
+    - If ALL k fail, falls back to `predict_uniform_prior` (and synthesizes
+      a per-outcome probabilities list at the uniform prior).
+
+    Cost: ~k * single-LLM ≈ ~$0.015/event for k=3 against Sonnet 4.6.
+    Parallelism is capped at k -- we don't over-fan-out and trip rate
+    limits.
+    """
+    outs = event.get("outcomes") or []
+    if not outs:
+        return {"p_yes": 0.5, "rationale": "no outcomes", "probabilities": []}
+    if k < 1:
+        k = 1
+
+    results: list[dict] = []
+    with ThreadPoolExecutor(max_workers=k) as ex:
+        futures = [ex.submit(predict_multi_outcome, event) for _ in range(k)]
+        for fut in as_completed(futures):
+            try:
+                r = fut.result()
+            except Exception as e:
+                log.warning(
+                    "self-consistency sample failed for %s: %s",
+                    event.get("market_ticker", "?"), e,
+                )
+                continue
+            if isinstance(r, dict):
+                results.append(r)
+
+    if not results:
+        log.warning(
+            "multi_outcome_sc%d all %d samples failed for %s; uniform fallback",
+            k, k, event.get("market_ticker", "?"),
+        )
+        base = predict_uniform_prior(event)
+        p = float(base["p_yes"])
+        return {
+            "p_yes": p,
+            "rationale": base["rationale"],
+            "probabilities": [
+                {"market": o, "probability": p} for o in outs
+            ],
+        }
+
+    # Average per-outcome probabilities, keyed by the original outcomes
+    # ordering for output stability. For each outcome, sum probabilities
+    # across the surviving samples (treating missing entries as the
+    # uniform prior) and divide by the sample count.
+    prior = 1.0 / len(outs)
+    prob_list: list[dict] = []
+    for o in outs:
+        vals: list[float] = []
+        for r in results:
+            raw = r.get("probabilities") or []
+            v: float | None = None
+            if isinstance(raw, list):
+                for entry in raw:
+                    if (
+                        isinstance(entry, dict)
+                        and entry.get("market") == o
+                        and "probability" in entry
+                    ):
+                        try:
+                            v = float(entry["probability"])
+                        except (TypeError, ValueError):
+                            v = None
+                        break
+            vals.append(v if v is not None else prior)
+        avg = sum(vals) / len(vals) if vals else prior
+        prob_list.append({"market": o, "probability": _clamp(avg)})
+
+    rationales = [
+        str(r.get("rationale", "")) for r in results if r.get("rationale")
+    ]
+    combined = " | ".join(rationales)
+    rationale = (f"sc{len(results)}: {combined}" if combined else f"sc{len(results)}")[:300]
+
+    return {
+        "p_yes": prob_list[0]["probability"],
+        "rationale": rationale,
+        "probabilities": prob_list,
+    }
+
+
+def predict_multi_outcome_sc3(event: dict) -> dict:
+    """Self-consistency-3 variant: average k=3 parallel `predict_multi_outcome`
+    samples per outcome.
+
+    Reduces sampling variance vs. a single Sonnet 4.6 multi-outcome call;
+    should help calibration on noisy/ambiguous events at the cost of ~3x
+    the single-LLM spend (~$0.015/event). Drops failed samples; if all
+    fail, returns `predict_uniform_prior`.
+    """
+    return _self_consistency_multi_outcome(event, k=3)
+
+
 def predict_ensemble_leaderboard(event: dict) -> dict:
     """Three-way ensemble of leaderboard-proven models: Opus 4.6 + GPT-5.2 +
     Sonnet 4.6. Logit-mean across all three. The Sonnet "anchor" gives us
@@ -685,6 +794,7 @@ __all__ = [
     "predict_sonnet_cot",
     "predict_sonnet_cot_shrink",
     "predict_multi_outcome",
+    "predict_multi_outcome_sc3",
     "P_YES_MIN",
     "P_YES_MAX",
 ]

@@ -43,15 +43,20 @@ def _market(bid: float, ask: float, q: str = "Will it rain tomorrow?"):
     )
 
 
-def _canned_client(p_yes: float):
+def _canned_client(p_yes: float, should_shrink: bool = False, source_quality: float = 0.6):
     payload = {
-        "sub_events": [
-            {"id": "rain", "statement": "rain >1mm", "p": p_yes,
-             "depends_on": [], "rationale": "test"},
-        ],
-        "combination": {"rule": "all_of", "rule_detail": "single sub-event"},
-        "p_yes": p_yes,
-        "rationale": "test stub",
+        "base_rate": 0.5,
+        "base_rate_rationale": "test base rate",
+        "evidence_for_yes": ["test evidence yes"],
+        "evidence_for_no": ["test evidence no"],
+        "stale_or_weak_evidence": [],
+        "key_uncertainties": ["test uncertainty"],
+        "time_to_resolution_risk": "medium",
+        "source_quality": source_quality,
+        "raw_p_yes_before_market": p_yes,
+        "should_shrink": should_shrink,
+        "shrink_reason": "test" if should_shrink else "",
+        "final_rationale": "test stub",
     }
     text = json.dumps(payload)
 

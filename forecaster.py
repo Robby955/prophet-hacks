@@ -196,7 +196,7 @@ def stage_decomposition(candidate: dict, llm_clients: dict) -> dict:
         triage,
     )
     candidate["decomposition_json"] = parsed
-    candidate["p_triage"] = float(parsed["p_yes"])
+    candidate["p_triage"] = float(parsed["raw_p_yes_before_market"])
     candidate["decomposition_parse_failed"] = parsed.get("parse_failed", False)
     return candidate
 
@@ -219,7 +219,7 @@ def stage_ensemble(candidate: dict, llm_clients: dict) -> dict:
             candidate["_market_meta"],
             strong,
         )
-        p_strong = float(parsed["p_yes"])
+        p_strong = float(parsed["raw_p_yes_before_market"])
         candidate["p_strong"] = p_strong
         candidate["decomposition_json_strong"] = parsed
         probs.append(p_strong)
@@ -232,7 +232,7 @@ def stage_ensemble(candidate: dict, llm_clients: dict) -> dict:
                 candidate["_market_meta"],
                 opt,
             )
-            probs.append(float(parsed2["p_yes"]))
+            probs.append(float(parsed2["raw_p_yes_before_market"]))
             candidate["decomposition_json_optional"] = parsed2
 
     ens = ensemble.combine_with_disagreement(probs, market_p)
@@ -244,12 +244,29 @@ def stage_ensemble(candidate: dict, llm_clients: dict) -> dict:
 
 
 def stage_calibrator(candidate: dict) -> dict:
-    """Stage 5. Shrink + blend with the market price."""
+    """Stage 5. Optional shrink + blend with the market price.
+
+    The pre-blend shrink is gated on the ``should_shrink`` hint from any
+    decomposition the pipeline produced (triage / strong / optional). If any
+    model flagged shrink, we pull the ensemble probability toward the market
+    before pooling. The model only flags; the code decides.
+    """
     market_p = candidate["p_market"]
     p_model_raw = candidate["p_model_raw"]
     eq = candidate.get("evidence_quality", 0.0)
 
-    p_model_shrunk = calibrator.shrink(p_model_raw, tau=0.75, anchor=market_p)
+    should_shrink = False
+    for key in ("decomposition_json", "decomposition_json_strong", "decomposition_json_optional"):
+        parsed = candidate.get(key)
+        if isinstance(parsed, dict) and parsed.get("should_shrink"):
+            should_shrink = True
+            break
+    candidate["shrink_applied"] = should_shrink
+
+    if should_shrink:
+        p_model_shrunk = calibrator.shrink(p_model_raw, tau=0.75, anchor=market_p)
+    else:
+        p_model_shrunk = p_model_raw
     candidate["p_model_shrunk"] = p_model_shrunk
 
     p_final = calibrator.blend_forecast(market_p, p_model_shrunk, eq)

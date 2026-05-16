@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prophet Hacks — status</title>
+<style>
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; max-width: 980px; margin: 2em auto; padding: 0 1em; color: #1f2933; background: #fafbfc; }
+  h1 { font-size: 1.4em; margin-bottom: 0.2em; }
+  h2 { margin-top: 1.6em; font-size: 1.1em; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.2em; }
+  .meta { color: #6b7280; font-size: 0.9em; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5em 0 1em; }
+  th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #e5e7eb; }
+  th { background: #f3f4f6; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .bar { background: #eef2ff; height: 8px; border-radius: 4px; overflow: hidden; min-width: 80px; display: inline-block; vertical-align: middle; }
+  .bar > div { background: #6366f1; height: 100%; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78em; }
+  .pill.ok { background: #d1fae5; color: #065f46; }
+  .pill.block { background: #fee2e2; color: #991b1b; }
+  .pill.todo { background: #fef3c7; color: #92400e; }
+  ul { padding-left: 1.2em; }
+  li { margin: 0.2em 0; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+  .card { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.8em 1em; }
+  .num-hero { font-size: 2em; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .num-hero.good { color: #065f46; }
+  .num-hero.warn { color: #92400e; }
+</style>
+</head>
+<body>
+
+<h1>Prophet Hacks — status</h1>
+<p class="meta">as of 2026-05-16 09:43 CT · last actor: claude-opus-4-7 · primary track: <strong>forecasting</strong> · head: <code>aeba874</code> · <a href="STATUS.yaml">canonical YAML</a></p>
+
+<h2>Brier scores on <code>sample-resolved</code> (n=26)</h2>
+<table>
+<thead><tr><th>variant</th><th>module</th><th class="num">Brier</th><th>vs random 0.25</th><th class="num">$/event</th></tr></thead>
+<tbody>
+<tr><td>random reference</td><td>—</td><td class="num">0.250</td><td><span class="bar"><div style="width:100%"></div></span></td><td class="num">0.000</td></tr>
+<tr><td>uniform_prior</td><td><code>forecast_track:predict_uniform_prior</code></td><td class="num">0.219</td><td><span class="bar"><div style="width:88%"></div></span></td><td class="num">0.000</td></tr>
+<tr><td><strong>single_llm</strong></td><td><code>forecast_track:predict_single_llm</code></td><td class="num"><strong>0.190</strong></td><td><span class="bar"><div style="width:76%"></div></span></td><td class="num">~0.005</td></tr>
+<tr><td>perfect</td><td>—</td><td class="num">0.000</td><td><span class="bar"><div style="width:0"></div></span></td><td class="num">—</td></tr>
+</tbody>
+</table>
+<p class="meta">12 YES / 14 NO. Categories: Sports 16, Entertainment 4, Elections 3, Politics 3. Run: <code>python scripts/backtest_forecast.py --variants uniform_prior,single_llm</code>.</p>
+
+<h2>Next steps</h2>
+<table>
+<thead><tr><th>#</th><th>title</th><th>owner</th><th>status</th><th>eta</th><th class="num">est. cost</th></tr></thead>
+<tbody>
+<tr><td>NS1</td><td>Get <code>PA_SERVER_API_KEY</code> from <code>prophetarena.co/profile/api-keys</code></td><td>Rob</td><td><span class="pill block">blocks NS2, NS6</span></td><td>5 min</td><td class="num">$0</td></tr>
+<tr><td>NS2</td><td><code>prophet forecast register --team-name &lt;name&gt;</code></td><td>Claude</td><td><span class="pill todo">waiting on NS1</span></td><td>2 min</td><td class="num">$0</td></tr>
+<tr><td>NS3</td><td>Backtest on sample-sports + entertainment + economics</td><td>Claude</td><td><span class="pill todo">approve $0.50?</span></td><td>15 min</td><td class="num">~$0.50</td></tr>
+<tr><td>NS4</td><td>Ensemble (Sonnet 4.6 + GPT-5.5-pro) with agreement gate</td><td>Claude</td><td><span class="pill todo">approve $0.50?</span></td><td>30 min</td><td class="num">~$0.50</td></tr>
+<tr><td>NS5</td><td>Retrieval-augmented variant (web search per event)</td><td>Claude</td><td><span class="pill todo">stretch</span></td><td>60 min</td><td class="num">~$0.30</td></tr>
+<tr><td>NS6</td><td>Pull live hackathon-day events</td><td>Claude</td><td><span class="pill todo">waiting on NS1</span></td><td>5 min</td><td class="num">$0</td></tr>
+<tr><td>NS7</td><td>Calibration plot per category (portfolio artifact)</td><td>Claude</td><td><span class="pill todo">post-NS3</span></td><td>20 min</td><td class="num">$0</td></tr>
+<tr><td>NS8</td><td>Opus 4.7 swap as upper-bound comparison</td><td>Claude</td><td><span class="pill todo">post-NS3</span></td><td>10 min</td><td class="num">~$0.40</td></tr>
+</tbody>
+</table>
+
+<h2>Traps to avoid</h2>
+<ul>
+<li><strong>No Kalshi API key.</strong> The <code>ai_prophet_core.forecast.kalshi_client</code> module is from a research paper, not the hackathon. Don't add <code>KALSHI_API_KEY</code> anywhere.</li>
+<li><strong>Trading-track patterns are not the submission target.</strong> <code>agent.py</code>/<code>risk.py</code>/<code>BenchmarkSession</code> live in the repo but are for the tick-trading track. The forecasting submission goes through <code>forecast_track.py</code>.</li>
+<li><strong>Module-level model caches.</strong> Edits to <code>config.yaml</code> or the forecast model don't take effect mid-process; restart required.</li>
+<li><strong>Variable outcomes length.</strong> Some events have 2 outcomes, some have 30. Binary YES = <code>resolved_outcome.value == [outcomes[0]]</code>.</li>
+</ul>
+
+<h2>Open questions for Rob</h2>
+<ul>
+<li>Team name for <code>prophet forecast register</code>?</li>
+<li>Approve ~$0.50 spend on the three remaining sample-dataset backtests?</li>
+<li>Approve ~$0.50 spend on the ensemble variant test?</li>
+<li>Commit the two leftover playbook PDFs or keep untracked?</li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+<li>Developer portal: <a href="https://prophetarena.co/developer">prophetarena.co/developer</a></li>
+<li>API keys (self-serve): <a href="https://prophetarena.co/profile/api-keys">prophetarena.co/profile/api-keys</a></li>
+<li>SDK upstream: <a href="https://github.com/ai-prophet/ai-prophet">ai-prophet/ai-prophet</a> · <a href="https://github.com/Robby955/ai-prophet">our fork</a> (cloned at <code>~/Desktop/ai-prophet/</code>)</li>
+<li>Sample datasets doc: <a href="https://github.com/ai-prophet/ai-prophet/blob/main/docs/using_sample_datasets.md">using_sample_datasets.md</a></li>
+<li>Build-a-bot doc: <a href="https://github.com/ai-prophet/ai-prophet/blob/main/docs/build_a_bot.md">build_a_bot.md</a></li>
+<li>Discord: <a href="https://discord.gg/yGUHfHbu5m">discord.gg/yGUHfHbu5m</a></li>
+</ul>
+
+</body>
+</html>

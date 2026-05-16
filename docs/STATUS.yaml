@@ -1,0 +1,161 @@
+# Prophet Hacks — live status artifact
+#
+# Feedable to any agent (Codex, future Claude runs, scheduled briefings).
+# Hand-edited; keep entries terse. Render the human view with:
+#   python scripts/render_status.py docs/STATUS.yaml docs/STATUS.html
+
+version: 1
+as_of: "2026-05-16T09:43:00-05:00"
+last_actor: claude-opus-4-7
+event:
+  name: "Prophet Hacks"
+  kickoff_ct: "2026-05-16T09:00:00-05:00"
+  duration_hours: 24
+  primary_track: "forecasting"
+  notes_on_track: |
+    Forecasting is `prophet forecast {register,events,predict,evaluate,
+    retrieve,leaderboard}`. Scoring is Brier per
+    ai_prophet_core.forecast.evaluate. Trading-track scaffolding still
+    lives in agent.py/risk.py and remains useful as a portfolio artifact
+    but is NOT the submission target.
+
+repo:
+  remote: "git@github.com:Robby955/prophet-hacks.git"
+  branch: "main"
+  head_commit: "aeba874"
+  privacy: "private (flip public after Rob review post-event)"
+  pushed: true
+
+forecasting_track:
+  contract:
+    predict_signature: "predict(event: dict) -> {p_yes: float in [0.01, 0.99], rationale: str}"
+    submission_shape: |
+      {
+        "timestamp": "ISO 8601",
+        "predictions": [{"market_ticker": str, "p_yes": float, "rationale": str}, ...]
+      }
+    actuals_shape: '{"market_ticker": 1.0 | 0.0, ...}'
+    binary_yes_condition: "resolved_outcome.value == [outcomes[0]]"
+
+  current_variants:
+    - name: "uniform_prior"
+      module: "forecast_track:predict_uniform_prior"
+      brier_sample_resolved: 0.219
+      cost_per_event_usd: 0.0
+      notes: "Deterministic 1/len(outcomes). Free control baseline."
+    - name: "single_llm"
+      module: "forecast_track:predict_single_llm"
+      model: "claude-sonnet-4-6"
+      brier_sample_resolved: 0.190
+      cost_per_event_usd: 0.005
+      wall_time_per_event_sec: 3.7
+      notes: "Single Anthropic call per event with JSON-parse fallback chain."
+
+  reference_brier:
+    random_05: 0.250
+    perfect: 0.000
+    sample_n_events: 26
+    sample_yes_count: 12
+    sample_no_count: 14
+    sample_categories: {Sports: 16, Entertainment: 4, Elections: 3, Politics: 3}
+
+next_steps:
+  - id: NS1
+    title: "Get PA_SERVER_API_KEY"
+    owner: "Rob"
+    blocker_for: ["NS2", "NS6"]
+    where: "https://prophetarena.co/profile/api-keys (self-serve)"
+    eta_minutes: 5
+  - id: NS2
+    title: "Register team via `prophet forecast register --team-name <name>`"
+    owner: "Claude"
+    requires: ["NS1"]
+    eta_minutes: 2
+  - id: NS3
+    title: "Run remaining sample datasets (sample-sports, sample-entertainment, sample-economics) for a larger Brier sample"
+    owner: "Claude"
+    expected_impact: "more reliable comparison; current n=26 is small"
+    eta_minutes: 15
+    cost_usd: ~0.5
+  - id: NS4
+    title: "Ensemble variant: Sonnet 4.6 + GPT-5.5-pro with logit-mean + agreement gate"
+    owner: "Claude"
+    expected_impact: "Brier likely 0.17-0.18 (15-25% improvement vs single Sonnet)"
+    eta_minutes: 30
+    cost_per_event_usd: 0.02
+  - id: NS5
+    title: "Retrieval-augmented variant: web search per event when close_time < N days"
+    owner: "Claude"
+    expected_impact: "biggest possible win; risk of over-fitting prompt"
+    eta_minutes: 60
+    cost_per_event_usd: 0.01
+  - id: NS6
+    title: "Pull live hackathon-day events via `prophet forecast events --status open`"
+    owner: "Claude"
+    requires: ["NS1"]
+    eta_minutes: 5
+  - id: NS7
+    title: "Calibration plot: predicted bucket vs realized rate, per category"
+    owner: "Claude"
+    expected_impact: "portfolio artifact; surfaces over/underconfidence patterns"
+    eta_minutes: 20
+  - id: NS8
+    title: "Opus 4.7 swap (single model, no ensemble) for comparison"
+    owner: "Claude"
+    expected_impact: "Brier delta unclear; 3x cost; sanity check"
+    eta_minutes: 10
+    cost_per_event_usd: 0.015
+
+traps_to_avoid:
+  - "DO NOT add KALSHI_API_KEY anywhere. Prophet Hacks goes through Prophet Arena's own API. Kalshi tickers in the data are just identifiers."
+  - "Trading-track patterns (BenchmarkSession tick loop) are NOT for the forecasting submission. They're parallel work for a separate track."
+  - "Module-level caches in forecast_track.py and forecaster.py read config once at import. Restart the process after editing config to see model changes."
+  - "Outcomes lists vary 2..30. Don't assume binary 2-outcome shape — `predict_uniform_prior` handles this; new variants must too."
+
+artifacts_committed:
+  - "CLAUDE.md"
+  - "forecast_track.py"
+  - "scripts/build_actuals.py"
+  - "scripts/backtest_forecast.py"
+  - "data/resolved.json (sample-resolved, 26 events)"
+  - "data/actuals.json (12 YES / 14 NO)"
+  - "data/predictions/{uniform_prior,single_llm}.json"
+  - "data/predictions/backtest_summary.json"
+  - "docs/DECISIONS.md (now 11 entries)"
+  - "docs/STATUS.yaml (this file)"
+
+open_questions_for_rob:
+  - "Team name for `prophet forecast register`?"
+  - "Approve $0.50 spend on sample-sports + sample-entertainment + sample-economics backtests?"
+  - "Approve $0.50 spend on ensemble variant test against the 26 sample-resolved events?"
+  - "Keep monitoring_demo.py + two playbook PDFs untracked (currently the case) or commit?"
+
+deferred_pre_kickoff_gaps_now_closed:
+  trading_track:
+    - "MAX_TRADES_PER_DAY, MAX_GROSS_EXPOSURE, TICK_SUBMISSION_DEADLINE_SECS imported from ai_prophet_core.ruleset with import-time sanity asserts."
+    - "Network-resilient claim_tick with exponential backoff + 5-min blackout alarm."
+    - "complete_tick in a finally block."
+    - "session.put_plan() wired for server-side audit trail."
+    - "finalize(status='FAILED', error_detail=...) carries diagnostic context."
+
+deferred_remaining_for_sprint_iteration:
+  forecasting:
+    - "Ensemble + agreement gate (port from forecaster.agreement_gate)."
+    - "Retrieval-augmented variant (Codex Goal 2 in docs/CODEX_GOALS.md)."
+    - "Stronger model (Opus 4.7) variant for upper-bound."
+    - "Self-consistency (k samples per event, take median)."
+    - "Per-category Brier breakdown for portfolio."
+  trading:
+    - "Fallback chain walking in forecaster._call_model."
+    - "Longshot guard + logit blend port from monitoring_demo into live agent."
+    - "Batched tool_use forecast (upstream pattern: one call covers all markets)."
+
+links:
+  developer_portal: "https://prophetarena.co/developer"
+  api_keys: "https://prophetarena.co/profile/api-keys"
+  sdk_repo: "https://github.com/ai-prophet/ai-prophet"
+  sdk_fork: "https://github.com/Robby955/ai-prophet (cloned at ~/Desktop/ai-prophet/)"
+  sample_datasets_doc: "https://github.com/ai-prophet/ai-prophet/blob/main/docs/using_sample_datasets.md"
+  build_a_bot_doc: "https://github.com/ai-prophet/ai-prophet/blob/main/docs/build_a_bot.md"
+  discord: "https://discord.gg/yGUHfHbu5m"
+  leaderboard: "(via `prophet forecast leaderboard`)"

@@ -31,7 +31,9 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
+from urllib.parse import urlparse
 
+import httpx
 from dotenv import load_dotenv
 
 
@@ -70,6 +72,64 @@ def _clamp(p: float) -> float:
     if p > P_YES_MAX:
         return P_YES_MAX
     return p
+
+
+def longshot_guard_floor(n_outcomes: int) -> float:
+    """Per-outcome probability floor per the Kalshi longshot bias finding.
+
+    Kalshi paper (and Whelan writeup): buyers of <$0.10 contracts lose >60%
+    on average. LLMs are prone to vivid-narrative tail predictions on
+    outcomes the prior is already small on. We require every outcome to be
+    at least `max(0.05, 0.5 / n_outcomes)` so we don't get punished on
+    longshots we got wrong.
+
+    For n=2 the floor is 0.25 (binary predictions clamped to [0.25, 0.75]).
+    For n=10 it's 0.05. For n=30 it's 0.05.
+    """
+    if n_outcomes <= 0:
+        return 0.05
+    return max(0.05, 0.5 / n_outcomes)
+
+
+def apply_longshot_guard(
+    probabilities: list[dict], n_outcomes: int,
+) -> list[dict]:
+    """Apply the longshot guard floor and renormalize.
+
+    `probabilities` is a list of {"market": str, "probability": float}.
+    Returns a NEW list (not in-place) with each probability raised to at
+    least the floor, then the entire vector scaled so it sums to 1.0 if it
+    was a valid distribution to begin with (sum within [0.5, 1.5]). If the
+    sum is outside that band we don't renormalize -- the variant emitted
+    something unusable and the server will normalize at its end.
+    """
+    if not probabilities:
+        return probabilities
+    floor = longshot_guard_floor(n_outcomes)
+    floored = [
+        {"market": p["market"], "probability": max(floor, float(p["probability"]))}
+        for p in probabilities
+    ]
+    total = sum(p["probability"] for p in floored)
+    if 0.5 <= total <= 1.5 and total > 0:
+        # Renormalize but preserve the floor: shrink excess proportionally
+        # from values ABOVE the floor only.
+        excess = total - 1.0
+        if abs(excess) < 1e-9:
+            return floored
+        above_floor = [p for p in floored if p["probability"] > floor + 1e-9]
+        slack = sum(p["probability"] - floor for p in above_floor)
+        if slack > 0 and excess > 0:
+            # Trim excess from above-floor entries proportional to their slack
+            scale = (slack - excess) / slack if slack > excess else 0.0
+            for p in above_floor:
+                p["probability"] = floor + (p["probability"] - floor) * max(0.0, scale)
+        elif excess < 0:
+            # Distribute the missing mass evenly across all outcomes
+            add = -excess / len(floored)
+            for p in floored:
+                p["probability"] += add
+    return floored
 
 
 def _yes_outcome(event: dict) -> str | None:
@@ -624,6 +684,8 @@ def predict_multi_outcome(event: dict) -> dict:
                     p = prior
             prob_list.append({"market": o, "probability": p})
         rationale = str(parsed.get("rationale", ""))[:300]
+        # Kalshi longshot guard: floor at max(0.05, 0.5/n) and renormalize.
+        prob_list = apply_longshot_guard(prob_list, len(outs))
         return {
             "p_yes": prob_list[0]["probability"],
             "rationale": rationale,
@@ -790,9 +852,13 @@ def predict_hybrid_routed(event: dict) -> dict:
                 {"market": outs[0], "probability": p},
                 {"market": outs[1], "probability": max(0.0, 1.0 - p)},
             ]
+        # Kalshi longshot guard: for n=2 the floor is 0.25, clamping
+        # binary predictions to [0.25, 0.75]. The Kalshi paper finding
+        # is mandatory per project_locked_strategic_decisions memory.
+        probs = apply_longshot_guard(probs, n)
         return {
-            "p_yes": p,
-            "rationale": f"hybrid(binary->gpt55): {base.get('rationale','')[:240]}",
+            "p_yes": probs[0]["probability"] if probs else p,
+            "rationale": f"hybrid(binary->gpt55+guard): {base.get('rationale','')[:240]}",
             "probabilities": probs,
         }
     # Multi-outcome path

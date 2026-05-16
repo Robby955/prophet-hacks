@@ -691,6 +691,76 @@ def _parse_multi_outcome_json(text: str) -> dict:
     raise ValueError(f"unparseable multi-outcome model output: {text[:200]}")
 
 
+_BINARY_QUESTION_RE = re.compile(
+    r"^\s*(will|does|is|has|have|had|are|was|were|can|could|should|would|do|did|may|might)\s",
+    re.IGNORECASE,
+)
+_HAIKU_MODEL = os.environ.get("PROPHET_INFERENCE_MODEL", "claude-haiku-4-5-20251001")
+
+
+def _infer_outcomes_when_missing(event: dict) -> list[str]:
+    """Real safety net: if PA's /predict webhook sends an event WITHOUT
+    `outcomes`, our pipeline would return `probabilities: []` -- worst
+    possible Brier. Investigation 2026-05-16 showed PA's /forecast/events
+    endpoint returns outcomes=[] for all 18 closed events it exposes,
+    so the live webhook shape is uncertain.
+
+    Strategy when outcomes is missing or empty:
+      1. If title matches a binary question pattern ("Will X?", "Does Y?",
+         etc.), return ["Yes", "No"]. Covers most prediction-market shapes.
+      2. Else, fire a cheap Haiku 4.5 call to infer 2-6 plausible outcomes.
+      3. Last resort: ["Yes", "No"].
+
+    Always logs a WARNING when inference fires, so we know in production
+    if PA is sending the light shape. Caller should flag in the response
+    metadata so /predictions can show that inference happened.
+    """
+    existing = event.get("outcomes") or []
+    if existing:
+        return list(existing)
+
+    title = (event.get("title") or "").strip()
+    if not title:
+        return []
+
+    log.warning(
+        "outcomes missing for %s; inferring from title=%r",
+        event.get("market_ticker", "?"), title[:80],
+    )
+
+    if _BINARY_QUESTION_RE.match(title):
+        return ["Yes", "No"]
+
+    try:
+        prompt = (
+            f"Question: {title}\n"
+            f"Category: {event.get('category','')}\n"
+            f"Rules: {(event.get('rules') or '')[:300]}\n\n"
+            "Return ONLY a JSON array of 2-6 plausible distinct outcome "
+            "strings. No prose. No commentary. Example shapes:\n"
+            '  ["Yes", "No"]\n'
+            '  ["Democrat", "Republican", "Third party"]\n'
+            '  ["Kansas City Chiefs", "Philadelphia Eagles", "Other"]'
+        )
+        resp = _aclient().messages.create(
+            model=_HAIKU_MODEL,
+            max_tokens=200,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = resp.content[0].text.strip() if resp.content else ""
+        m = re.search(r"\[\s*\"[^\[\]]*?\"\s*(?:,\s*\"[^\[\]]*?\"\s*)*\]", text, re.DOTALL)
+        if m:
+            arr = json.loads(m.group())
+            if isinstance(arr, list) and 2 <= len(arr) <= 10:
+                clean = [str(o).strip() for o in arr if str(o).strip()]
+                if 2 <= len(clean) <= 10:
+                    return clean
+    except Exception as e:
+        log.warning("Haiku outcome inference failed: %s", e)
+
+    return ["Yes", "No"]
+
+
 def _match_outcome_label(raw_key: str, candidates: list[str]) -> str | None:
     """Resolve a raw model-emitted key to the closest candidate outcome label.
 
@@ -1137,15 +1207,24 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
             "evidence_urls": [<str>, ...],
         }
     """
-    outs = event.get("outcomes") or []
+    # Safety net: PA's /predict webhook *may* send events without outcomes.
+    # If we got here with outcomes already present, this is a no-op.
+    # If not, infer them (binary heuristic, then Haiku fallback). Anything
+    # is better than returning probabilities=[] which scores worst-case.
+    outcomes_inferred = not bool(event.get("outcomes"))
+    outs = _infer_outcomes_when_missing(event)
     n = len(outs)
     if n == 0:
         return {
             "p_yes": 0.5,
-            "rationale": "no outcomes",
+            "rationale": "no outcomes and no title to infer from",
             "probabilities": [],
             "evidence_urls": [],
         }
+    if outcomes_inferred:
+        # Splice inferred outcomes back onto the event so downstream prompt
+        # builders (which read event.get("outcomes")) see them.
+        event = {**event, "outcomes": outs}
 
     # ---- 1-3. Retrieve evidence (degrade gracefully). ----
     if not os.environ.get("BRAVE_SEARCH_API_KEY"):

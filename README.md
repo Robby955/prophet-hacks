@@ -12,6 +12,7 @@ runbook are useful portfolio artifacts.
 
 | Item | Value |
 | --- | --- |
+| Root site | <https://forecastingpath.com/> once the apex domain is bound |
 | Dashboard | <https://agent.forecastingpath.com/dashboard> |
 | Predict endpoint | `POST https://agent.forecastingpath.com/predict` |
 | Health | <https://agent.forecastingpath.com/healthz> |
@@ -25,6 +26,9 @@ The production service is configured by `railway.toml` and starts with:
 ```bash
 /opt/venv/bin/uvicorn forecast_agent_server:app --host 0.0.0.0 --port $PORT
 ```
+
+The FastAPI root route redirects to `/dashboard`, so the apex domain can point
+at this same service once Railway and Cloudflare DNS are bound.
 
 ## Install
 

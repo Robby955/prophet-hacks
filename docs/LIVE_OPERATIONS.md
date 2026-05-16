@@ -11,6 +11,7 @@ Current handoff for the Prophet Hacks forecasting endpoint.
 | Track | Forecasting |
 | Host | Railway project `mindful-unity`, service `oracles-agent`, environment `production` |
 | Predict endpoint | `POST https://agent.forecastingpath.com/predict` |
+| Root site | `https://forecastingpath.com/` once apex DNS and Railway custom domain are bound |
 | Health URL | `https://agent.forecastingpath.com/healthz` |
 | Dashboard | `https://agent.forecastingpath.com/dashboard` |
 | FastAPI docs | `https://agent.forecastingpath.com/docs` |
@@ -44,6 +45,9 @@ active, with no calls yet from the platform and no open forecast events.
 
 The dashboard keeps only in-memory recent predictions. A Railway restart clears
 the dashboard history but does not affect Prophet Arena's scored records.
+
+The app root redirects to `/dashboard`. Once `forecastingpath.com` is bound to
+the Railway service, the apex domain will open the same live monitor.
 
 ## Deploy
 
@@ -165,3 +169,30 @@ Then hit `/healthz`. The `variant` field should be `multi_outcome_retrieval`.
 Prefer a new deploy from a known-good commit over force-pushing or deleting
 deployments. Current known-good production commit after the dashboard mobile
 fix is `64ac36c`.
+
+## Apex Domain Fix
+
+Current DNS state: `agent.forecastingpath.com` resolves through Cloudflare to
+Railway, but `forecastingpath.com` has no apex record. Cloudflare nameservers
+are already active for the zone.
+
+The Railway account in this shell cannot add custom domains; both Railway MCP
+and CLI return `Unauthorized. Please run railway login again.` Finish it in the
+Railway UI:
+
+1. Open Railway project `mindful-unity`.
+2. Open service `oracles-agent`.
+3. Go to Settings -> Networking -> Custom Domain.
+4. Add `forecastingpath.com`, target port `8080`.
+5. Copy the DNS target Railway shows.
+6. In Cloudflare DNS, add a `CNAME` record:
+   - Name: `@`
+   - Target: the Railway target from step 5
+   - Proxy status: DNS only until Railway validates the certificate
+
+After DNS propagates:
+
+```bash
+dig +short forecastingpath.com
+curl -I -L https://forecastingpath.com/
+```

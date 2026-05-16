@@ -36,16 +36,20 @@
   <div><div class="label">endpoint</div><div class="value"><span class="pill live">LIVE on Railway</span></div></div>
   <div><div class="label">variant served</div><div class="value">multi_outcome_retrieval</div></div>
   <div><div class="label">first call</div><div class="value"><span class="pill wait">waiting</span></div></div>
-  <div><div class="label">latest deploy</div><div class="value">a4acf1aa SUCCESS</div></div>
+  <div><div class="label">root domain</div><div class="value"><span class="pill wait">needs DNS</span></div></div>
 </div>
 
 <h2>Production endpoint</h2>
 <ul>
+  <li><code>GET https://forecastingpath.com/</code> - redirects to the live dashboard after apex DNS is bound</li>
   <li><code>POST <a href="https://agent.forecastingpath.com/predict">https://agent.forecastingpath.com/predict</a></code></li>
   <li><code>GET <a href="https://agent.forecastingpath.com/healthz">/healthz</a></code> - health JSON</li>
   <li><code>GET <a href="https://agent.forecastingpath.com/dashboard">/dashboard</a></code> - live dashboard</li>
   <li><code>GET <a href="https://agent.forecastingpath.com/docs">/docs</a></code> - FastAPI docs</li>
 </ul>
+
+<h2>Apex domain</h2>
+<p><code>agent.forecastingpath.com</code> is live. The apex <code>forecastingpath.com</code> still needs a Railway custom-domain binding plus a Cloudflare <code>CNAME @</code> record to the Railway target. See <a href="LIVE_OPERATIONS.md">LIVE_OPERATIONS.md</a> for the exact UI steps.</p>
 
 <h2>Current behavior</h2>
 <ol>

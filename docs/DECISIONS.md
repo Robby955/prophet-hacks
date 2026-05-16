@@ -141,3 +141,11 @@ rationale, who or what made it, and any related commit SHA.
 - Rationale: the repo had outgrown its trading-skeleton README and several status artifacts still said `multi_outcome` or quick tunnel. Future agents need one reliable source of current deployment truth before touching forecasting logic.
 - Decided by: Codex orientation pass after Railway, GitHub PR, and Prophet Arena endpoint checks.
 - Commit: this branch.
+
+## 2026-05-16 · app root redirects to live dashboard
+
+- `GET /` now redirects to `/dashboard` with HTTP 307. Once `forecastingpath.com` is bound to the Railway service, the apex domain will open the live monitor instead of a bare JSON API stub.
+- Added direct FastAPI endpoint tests for root redirect, `/healthz`, `/predict` response shape, and `/favicon.ico`.
+- Railway custom-domain creation for `forecastingpath.com` is still blocked from this shell by `Unauthorized. Please run railway login again.` Manual Railway UI plus Cloudflare DNS steps are documented in `docs/LIVE_OPERATIONS.md`.
+- Decided by: Codex after confirming `agent.forecastingpath.com` works and apex `forecastingpath.com` lacks an A/AAAA/CNAME answer.
+- Commit: this branch.

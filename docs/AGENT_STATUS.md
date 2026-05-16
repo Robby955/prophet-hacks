@@ -25,10 +25,10 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 
 ## codex/main-orientation
 
-- **Current task:** Repo and live-service orientation complete; documentation drift corrected.
-- **Files owned this session:** `README.md`, `.env.example`, `forecast_agent_server.py`, `docs/STATUS.yaml`, `docs/STATUS.html`, `docs/LIVE_OPERATIONS.md`, `docs/AGENT_STATUS.md`
-- **Last updated:** 2026-05-16T18:25:03Z
-- **Notes:** Verification passed with 61 tests, smoke import, dry-run smoke, status YAML parse, and public health checks.
+- **Current task:** Root-domain dashboard redirect and apex DNS handoff.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `README.md`, `docs/STATUS.yaml`, `docs/STATUS.html`, `docs/LIVE_OPERATIONS.md`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-16T18:33:17Z
+- **Notes:** Railway custom-domain creation is blocked by local auth; app root now redirects to `/dashboard` once the apex domain points at the service.
 
 ## (template) <agent or worktree name>
 

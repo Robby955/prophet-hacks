@@ -15,6 +15,8 @@ event:
   primary_track: "forecasting"
 
 production:
+  root_url: "https://forecastingpath.com/"
+  root_url_status: "blocked on apex Railway custom-domain binding plus Cloudflare DNS record"
   endpoint_url: "https://agent.forecastingpath.com/predict"
   health_url: "https://agent.forecastingpath.com/healthz"
   dashboard_url: "https://agent.forecastingpath.com/dashboard"
@@ -34,6 +36,7 @@ production:
   last_run_n_predictions: null
   variant_served: "multi_outcome_retrieval"
   current_public_state: "healthy, waiting for first Prophet Arena call"
+  root_route_behavior: "redirects to /dashboard once a hostname points at the service"
 
 repo:
   remote: "git@github.com:Robby955/prophet-hacks.git"

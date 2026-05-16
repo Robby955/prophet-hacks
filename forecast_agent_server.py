@@ -50,7 +50,12 @@ from typing import Any
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, Response, StreamingResponse
+from fastapi.responses import (
+    HTMLResponse,
+    RedirectResponse,
+    Response,
+    StreamingResponse,
+)
 from pydantic import BaseModel, Field
 
 load_dotenv()
@@ -189,13 +194,9 @@ def healthz() -> dict[str, Any]:
     }
 
 
-@app.get("/")
-def root() -> dict[str, str]:
-    return {
-        "service": "The Oracles forecast agent",
-        "endpoint": "POST /predict",
-        "health": "GET /healthz",
-    }
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse(url="/dashboard", status_code=307)
 
 
 @app.get("/favicon.ico", include_in_schema=False)

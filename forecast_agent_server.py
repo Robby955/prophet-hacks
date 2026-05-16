@@ -84,6 +84,7 @@ _VARIANT_FN = {
     "sonnet_cot": forecast_track.predict_sonnet_cot,
     "sonnet_cot_shrink": forecast_track.predict_sonnet_cot_shrink,
     "multi_outcome": forecast_track.predict_multi_outcome,
+    "multi_outcome_sc3": forecast_track.predict_multi_outcome_sc3,
 }.get(_VARIANT_NAME, forecast_track.predict_single_llm)
 
 

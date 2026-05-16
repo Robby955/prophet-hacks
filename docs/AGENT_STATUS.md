@@ -82,6 +82,13 @@ and `curl -s https://agent.forecastingpath.com/healthz | jq .commit`.
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.
 
+## codex/sae-variant
+
+- **Current task:** Offline SAE variant wired and measured; `/compare` reliability diagram and `/compare-open` multi-model matrix added. Verifying branch before handoff/merge decision.
+- **Files owned this session:** `forecast_track.py`, `forecast_agent_server.py`, `scripts/backtest_forecast.py`, `tests/test_forecast_track_sae.py`, `tests/test_forecast_agent_server.py`, `data/predictions/ablation_open_*.json`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-16T21:55:30Z
+- **Notes:** Worktree branch: `.claude/worktrees/codex-sae-variant` / `codex/sae-variant`. `multi_outcome_retrieval_sae` backtest scored Brier `0.11567` vs production `0.03791`, so it is not a promotion candidate. Production `PROPHET_AGENT_VARIANT` remains untouched. Open-event ablations for Opus 4.6, Sonnet 4.6, and GPT-5.2 are generated for all three datasets and surfaced as a p(outcome[0]) spread matrix on `/compare-open`.
+
 ## codex/cicd-healthz-fix
 
 - **Current task:** Fix `/healthz.commit` returning `dev` after the first deploy-wrapper implementation.

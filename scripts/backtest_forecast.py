@@ -48,6 +48,7 @@ VARIANTS = {
     "multi_outcome": forecast_track.predict_multi_outcome,
     "multi_outcome_sc3": forecast_track.predict_multi_outcome_sc3,
     "multi_outcome_retrieval": forecast_track.predict_multi_outcome_retrieval,
+    "multi_outcome_retrieval_sae": forecast_track.predict_multi_outcome_retrieval_sae,
     "hybrid_routed": forecast_track.predict_hybrid_routed,
 }
 

@@ -1,0 +1,732 @@
+{
+  "timestamp": "2026-05-16T16:49:07Z",
+  "model": "anthropic/claude-sonnet-4-6",
+  "predictions": [
+    {
+      "market_ticker": "KXECONSTATCPICORE-26MAY",
+      "p_yes": 0.0625,
+      "rationale": "Core CPI for May 2026 is most likely in the 0.2%-0.3% range based on recent April 2026 consensus of 0.3% and market pricing showing very low probability (~6%) for negative readings; negative outcomes near mechanically low market-implied probabilities.",
+      "probabilities": [
+        {
+          "market": "Exactly -0.2%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly -0.1%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 0.0%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 0.1%",
+          "probability": 0.13793103448275862
+        },
+        {
+          "market": "Exactly 0.2%",
+          "probability": 0.25
+        },
+        {
+          "market": "Exactly 0.3%",
+          "probability": 0.25
+        },
+        {
+          "market": "Exactly 0.4%",
+          "probability": 0.11206896551724138
+        },
+        {
+          "market": "Exactly 0.5%",
+          "probability": 0.0625
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/cpi/",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+        "https://octagonai.co/markets/economics/inflation/cpi-month-over-month-in-may-2026/",
+        "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-05-11/"
+      ]
+    },
+    {
+      "market_ticker": "KXECONSTATCPIYOY-26MAY",
+      "p_yes": 0.05,
+      "rationale": "April 2026 C-CPI-U at 3.6% YoY suggests headline CPI around 2.7-3.0%, centering probability mass there with spread across adjacent values given one month's uncertainty.",
+      "probabilities": [
+        {
+          "market": "Exactly 2.0%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.1%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.2%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.3%",
+          "probability": 0.05408163265306122
+        },
+        {
+          "market": "Exactly 2.4%",
+          "probability": 0.05816326530612245
+        },
+        {
+          "market": "Exactly 2.5%",
+          "probability": 0.06632653061224489
+        },
+        {
+          "market": "Exactly 2.6%",
+          "probability": 0.07448979591836734
+        },
+        {
+          "market": "Exactly 2.7%",
+          "probability": 0.08265306122448979
+        },
+        {
+          "market": "Exactly 2.8%",
+          "probability": 0.08673469387755102
+        },
+        {
+          "market": "Exactly 2.9%",
+          "probability": 0.08265306122448979
+        },
+        {
+          "market": "Exactly 3.0%",
+          "probability": 0.07448979591836734
+        },
+        {
+          "market": "Exactly 3.1%",
+          "probability": 0.06224489795918367
+        },
+        {
+          "market": "Exactly 3.2%",
+          "probability": 0.05816326530612245
+        },
+        {
+          "market": "Exactly 3.3%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 3.4%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 3.5%",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/news.release/cpi.nr0.htm",
+        "https://www.investing.com/economic-calendar/cpi-733",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting"
+      ]
+    },
+    {
+      "market_ticker": "KXHOUSINGSTART-26MAY21",
+      "p_yes": 0.45,
+      "rationale": "With January 2026 at 1.487M but March showing permit declines due to rising mortgage rates (back to ~6.4-6.5% by April), the central estimate for April 2026 housing starts is around 1.38-1.45M, making outcomes above 1.400M roughly a coin flip with decreasing probability for higher thresholds.",
+      "probabilities": [
+        {
+          "market": "Above 1.400M",
+          "probability": 0.45
+        },
+        {
+          "market": "Above 1.425M",
+          "probability": 0.35
+        },
+        {
+          "market": "Above 1.450M",
+          "probability": 0.27
+        },
+        {
+          "market": "Above 1.475M",
+          "probability": 0.2
+        },
+        {
+          "market": "Above 1.500M",
+          "probability": 0.14
+        },
+        {
+          "market": "Above 1.525M",
+          "probability": 0.1
+        },
+        {
+          "market": "Above 1.550M",
+          "probability": 0.07
+        },
+        {
+          "market": "Above 1.575M",
+          "probability": 0.0625
+        }
+      ],
+      "evidence_urls": [
+        "https://economics.td.com/us-housing-starts-and-permits",
+        "https://tradingeconomics.com/united-states/housing-starts",
+        "https://shopprop.com/go/guides/may-2026-housing-market-update/",
+        "http://www.forecasts.org/house.htm",
+        "https://ycharts.com/indicators/housing_starts"
+      ]
+    },
+    {
+      "market_ticker": "KXDEGDPQOQF-26MAY22",
+      "p_yes": 0.97,
+      "rationale": "Destatis flash estimate of ~0.5% QoQ (Polymarket) or 0.3% (FocusEconomics) places Germany's Q1 2026 GDP growth clearly positive, making all negative thresholds near-certain YES and creating uncertainty mainly around the 0.3-0.5% boundary.",
+      "probabilities": [
+        {
+          "market": "Above -0.4%",
+          "probability": 0.97
+        },
+        {
+          "market": "Above -0.3%",
+          "probability": 0.97
+        },
+        {
+          "market": "Above -0.2%",
+          "probability": 0.97
+        },
+        {
+          "market": "Above -0.1%",
+          "probability": 0.96
+        },
+        {
+          "market": "Above -0.0%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above 0.1%",
+          "probability": 0.93
+        },
+        {
+          "market": "Above 0.2%",
+          "probability": 0.9
+        },
+        {
+          "market": "Above 0.3%",
+          "probability": 0.75
+        },
+        {
+          "market": "Above 0.4%",
+          "probability": 0.65
+        },
+        {
+          "market": "Above 0.5%",
+          "probability": 0.35
+        },
+        {
+          "market": "Above 0.6%",
+          "probability": 0.1
+        },
+        {
+          "market": "Above 0.7%",
+          "probability": 0.06
+        },
+        {
+          "market": "Above 0.8%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 0.9%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.0%",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/germany-gdp-growth-in-q1-2026",
+        "https://octagonai.co/markets/economics/gdp/germany-gdp-growth-rate-yoy-flash-for-q1-2026/",
+        "https://tradingeconomics.com/germany/gdp-growth",
+        "https://www.focus-economics.com/countries/germany/news/gdp/germany-national-accounts-p-30-04-2026-economic-growth-accelerates-in-the-first-quarter-of-2026/",
+        "https://economy-finance.ec.europa.eu/economic-surveillance-eu-member-states/country-pages/germany/economic-forecast-germany_en"
+      ]
+    },
+    {
+      "market_ticker": "KXESGDPQOQF-26JUN25",
+      "p_yes": 0.95,
+      "rationale": "Spain's Q1 2026 QoQ GDP growth was reported at exactly 0.6%, making all thresholds up to and including 0.5% clearly met, while thresholds strictly above 0.6% are almost certainly not met.",
+      "probabilities": [
+        {
+          "market": "Above -0.1%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above -0.0%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above 0.1%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above 0.2%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above 0.3%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above 0.4%",
+          "probability": 0.95
+        },
+        {
+          "market": "Above 0.5%",
+          "probability": 0.93
+        },
+        {
+          "market": "Above 0.6%",
+          "probability": 0.07
+        },
+        {
+          "market": "Above 0.7%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 0.8%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 0.9%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.0%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.1%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.2%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.3%",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.generationwealth.es/en/latest-economic-news/spain-economy-may-2026-gdp-inflation-energy-outlook",
+        "https://economy-finance.ec.europa.eu/economic-surveillance-eu-member-states/country-pages/spain/economic-forecast-spain_en",
+        "https://www.bbvaresearch.com/en/publicaciones/spain-economic-outlook-march-2026/",
+        "https://www.caixabankresearch.com/en/economics-markets/recent-developments/spanish-economy-faces-2026-optimism",
+        "https://www.focus-economics.com/countries/spain/news/gdp/spain-national-accounts-p-30-04-2026-economic-growth-slows-in-the-first-quarter-of-2026/"
+      ]
+    },
+    {
+      "market_ticker": "KXCBDECISIONAUSTRALIA-26JUN16",
+      "p_yes": 0.1,
+      "rationale": "RBA is in gradual easing cycle at 3.60%, making a standard 25bp cut or hold most likely by June 2026, with cuts larger than 25bps highly unusual for RBA and hikes very unlikely given current trajectory.",
+      "probabilities": [
+        {
+          "market": "Cut more than 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Cut 1-25bps",
+          "probability": 0.33076923076923076
+        },
+        {
+          "market": "Maintain current rate",
+          "probability": 0.36923076923076914
+        },
+        {
+          "market": "Hike 1-25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Hike more than 25bps",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.rba.gov.au/media-releases/2026/mr-26-12.html",
+        "https://www.cnbc.com/2026/05/05/australia-central-bank-rate-hike-inflation-rba.html",
+        "https://thetimes.com.au/world/46346-why-the-reserve-bank-of-australia-has-held-rates-and-what-it-means-for-2026"
+      ]
+    },
+    {
+      "market_ticker": "KXCBDECISIONJAPAN-26JUN15",
+      "p_yes": 0.1,
+      "rationale": "BOJ held at 0.75% in April amid Iran war uncertainty with 3 hawkish dissenters; June outcome is split between another hold and a 25bps hike to 1.0%, with cuts essentially off the table given the ongoing tightening cycle.",
+      "probabilities": [
+        {
+          "market": "Cut more than 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Cut 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Maintain current rate",
+          "probability": 0.40000000000000013
+        },
+        {
+          "market": "Hike 25bps",
+          "probability": 0.30000000000000004
+        },
+        {
+          "market": "Hike more than 25bps",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.reuters.com/world/asia-pacific/view-investors-react-bojs-decision-hold-rates-2026-04-28/",
+        "https://www.cnbc.com/2026/04/28/bank-of-japan-keeps-policy-rate-steady-cpi-iran-war-gdp.html",
+        "https://tradingeconomics.com/japan/interest-rate",
+        "https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k260428a.pdf"
+      ]
+    },
+    {
+      "market_ticker": "KXUSTYLD-10Y26JUN30",
+      "p_yes": 0.85,
+      "rationale": "With 10-year yields currently near 4.3-4.4% and ~13 months of uncertainty, I model a distribution centered ~4.2% (modest Fed cut expectations) with ~65bps standard deviation, giving declining probabilities from ~85% at 3.60% threshold down to ~8% at 5.00%.",
+      "probabilities": [
+        {
+          "market": "Above 3.60%",
+          "probability": 0.85
+        },
+        {
+          "market": "Above 3.70%",
+          "probability": 0.82
+        },
+        {
+          "market": "Above 3.80%",
+          "probability": 0.78
+        },
+        {
+          "market": "Above 3.90%",
+          "probability": 0.73
+        },
+        {
+          "market": "Above 4.00%",
+          "probability": 0.67
+        },
+        {
+          "market": "Above 4.10%",
+          "probability": 0.6
+        },
+        {
+          "market": "Above 4.20%",
+          "probability": 0.53
+        },
+        {
+          "market": "Above 4.30%",
+          "probability": 0.46
+        },
+        {
+          "market": "Above 4.40%",
+          "probability": 0.39
+        },
+        {
+          "market": "Above 4.50%",
+          "probability": 0.32
+        },
+        {
+          "market": "Above 4.60%",
+          "probability": 0.26
+        },
+        {
+          "market": "Above 4.70%",
+          "probability": 0.2
+        },
+        {
+          "market": "Above 4.80%",
+          "probability": 0.15
+        },
+        {
+          "market": "Above 4.90%",
+          "probability": 0.11
+        },
+        {
+          "market": "Above 5.00%",
+          "probability": 0.08
+        }
+      ],
+      "evidence_urls": [
+        "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value=2026",
+        "https://streetstats.finance/rates/treasuries/",
+        "https://ycharts.com/indicators/10_year_treasury_rate",
+        "https://fred.stlouisfed.org/series/DGS10",
+        "https://www.bloomberg.com/markets/rates-bonds/government-bonds/us"
+      ]
+    },
+    {
+      "market_ticker": "KXCBDECISIONCANADA-26JUL",
+      "p_yes": 0.1,
+      "rationale": "Bank of Canada has paused its cutting cycle at 2.25% with inflation risks rising and market expectations shifting toward potential hikes rather than cuts by mid-2026, making 'Maintains rate' most likely but 'Hike 25bps' a meaningful second possibility.",
+      "probabilities": [
+        {
+          "market": "Cut >25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Cut 25bps",
+          "probability": 0.11612903225806451
+        },
+        {
+          "market": "Maintains rate",
+          "probability": 0.43870967741935485
+        },
+        {
+          "market": "Hike 25bps",
+          "probability": 0.24516129032258063
+        },
+        {
+          "market": "Hike >25bps",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bankofcanada.ca/2026/04/fad-press-release-2026-04-29/",
+        "https://www.nesto.ca/mortgage-basics/bank-of-canada-interest-rate-schedule/",
+        "https://equalsmoney.com/economic-calendar/events/boc-interest-rate-decision"
+      ]
+    },
+    {
+      "market_ticker": "KXECONSTATCORECPIYOY-26JUN",
+      "p_yes": 0.05,
+      "rationale": "With core CPI at 2.8% in April 2026 and accelerating, June 2026 is most likely to land in the 2.8-3.1% range, with probability centered around 2.9-3.0%.",
+      "probabilities": [
+        {
+          "market": "Exactly 2.2%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.3%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.4%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.5%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 2.6%",
+          "probability": 0.059756097560975614
+        },
+        {
+          "market": "Exactly 2.7%",
+          "probability": 0.06951219512195123
+        },
+        {
+          "market": "Exactly 2.8%",
+          "probability": 0.08902439024390245
+        },
+        {
+          "market": "Exactly 2.9%",
+          "probability": 0.09390243902439026
+        },
+        {
+          "market": "Exactly 3.0%",
+          "probability": 0.08902439024390245
+        },
+        {
+          "market": "Exactly 3.1%",
+          "probability": 0.07926829268292684
+        },
+        {
+          "market": "Exactly 3.2%",
+          "probability": 0.06463414634146342
+        },
+        {
+          "market": "Exactly 3.3%",
+          "probability": 0.054878048780487805
+        },
+        {
+          "market": "Exactly 3.4%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 3.5%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 3.6%",
+          "probability": 0.05
+        },
+        {
+          "market": "Exactly 3.7%",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/cpi/",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+        "https://tradingeconomics.com/united-states/inflation-cpi"
+      ]
+    },
+    {
+      "market_ticker": "KXECONSTATCPI-26JUN",
+      "p_yes": 0.05555555555555555,
+      "rationale": "No specific June 2026 CPI forecasts available; using historical base rates for monthly CPI MoM readings, centered around 0.1-0.3% given moderating but uncertain inflation environment, with modest probability on negative readings.",
+      "probabilities": [
+        {
+          "market": "Exactly -0.2%",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Exactly -0.1%",
+          "probability": 0.07876230661040788
+        },
+        {
+          "market": "Exactly 0.0%",
+          "probability": 0.09774964838255978
+        },
+        {
+          "market": "Exactly 0.1%",
+          "probability": 0.17369901547116737
+        },
+        {
+          "market": "Exactly 0.2%",
+          "probability": 0.21167369901547117
+        },
+        {
+          "market": "Exactly 0.3%",
+          "probability": 0.17369901547116737
+        },
+        {
+          "market": "Exactly 0.4%",
+          "probability": 0.09774964838255978
+        },
+        {
+          "market": "Exactly 0.5%",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Exactly 0.6%",
+          "probability": 0.05555555555555555
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/schedule/news_release/cpi.htm",
+        "https://www.investing.com/economic-calendar/cpi-733",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+        "https://cpiinflationcalculator.com/2026-u-s-inflation-rate-cpi/"
+      ]
+    },
+    {
+      "market_ticker": "KXAAAGASED-26NOV03",
+      "p_yes": 0.92,
+      "rationale": "With current US gas prices around $3.10-3.30 in early 2025 and downward pressure from oil markets, prices above $2.50-$2.75 are near-certain for Nov 2026, while $3.00-$3.25 is moderately likely; higher thresholds require supply shocks that are possible but not the base case.",
+      "probabilities": [
+        {
+          "market": "Above 2.50",
+          "probability": 0.92
+        },
+        {
+          "market": "Above 2.75",
+          "probability": 0.85
+        },
+        {
+          "market": "Above 3.00",
+          "probability": 0.7
+        },
+        {
+          "market": "Above 3.25",
+          "probability": 0.55
+        },
+        {
+          "market": "Above 3.50",
+          "probability": 0.4
+        },
+        {
+          "market": "Above 3.75",
+          "probability": 0.28
+        },
+        {
+          "market": "Above 4.00",
+          "probability": 0.18
+        },
+        {
+          "market": "Above 4.25",
+          "probability": 0.12
+        },
+        {
+          "market": "Above 4.50",
+          "probability": 0.08
+        },
+        {
+          "market": "Above 4.75",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 5.00",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMM_EPMR_PTE_NUS_DPG&f=W",
+        "https://gasprices.aaa.com/state-gas-price-averages/",
+        "https://www.finder.com/economics/gas-prices",
+        "https://ycharts.com/indicators/us_gas_price"
+      ]
+    },
+    {
+      "market_ticker": "KXFED-26SEP",
+      "p_yes": 0.88,
+      "rationale": "Current upper bound is 3.75% (May 2026); by September 2026, modest cuts are most likely, making outcomes above 3.25-3.50% roughly a coin flip, with higher thresholds increasingly unlikely and lower thresholds near-certain.",
+      "probabilities": [
+        {
+          "market": "Above 2.75%",
+          "probability": 0.88
+        },
+        {
+          "market": "Above 3.00%",
+          "probability": 0.78
+        },
+        {
+          "market": "Above 3.25%",
+          "probability": 0.62
+        },
+        {
+          "market": "Above 3.50%",
+          "probability": 0.52
+        },
+        {
+          "market": "Above 3.75%",
+          "probability": 0.22
+        },
+        {
+          "market": "Above 4.00%",
+          "probability": 0.1
+        },
+        {
+          "market": "Above 4.25%",
+          "probability": 0.06
+        },
+        {
+          "market": "Above 4.50%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 4.75%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 5.00%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 5.25%",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260318a.htm",
+        "https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast",
+        "https://equalsmoney.com/economic-calendar/events/fed-interest-rate-decision",
+        "https://www.forbes.com/sites/investor-hub/article/fed-meeting-tracker-interest-rate-strategy/",
+        "https://fred.stlouisfed.org/series/DFEDTARU"
+      ]
+    }
+  ]
+}

@@ -30,11 +30,17 @@ import math
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse
 
 import httpx
 from dotenv import load_dotenv
+
+from forecasting.borrowed_strength import (
+    BorrowedStrengthInputs,
+    borrowed_strength_estimate,
+)
 
 
 load_dotenv()
@@ -1172,7 +1178,119 @@ def _build_retrieval_user_prompt(event: dict, chunks: list[dict]) -> str:
     return "\n".join(parts)
 
 
-def predict_multi_outcome_retrieval(event: dict) -> dict:
+def _hours_to_resolution(event: dict) -> float:
+    raw = str(event.get("close_time") or "").strip()
+    if not raw:
+        return 48.0
+    try:
+        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        delta_hours = (dt - datetime.now(timezone.utc)).total_seconds() / 3600.0
+        # Historical backtests contain already-closed events. Treat those as
+        # neutral medium-horizon forecasts rather than "resolves immediately",
+        # otherwise the shrinkage gate would be artificially pessimistic.
+        return delta_hours if delta_hours > 0 else 48.0
+    except ValueError:
+        return 48.0
+
+
+def _event_domain(event: dict) -> str:
+    raw = str(event.get("category") or "other").lower().strip()
+    raw = re.sub(r"[^a-z0-9]+", "_", raw).strip("_")
+    return raw or "other"
+
+
+def _sae_source_quality(chunks: list[dict]) -> float:
+    if not chunks:
+        return 0.35
+    best_priority = min(_domain_priority(c.get("domain") or "") for c in chunks)
+    if best_priority <= 1:
+        return 0.85
+    if best_priority <= 8:
+        return 0.75
+    return min(0.70, 0.45 + 0.05 * len(chunks))
+
+
+def _apply_sae_borrowed_strength(
+    probabilities: list[dict],
+    *,
+    event: dict,
+    chunks: list[dict],
+) -> tuple[list[dict], dict]:
+    """Shrink raw per-outcome model probabilities toward 1/n.
+
+    Prophet's /predict payload does not include live market prices, so this
+    offline experimental variant deliberately uses the uninformed prior as
+    `p_market` and keeps the auditable borrowed-strength pieces that do not
+    require market data: source quality, horizon, domain reliability, and
+    model uncertainty. Do not parse odds out of snippets here.
+    """
+    if not probabilities:
+        return probabilities, {"applied": False, "reason": "no probabilities"}
+
+    n = len(probabilities)
+    prior = 1.0 / n
+    domain = _event_domain(event)
+    hours = _hours_to_resolution(event)
+    source_quality = _sae_source_quality(chunks)
+    retrieval_conflict = 0.0 if chunks else 0.30
+    spread = min(0.20, max(0.02, prior * 0.20))
+    yes_bid = max(0.01, prior - spread)
+    yes_ask = min(0.99, prior + spread)
+
+    shrunk: list[dict] = []
+    audit_rows: list[dict] = []
+    for p in probabilities:
+        market = str(p.get("market") or "")
+        try:
+            raw_p = _clamp(float(p.get("probability", prior)))
+        except (TypeError, ValueError):
+            raw_p = prior
+        result = borrowed_strength_estimate(
+            BorrowedStrengthInputs(
+                p_market=prior,
+                p_models=[(_OPUS_MODEL, raw_p)],
+                domain=domain,
+                source_quality=source_quality,
+                retrieval_conflict=retrieval_conflict,
+                hours_to_resolution=hours,
+                yes_bid=yes_bid,
+                yes_ask=yes_ask,
+                p_history=None,
+                n_history=0,
+            ),
+        )
+        shrunk.append({"market": market, "probability": result.p_final})
+        audit_rows.append({
+            "market": market,
+            "raw_probability": round(raw_p, 6),
+            "shrunk_probability": round(result.p_final, 6),
+            "action": result.action,
+            "weights": result.weights,
+            "uncertainty": {
+                "aggregate": round(result.uncertainty.aggregate, 6),
+                "model_disagreement": round(result.uncertainty.model_disagreement, 6),
+                "retrieval_conflict": round(result.uncertainty.retrieval_conflict, 6),
+                "spread_width": round(result.uncertainty.spread_width, 6),
+                "horizon_proximity": round(result.uncertainty.horizon_proximity, 6),
+            },
+            "decisions": result.decisions,
+        })
+
+    return shrunk, {
+        "applied": True,
+        "p_market_source": "uninformed_prior_1_over_n",
+        "p_market": round(prior, 6),
+        "domain": domain,
+        "hours_to_resolution": round(hours, 3),
+        "source_quality": round(source_quality, 3),
+        "retrieval_conflict": round(retrieval_conflict, 3),
+        "outcomes": audit_rows,
+    }
+
+
+def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = False) -> dict:
     """Brave-search retrieval-augmented multi-outcome forecaster.
 
     Pipeline:
@@ -1222,6 +1340,8 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
         "latency_ms": {},
         "warnings": [],
     }
+    if apply_sae:
+        trace["sae"] = {"applied": False, "reason": "not reached"}
 
     # Safety net: PA's /predict webhook *may* send events without outcomes.
     outcomes_inferred = not bool(event.get("outcomes"))
@@ -1340,16 +1460,42 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
     trace["latency_ms"]["llm"] = int((_time.time() - t_llm) * 1000)
 
     # ---- 5. Apply Kalshi longshot guard (always). ----
+    if apply_sae:
+        prob_list, sae_trace = _apply_sae_borrowed_strength(
+            prob_list,
+            event=event,
+            chunks=chunks,
+        )
+        trace["sae"] = sae_trace
+        rationale = f"sae shrinkage toward 1/{n}: {rationale}"[:300]
+
     guarded = apply_longshot_guard(prob_list, n)
     trace["longshot_guard_applied"] = True
     trace["latency_ms"]["total"] = int((_time.time() - t_start) * 1000)
-    return {
+    out = {
         "p_yes": guarded[0]["probability"] if guarded else 0.5,
         "rationale": rationale,
         "_trace": trace,
         "probabilities": guarded,
         "evidence_urls": evidence_urls,
     }
+    if apply_sae:
+        out["sae"] = trace.get("sae")
+    return out
+
+
+def predict_multi_outcome_retrieval(event: dict) -> dict:
+    return _predict_multi_outcome_retrieval_impl(event, apply_sae=False)
+
+
+def predict_multi_outcome_retrieval_sae(event: dict) -> dict:
+    """Offline experimental retrieval variant with SAE shrinkage.
+
+    This does not change production routing. It uses the exact retrieval +
+    Opus 4.7 parse path, then shrinks each raw outcome probability toward
+    the uninformed 1/n prior using `borrowed_strength_estimate`.
+    """
+    return _predict_multi_outcome_retrieval_impl(event, apply_sae=True)
 
 
 def predict_hybrid_routed(event: dict) -> dict:
@@ -1452,6 +1598,7 @@ __all__ = [
     "predict_multi_outcome",
     "predict_multi_outcome_sc3",
     "predict_multi_outcome_retrieval",
+    "predict_multi_outcome_retrieval_sae",
     "P_YES_MIN",
     "P_YES_MAX",
 ]

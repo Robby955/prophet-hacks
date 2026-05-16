@@ -135,3 +135,75 @@ def test_events_stream_requires_dashboard_auth_when_configured(monkeypatch) -> N
     response = client.get("/events")
 
     assert response.status_code == 401
+
+
+def test_compare_renders_reliability_diagram(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+
+    def fake_compare_data() -> dict:
+        return {
+            "models": ["Opus 4.7 (production)"],
+            "summary": {
+                "Opus 4.7 (production)": {"mean_brier": 0.05, "n": 3},
+            },
+            "events": [
+                {
+                    "ticker": "A",
+                    "title": "Event A",
+                    "category": "Sports",
+                    "n_outcomes": 2,
+                    "winner": "Yes",
+                    "outcomes": ["Yes", "No"],
+                    "models": {
+                        "Opus 4.7 (production)": {
+                            "p_yes": 0.80,
+                            "brier": 0.04,
+                            "rationale": "confident",
+                            "probs": [],
+                        },
+                    },
+                },
+                {
+                    "ticker": "B",
+                    "title": "Event B",
+                    "category": "Politics",
+                    "n_outcomes": 2,
+                    "winner": "No",
+                    "outcomes": ["Yes", "No"],
+                    "models": {
+                        "Opus 4.7 (production)": {
+                            "p_yes": 0.30,
+                            "brier": 0.09,
+                            "rationale": "lean no",
+                            "probs": [],
+                        },
+                    },
+                },
+            ],
+        }
+
+    monkeypatch.setattr(server, "_load_compare_data", fake_compare_data)
+    client = TestClient(server.app)
+
+    response = client.get("/compare")
+
+    assert response.status_code == 200
+    assert "Reliability diagram" in response.text
+    assert "class='reliability-chart'" in response.text
+    assert "Perfect calibration" in response.text
+
+
+def test_compare_open_renders_model_agreement_matrix(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/compare-open")
+
+    assert response.status_code == 200
+    assert "Model agreement matrix" in response.text
+    assert "Opus 4.7 prod" in response.text
+    assert "Opus 4.6" in response.text
+    assert "Sonnet 4.6" in response.text
+    assert "GPT-5.2" in response.text

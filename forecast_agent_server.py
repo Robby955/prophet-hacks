@@ -64,6 +64,10 @@ from pydantic import BaseModel, ConfigDict, Field
 load_dotenv()
 
 import forecast_track  # noqa: E402
+from evaluation.ece import (  # noqa: E402
+    expected_calibration_error,
+    reliability_diagram_data,
+)
 
 
 # In-memory ring buffer of the last N predictions served. Used by /dashboard.
@@ -97,6 +101,7 @@ _VARIANT_COSTS: dict[str, float] = {
     "multi_outcome": 0.010,
     "multi_outcome_sc3": 0.030,
     "multi_outcome_retrieval": 0.10,
+    "multi_outcome_retrieval_sae": 0.10,
     "hybrid_routed": 0.008,
 }
 
@@ -116,6 +121,7 @@ _VARIANT_DESCRIPTIONS: dict[str, str] = {
     "multi_outcome": "ONE Sonnet 4.6 call returns per-outcome probabilities directly (no distribute hack). Kalshi longshot guard applied.",
     "multi_outcome_sc3": "k=3 parallel multi_outcome calls, averaged per-outcome (self-consistency).",
     "multi_outcome_retrieval": "Brave Search → 5 deduped evidence chunks → Opus 4.7 multi-outcome call with market-odds anchoring → Kalshi longshot guard. The current production variant.",
+    "multi_outcome_retrieval_sae": "Offline experimental: production retrieval path plus borrowed-strength shrinkage toward the 1/n prior before the Kalshi longshot guard.",
     "hybrid_routed": "Binary (n<=2): gpt55. Multi (n>2): multi_outcome. Routes by outcome count to play each model's strength.",
 }
 
@@ -143,6 +149,7 @@ _VARIANT_FN = {
     "multi_outcome": forecast_track.predict_multi_outcome,
     "multi_outcome_sc3": forecast_track.predict_multi_outcome_sc3,
     "multi_outcome_retrieval": forecast_track.predict_multi_outcome_retrieval,
+    "multi_outcome_retrieval_sae": forecast_track.predict_multi_outcome_retrieval_sae,
     "hybrid_routed": forecast_track.predict_hybrid_routed,
 }.get(_VARIANT_NAME, forecast_track.predict_single_llm)
 
@@ -1026,6 +1033,92 @@ def _brier_color(b: float | None) -> str:
     return "#fca5a5"  # red-300
 
 
+def _compare_reliability_svg(data: dict[str, Any]) -> str:
+    """Render reliability for p(outcome[0]) on resolved comparison data."""
+    models = data.get("models") or []
+    if not models:
+        return "<div class='reliability-panel'><h2>Reliability diagram</h2><p class='meta'>No model data available.</p></div>"
+    model_label = next((m for m in models if "production" in m.lower()), models[0])
+
+    probs: list[float] = []
+    outcomes: list[int] = []
+    for row in data.get("events", []):
+        outs = row.get("outcomes") or []
+        if not outs:
+            continue
+        pred = (row.get("models") or {}).get(model_label) or {}
+        p_yes = pred.get("p_yes")
+        if p_yes is None:
+            continue
+        probs.append(max(0.0, min(1.0, float(p_yes))))
+        outcomes.append(1 if row.get("winner") == outs[0] else 0)
+
+    if not probs:
+        return (
+            "<div class='reliability-panel'><h2>Reliability diagram</h2>"
+            f"<p class='meta'>No binary p(outcome[0]) rows for {html_escape(model_label)}.</p></div>"
+        )
+
+    bins = reliability_diagram_data(probs, outcomes, n_bins=10)
+    ece = expected_calibration_error(probs, outcomes, n_bins=10)
+    width, height = 520, 280
+    pad_l, pad_r, pad_t, pad_b = 54, 24, 22, 44
+    plot_w = width - pad_l - pad_r
+    plot_h = height - pad_t - pad_b
+
+    def x(p: float) -> float:
+        return pad_l + p * plot_w
+
+    def y(p: float) -> float:
+        return pad_t + (1.0 - p) * plot_h
+
+    grid = []
+    for i in range(0, 11, 2):
+        v = i / 10
+        grid.append(
+            f"<line x1='{x(v):.1f}' y1='{pad_t}' x2='{x(v):.1f}' y2='{height - pad_b}' class='grid-line'/>"
+            f"<line x1='{pad_l}' y1='{y(v):.1f}' x2='{width - pad_r}' y2='{y(v):.1f}' class='grid-line'/>"
+        )
+    points = [
+        f"{x(b.p_mean):.1f},{y(b.outcome_mean):.1f}"
+        for b in bins
+        if b.count > 0
+    ]
+    circles = []
+    for b in bins:
+        if b.count == 0:
+            continue
+        r = min(12, 4 + b.count * 1.5)
+        circles.append(
+            f"<circle cx='{x(b.p_mean):.1f}' cy='{y(b.outcome_mean):.1f}' r='{r:.1f}' class='rel-point'>"
+            f"<title>forecast {b.p_mean:.2f}, observed {b.outcome_mean:.2f}, n={b.count}</title>"
+            "</circle>"
+        )
+    polyline = (
+        f"<polyline points='{' '.join(points)}' class='rel-line'/>"
+        if len(points) >= 2 else ""
+    )
+    count = len(probs)
+    return f"""
+<section class='reliability-panel'>
+  <div>
+    <h2>Reliability diagram</h2>
+    <p class='meta'>Production model calibration on resolved rows: <strong>{html_escape(model_label)}</strong>. Small-n view: {count} outcome[0] probabilities, ECE {ece:.3f}.</p>
+  </div>
+  <svg class='reliability-chart' width='{width}' height='{height}' viewBox='0 0 {width} {height}' role='img' aria-label='Reliability diagram for {html_escape(model_label)}'>
+    {''.join(grid)}
+    <line x1='{pad_l}' y1='{height - pad_b}' x2='{width - pad_r}' y2='{height - pad_b}' class='axis-line'/>
+    <line x1='{pad_l}' y1='{pad_t}' x2='{pad_l}' y2='{height - pad_b}' class='axis-line'/>
+    <line x1='{x(0):.1f}' y1='{y(0):.1f}' x2='{x(1):.1f}' y2='{y(1):.1f}' class='perfect-line'/>
+    {polyline}
+    {''.join(circles)}
+    <text x='{width / 2:.1f}' y='{height - 9}' class='axis-label'>Mean forecast probability</text>
+    <text x='16' y='{height / 2:.1f}' class='axis-label rotate'>Observed frequency</text>
+    <text x='{x(0.58):.1f}' y='{y(0.66):.1f}' class='perfect-label'>Perfect calibration</text>
+  </svg>
+</section>"""
+
+
 @app.get("/compare", response_class=HTMLResponse)
 def compare(
     request: Request,
@@ -1079,6 +1172,7 @@ def compare(
     rows_html = "\n".join(body_rows)
     n_events = len(events)
     summary_html = "\n".join(summary_cells)
+    reliability_html = _compare_reliability_svg(data)
 
     html = f"""<!doctype html>
 <html lang="en"><head>
@@ -1123,6 +1217,20 @@ def compare(
   .legend {{ display: flex; flex-wrap: wrap; gap: 0.6em; margin: 0.7em 0; font-size: 0.85em; }}
   .legend-item {{ display: inline-flex; align-items: center; gap: 0.35em; }}
   .legend-swatch {{ width: 14px; height: 14px; border-radius: 3px; border: 1px solid #cbd5e1; }}
+  .reliability-panel {{ margin: 1.2em 0; background: var(--panel); border: 1px solid var(--border);
+                        border-radius: 8px; padding: 1em; display: grid;
+                        grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1.2fr);
+                        gap: 1em; align-items: center; }}
+  .reliability-panel h2 {{ margin: 0 0 0.3em; font-size: 1.05rem; }}
+  .reliability-chart {{ width: 100%; max-width: 520px; height: auto; }}
+  .grid-line {{ stroke: #e5e7eb; stroke-width: 1; }}
+  .axis-line {{ stroke: #64748b; stroke-width: 1.2; }}
+  .perfect-line {{ stroke: #64748b; stroke-width: 1.2; stroke-dasharray: 5 5; }}
+  .rel-line {{ fill: none; stroke: var(--accent); stroke-width: 2.5; }}
+  .rel-point {{ fill: #1d4ed8; fill-opacity: 0.78; stroke: #ffffff; stroke-width: 1.5; }}
+  .axis-label, .perfect-label {{ fill: var(--muted); font-size: 12px; }}
+  .rotate {{ transform: rotate(-90deg); transform-origin: 16px 140px; }}
+  @media (max-width: 760px) {{ .reliability-panel {{ grid-template-columns: 1fr; }} }}
   a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
   a:hover {{ text-decoration: underline; }}
 </style>
@@ -1150,6 +1258,8 @@ Lower Brier = better. Random binary baseline = 0.25, uniform-prior baseline = 0.
 {summary_html}
 </div>
 
+{reliability_html}
+
 <p class="meta">{n_events} events × {len(models)} models = {n_events * len(models)} predictions in the grid below. Tooltips show rationale.</p>
 
 <table>
@@ -1172,6 +1282,44 @@ Ground truth in <code>data/resolved.json</code>. Full methodology + per-decision
     return response
 
 
+_OPEN_COMPARE_MODELS: list[tuple[str, str]] = [
+    ("Opus 4.7 prod", "open_{dataset}.json"),
+    ("Opus 4.6", "ablation_open_{dataset}_claude-opus-4-6.json"),
+    ("Sonnet 4.6", "ablation_open_{dataset}_claude-sonnet-4-6.json"),
+    ("GPT-5.2", "ablation_open_{dataset}_gpt-5-2.json"),
+]
+
+
+def _prediction_market_ticker(prediction: dict[str, Any]) -> str | None:
+    return (
+        prediction.get("market_ticker")
+        or (prediction.get("_event") or {}).get("market_ticker")
+    )
+
+
+def _load_open_predictions_by_model(
+    pred_dir: Path,
+    dataset: str,
+) -> dict[str, dict[str, dict[str, Any]]]:
+    by_model: dict[str, dict[str, dict[str, Any]]] = {}
+    for label, template in _OPEN_COMPARE_MODELS:
+        path = pred_dir / template.format(dataset=dataset)
+        if not path.exists():
+            by_model[label] = {}
+            continue
+        data = json.loads(path.read_text())
+        preds = data.get("predictions", []) if isinstance(data, dict) else data
+        rows: dict[str, dict[str, Any]] = {}
+        for pred in preds:
+            if not isinstance(pred, dict):
+                continue
+            ticker = _prediction_market_ticker(pred)
+            if ticker:
+                rows[ticker] = pred
+        by_model[label] = rows
+    return by_model
+
+
 @app.get("/compare-open", response_class=HTMLResponse)
 def compare_open(
     request: Request,
@@ -1185,29 +1333,54 @@ def compare_open(
     said, find any bugs or such too'. Shows category + title + Opus 4.7's
     per-outcome probabilities + rationale + evidence URLs for every event.
     """
-    base = Path(__file__).resolve().parent / "data/predictions"
+    repo_root = Path(__file__).resolve().parent
+    pred_dir = repo_root / "data/predictions"
+    dataset_dir = repo_root / "data/datasets"
     sources = [
-        ("sample-economics", base / "open_sample-economics.json"),
-        ("sample-entertainment", base / "open_sample-entertainment.json"),
-        ("sample-sports", base / "open_sample-sports.json"),
+        "sample-economics",
+        "sample-entertainment",
+        "sample-sports",
     ]
     sections_html: list[str] = []
     total = 0
-    for ds_name, path in sources:
-        if not path.exists():
+    model_labels = [label for label, _ in _OPEN_COMPARE_MODELS]
+    model_header = "".join(f"<span>{html_escape(label)}</span>" for label in model_labels)
+    for ds_name in sources:
+        dataset_path = dataset_dir / f"{ds_name}.json"
+        if not dataset_path.exists():
             continue
-        data = json.loads(path.read_text())
-        preds = data.get("predictions", []) if isinstance(data, dict) else data
+        events = json.loads(dataset_path.read_text())
+        if not isinstance(events, list):
+            continue
+        by_model = _load_open_predictions_by_model(pred_dir, ds_name)
         cards = []
-        for p in preds:
-            ev = p.get("_event", {})
-            title = ev.get("title") or p.get("title", "")
-            cat = ev.get("category") or p.get("category", "?")
-            ticker = ev.get("market_ticker") or p.get("market_ticker", "?")
+        event_cards: list[tuple[float, str]] = []
+        for ev in events:
+            ticker = ev.get("market_ticker") or ev.get("event_ticker") or "?"
+            prod = by_model.get("Opus 4.7 prod", {}).get(ticker, {})
+            title = ev.get("title") or prod.get("title", "")
+            cat = ev.get("category") or prod.get("category", "?")
             close_time = ev.get("close_time", "")
-            probs = p.get("probabilities") or []
-            rationale = (p.get("rationale") or "")[:300]
-            ev_urls = (p.get("evidence_urls") or [])[:4]
+            probs = prod.get("probabilities") or []
+            rationale = (prod.get("rationale") or "")[:300]
+            ev_urls = (prod.get("evidence_urls") or [])[:4]
+            p_values: list[float] = []
+            model_cells = []
+            for label in model_labels:
+                pred = by_model.get(label, {}).get(ticker, {})
+                p_yes = pred.get("p_yes")
+                if isinstance(p_yes, (int, float)):
+                    p_float = max(0.0, min(1.0, float(p_yes)))
+                    p_values.append(p_float)
+                    pct = p_float * 100
+                    tooltip = html_escape((pred.get("rationale") or "")[:220])
+                    model_cells.append(
+                        f"<span class='model-p' title='{tooltip}'>{pct:.0f}%</span>"
+                    )
+                else:
+                    model_cells.append("<span class='model-p missing'>&mdash;</span>")
+            spread = (max(p_values) - min(p_values)) if len(p_values) >= 2 else 0.0
+            spread_class = "spread-high" if spread >= 0.25 else ("spread-mid" if spread >= 0.12 else "spread-low")
             prob_rows = []
             for pp in probs:
                 pct = max(0.0, min(1.0, float(pp.get("probability", 0.0)))) * 100
@@ -1227,22 +1400,27 @@ def compare_open(
                     except Exception:
                         pass
                 ev_html = "<div class='evidence muted small'>Evidence: " + " · ".join(hosts) + "</div>"
-            cards.append(
+            event_cards.append((spread,
                 f"<div class='pred-card'>"
                 f"<div class='pred-head'>"
                 f"<span class='cat-pill'>{html_escape(cat)}</span>"
                 f"<code class='small muted'>{html_escape(ticker[:48])}</code>"
                 f"<span class='small muted'>closes {html_escape(close_time[:10])}</span>"
+                f"<span class='spread-pill {spread_class}'>spread {spread:.2f}</span>"
                 f"</div>"
                 f"<div class='pred-title'>{html_escape(title[:140])}</div>"
+                f"<div class='model-grid'><div class='model-grid-head'>{model_header}</div>"
+                f"<div class='model-grid-row'>{''.join(model_cells)}</div></div>"
                 f"<div class='pred-bars'>{''.join(prob_rows)}</div>"
                 f"<div class='pred-rationale'>{html_escape(rationale)}</div>"
                 f"{ev_html}"
                 f"</div>"
-            )
-        total += len(preds)
+            ))
+        event_cards.sort(key=lambda item: item[0], reverse=True)
+        cards = [html for _, html in event_cards]
+        total += len(events)
         sections_html.append(
-            f"<h2>{ds_name} <span class='muted small'>({len(preds)} events)</span></h2>"
+            f"<h2>{ds_name} <span class='muted small'>({len(events)} events)</span></h2>"
             f"<div class='pred-list'>{''.join(cards)}</div>"
         )
     body_html = "\n".join(sections_html) or "<p>No open-event predictions yet.</p>"
@@ -1277,7 +1455,24 @@ def compare_open(
   .cat-pill {{ background: #eef2ff; color: var(--accent); padding: 0.15em 0.55em;
                border-radius: 4px; font-size: 0.78em; font-weight: 700;
                text-transform: uppercase; letter-spacing: 0.03em; }}
+  .spread-pill {{ padding: 0.15em 0.55em; border-radius: 4px;
+                  font-size: 0.78em; font-weight: 700; }}
+  .spread-low {{ background: #ecfdf5; color: #047857; }}
+  .spread-mid {{ background: #fffbeb; color: #b45309; }}
+  .spread-high {{ background: #fef2f2; color: #b91c1c; }}
   .pred-title {{ font-weight: 650; margin-bottom: 0.55em; line-height: 1.35; }}
+  .model-grid {{ margin: 0.55em 0 0.7em; border: 1px solid var(--border);
+                 border-radius: 6px; overflow: hidden; }}
+  .model-grid-head, .model-grid-row {{ display: grid;
+                 grid-template-columns: repeat(4, minmax(0, 1fr)); }}
+  .model-grid-head span {{ background: #f1f3f7; color: var(--muted);
+                 font-size: 0.72em; font-weight: 700; text-transform: uppercase;
+                 padding: 0.4em 0.45em; border-right: 1px solid var(--border); }}
+  .model-grid-row span {{ padding: 0.45em; border-top: 1px solid var(--border);
+                 border-right: 1px solid var(--border); font-weight: 750;
+                 font-variant-numeric: tabular-nums; text-align: center; }}
+  .model-grid-head span:last-child, .model-grid-row span:last-child {{ border-right: 0; }}
+  .model-p.missing {{ color: var(--muted); font-weight: 500; }}
   .pred-bars {{ display: flex; flex-direction: column; gap: 0.32em; }}
   .prob-row {{ display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(80px, 2fr) 44px;
                gap: 0.5em; align-items: center; font-size: 0.88em; }}
@@ -1303,9 +1498,10 @@ run against PA's three open dataset releases — <code>sample-economics</code>, 
 this view is for inspecting the agent's reasoning on a wider variety of events than the resolved set.
 For the scored comparison vs other models, see <a href="/compare">/compare</a>.
 </p>
+<p class="meta"><strong>Model agreement matrix:</strong> each card now shows p(outcome[0]) from Opus 4.7 production, Opus 4.6, Sonnet 4.6, and GPT-5.2. Cards are sorted by spread within each dataset so high-disagreement events rise to the top.</p>
 {body_html}
 <p class="meta" style="margin-top:2em">
-Source: <code>data/predictions/open_sample-*.json</code>. <a href="/dashboard">← back to live dashboard</a>
+Source: <code>data/predictions/open_sample-*.json</code> and <code>data/predictions/ablation_open_*.json</code>. <a href="/dashboard">← back to live dashboard</a>
 </p>
 </div>
 </body></html>"""

@@ -1,0 +1,639 @@
+{
+  "timestamp": "2026-05-16T16:51:43Z",
+  "model": "openai/gpt-5.2",
+  "predictions": [
+    {
+      "market_ticker": "KXACMAFAOTY-68",
+      "p_yes": 0.0893574297188755,
+      "rationale": "Evidence only confirms the nominee set (Ballerini, Lambert, Langley, Moroney, Wilson) with no winner indicated; absent market odds, I lean toward Wilson/Moroney given stronger recent awards momentum (e.g., Wilson\u2019s recent top-category wins) while keeping meaningful chances for Lambert/Ballerini and ",
+      "probabilities": [
+        {
+          "market": "Ella Langley",
+          "probability": 0.0893574297188755
+        },
+        {
+          "market": "Kelsea Ballerini",
+          "probability": 0.14357429718875503
+        },
+        {
+          "market": "Lainey Wilson",
+          "probability": 0.27911646586345384
+        },
+        {
+          "market": "Megan Moroney",
+          "probability": 0.23393574297188757
+        },
+        {
+          "market": "Miranda Lambert",
+          "probability": 0.1706827309236948
+        },
+        {
+          "market": "Tie",
+          "probability": 0.08333333333333333
+        }
+      ],
+      "evidence_urls": [
+        "https://www.rollingstone.com/music/music-country/2026-acm-awards-winners-list-1235554212/",
+        "https://www.acmcountry.com/news/women-lead-nominations-for-the-61st-academy-of-country-music-awards",
+        "https://www.forbes.com/sites/matthewleimkuehler/2026/05/14/acm-awards-2026-a-list-of-winners-and-nominees/",
+        "https://www.billboard.com/music/awards/2026-acm-awards-nominations-list-1236218387/",
+        "https://www.usmagazine.com/entertainment/news/what-to-know-about-2026-acm-awards-nominations-more/"
+      ]
+    },
+    {
+      "market_ticker": "KXNETFLIXTOPVIEWSTV-26MAY18",
+      "p_yes": 0.9,
+      "rationale": "Recent Netflix weekly-view examples (e.g., Man on Fire doing ~11\u201312.6M per week early on) suggest the #1 show typically clears 6\u20139M and often lands in the low-to-mid teens, while 25M+ weeks are possible but comparatively rare absent a record-breaking phenomenon.",
+      "probabilities": [
+        {
+          "market": "At least 6 million",
+          "probability": 0.9
+        },
+        {
+          "market": "At least 9 million",
+          "probability": 0.75
+        },
+        {
+          "market": "At least 12 million",
+          "probability": 0.55
+        },
+        {
+          "market": "At least 15 million",
+          "probability": 0.35
+        },
+        {
+          "market": "At least 18 million",
+          "probability": 0.22
+        },
+        {
+          "market": "At least 21 million",
+          "probability": 0.15
+        },
+        {
+          "market": "At least 25 million",
+          "probability": 0.08
+        },
+        {
+          "market": "At least 30 million",
+          "probability": 0.05
+        },
+        {
+          "market": "At least 35 million",
+          "probability": 0.05
+        },
+        {
+          "market": "At least 40 million",
+          "probability": 0.05
+        },
+        {
+          "market": "At least 50 million",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://collider.com/netflix-man-on-fire-series-12-million-views-week-2-numbers/",
+        "https://flixpatrol.com/top10/netflix/",
+        "https://www.whats-on-netflix.com/news/top-10-reports/netflix-top-10s-swapped-legends-remarkably-bright-creatures/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBS-26",
+      "p_yes": 0.07142857142857142,
+      "rationale": "Anchored to cited Polymarket odds showing Demon Slayer (~47%) and Solo Leveling S2 (~42%) heavily favored for Best Anime Score, with other nominated shows (incl. Apothecary Diaries, Dan Da Dan, Chainsaw Man movie, Gachiakuta) and a tie left as low-probability residuals.",
+      "probabilities": [
+        {
+          "market": "The Apothecary Diaries ",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Chainsaw Man \u2013 The Movie: Reze Arc",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+          "probability": 0.3381589729582082
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Solo Leveling Season 2 -Arise from the Shadow-",
+          "probability": 0.3046981698989347
+        },
+        {
+          "market": "Tie",
+          "probability": 0.07142857142857142
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/anime-awards-best-anime-score-winner",
+        "https://www.crunchyroll.com/news/latest/2026/3/9/demon-slayer-kimetsu-no-yaiba-infinity-castle-wins-saturn-award",
+        "https://www.tvguide.com/news/crunchyroll-anime-awards-nominees-full-list-2026/",
+        "https://fandomwire.com/every-crunchyroll-anime-awards-2026-nominee/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBAC-26",
+      "p_yes": 0.19016208066339996,
+      "rationale": "With no direct Best Action nominee list in the snippets, I lean on broader awards signals: My Hero Academia FINAL SEASON is repeatedly framed as a 2026 frontrunner, Solo Leveling S2 is explicitly nominated for Best Action and follows a 2025 AOTY win, and DAN DA DAN S2 is also a major multi-category ",
+      "probabilities": [
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.19016208066339996
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.09781379570297777
+        },
+        {
+          "market": "Kaiju No. 8 Season 2",
+          "probability": 0.1162834526950622
+        },
+        {
+          "market": "My Hero Academia FINAL SEASON",
+          "probability": 0.22710139464756882
+        },
+        {
+          "market": "ONE PIECE",
+          "probability": 0.08857896720693555
+        },
+        {
+          "market": "Solo Leveling Season 2 -Arise from the Shadow-",
+          "probability": 0.20863173765548437
+        },
+        {
+          "market": "Tie",
+          "probability": 0.07142857142857142
+        }
+      ],
+      "evidence_urls": [
+        "https://www.timeout.com/usa/news/heres-the-full-list-of-the-nominees-for-the-2026-crunchyroll-anime-awards-040326",
+        "https://www.cbr.com/crunchyroll-anime-awards-solo-leveling-my-hero-academia/",
+        "https://www.reddit.com/r/sololeveling/comments/1saua03/crunchyroll_has_released_the_2026_awards_list/",
+        "https://fandomwire.com/every-crunchyroll-anime-awards-2026-nominee/",
+        "https://gamerant.com/solo-leveling-mha-2026-crunchyroll-awards/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBR-26",
+      "p_yes": 0.15682182985553772,
+      "rationale": "I\u2019m anchoring strongly to the cited prediction-market price of 56\u00a2 for The Fragrant Flower Blooms With Dignity (clear favorite), with Blue Box and My Dress-Up Darling S2 as the main alternatives based on nominee lists and one pundit pick for Blue Box; tie remains very unlikely.",
+      "probabilities": [
+        {
+          "market": "Blue Box",
+          "probability": 0.15682182985553772
+        },
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "The Fragrant Flower Blooms With Dignity",
+          "probability": 0.45569823434991985
+        },
+        {
+          "market": "Honey Lemon Soda",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "My Dress-Up Darling Season 2",
+          "probability": 0.10176565008025681
+        },
+        {
+          "market": "Ranma1/2 Season2",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Tie",
+          "probability": 0.07142857142857142
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/anime-awards-best-romance-anime-winner/will-the-fragrant-flower-blooms-with-dignity-win-best-romance-anime-at-the-2026-crunchyroll-anime-awards",
+        "https://fandomwire.com/crunchyroll-anime-awards-2026-our-predictions-for-each-major-category-this-year/",
+        "https://www.cbr.com/crunchyroll-2026-anime-awards-nominees/",
+        "https://www.aninews.in/news/entertainment/hollywood/crunchyroll-anime-awards-2026-gachiakuta-dan-da-dan-s2-nominated-in-anime-of-the-year-category-check-nominations-here20260405230250/",
+        "https://animehunch.com/crunchyroll-anime-awards-2026-reveals-full-list-of-nominees/"
+      ]
+    },
+    {
+      "market_ticker": "KXEUROVISIONRANK-26TOP5",
+      "p_yes": 0.05,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Albania",
+          "probability": 0.05
+        },
+        {
+          "market": "Armenia",
+          "probability": 0.05
+        },
+        {
+          "market": "Australia",
+          "probability": 0.05
+        },
+        {
+          "market": "Austria",
+          "probability": 0.05
+        },
+        {
+          "market": "Azerbaijan",
+          "probability": 0.05
+        },
+        {
+          "market": "Belgium",
+          "probability": 0.05
+        },
+        {
+          "market": "Bulgaria",
+          "probability": 0.05
+        },
+        {
+          "market": "Cyprus",
+          "probability": 0.05
+        },
+        {
+          "market": "Croatia",
+          "probability": 0.05
+        },
+        {
+          "market": "Czechia",
+          "probability": 0.05
+        },
+        {
+          "market": "Denmark",
+          "probability": 0.05
+        },
+        {
+          "market": "Estonia",
+          "probability": 0.05
+        },
+        {
+          "market": "Finland",
+          "probability": 0.05
+        },
+        {
+          "market": "France",
+          "probability": 0.05
+        },
+        {
+          "market": "Georgia",
+          "probability": 0.05
+        },
+        {
+          "market": "Germany",
+          "probability": 0.05
+        },
+        {
+          "market": "Greece",
+          "probability": 0.05
+        },
+        {
+          "market": "Israel",
+          "probability": 0.05
+        },
+        {
+          "market": "Italy",
+          "probability": 0.05
+        },
+        {
+          "market": "Latvia",
+          "probability": 0.05
+        },
+        {
+          "market": "Lithuania",
+          "probability": 0.05
+        },
+        {
+          "market": "Luxembourg",
+          "probability": 0.05
+        },
+        {
+          "market": "Malta",
+          "probability": 0.05
+        },
+        {
+          "market": "Moldova",
+          "probability": 0.05
+        },
+        {
+          "market": "Montenegro",
+          "probability": 0.05
+        },
+        {
+          "market": "Norway",
+          "probability": 0.05
+        },
+        {
+          "market": "Poland",
+          "probability": 0.05
+        },
+        {
+          "market": "Portugal",
+          "probability": 0.05
+        },
+        {
+          "market": "Romania",
+          "probability": 0.05
+        },
+        {
+          "market": "San Marino",
+          "probability": 0.05
+        },
+        {
+          "market": "Serbia",
+          "probability": 0.05
+        },
+        {
+          "market": "Sweden",
+          "probability": 0.05
+        },
+        {
+          "market": "Switzerland",
+          "probability": 0.05
+        },
+        {
+          "market": "Ukraine",
+          "probability": 0.05
+        },
+        {
+          "market": "United Kingdom",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.racingpost.com/sport/special-events/eurovision/eurovision-song-contest-grand-final-2026-date-start-time-how-to-bet-betting-odds-how-to-watch-aIJac2s0Z8Ln/",
+        "https://www.manchestereveningnews.co.uk/news/tv/eurovision-2026-final-running-order-33953598",
+        "https://eurovisionworld.com/eurovision/2026",
+        "https://www.scotsman.com/arts-and-culture/film-and-tv/eurovision-2026-final-running-order-8548967",
+        "https://www.express.co.uk/showbiz/tv-radio/2206208/eurovision-2026-final-running-order"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBA-26",
+      "p_yes": 0.20325755005089924,
+      "rationale": "Evidence snippet summarizing Polymarket-style commentary frames Gachiakuta as a slight Best Animation frontrunner with DAN DA DAN S2 (more nominations) and MHA FINAL SEASON close behind, while Solo Leveling S2/ONE PIECE/Takopi are nominees but with weaker winner-specific signals; tie remains very un",
+      "probabilities": [
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.20325755005089924
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.2198846284356973
+        },
+        {
+          "market": "My Hero Academia FINAL SEASON",
+          "probability": 0.17831693247370206
+        },
+        {
+          "market": "ONE PIECE",
+          "probability": 0.09518154054971158
+        },
+        {
+          "market": "Solo Leveling Season 2 -Arise from the Shadow-",
+          "probability": 0.11180861893450966
+        },
+        {
+          "market": "Takopi's Original Sin",
+          "probability": 0.12012215812690873
+        },
+        {
+          "market": "Tie",
+          "probability": 0.07142857142857142
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/anime-awards-best-animation-winner",
+        "https://comicbook.com/anime/feature/sorry-fans-crunchyrolls-2026-anime-awards-deal-a-major-blow-to-solo-leveling/",
+        "https://www.animenewsnetwork.com/interest/2026-04-02/crunchyroll-anime-awards-reveals-2026-nominees/.236046",
+        "https://www.timeout.com/usa/news/heres-the-full-list-of-the-nominees-for-the-2026-crunchyroll-anime-awards-040326",
+        "https://fandomwire.com/every-crunchyroll-anime-awards-2026-nominee/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBNS-26",
+      "p_yes": 0.09991859991859993,
+      "rationale": "All listed outcomes are confirmed nominees for Best New Series; with no market odds provided, I lean toward higher-profile/buzzier picks (notably SAKAMOTO DAYS and Takopi\u2019s Original Sin) while keeping probabilities fairly diffuse given limited evidence beyond nominations and general commentary.",
+      "probabilities": [
+        {
+          "market": "Clevatess",
+          "probability": 0.09991859991859993
+        },
+        {
+          "market": "The Fragrant Flower Blooms With Dignity",
+          "probability": 0.14977614977614978
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.15974765974765975
+        },
+        {
+          "market": "SAKAMOTO DAYS",
+          "probability": 0.2195767195767196
+        },
+        {
+          "market": "The Summer Hikaru Died",
+          "probability": 0.11986161986161986
+        },
+        {
+          "market": "Takopi's Original Sin",
+          "probability": 0.1796906796906797
+        },
+        {
+          "market": "Tie",
+          "probability": 0.07142857142857142
+        }
+      ],
+      "evidence_urls": [
+        "https://fandomwire.com/crunchyroll-anime-awards-2026-our-predictions-for-each-major-category-this-year/",
+        "https://www.aninews.in/news/entertainment/hollywood/crunchyroll-anime-awards-2026-gachiakuta-dan-da-dan-s2-nominated-in-anime-of-the-year-category-check-nominations-here20260405230250/",
+        "https://deadline.com/2026/04/anime-awards-nominations-2026-crunchyroll-1236770375/",
+        "https://screenrant.com/crunchyroll-anime-year-award-nominee-list-revealed/",
+        "https://comicbook.com/anime/feature/crunchyrolls-best-new-anime-nominees-confirm-what-truly-dominated-2025/"
+      ]
+    },
+    {
+      "market_ticker": "KXGTA6ONTIME",
+      "p_yes": 1.0,
+      "rationale": "Rockstar\u2019s own announcement sets GTA VI\u2019s release date to May 26, 2026 (which would satisfy the criterion), but secondary reporting notes meaningful risk of further delay, and some sources still list a later 2026 date.",
+      "probabilities": [
+        {
+          "market": "By May 26, 2026",
+          "probability": 1.0
+        }
+      ],
+      "evidence_urls": [
+        "https://en.wikipedia.org/wiki/Grand_Theft_Auto_VI",
+        "https://www.rockstargames.com/newswire/article/258aa538o412ok/grand-theft-auto-vi-is-now-coming-may-26-2026",
+        "https://www.psu.com/news/grand-theft-auto-vi-may-2026-release-date-still-could-be-delayed-says-bloomberg-journalist/",
+        "https://www.sideshow.com/blog/gta-6-release-date-details-grand-theft-auto",
+        "https://www.gamingbible.com/news/platform/xbox/gta-6-platforms-xbox-ps5-269721-20251126"
+      ]
+    },
+    {
+      "market_ticker": "KXSPOTIFYALBUMRELEASEDATEDRAKE-26",
+      "p_yes": 0.1,
+      "rationale": "Multiple recent sources (DraftKings, Wikipedia, Hindustan Times, Genius) state \u2018Iceman\u2019 releases on Spotify May 15, 2026, implying a very low chance of any release before Feb/Mar/Apr/May 2026.",
+      "probabilities": [
+        {
+          "market": "Before February",
+          "probability": 0.1
+        },
+        {
+          "market": "Before March",
+          "probability": 0.1
+        },
+        {
+          "market": "Before April",
+          "probability": 0.1
+        },
+        {
+          "market": "Before May",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://dknetwork.draftkings.com/2026/05/14/drakes-iceman-release-date-and-history/",
+        "https://en.wikipedia.org/wiki/Iceman_(Drake_album)",
+        "https://www.hindustantimes.com/entertainment/music/what-time-will-drakes-iceman-album-release-friday-lebron-diss-in-1-am-in-albany-leak-fuels-buzz-101778800012435.html",
+        "https://www.capitalxtra.com/news/drake-new-album-iceman-release-date-features/",
+        "https://genius.com/albums/Drake/Iceman"
+      ]
+    },
+    {
+      "market_ticker": "KXMEDIARELEASEICEMAN-26",
+      "p_yes": 0.2,
+      "rationale": "Multiple sources state ICEMAN Episode 4 is slated to premiere May 14, 2026 (official YouTube/livestream at 9:45 PM ET), making any release before May 1, 2026\u2014and especially before earlier cutoffs\u2014very unlikely.",
+      "probabilities": [
+        {
+          "market": "Before Jan 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before Feb 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before Mar 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before Apr 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before May 1, 2026",
+          "probability": 0.2
+        }
+      ],
+      "evidence_urls": [
+        "https://www.hotnewhiphop.com/994829-drake-iceman-episode-4-release-time",
+        "https://urbanstreetculture.co.za/drake-iceman-episode-4-release-time-global-premiere-times-revealed/",
+        "https://www.capitalxtra.com/news/drake-new-album-iceman-release-date-features/",
+        "https://artthreat.net/32687-90685-what-time-is-iceman-dropping-drake-livestreams-episode-4-from-toronto-tonight-at/"
+      ]
+    },
+    {
+      "market_ticker": "KXEMMYLSERIES-26SEP14",
+      "p_yes": 0.05,
+      "rationale": "With no market-odds given, I lean toward the few series explicitly highlighted as major contenders (Death by Lightning, The Beast in Me, Half Man, Lord of the Flies), discount Beef as unlikely/unclear for 2026 eligibility, and keep others near the uninformed prior; ties are rare.",
+      "probabilities": [
+        {
+          "market": "Beef",
+          "probability": 0.05
+        },
+        {
+          "market": "The Beast in Me",
+          "probability": 0.14705882352941174
+        },
+        {
+          "market": "Love Story",
+          "probability": 0.07647058823529412
+        },
+        {
+          "market": "All Her Fault",
+          "probability": 0.07647058823529412
+        },
+        {
+          "market": "Half Man",
+          "probability": 0.12058823529411763
+        },
+        {
+          "market": "Black Rabbit",
+          "probability": 0.07647058823529412
+        },
+        {
+          "market": "Death by Lightning",
+          "probability": 0.15588235294117647
+        },
+        {
+          "market": "Lord of the Flies",
+          "probability": 0.11176470588235293
+        },
+        {
+          "market": "DTF St. Louis",
+          "probability": 0.06764705882352942
+        },
+        {
+          "market": "Bait",
+          "probability": 0.06764705882352942
+        },
+        {
+          "market": "Tie",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://theplaylist.net/limited-or-anthology-series-emmys-2026-predictions-and-contenders-20260430/",
+        "https://www.indiewire.com/lists/2026-emmy-predictions-primetime-awards/",
+        "https://www.hollywoodreporter.com/lists/emmys-2026-predictions-feinberg-forecast/",
+        "https://www.goldderby.com/tv/2026/2026-emmys-analysis-death-by-lightning-reggie-dinkins-industry/"
+      ]
+    },
+    {
+      "market_ticker": "KXDAILYSHOW-26",
+      "p_yes": 0.97,
+      "rationale": "Late-night lineup evidence explicitly lists Ryan Gosling (May 18, 2026; rerun of 3/18/2026) and Pedro Pascal (May 13, 2026) as Late Show guests within the window, so those are near-certain; the others have no snippet support so I stay near the uninformed prior with mild adjustments for plausibility ",
+      "probabilities": [
+        {
+          "market": "Ryan Gosling",
+          "probability": 0.97
+        },
+        {
+          "market": "Seth Meyers",
+          "probability": 0.13
+        },
+        {
+          "market": "Donald Trump",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "Pedro Pascal",
+          "probability": 0.96
+        },
+        {
+          "market": "Travis Kelce",
+          "probability": 0.14
+        },
+        {
+          "market": "Zendaya",
+          "probability": 0.2
+        }
+      ],
+      "evidence_urls": [
+        "https://latenighter.com/lineups-by-show/",
+        "https://www.interbridge.com/lineups.html",
+        "https://www.latimes.com/entertainment-arts/tv/story/2026-03-06/ryan-gosling-eva-mendes-birthday-surprise-fallon-tonight-show",
+        "https://www.imdb.com/title/tt32294912/characters/nm0331516",
+        "https://www.facebook.com/TheThingsEntertainment/posts/not-only-did-ryan-gosling-walk-off-the-late-show-set-but-he-also-ripped-stephen-/769050728729083/"
+      ]
+    }
+  ]
+}

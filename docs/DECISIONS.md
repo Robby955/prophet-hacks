@@ -219,3 +219,26 @@ rationale, who or what made it, and any related commit SHA.
 - Decision: stay on Opus 4.7 for production. The ablation script `scripts/ablate_openrouter.py` is now the harness for any future "should we swap?" question — run it on the same 26 events before any model swap.
 - Decided by: Claude, authorized by Rob to spend on ablation rather than vibes.
 - Commit: this commit.
+
+## 2026-05-16 · Multi-vendor ablation across 4 models — same pipeline, same prompt
+
+Ran the same `predict_multi_outcome_retrieval` pipeline (Brave 5-chunk retrieval + market-anchor system prompt + 0.10 longshot floor) through 4 different LLMs on the 26-event sample-resolved set, swapping ONLY the LLM call. Spend: ~$2.50 total.
+
+| Model | Mean Brier | Binary (n=14) | Multi (n=12) |
+|---|---|---|---|
+| **Opus 4.7 (production)** | **0.0379** | 0.0425 | 0.0177 |
+| Claude Opus 4.6 | 0.2264 | 0.0438 | 0.4396 |
+| GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
+| Gemini 3.1 Pro Preview | 0.4149 | 0.0750 | 0.8115 |
+
+**Key finding:** binary-event Brier is roughly comparable across all four models (0.04–0.08 range). The Opus 4.7 win is dominated by **multi-outcome JSON schema compliance**. Three of the four alternatives emit malformed JSON or assign probability mass to keys that aren't in the supplied outcome list, defaulting our parser to uniform prior — which then loses badly when the actual winner had high-prior support.
+
+**What this means for production decisions:**
+- Opus 4.7 is locked in for `multi_outcome_retrieval` (no swap)
+- For a future binary-only variant, GPT-5.2 / Opus 4.6 are viable cheap alternatives
+- The schema-compliance failure mode is a real risk if Opus 4.7 becomes deprecated. Mitigation: parse-resilience in `_parse_multi_outcome_json` (e.g. fuzzy match outcome labels, retry once on parse failure)
+- "Leaderboard #1 ≠ best in your pipeline" — confirmed three different ways
+
+Files: `data/predictions/ablation_*.json` (per-model predictions), `scripts/ablate_openrouter.py` (the standard ablation harness).
+
+Decided by: Claude after Rob authorized aggressive spending for real ablation data ("do not screw me if you end up going easy").

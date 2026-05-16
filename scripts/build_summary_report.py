@@ -45,6 +45,16 @@ ABLATION_FILES = [
     ("Gemini 3.1 Pro (post-harden)", "ablation_gemini-3-1-pro-preview-postharden.json",   "#ea580c"),
 ]
 
+# Open-event ablations Codex ran. No actuals (events unresolved), so we
+# compute model-agreement statistics instead of Brier.
+OPEN_DATASETS = ["sample-economics", "sample-entertainment", "sample-sports"]
+OPEN_MODELS = [
+    ("Opus 4.7 (prod)",  "open_{ds}.json"),
+    ("Opus 4.6",         "ablation_open_{ds}_claude-opus-4-6.json"),
+    ("Sonnet 4.6",       "ablation_open_{ds}_claude-sonnet-4-6.json"),
+    ("GPT-5.2",          "ablation_open_{ds}_gpt-5-2.json"),
+]
+
 
 def _load_predictions(path: Path) -> dict[str, dict]:
     if not path.exists():
@@ -56,6 +66,61 @@ def _load_predictions(path: Path) -> dict[str, dict]:
 
 def _multi_brier(probs: list[float], winner_idx: int) -> float:
     return sum((p - (1.0 if i == winner_idx else 0.0)) ** 2 for i, p in enumerate(probs))
+
+
+def _compute_open_agreement() -> dict:
+    """Per-open-dataset model agreement stats.
+
+    For each event, compute the spread (max - min) of p(outcome[0])
+    across the 4 models. Aggregate into:
+      - n_consensus: events where spread < 0.10 (all models close)
+      - n_contested: events where spread > 0.30 (high disagreement)
+      - n_mid: in between
+      - mean_spread: average spread across the dataset
+    """
+    pred_dir = ROOT / "data/predictions"
+    out: dict[str, dict] = {}
+    for ds in OPEN_DATASETS:
+        per_event_p0: dict[str, list[float]] = {}
+        for label, fname_tmpl in OPEN_MODELS:
+            p = pred_dir / fname_tmpl.format(ds=ds)
+            if not p.exists():
+                continue
+            data = json.loads(p.read_text())
+            preds = data.get("predictions", []) if isinstance(data, dict) else data
+            for pr in preds:
+                t = pr.get("market_ticker") or pr.get("_event", {}).get("market_ticker")
+                if not t:
+                    continue
+                p0 = pr.get("p_yes")
+                if p0 is None:
+                    probs = pr.get("probabilities", [])
+                    p0 = probs[0]["probability"] if probs else None
+                if p0 is not None:
+                    per_event_p0.setdefault(t, []).append(float(p0))
+        # Aggregate spread stats
+        spreads = []
+        n_consensus = n_mid = n_contested = 0
+        for t, vals in per_event_p0.items():
+            if len(vals) < 2:
+                continue
+            spread = max(vals) - min(vals)
+            spreads.append(spread)
+            if spread < 0.10:
+                n_consensus += 1
+            elif spread > 0.30:
+                n_contested += 1
+            else:
+                n_mid += 1
+        out[ds] = {
+            "n_events": len(per_event_p0),
+            "n_with_multi_model": len(spreads),
+            "mean_spread": sum(spreads) / len(spreads) if spreads else 0.0,
+            "n_consensus": n_consensus,
+            "n_mid": n_mid,
+            "n_contested": n_contested,
+        }
+    return out
 
 
 def _compute_summary() -> dict[str, Any]:
@@ -105,6 +170,9 @@ def _compute_summary() -> dict[str, Any]:
             "binary_actual": binary_actual,
         }
 
+    # Open-event multi-model agreement (Codex's offline ablations)
+    open_summary = _compute_open_agreement()
+
     git_sha = "unknown"
     try:
         git_sha = subprocess.check_output(
@@ -120,10 +188,27 @@ def _compute_summary() -> dict[str, Any]:
         "n_events_resolved": len(resolved),
         "per_model": per_model,
         "baselines": {"random_binary": 0.250, "uniform_prior": 0.219},
+        "open_summary": open_summary,
     }
 
 
 # --- HTML rendering -------------------------------------------------------
+
+
+def _open_rows(s: dict[str, Any]) -> list[str]:
+    out = []
+    for ds, stats in s.get("open_summary", {}).items():
+        if stats["n_events"] == 0:
+            continue
+        out.append(
+            f"<tr><td><strong>{ds}</strong></td>"
+            f"<td>{stats['n_events']}</td>"
+            f"<td>{stats['mean_spread']:.3f}</td>"
+            f"<td style='color:#047857'>{stats['n_consensus']}</td>"
+            f"<td>{stats['n_mid']}</td>"
+            f"<td style='color:#b91c1c'>{stats['n_contested']}</td></tr>"
+        )
+    return out
 
 
 def _render_html(s: dict[str, Any]) -> str:
@@ -214,6 +299,15 @@ def _render_html(s: dict[str, Any]) -> str:
   <img src="summary_calibration.png" alt="Reliability diagram for the production model on 14 binary events">
   <figcaption>Bin-mean predicted vs bin-mean actual outcome. Diagonal = perfectly calibrated.</figcaption>
 </figure>
+
+<h2>Open-event ablations · 4-model agreement on 42 unresolved events</h2>
+<table>
+  <thead><tr><th>Dataset</th><th>n events</th><th>Mean p(outcome[0]) spread</th><th>Consensus (&lt;0.10)</th><th>Mid</th><th>Contested (&gt;0.30)</th></tr></thead>
+  <tbody>
+  {''.join(_open_rows(s))}
+  </tbody>
+</table>
+<p class="meta">Models: Opus 4.7 (prod), Opus 4.6, Sonnet 4.6, GPT-5.2. Same pipeline; only the LLM call swaps. Spread = max(p_yes) − min(p_yes) across the 4 models per event. Consensus events likely have informative evidence; contested events flag where models genuinely disagree. Full per-event matrix on the auth-protected <code>/compare-open</code> page.</p>
 
 <h2>Per-event Brier · production model</h2>
 <figure>

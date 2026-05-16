@@ -45,7 +45,7 @@
 
 <header>
   <h1>ForecastingPath · Summary Report</h1>
-  <div class="meta">Generated 2026-05-16T21:50:17.483206+00:00 · Git <code>0b5f3dea</code> · 26 resolved events</div>
+  <div class="meta">Generated 2026-05-16T23:29:36.039698+00:00 · Git <code>c75e74ca</code> · 26 resolved events</div>
 </header>
 
 <div class="kpis">
@@ -102,6 +102,15 @@
   <img src="summary_calibration.png" alt="Reliability diagram for the production model on 14 binary events">
   <figcaption>Bin-mean predicted vs bin-mean actual outcome. Diagonal = perfectly calibrated.</figcaption>
 </figure>
+
+<h2>Open-event ablations · 4-model agreement on 42 unresolved events</h2>
+<table>
+  <thead><tr><th>Dataset</th><th>n events</th><th>Mean p(outcome[0]) spread</th><th>Consensus (&lt;0.10)</th><th>Mid</th><th>Contested (&gt;0.30)</th></tr></thead>
+  <tbody>
+  <tr><td><strong>sample-economics</strong></td><td>13</td><td>0.305</td><td style='color:#047857'>8</td><td>0</td><td style='color:#b91c1c'>5</td></tr><tr><td><strong>sample-entertainment</strong></td><td>13</td><td>0.153</td><td style='color:#047857'>10</td><td>1</td><td style='color:#b91c1c'>2</td></tr><tr><td><strong>sample-sports</strong></td><td>16</td><td>0.126</td><td style='color:#047857'>9</td><td>4</td><td style='color:#b91c1c'>3</td></tr>
+  </tbody>
+</table>
+<p class="meta">Models: Opus 4.7 (prod), Opus 4.6, Sonnet 4.6, GPT-5.2. Same pipeline; only the LLM call swaps. Spread = max(p_yes) − min(p_yes) across the 4 models per event. Consensus events likely have informative evidence; contested events flag where models genuinely disagree. Full per-event matrix on the auth-protected <code>/compare-open</code> page.</p>
 
 <h2>Per-event Brier · production model</h2>
 <figure>

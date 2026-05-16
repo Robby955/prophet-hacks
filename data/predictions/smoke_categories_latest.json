@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-05-16T18:27:54Z",
+  "results": [
+    {
+      "category": "Climate",
+      "title": "Will any UK weather station record above 40.0\u00b0C in July 2027",
+      "n_outcomes": 2,
+      "status": 200,
+      "latency_s": 2.95,
+      "n_probs": 2,
+      "probs_in_range": true,
+      "labels_match": true,
+      "p_outcome_0": 0.1,
+      "rationale": "40\u00b0C only happened once (2022) in UK history; base rate for any given July is low even with climate change."
+    },
+    {
+      "category": "Crypto",
+      "title": "Will Bitcoin close above $200,000 on December 31, 2027?",
+      "n_outcomes": 2,
+      "status": 200,
+      "latency_s": 4.14,
+      "n_probs": 2,
+      "probs_in_range": true,
+      "labels_match": true,
+      "p_outcome_0": 0.27,
+      "rationale": "Prediction markets give ~15% for $200K touched anytime before end-2027; closing strictly above on the specific date is harder, but two more years of potential b"
+    },
+    {
+      "category": "Finance",
+      "title": "Will the S&P 500 close above 7,000 on any day in 2027?",
+      "n_outcomes": 2,
+      "status": 200,
+      "latency_s": 3.57,
+      "n_probs": 2,
+      "probs_in_range": true,
+      "labels_match": true,
+      "p_outcome_0": 0.8999999999999999,
+      "rationale": "SPX already closed above 7,000 in April 2026 per evidence; barring a >15% sustained crash through all of 2027, it will close above 7,000 again."
+    },
+    {
+      "category": "Geopolitics",
+      "title": "Which country will host the 2030 FIFA World Cup?",
+      "n_outcomes": 4,
+      "status": 200,
+      "latency_s": 3.34,
+      "n_probs": 4,
+      "probs_in_range": true,
+      "labels_match": true,
+      "p_outcome_0": 0.7,
+      "rationale": "FIFA officially confirmed Morocco/Portugal/Spain as 2030 hosts on Dec 11, 2024."
+    },
+    {
+      "category": "Pop-culture",
+      "title": "Will Taylor Swift release a new studio album in 2027?",
+      "n_outcomes": 2,
+      "status": 200,
+      "latency_s": 3.54,
+      "n_probs": 2,
+      "probs_in_range": true,
+      "labels_match": true,
+      "p_outcome_0": 0.27,
+      "rationale": "Showgirl just released and Swift is planning a wedding; 2027 likely focused on re-recordings/tour, with TS13 more probable in 2028."
+    },
+    {
+      "category": "Tech",
+      "title": "Will OpenAI publicly release a model named GPT-6 by end of 2",
+      "n_outcomes": 2,
+      "status": 200,
+      "latency_s": 3.97,
+      "n_probs": 2,
+      "probs_in_range": true,
+      "labels_match": true,
+      "p_outcome_0": 0.7,
+      "rationale": "GPT-5 already released; OpenAI's cadence and multiple sources suggest GPT-6 likely arrives in 2026-2027, though naming convention (e.g., GPT-5.5) and delays add"
+    }
+  ]
+}

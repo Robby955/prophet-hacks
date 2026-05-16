@@ -1,0 +1,6 @@
+{"title": "Missing task_id event", "outcomes": ["Yes", "No"]}
+{"task_id": "BAD-EMPTY-OUTCOMES", "title": "Empty outcomes", "outcomes": []}
+{"task_id": "BAD-DUPE-OUTCOMES", "title": "Duplicate outcomes", "outcomes": ["Yes", "Yes"]}
+{"task_id": "BAD-RESOLVED-NOT-IN-OUTCOMES", "title": "Resolved value not in outcomes", "outcomes": ["Yes", "No"], "resolved_outcome": {"value": ["Maybe"], "resolved_at": "2026-05-15T12:00:00Z"}}
+{"task_id": "BAD-TIMESTAMP", "title": "Bad close_time", "outcomes": ["Yes", "No"], "metadata": {"close_time": "not-an-iso-timestamp"}}
+{"task_id": "BAD-SINGLE-OUTCOME", "title": "Only one outcome", "outcomes": ["Yes"]}

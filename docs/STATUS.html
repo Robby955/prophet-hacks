@@ -2,106 +2,85 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The Oracles — status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Oracles - status</title>
 <style>
-  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; max-width: 1080px; margin: 1.5em auto; padding: 0 1em; color: #1f2933; background: #fafbfc; }
-  h1 { font-size: 1.4em; margin-bottom: 0.2em; }
-  h2 { margin-top: 1.6em; font-size: 1.1em; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.2em; }
-  .meta { color: #6b7280; font-size: 0.9em; }
-  table { border-collapse: collapse; width: 100%; margin: 0.5em 0 1em; }
-  th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
-  th { background: #f3f4f6; font-weight: 600; }
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; max-width: 1080px; margin: 1.5em auto; padding: 0 1em; color: #111827; background: #f7f8fb; }
+  h1 { font-size: 1.5em; margin-bottom: 0.2em; }
+  h2 { margin-top: 1.6em; font-size: 1.1em; border-bottom: 1px solid #d8dde6; padding-bottom: 0.2em; }
+  .meta { color: #6b7280; font-size: 0.92em; }
+  .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.8em; margin: 1em 0; }
+  .summary > div { background: white; border: 1px solid #d8dde6; border-radius: 6px; padding: 0.8em; min-width: 0; }
+  .label { font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; font-weight: 700; }
+  .value { font-size: 1.05em; font-weight: 700; margin-top: 0.25em; overflow-wrap: anywhere; }
+  table { border-collapse: collapse; width: 100%; margin: 0.5em 0 1em; background: white; border: 1px solid #d8dde6; }
+  th, td { text-align: left; padding: 0.5em 0.65em; border-bottom: 1px solid #d8dde6; vertical-align: top; }
+  th { background: #f1f3f7; font-weight: 700; color: #374151; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78em; font-weight: 600; }
-  .pill.ok { background: #d1fae5; color: #065f46; }
-  .pill.block { background: #fee2e2; color: #991b1b; }
-  .pill.todo { background: #fef3c7; color: #92400e; }
+  code { background: #f1f3f7; padding: 1px 5px; border-radius: 3px; }
+  a { color: #1d4ed8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78em; font-weight: 700; }
   .pill.live { background: #dbeafe; color: #1e3a8a; }
-  ul { padding-left: 1.2em; }
-  li { margin: 0.2em 0; }
-  code { background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
-  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8em; margin: 0.8em 0; }
-  .summary > div { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.6em 0.8em; }
-  .summary .label { font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; }
-  .summary .value { font-size: 1.05em; font-weight: 600; margin-top: 0.2em; font-variant-numeric: tabular-nums; }
+  .pill.wait { background: #fef3c7; color: #92400e; }
+  .pill.ok { background: #d1fae5; color: #065f46; }
+  @media (max-width: 720px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } table { display: block; overflow-x: auto; } }
 </style>
 </head>
 <body>
 
-<h1>The Oracles — status</h1>
-<p class="meta">team <strong>CanadaHacks</strong> · project <strong>The Oracles</strong> · track <strong>forecasting</strong> · as of 2026-05-16 11:24 CT · <a href="STATUS.yaml">canonical YAML</a> · <a href="https://agent.forecastingpath.com/dashboard">live dashboard</a></p>
+<h1>The Oracles - status</h1>
+<p class="meta">team <strong>CanadaHacks</strong> | track <strong>forecasting</strong> | as of 2026-05-16 13:21 CT | canonical data in <a href="STATUS.yaml">STATUS.yaml</a></p>
 
 <div class="summary">
   <div><div class="label">endpoint</div><div class="value"><span class="pill live">LIVE on Railway</span></div></div>
-  <div><div class="label">variant served</div><div class="value">multi_outcome</div></div>
-  <div><div class="label">first call?</div><div class="value">not yet</div></div>
-  <div><div class="label">scores</div><div class="value">none yet</div></div>
+  <div><div class="label">variant served</div><div class="value">multi_outcome_retrieval</div></div>
+  <div><div class="label">first call</div><div class="value"><span class="pill wait">waiting</span></div></div>
+  <div><div class="label">latest deploy</div><div class="value">a4acf1aa SUCCESS</div></div>
 </div>
 
 <h2>Production endpoint</h2>
 <ul>
-<li><code>POST <a href="https://agent.forecastingpath.com/predict">/predict</a></code> — Prophet Arena calls this</li>
-<li><code>GET <a href="https://agent.forecastingpath.com/healthz">/healthz</a></code> — health JSON</li>
-<li><code>GET <a href="https://agent.forecastingpath.com/dashboard">/dashboard</a></code> — live HTML view</li>
-<li><code>GET <a href="https://agent.forecastingpath.com/docs">/docs</a></code> — Swagger UI</li>
+  <li><code>POST <a href="https://agent.forecastingpath.com/predict">https://agent.forecastingpath.com/predict</a></code></li>
+  <li><code>GET <a href="https://agent.forecastingpath.com/healthz">/healthz</a></code> - health JSON</li>
+  <li><code>GET <a href="https://agent.forecastingpath.com/dashboard">/dashboard</a></code> - live dashboard</li>
+  <li><code>GET <a href="https://agent.forecastingpath.com/docs">/docs</a></code> - FastAPI docs</li>
 </ul>
 
-<h2>Brier scores on <code>sample-resolved</code> (n=26)</h2>
-<p class="meta">Two scoring conventions. Legacy uses binary p_yes vs 0/1 actual. Proper uses sum((p_i − 1[outcome_i==winner])^2) per event averaged across events.</p>
+<h2>Current behavior</h2>
+<ol>
+  <li>Prophet Arena calls <code>/predict</code> with an event and outcome labels.</li>
+  <li>The endpoint runs <code>forecast_track.predict_multi_outcome_retrieval</code>.</li>
+  <li>Brave Search evidence is deduped by domain and injected as snippets.</li>
+  <li>Claude Sonnet 4.6 returns per-outcome probabilities.</li>
+  <li>The Kalshi longshot guard floors low values at <code>max(0.05, 0.5 / n_outcomes)</code>.</li>
+  <li>The endpoint returns <code>{"probabilities": [{"market": "...", "probability": ...}]}</code>.</li>
+</ol>
 
+<h2>Backtest reference</h2>
+<p class="meta">The retrieval number on resolved samples is optimistic because web search can find post-resolution articles. Treat live performance as the real measure.</p>
 <table>
-<thead><tr><th>variant</th><th class="num">legacy Brier</th><th class="num">proper per-outcome Brier</th><th>in production?</th></tr></thead>
+<thead><tr><th>variant</th><th class="num">legacy Brier</th><th>notes</th></tr></thead>
 <tbody>
-<tr><td>random reference</td><td class="num">0.250</td><td class="num">~0.50 (2-out) ~0.97 (30-out)</td><td>—</td></tr>
-<tr><td>uniform_prior</td><td class="num">0.219</td><td class="num">—</td><td>—</td></tr>
-<tr><td>single_llm (Sonnet 4.6)</td><td class="num">0.193</td><td class="num">0.6742</td><td>no</td></tr>
-<tr><td>opus_47</td><td class="num">0.230</td><td class="num">—</td><td>no</td></tr>
-<tr><td>opus_46 (leaderboard top agent)</td><td class="num">0.237</td><td class="num">—</td><td>no</td></tr>
-<tr><td>gpt55</td><td class="num">0.198</td><td class="num">—</td><td>no</td></tr>
-<tr><td>gpt52</td><td class="num">0.203</td><td class="num">—</td><td>no</td></tr>
-<tr><td>ensemble_logit</td><td class="num">0.193</td><td class="num">—</td><td>no</td></tr>
-<tr><td>sonnet_cot_shrink</td><td class="num">0.194</td><td class="num">—</td><td>no</td></tr>
-<tr><td><strong>multi_outcome</strong></td><td class="num">0.211</td><td class="num"><strong>0.6510 ← winner</strong></td><td><strong>YES</strong></td></tr>
-<tr><td>multi_outcome_sc3 (subagent in flight)</td><td class="num">—</td><td class="num">—</td><td>not yet</td></tr>
+  <tr><td>random 0.5</td><td class="num">0.250</td><td>reference</td></tr>
+  <tr><td>uniform_prior</td><td class="num">0.219</td><td>free control</td></tr>
+  <tr><td>single_llm</td><td class="num">0.193</td><td>Sonnet 4.6 baseline</td></tr>
+  <tr><td>multi_outcome_retrieval</td><td class="num">0.064</td><td>production; contaminated historical-retrieval backtest</td></tr>
 </tbody>
 </table>
 
-<h2>What I&apos;m running in the background</h2>
+<h2>Open GitHub PRs</h2>
 <table>
-<thead><tr><th>id</th><th>task</th><th>status</th></tr></thead>
+<thead><tr><th>PR</th><th>title</th><th>status note</th></tr></thead>
 <tbody>
-<tr><td><code>a2531ca5</code></td><td>self-consistency multi_outcome (k=3, parallel)</td><td><span class="pill todo">running</span></td></tr>
-<tr><td><code>a81f59b7</code></td><td>calibration plot + per-category Brier reports</td><td><span class="pill todo">running</span></td></tr>
+  <tr><td>#1</td><td>v2 calibrated ensemble forecaster</td><td>large architecture branch; not current production</td></tr>
+  <tr><td>#3</td><td>auto-refreshing HTML dashboard for JSONL trace</td><td>separate from FastAPI live dashboard</td></tr>
+  <tr><td>#4</td><td>v3-v6 offline forecasting stack</td><td>large branch; review carefully before merge</td></tr>
 </tbody>
 </table>
 
-<h2>Blocked on you</h2>
-<ul>
-<li><span class="pill block">2 min</span> Add <code>agent.forecastingpath.com</code> custom domain in Railway UI (CLI/MCP rejected the operation). DNS records will print there to paste at your registrar.</li>
-<li><span class="pill block">async</span> Have your other agent push <code>forecastingpath.com</code> root site to a new public repo (<code>Robby955/forecastingpath</code>) and link it to Vercel.</li>
-<li><span class="pill block">5 min</span> Optional: sign up for Brave Search API (free 2k req/mo) and add <code>BRAVE_API_KEY</code> to <code>variables.txt</code> — unlocks the retrieval variant.</li>
-</ul>
-
-<h2>Open questions answered today</h2>
-<ul>
-<li>Response shape — <strong>multi-outcome</strong> <code>{probabilities: [...]}</code>, not binary <code>{p_yes}</code> (Tony Yang confirmation + new docs)</li>
-<li>Scoring — Brier, lower better, summed per-outcome per event then averaged</li>
-<li>Submission — endpoint-only, no upload path</li>
-<li>Event posting — continuous, gated on indexer; <code>last_run_at: null</code> means we&apos;re waiting</li>
-</ul>
-
-<h2>Traps already hit, documented in memory so future agents don&apos;t repeat</h2>
-<ul>
-<li>Trading vs forecasting track confusion (cost ~2h)</li>
-<li>Cloudflare quick tunnels rotate URLs on restart</li>
-<li>Railway nixpacks venv path is not on $PATH for startCommand</li>
-<li><code>fastapi</code> + <code>uvicorn</code> were locally pip-installed but not in <code>requirements.txt</code></li>
-<li>OpenAI GPT-5.x reject <code>max_tokens</code> + <code>temperature</code> overrides</li>
-<li>Anthropic Opus 4.7 rejects <code>temperature</code></li>
-</ul>
-
-<h2>Budget</h2>
-<p>API spend so far: ~$5 (10 variants × ~26 events with mix of Sonnet/Opus/GPT calls, plus smoke tests). Railway: $0 (trial). <strong>Ample headroom</strong> for the parallel agents and a few retrieval-augmented experiments.</p>
+<h2>Runbook</h2>
+<p>Use <a href="LIVE_OPERATIONS.md">LIVE_OPERATIONS.md</a> for the current Railway deploy, verification, and incident handoff. Use <a href="RUNBOOK.md">RUNBOOK.md</a> for broader agent failure patterns.</p>
 
 </body>
 </html>

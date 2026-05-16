@@ -3,6 +3,10 @@
 What to do when something goes wrong mid-event. Each section is a single
 incident pattern with a triage step, a fix, and a recovery check.
 
+For the live forecasting endpoint on Railway, start with
+`docs/LIVE_OPERATIONS.md`. This runbook still covers the trading skeleton,
+SDK lifecycle, and general failure patterns.
+
 ---
 
 ## Rate-limit hit (HTTP 429)

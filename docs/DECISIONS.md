@@ -133,3 +133,11 @@ rationale, who or what made it, and any related commit SHA.
 - Status: deferred. Not in the skeleton. Promote to a separate forecaster variant once the single-model path is proven on a real tick.
 - Decided by: Rob.
 - Commit: not yet wired.
+
+## 2026-05-16 · live docs aligned to Railway production endpoint
+
+- README, `docs/STATUS.yaml`, `docs/STATUS.html`, `.env.example`, and `forecast_agent_server.py` now describe the current production path: Railway service `oracles-agent`, custom domain `agent.forecastingpath.com`, Prophet Arena endpoint-only submission, and `multi_outcome_retrieval` as the served variant.
+- Added `docs/LIVE_OPERATIONS.md` as the handoff for deployment, health checks, public dashboard verification, and common incidents. This replaces stale cloudflared-tunnel instructions for production; Cloudflare quick tunnels remain explicitly documented as not active.
+- Rationale: the repo had outgrown its trading-skeleton README and several status artifacts still said `multi_outcome` or quick tunnel. Future agents need one reliable source of current deployment truth before touching forecasting logic.
+- Decided by: Codex orientation pass after Railway, GitHub PR, and Prophet Arena endpoint checks.
+- Commit: this branch.

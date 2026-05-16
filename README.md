@@ -1,128 +1,165 @@
 # prophet-hacks
 
-A boring, reliable, observable agent for Prophet Arena. Survives the tick
-loop, logs every decision as JSONL, and only trades when the forecast edge is
-big enough.
+Prophet Hacks 2026 repo for Team `CanadaHacks`, project `The Oracles`.
+
+The live submission path is the Prophet Arena forecasting track. Prophet Arena
+calls our HTTP endpoint, receives one probability per listed outcome, and scores
+the result with Brier score after events resolve. The repo also keeps the
+original trading-track skeleton because its risk caps, JSONL traces, and
+runbook are useful portfolio artifacts.
+
+## Production
+
+| Item | Value |
+| --- | --- |
+| Dashboard | <https://agent.forecastingpath.com/dashboard> |
+| Predict endpoint | `POST https://agent.forecastingpath.com/predict` |
+| Health | <https://agent.forecastingpath.com/healthz> |
+| FastAPI docs | <https://agent.forecastingpath.com/docs> |
+| Host | Railway project `mindful-unity`, service `oracles-agent`, environment `production` |
+| Team | `CanadaHacks` |
+| Production variant | `multi_outcome_retrieval` |
+
+The production service is configured by `railway.toml` and starts with:
+
+```bash
+/opt/venv/bin/uvicorn forecast_agent_server:app --host 0.0.0.0 --port $PORT
+```
 
 ## Install
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Python 3.11+ (see `.python-version`; 3.13 is the dev baseline as of 2026-05-16).
+Python 3.11+ is supported. Python 3.13 is the current dev baseline.
 
-## Environment variables
+## Environment
+
+Copy `.env.example` to `.env` and fill in the keys. `.env` is gitignored.
 
 | Var | Required | Notes |
 | --- | --- | --- |
-| `PA_SERVER_API_KEY` | yes | Prophet Arena API key (sent as `X-API-Key`) |
+| `PA_SERVER_API_KEY` | yes | Prophet Arena API key, sent as `X-API-Key` |
 | `PA_SERVER_URL` | no | Defaults to `https://api.aiprophet.dev` |
-| `OPENAI_API_KEY` | for OpenAI variants | Used by triage model and ensemble |
-| `ANTHROPIC_API_KEY` | for Anthropic variants | Used by forecast model |
-| `PROPHET_FORECAST_MODEL` | no | Override forecast model. Default: `anthropic/claude-sonnet-4-6` |
-| `PROPHET_TRIAGE_MODEL` | no | Override triage model. Default: `openai/gpt-5.4-mini` |
-| `PA_N_TICKS` | no | Experiment-length hint. Default 96. |
+| `OPENAI_API_KEY` | for OpenAI variants | Used by GPT variants and ensembles |
+| `ANTHROPIC_API_KEY` | for Anthropic variants | Used by Sonnet and Opus variants |
+| `BRAVE_SEARCH_API_KEY` | for `multi_outcome_retrieval` | Used for the production retrieval variant |
+| `PROPHET_AGENT_VARIANT` | no | FastAPI variant. Production uses `multi_outcome_retrieval` |
+| `PROPHET_FORECAST_TRACK_MODEL` | no | Forecast-track Anthropic model. Default: `claude-sonnet-4-6` |
+| `PROPHET_FORECAST_OPENAI_MODEL` | no | Forecast-track OpenAI model. Default: `gpt-5.5` |
+| `PROPHET_FORECAST_MODEL` | no | Trading-track forecast model override |
+| `PROPHET_TRIAGE_MODEL` | no | Trading-track triage model override. Default: `openai/gpt-5.4-mini` |
+| `PA_N_TICKS` | no | Trading-track experiment-length hint. Default: `96` |
 
-Copy `.env.example` to `.env` (file not committed) and fill in.
+Secrets also live outside the repo in `~/Desktop/variables.txt`; use
+`scripts/sync_env_from_variables.sh` when useful.
 
-## Run
-
-### Continuous mode (default)
-
-Runs ticks in a loop until the experiment completes or SIGINT/SIGTERM:
-
-```bash
-python agent.py --slug my-experiment --variant model-forecast-no-retrieval
-```
-
-### Single tick
-
-Run exactly one tick and exit:
+## Run The Forecast Endpoint Locally
 
 ```bash
-python agent.py --slug my-experiment --once
+source .venv/bin/activate
+PROPHET_AGENT_VARIANT=multi_outcome_retrieval \
+  uvicorn forecast_agent_server:app --host 127.0.0.1 --port 8000
 ```
 
-### Dry run
+Health check:
 
-Smoke test without hitting the API:
+```bash
+curl http://127.0.0.1:8000/healthz
+```
+
+Example prediction request:
+
+```bash
+curl -X POST http://127.0.0.1:8000/predict \
+  -H 'content-type: application/json' \
+  -d '{
+    "event_ticker": "TEST",
+    "market_ticker": "TEST",
+    "title": "Will the US Federal Reserve cut rates at the December 2026 meeting?",
+    "category": "Economics",
+    "close_time": "2026-12-31T23:59:59Z",
+    "outcomes": ["Yes", "No"]
+  }'
+```
+
+Expected response shape:
+
+```json
+{
+  "probabilities": [
+    {"market": "Yes", "probability": 0.55},
+    {"market": "No", "probability": 0.45}
+  ],
+  "rationale": "..."
+}
+```
+
+## Forecasting Backtests
+
+```bash
+source .venv/bin/activate
+prophet forecast retrieve --dataset sample-resolved --include-resolved -o data/resolved.json
+python scripts/build_actuals.py data/resolved.json data/actuals.json
+python scripts/backtest_forecast.py \
+  --events data/resolved.json \
+  --actuals data/actuals.json \
+  --variants uniform_prior,single_llm,multi_outcome,multi_outcome_retrieval
+```
+
+Reference results from the 26-event `sample-resolved` run are tracked in
+`data/predictions/backtest_summary.json` and surfaced on the live dashboard.
+The retrieval backtest is optimistic because Brave can find articles about
+already-resolved sample events; live future events do not have that leakage.
+
+## Forecast Variants
+
+Defined in `forecast_track.py` and served through `forecast_agent_server.py`:
+
+- `uniform_prior` - deterministic `1 / len(outcomes)`, no model call.
+- `single_llm` - one Claude Sonnet 4.6 call, legacy binary `p_yes`.
+- `opus_47`, `opus_46` - one Opus call, legacy binary `p_yes`.
+- `gpt55`, `gpt52` - one OpenAI call, legacy binary `p_yes`.
+- `ensemble_logit`, `ensemble_leaderboard` - logit-space model blends.
+- `sonnet_cot`, `sonnet_cot_shrink` - structured prompt experiments.
+- `multi_outcome` - one Sonnet call that returns per-outcome probabilities.
+- `multi_outcome_sc3` - three parallel `multi_outcome` calls averaged by outcome.
+- `multi_outcome_retrieval` - Brave Search plus Sonnet per-outcome forecast.
+- `hybrid_routed` - GPT for binary events, multi-outcome prompt otherwise.
+
+## Trading Skeleton
+
+The trading agent is not the live hackathon submission path, but it remains
+useful for risk and observability work:
 
 ```bash
 python agent.py --slug smoke --dry-run
+python agent.py --slug <slug> --variant model-forecast-no-retrieval
+python agent.py --slug <slug> --once
 ```
 
-Resume is automatic: re-running with the same `--slug` resumes the same
-experiment (the SDK call is `create_or_get_experiment`).
+One JSONL file is written per tick under `trace/<slug>/<tick_id>.jsonl`.
+`risk.py` is authoritative for hard caps and asserts at import time that local
+caps are at least as strict as `ai_prophet_core.ruleset`.
 
-## Variants
+## Verify
 
-Set in `config.yaml` or via `--variant`:
-
-- `baseline-market-price` -- Uses market mid as `p_yes`. Trades nothing. Control.
-- `model-forecast-no-retrieval` (default) -- Single LLM call. Question/description/quote only.
-- `model-forecast-retrieval` (stub) -- Raises `NotImplementedError`.
-- `calibrated-ensemble` -- Two-model agreement gate. Trades only when both models agree.
-
-## Architecture
-
-```
-agent.py             tick lifecycle (BenchmarkSession) + CLI
-forecaster.py        LLM callers, prompt, parsing, variant dispatch
-market_filter.py     eligibility checks (sanity, freshness, headroom)
-risk.py              hard caps and invariant assertions
-logger.py            JSONL trace writer
-config.yaml          model routing + policy thresholds
-```
-
-## Hard limits
-
-All hard caps live in `risk.py` as module constants. `config.yaml` mirrors
-them for visibility, but `risk.py` is authoritative. If they disagree,
-the code wins.
-
-| Cap | Value | Source |
-| --- | --- | --- |
-| `EDGE_THRESHOLD` | 0.08 | `risk.py` |
-| `MAX_TRADES_PER_TICK` | 3 | `risk.py` (server allows 20) |
-| `MAX_NOTIONAL_PER_NEW_POSITION` | $100 | `risk.py` |
-| `MAX_NOTIONAL_PER_MARKET` | $1,000 | `risk.py` (matches server) |
-| `MAX_OPEN_POSITIONS` | 30 | `risk.py` (matches server) |
-| `MAX_MARKETS_ANALYZED_PER_TICK` | 5 | `risk.py` |
-
-## Forecasting
-
-The LLM forecaster (`model-forecast-no-retrieval`):
-1. Constructs a structured prompt from market fields (question, description, topic, quotes, time to resolution)
-2. Asks the model for `{"p_yes": float, "rationale": "..."}` with JSON mode
-3. Parses with fallback (direct JSON, embedded JSON, regex)
-4. Clamps to [0.01, 0.99] and rounds to nearest bucket
-5. Computes edge vs market ask; trades only when edge >= 0.08
-
-The ensemble variant (`calibrated-ensemble`):
-1. Calls both triage (cheap) and forecast (strong) models
-2. Applies agreement gate: trade only when both agree on direction AND both have |p - 0.5| >= 0.10
-3. Returns averaged probability or falls back to market mid (skip)
-
-## Trace output
-
-One JSONL file per tick at `trace/<slug>/<tick_id>.jsonl`. One record per
-market decision. Schema in `SUBMISSION_NOTES.md`.
-
-## Tests
+Use the project gate before merging or deploying:
 
 ```bash
-# With pytest (if available)
-python -m pytest tests/ -v
-
-# Without pytest
-python -c "exec(open('tests/test_forecaster.py').read())"
+PATH="$PWD/.venv/bin:$PATH" ./scripts/agent/verify.sh
 ```
 
-## Submission
+The PATH prefix matters in shells where `python` is not globally installed.
+The gate runs the available tests, smoke imports, and `agent.py --dry-run`.
 
-```bash
-bash scripts/package_submission.sh
-```
+## Key Docs
+
+- `docs/LIVE_OPERATIONS.md` - current production endpoint, deploy, and triage handoff.
+- `docs/STATUS.yaml` - machine-readable live status artifact for future agents.
+- `docs/RUNBOOK.md` - incident patterns and recovery checks.
+- `docs/DECISIONS.md` - append-only decision log.
+- `SUBMISSION_NOTES.md` - trace schema and submission gates.

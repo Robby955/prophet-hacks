@@ -23,6 +23,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-15T00:00:00Z (seed entry).
 - **Notes:** Rob holds final-say on `agent.py`, `config.yaml`, and anything in `docs/`. Other agents propose via branches; Rob merges.
 
+## codex/main-orientation
+
+- **Current task:** Repo and live-service orientation complete; documentation drift corrected.
+- **Files owned this session:** `README.md`, `.env.example`, `forecast_agent_server.py`, `docs/STATUS.yaml`, `docs/STATUS.html`, `docs/LIVE_OPERATIONS.md`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-16T18:25:03Z
+- **Notes:** Verification passed with 61 tests, smoke import, dry-run smoke, status YAML parse, and public health checks.
+
 ## (template) <agent or worktree name>
 
 - **Current task:** `<one line>`

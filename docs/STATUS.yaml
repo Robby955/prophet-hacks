@@ -1,12 +1,10 @@
-# Prophet Hacks — live status artifact
-#
-# Feedable to any agent (Codex, future Claude runs, scheduled briefings).
-# Hand-edited; keep entries terse. Render the human view at /dashboard
-# on the live agent or open docs/STATUS.html locally.
+# Prophet Hacks live status artifact.
+# Feedable to Codex, Claude, or a scheduled briefing job.
+# Keep terse and factual. The richer human view is the live dashboard.
 
-version: 2
-as_of: "2026-05-16T11:24:00-05:00"
-last_actor: claude-opus-4-7
+version: 3
+as_of: "2026-05-16T13:21:00-05:00"
+last_actor: codex
 project_name: The Oracles
 team_name: CanadaHacks
 
@@ -17,79 +15,115 @@ event:
   primary_track: "forecasting"
 
 production:
-  endpoint_url: "https://agent.forecastingpath.com/predict"  # Railway-backed, custom domain
+  endpoint_url: "https://agent.forecastingpath.com/predict"
   health_url: "https://agent.forecastingpath.com/healthz"
   dashboard_url: "https://agent.forecastingpath.com/dashboard"
   docs_url: "https://agent.forecastingpath.com/docs"
-  hosting: "Railway (project mindful-unity, service oracles-agent)"
+  hosting: "Railway"
+  railway_project_name: "mindful-unity"
+  railway_project_id: "9a8a6424-51b7-4723-b853-48a0ec33d45e"
+  railway_service_name: "oracles-agent"
+  railway_service_id: "ff3b8fd2-19c9-4905-8040-94d3f612a8eb"
+  railway_environment: "production"
+  latest_deployment_id: "a4acf1aa-d9bb-4582-8f8f-a35491666393"
+  latest_deployment_status: "SUCCESS"
   registered_with_prophet_arena: true
   is_active: true
-  last_run_at: null  # Prophet Arena has not yet called our /predict
-  variant_served: "multi_outcome"
+  last_run_at: null
+  last_run_status: null
+  last_run_n_predictions: null
+  variant_served: "multi_outcome_retrieval"
+  current_public_state: "healthy, waiting for first Prophet Arena call"
 
 repo:
   remote: "git@github.com:Robby955/prophet-hacks.git"
   branch: "main"
+  current_head: "64ac36c"
   privacy: "private during sprint; flip public after Rob review post-event"
+  open_prs:
+    - number: 1
+      title: "feat(architecture): v2 calibrated ensemble forecaster"
+      note: "large architecture branch; not current production"
+    - number: 3
+      title: "feat(monitor): auto-refreshing HTML dashboard for live + post-event review"
+      note: "trace monitor branch; separate from FastAPI live dashboard"
+    - number: 4
+      title: "feat(v3-v6): full SAE-borrowed-strength forecasting stack"
+      note: "large offline harness branch; review carefully before merging"
+  open_issues_count: 0
 
 forecasting_track:
   contract:
     response_shape: |
       {"probabilities": [{"market": "<outcome label>", "probability": <0..1>}, ...]}
     actuals_shape: '{"market_ticker": "<winner label string>"}'
-    binary_yes_condition_deprecated: "old docs said {p_yes, rationale}; that is wrong as of 2026-05-16"
-    submission_mechanism: "endpoint-only; /forecast/endpoints/register; no upload path"
+    old_binary_shape: "{p_yes, rationale} is legacy; the live endpoint converts legacy variants to probabilities"
+    submission_mechanism: "endpoint-only via /forecast/endpoints/register"
     sla: "10 minutes per event"
+
+  production_pipeline:
+    variant: "multi_outcome_retrieval"
+    steps:
+      - "Build one Brave Search query from event title plus the most informative outcome"
+      - "Fetch up to 5 web results"
+      - "Dedupe by domain; prefer .gov, .edu, exchanges, and major news"
+      - "Prompt Claude Sonnet 4.6 for per-outcome probabilities"
+      - "Apply Kalshi longshot guard: floor at max(0.05, 0.5 / n_outcomes)"
+      - "Return Prophet Arena probabilities list"
+    graceful_degradation:
+      - "If BRAVE_SEARCH_API_KEY is missing or Brave fails, fall back to multi_outcome"
+      - "If the LLM call fails, fall back to uniform prior"
 
   variants_in_forecast_track_py:
     - name: uniform_prior
       description: "deterministic 1/len(outcomes)"
       cost_per_event_usd: 0.0
     - name: single_llm
-      description: "one Sonnet 4.6 call; emits binary p_yes for outcomes[0]"
+      description: "one Sonnet 4.6 call; emits legacy binary p_yes"
       cost_per_event_usd: 0.005
     - name: opus_47
       description: "one Opus 4.7 call"
       cost_per_event_usd: 0.015
     - name: opus_46
-      description: "one Opus 4.6 call; leaderboard top agent reference"
+      description: "one Opus 4.6 call"
       cost_per_event_usd: 0.015
     - name: gpt55
-      description: "one GPT-5.5 call (cross-vendor)"
+      description: "one GPT-5.5 call"
       cost_per_event_usd: 0.010
     - name: gpt52
-      description: "one GPT-5.2 call; leaderboard top OpenAI fixed-context"
+      description: "one GPT-5.2 call"
       cost_per_event_usd: 0.010
     - name: ensemble_logit
       description: "Sonnet 4.6 + GPT-5.5, logit-mean blend"
       cost_per_event_usd: 0.015
     - name: ensemble_leaderboard
-      description: "Sonnet 4.6 + Opus 4.6 + GPT-5.2, logit-mean three-way"
+      description: "Sonnet 4.6 + Opus 4.6 + GPT-5.2, logit-mean blend"
       cost_per_event_usd: 0.025
     - name: sonnet_cot
-      description: "Sonnet 4.6 with structured CoT JSON prompt"
+      description: "Sonnet 4.6 structured prompt experiment"
       cost_per_event_usd: 0.007
     - name: sonnet_cot_shrink
-      description: "sonnet_cot + post-hoc shrinkage to prior"
+      description: "sonnet_cot plus post-hoc shrinkage to prior"
       cost_per_event_usd: 0.007
     - name: multi_outcome
-      description: "ONE Sonnet 4.6 call returns per-outcome probabilities"
+      description: "one Sonnet 4.6 call returns per-outcome probabilities"
       cost_per_event_usd: 0.010
-      currently_in_production: true
     - name: multi_outcome_sc3
-      description: "k=3 parallel multi_outcome calls, averaged per-outcome (self-consistency)"
+      description: "k=3 parallel multi_outcome calls, averaged per outcome"
       cost_per_event_usd: 0.030
-      status: "subagent built it; not yet promoted to production"
+    - name: multi_outcome_retrieval
+      description: "Brave Search evidence plus multi_outcome prompt plus Kalshi guard"
+      cost_per_event_usd: 0.012
+      currently_in_production: true
+    - name: hybrid_routed
+      description: "binary routes to gpt55; multi-outcome routes to multi_outcome"
+      cost_per_event_usd: 0.008
 
   brier_baseline_sample_resolved:
     n_events: 26
-    note: |
-      Two scoring conventions in use. Legacy backtest uses binary p_yes vs
-      binary 1/0 actual (single_llm winner). Proper per-outcome Brier uses
-      sum((p_i - 1[outcome_i==winner])^2) across all outcomes per event
-      (multi_outcome winner). Standard error on n=26 is ~0.05-0.10 so deltas
-      below that are within noise.
+    caution: "retrieval on resolved historical events can leak through web search"
     legacy_p_yes_brier:
+      random_0_5: 0.250
       uniform_prior: 0.219
       single_llm: 0.193
       opus_47: 0.230
@@ -101,77 +135,39 @@ forecasting_track:
       sonnet_cot: 0.207
       sonnet_cot_shrink: 0.194
       multi_outcome: 0.211
-    proper_per_outcome_brier:
-      single_llm_distributed: 0.6742
-      multi_outcome_direct: 0.6510  # +0.0232 better; within SE but architecturally correct
+      multi_outcome_retrieval: 0.064
 
 infra:
-  subagents_in_flight:
-    - id_short: "a2531ca5"
-      task: "predict_multi_outcome_sc3 self-consistency variant"
-      worktree: ".claude/worktrees/agent-a2531ca5c2eee0871"
-      status: "appears to have merged its dispatch entry into main forecast_agent_server.py; awaiting full report"
-    - id_short: "a81f59b7"
-      task: "scripts/build_calibration_report.py + reliability/per-category plots"
-      worktree: ".claude/worktrees/agent-a81f59b78206532fe"
-      status: "running"
-  decommissioned:
-    - "cloudflared quick tunnel (replaced by stable Railway URL)"
-    - "scripts/watchdog.sh, scripts/watch_predictions.sh (no longer needed; container is managed)"
-    - "local FastAPI server (Railway hosts the production instance)"
+  active:
+    - "Railway production service"
+    - "custom domain agent.forecastingpath.com"
+  not_active:
+    - "Cloudflare quick tunnel, replaced by Railway custom domain"
+    - "local FastAPI process, Railway hosts production"
+    - "scripts/watchdog.sh and scripts/watch_predictions.sh, superseded by managed container for production"
 
-next_steps_blocked_on_rob:
-  - id: NS1
-    title: "Add agent.forecastingpath.com custom domain in Railway UI"
-    why_blocked: "CLI/MCP reject custom-domain operations as Unauthorized"
-    path: "Railway dashboard → mindful-unity → oracles-agent → Settings → Networking → Custom Domain"
-    eta_minutes: 2
-  - id: NS2
-    title: "Stand up forecastingpath.com root via Vercel (other agent)"
-    why_blocked: "Rob's other agent is doing this; suggested repo Robby955/forecastingpath"
-  - id: NS3
-    title: "BRAVE_API_KEY for retrieval variant"
-    why_blocked: "needs free signup at brave.com/search/api/"
-    when_added: "I wire predict_multi_outcome_retrieval and backtest"
-
-next_steps_i_can_drive:
-  - id: ND1
-    title: "Merge + promote multi_outcome_sc3 if subagent reports green"
-    eta_minutes: 5
-  - id: ND2
-    title: "Merge calibration plot subagent's output"
-    eta_minutes: 5
-  - id: ND3
-    title: "Set up scheduled poller (Railway side cron or Python loop) for endpoint state"
-    eta_minutes: 15
-  - id: ND4
-    title: "Run multi_outcome on the unresolved sample datasets (sample-sports/entertainment/economics) so we have predictions queued for when events resolve"
-    eta_minutes: 15
-    cost_usd: 0.5
-  - id: ND5
-    title: "Per-category prompt experiment (e.g. Sports vs Politics need different framing)"
-    eta_minutes: 60
-
-budget_spent_usd_estimate: 5.0  # ~10 variants × ~25 events × $0.005-$0.015 plus a few smoke tests
-budget_remaining_usd_hackathon: "ample; Rob authorized aggressive spend"
+next_steps:
+  immediate:
+    - "Watch for Prophet Arena first call or open events"
+    - "If first call arrives, verify /predictions and dashboard history fill"
+    - "Keep README, STATUS.yaml, and LIVE_OPERATIONS.md current after deploys"
+  review_before_merge:
+    - "Open GitHub PRs #1, #3, #4 are large and not equivalent to production main"
+    - "Review data leakage risk before promoting any retrieval backtest result"
 
 traps_already_hit_dont_repeat:
-  - "DO NOT add KALSHI_API_KEY anywhere"
-  - "DO NOT confuse forecasting vs trading tracks; we are forecasting"
-  - "Endpoint response is multi-outcome {probabilities: [...]} per 2026-05-16 docs, NOT binary {p_yes}"
-  - "OpenAI GPT-5.x reject max_tokens (must be max_completion_tokens) AND temperature override"
-  - "Anthropic Opus 4.7 rejects temperature param"
-  - "Cloudflare quick tunnels rotate URLs every restart; Railway custom domain is the right answer"
-  - "Railway nixpacks venv is at /opt/venv but NOT on PATH; startCommand must use absolute path"
-  - "fastapi + uvicorn must be in requirements.txt (not just locally pip-installed)"
+  - "Do not confuse forecasting and trading tracks"
+  - "Endpoint response is {probabilities: [...]}, not binary {p_yes}"
+  - "Cloudflare quick tunnels rotate URLs; do not use one as the registered endpoint"
+  - "Railway Nixpacks venv is /opt/venv and not on PATH; startCommand uses the absolute uvicorn path"
+  - "OpenAI GPT-5.x reject max_tokens and temperature overrides"
+  - "Anthropic Opus 4.7 rejects temperature"
+  - "fastapi and uvicorn must stay in requirements.txt"
 
 links:
   developer_portal: "https://prophetarena.co/developer"
   api_keys: "https://prophetarena.co/profile/api-keys"
   leaderboard_web: "https://prophetarena.co/leaderboard/forecast?tab=model"
-  sdk_repo: "https://github.com/ai-prophet/ai-prophet"
-  sdk_fork: "https://github.com/Robby955/ai-prophet"
-  dataset_registry: "https://github.com/ai-prophet/ai-prophet-datasets"
-  sample_datasets_doc: "https://github.com/ai-prophet/ai-prophet/blob/main/docs/using_sample_datasets.md"
-  discord: "https://discord.gg/yGUHfHbu5m"
+  live_dashboard: "https://agent.forecastingpath.com/dashboard"
   railway_project: "https://railway.com/project/9a8a6424-51b7-4723-b853-48a0ec33d45e"
+  github_repo: "https://github.com/Robby955/prophet-hacks"

@@ -2,22 +2,18 @@
 
 The Prophet Arena server pulls predictions from a registered HTTP endpoint
 when new events appear. We wrap a `predict_*` variant from
-`forecast_track.py` behind a /predict route and expose it publicly via a
-cloudflared tunnel.
+`forecast_track.py` behind a /predict route and expose it publicly through
+Railway at https://agent.forecastingpath.com.
 
 Usage:
     # 1. Start the server:
     .venv/bin/python forecast_agent_server.py
     # listens on 0.0.0.0:8000
 
-    # 2. In a SEPARATE terminal, start the tunnel:
-    cloudflared tunnel --url http://localhost:8000
-    # prints a public URL like https://<random>.trycloudflare.com
-
-    # 3. Register the endpoint with Prophet Arena (one-shot):
+    # 2. Register the endpoint with Prophet Arena (one-shot):
     .venv/bin/prophet forecast register \\
         --team-name CanadaHacks \\
-        --endpoint-url https://<random>.trycloudflare.com/predict
+        --endpoint-url https://agent.forecastingpath.com/predict
 
 Health checks:
     curl http://localhost:8000/healthz       -> {"status":"ok","variant":"..."}
@@ -26,9 +22,9 @@ Health checks:
 
 Variant routing:
     Set PROPHET_AGENT_VARIANT env var to swap which predict_* in
-    forecast_track.py gets called. Defaults to single_llm. Set to
-    `multi_outcome` to emit real per-outcome probabilities directly from
-    the model.
+    forecast_track.py gets called. The local fallback is single_llm;
+    production currently sets `multi_outcome_retrieval`, which uses Brave
+    Search evidence plus the multi-outcome Sonnet prompt.
 
 Response schema (per the 2026-05-16 server docs):
     {"probabilities": [{"market": "<outcome>", "probability": <0..1>}, ...]}

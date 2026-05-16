@@ -54,7 +54,7 @@ from typing import Any
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 load_dotenv()
@@ -200,6 +200,11 @@ def root() -> dict[str, str]:
         "endpoint": "POST /predict",
         "health": "GET /healthz",
     }
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
 
 
 def _distribute_p_yes_to_outcomes(
@@ -486,11 +491,11 @@ def _svg_brier_bars(rows: list[dict], width: int = 540, row_h: int = 22) -> str:
         # color: best (lowest) = bright accent; worst = muted
         is_best = i == 0
         bar_color = "#10b981" if is_best else "#6366f1"
-        text_color = "#e8edf5" if is_best else "#c7d2fe"
+        text_color = "#111827" if is_best else "#374151"
         bars.append(
             f"<rect x='180' y='{y-9}' width='{bw:.1f}' height='14' fill='{bar_color}' opacity='0.85' rx='2'/>"
             f"<text x='174' y='{y+2}' fill='{text_color}' font-size='11' text-anchor='end'>{html_escape(r['variant'])}</text>"
-            f"<text x='{180+bw+6:.1f}' y='{y+2}' fill='#e8edf5' font-size='11' font-variant-numeric='tabular-nums'>{r['brier']:.4f}</text>"
+            f"<text x='{180+bw+6:.1f}' y='{y+2}' fill='#111827' font-size='11' font-variant-numeric='tabular-nums'>{r['brier']:.4f}</text>"
         )
     return (
         f"<svg width='{width}' height='{height}' viewBox='0 0 {width} {height}'>"
@@ -554,7 +559,7 @@ def dashboard() -> str:
                 f"<a href='{html_escape(u)}' target='_blank' rel='noopener'>{html_escape(u.split('/')[2] if '/' in u else u[:40])}</a>"
                 for u in evidence[:5]
             )
-            evidence_html = f"<div class='evidence'>📎 {links}</div>"
+            evidence_html = f"<div class='evidence'>Evidence: {links}</div>"
         pred_cards += (
             f"<div class='pred-card'>"
             f"<div class='pred-head'>"
@@ -689,7 +694,7 @@ def dashboard() -> str:
   .page {{ max-width: 1080px; margin: 0 auto; padding: 1.5em 1.4em 4em; }}
   a {{ color: var(--accent); text-decoration: none; }}
   a:hover {{ text-decoration: underline; }}
-  h1 {{ font-size: 1.7em; margin: 0 0 0.15em; font-weight: 700; letter-spacing: -0.01em; }}
+  h1 {{ font-size: 1.7em; margin: 0 0 0.15em; font-weight: 700; letter-spacing: 0; }}
   h2 {{ font-size: 1.15em; margin: 2em 0 0.6em; font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 0.3em; }}
   p, li, td {{ font-size: 1em; line-height: 1.55; color: var(--text-2); }}
   .meta {{ color: var(--muted); font-size: 0.92em; }}
@@ -708,7 +713,7 @@ def dashboard() -> str:
 
   .kpis {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8em; margin: 1.2em 0; }}
   @media (max-width: 720px) {{ .kpis {{ grid-template-columns: repeat(2, 1fr); }} }}
-  .kpi {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.9em 1em; }}
+  .kpi {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.9em 1em; min-width: 0; }}
   .kpi .label {{ font-size: 0.78em; text-transform: uppercase; color: var(--muted); letter-spacing: 0.06em; font-weight: 600; }}
   .kpi .value {{ font-size: 1.55em; font-weight: 700; margin-top: 0.25em; font-variant-numeric: tabular-nums; color: var(--text); }}
   .kpi .sub {{ font-size: 0.88em; color: var(--muted); margin-top: 0.15em; }}
@@ -727,12 +732,12 @@ def dashboard() -> str:
   td.num {{ text-align: right; font-variant-numeric: tabular-nums; }}
   tr.row-self {{ background: var(--accent-soft); font-weight: 600; }}
 
-  .card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; margin-bottom: 0.7em; }}
+  .card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; margin-bottom: 0.7em; min-width: 0; overflow-x: auto; }}
   .card h3 {{ margin: 0 0 0.5em; font-size: 1em; font-weight: 700; }}
   .card p {{ margin: 0.4em 0; }}
 
   .pipeline {{ display: flex; flex-wrap: wrap; gap: 0.4em 0.5em; align-items: center; margin-top: 0.6em; }}
-  .pipeline span.step {{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 0.9em; }}
+  .pipeline span.step {{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 0.9em; max-width: 100%; overflow-wrap: anywhere; }}
   .pipeline span.arrow {{ color: var(--muted); font-weight: 700; }}
 
   .pred-list {{ display: grid; grid-template-columns: 1fr; gap: 0.8em; }}
@@ -750,7 +755,7 @@ def dashboard() -> str:
   .pred-rationale {{ color: var(--text-2); font-size: 0.93em; line-height: 1.5; margin-top: 0.6em; padding-top: 0.6em; border-top: 1px solid var(--border); }}
   .evidence {{ font-size: 0.88em; color: var(--muted); margin-top: 0.5em; }}
   .evidence a {{ margin-right: 0.6em; }}
-  .empty {{ text-align: center; color: var(--muted); padding: 2em; background: var(--panel); border-radius: 8px; border: 1px dashed var(--border); font-size: 1em; }}
+  .empty {{ text-align: center; color: var(--muted); padding: 2em; background: var(--panel); border-radius: 8px; border: 1px dashed var(--border); font-size: 1em; overflow-wrap: anywhere; }}
 
   form.try {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; }}
   form.try label {{ display: block; font-size: 0.9em; color: var(--muted); margin: 0.8em 0 0.3em; font-weight: 600; }}
@@ -763,8 +768,20 @@ def dashboard() -> str:
   @keyframes flash {{ 0% {{ background: var(--ok-soft); }} 100% {{ background: var(--panel); }} }}
   .pred-card.fresh {{ animation: flash 1.8s ease-out; }}
 
-  .math-box {{ background: var(--panel-2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; padding: 0.7em 1.1em; margin: 0.6em 0; font-size: 0.97em; }}
+  .math-box {{ background: var(--panel-2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; padding: 0.7em 1.1em; margin: 0.6em 0; font-size: 0.97em; overflow-x: auto; }}
   .math-box .label {{ font-size: 0.85em; color: var(--muted); font-weight: 600; margin-bottom: 0.4em; }}
+  .math-box .katex-display {{ margin: 0; overflow-x: auto; overflow-y: hidden; }}
+  svg {{ max-width: 100%; height: auto; }}
+  @media (max-width: 520px) {{
+    .page {{ padding: 1.3em 1.05em 3em; }}
+    .kpis {{ gap: 0.75em; }}
+    .kpi {{ padding: 0.85em 0.9em; }}
+    .kpi .label {{ font-size: 0.74em; overflow-wrap: anywhere; }}
+    .kpi .value {{ font-size: 1.45em; overflow-wrap: anywhere; }}
+    th, td {{ padding: 0.55em 0.65em; overflow-wrap: anywhere; }}
+    table {{ display: block; overflow-x: auto; }}
+    .prob-row {{ grid-template-columns: minmax(0, 1.2fr) minmax(80px, 2fr) 44px; gap: 0.45em; }}
+  }}
 </style>
 </head><body>
 <div class="page">

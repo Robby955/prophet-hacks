@@ -149,3 +149,11 @@ rationale, who or what made it, and any related commit SHA.
 - Railway custom-domain creation for `forecastingpath.com` is still blocked from this shell by `Unauthorized. Please run railway login again.` Manual Railway UI plus Cloudflare DNS steps are documented in `docs/LIVE_OPERATIONS.md`.
 - Decided by: Codex after confirming `agent.forecastingpath.com` works and apex `forecastingpath.com` lacks an A/AAAA/CNAME answer.
 - Commit: this branch.
+
+## 2026-05-16 · live dashboard moved behind token auth
+
+- The dashboard, prediction-history JSON, and SSE stream now require `DASHBOARD_AUTH_TOKEN` when the variable is set. Auth accepts `?token=...`, `x-dashboard-token`, `Authorization: Bearer ...`, or the `dashboard_token` cookie set after a valid query-token visit.
+- `GET /` is now a public status page instead of a redirect to the live monitor. `/predict` and `/healthz` remain public because Prophet Arena needs direct endpoint access and health checks should stay simple.
+- FastAPI Swagger/OpenAPI routes are disabled on this app. The live monitor contains enough internals and a production prediction form that public access is not worth the competition leak/spend risk.
+- Decided by: Codex after Rob asked whether the dashboard was public and whether it should be.
+- Commit: this branch.

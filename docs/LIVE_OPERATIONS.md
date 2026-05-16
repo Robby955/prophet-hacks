@@ -11,10 +11,9 @@ Current handoff for the Prophet Hacks forecasting endpoint.
 | Track | Forecasting |
 | Host | Railway project `mindful-unity`, service `oracles-agent`, environment `production` |
 | Predict endpoint | `POST https://agent.forecastingpath.com/predict` |
-| Root site | `https://forecastingpath.com/` once apex DNS and Railway custom domain are bound |
+| Root site | `https://forecastingpath.com/` once DNS propagation finishes |
 | Health URL | `https://agent.forecastingpath.com/healthz` |
-| Dashboard | `https://agent.forecastingpath.com/dashboard` |
-| FastAPI docs | `https://agent.forecastingpath.com/docs` |
+| Dashboard | `https://agent.forecastingpath.com/dashboard` with `DASHBOARD_AUTH_TOKEN` |
 | Production variant | `multi_outcome_retrieval` |
 
 As of 2026-05-16 13:20 CT, Prophet Arena reports the endpoint registered and
@@ -46,8 +45,9 @@ active, with no calls yet from the platform and no open forecast events.
 The dashboard keeps only in-memory recent predictions. A Railway restart clears
 the dashboard history but does not affect Prophet Arena's scored records.
 
-The app root redirects to `/dashboard`. Once `forecastingpath.com` is bound to
-the Railway service, the apex domain will open the same live monitor.
+The app root is a public status page. `/dashboard`, `/predictions`, and
+`/events` are private when `DASHBOARD_AUTH_TOKEN` is set. `/predict` remains
+public because Prophet Arena calls it directly.
 
 ## Deploy
 
@@ -72,7 +72,8 @@ Verify production after `SUCCESS`:
 
 ```bash
 curl -fsS https://agent.forecastingpath.com/healthz
-curl -fsS https://agent.forecastingpath.com/predictions
+curl -fsS -H "x-dashboard-token: $DASHBOARD_AUTH_TOKEN" \
+  https://agent.forecastingpath.com/predictions
 ```
 
 For a visual check, open the dashboard at desktop and mobile widths and confirm:
@@ -81,6 +82,7 @@ For a visual check, open the dashboard at desktop and mobile widths and confirm:
 - no horizontal overflow at 390px width
 - the status banner explains `Waiting for first call` while `last_run_at` is null
 - KaTeX renders the Brier and Kalshi formulas
+- an unauthenticated `/dashboard` request returns 401 in production
 
 ## Runtime Checks
 
@@ -136,7 +138,8 @@ This is expected while Prophet Arena has not posted open events or has not
 called the endpoint. Check:
 
 ```bash
-curl -fsS https://agent.forecastingpath.com/predictions
+curl -fsS -H "x-dashboard-token: $DASHBOARD_AUTH_TOKEN" \
+  https://agent.forecastingpath.com/predictions
 ```
 
 `{"count": 0, "predictions": []}` means the process is healthy but has not
@@ -164,31 +167,45 @@ railway deployment list --service oracles-agent --limit 3 --json
 
 Then hit `/healthz`. The `variant` field should be `multi_outcome_retrieval`.
 
+### Dashboard returns 401
+
+This is expected after dashboard auth is enabled. Use either:
+
+```bash
+curl -fsS -H "x-dashboard-token: $DASHBOARD_AUTH_TOKEN" \
+  https://agent.forecastingpath.com/predictions
+```
+
+or open:
+
+```text
+https://agent.forecastingpath.com/dashboard?token=<DASHBOARD_AUTH_TOKEN>
+```
+
+The query-token path sets an HTTP-only cookie for subsequent dashboard
+requests.
+
 ### Need rollback
 
 Prefer a new deploy from a known-good commit over force-pushing or deleting
-deployments. Current known-good production commit after the dashboard mobile
-fix is `64ac36c`.
+deployments.
 
 ## Apex Domain Fix
 
-Current DNS state: `agent.forecastingpath.com` resolves through Cloudflare to
-Railway, but `forecastingpath.com` has no apex record. Cloudflare nameservers
-are already active for the zone.
+Current Railway state: `agent.forecastingpath.com` and `forecastingpath.com`
+are both bound to service `oracles-agent` on target port `8080`.
 
-The Railway account in this shell cannot add custom domains; both Railway MCP
-and CLI return `Unauthorized. Please run railway login again.` Finish it in the
-Railway UI:
+Current DNS state from this shell: Cloudflare authoritative DNS returns an apex
+A answer for `forecastingpath.com`, but local resolver caches may still return
+NXDOMAIN while propagation completes. If Railway still asks for TXT
+verification, confirm the Railway-provided TXT is present in Cloudflare.
 
-1. Open Railway project `mindful-unity`.
-2. Open service `oracles-agent`.
-3. Go to Settings -> Networking -> Custom Domain.
-4. Add `forecastingpath.com`, target port `8080`.
-5. Copy the DNS target Railway shows.
-6. In Cloudflare DNS, add a `CNAME` record:
-   - Name: `@`
-   - Target: the Railway target from step 5
-   - Proxy status: DNS only until Railway validates the certificate
+Cloudflare nameservers are already active for the zone. Expected DNS records:
+
+- Apex CNAME/flattened target: `6aj0vnvv.up.railway.app`
+- TXT verification, if Railway still shows pending: the `railway-verify=...`
+  value shown in Railway
+- Proxy status: DNS only until Railway validates the certificate
 
 After DNS propagates:
 

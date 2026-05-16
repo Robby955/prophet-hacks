@@ -41,6 +41,7 @@ import collections
 import json
 import logging
 import os
+import secrets
 import time
 from datetime import datetime, timezone
 from html import escape as html_escape
@@ -49,10 +50,9 @@ from typing import Any
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import (
     HTMLResponse,
-    RedirectResponse,
     Response,
     StreamingResponse,
 )
@@ -144,7 +144,13 @@ _VARIANT_FN = {
 }.get(_VARIANT_NAME, forecast_track.predict_single_llm)
 
 
-app = FastAPI(title="The Oracles forecast agent", version="0.1.0")
+app = FastAPI(
+    title="The Oracles forecast agent",
+    version="0.1.0",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 
 
 class EventRequest(BaseModel):
@@ -194,9 +200,119 @@ def healthz() -> dict[str, Any]:
     }
 
 
-@app.get("/", include_in_schema=False)
-def root() -> RedirectResponse:
-    return RedirectResponse(url="/dashboard", status_code=307)
+def _dashboard_auth_token() -> str:
+    return os.environ.get("DASHBOARD_AUTH_TOKEN", "").strip()
+
+
+def _dashboard_auth_enabled() -> bool:
+    return bool(_dashboard_auth_token())
+
+
+def _request_dashboard_token(request: Request) -> str:
+    query_token = request.query_params.get("token", "")
+    if query_token:
+        return query_token
+    header_token = request.headers.get("x-dashboard-token", "")
+    if header_token:
+        return header_token
+    auth_header = request.headers.get("authorization", "")
+    if auth_header.lower().startswith("bearer "):
+        return auth_header[7:].strip()
+    cookie_token = request.cookies.get("dashboard_token", "")
+    return cookie_token
+
+
+def _is_dashboard_authorized(request: Request) -> bool:
+    expected = _dashboard_auth_token()
+    if not expected:
+        return True
+    supplied = _request_dashboard_token(request)
+    return bool(supplied) and secrets.compare_digest(supplied, expected)
+
+
+def _require_dashboard_auth(request: Request) -> None:
+    if _is_dashboard_authorized(request):
+        return
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="dashboard authentication required",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
+def _set_dashboard_cookie_if_needed(response: Response, request: Request) -> None:
+    expected = _dashboard_auth_token()
+    supplied = request.query_params.get("token", "")
+    if not expected or not supplied:
+        return
+    if not secrets.compare_digest(supplied, expected):
+        return
+    response.set_cookie(
+        "dashboard_token",
+        supplied,
+        max_age=12 * 60 * 60,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+    )
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def root() -> str:
+    dashboard_status = "restricted" if _dashboard_auth_enabled() else "public"
+    return f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForecastPath</title>
+<style>
+  :root {{
+    --bg: #f7f8fb;
+    --panel: #ffffff;
+    --border: #d8dde6;
+    --text: #111827;
+    --muted: #5b6472;
+    --accent: #1d4ed8;
+    --ok: #047857;
+  }}
+  * {{ box-sizing: border-box; }}
+  body {{ margin: 0; min-height: 100vh; display: grid; place-items: center;
+         background: var(--bg); color: var(--text);
+         font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }}
+  main {{ width: min(760px, calc(100vw - 32px)); background: var(--panel);
+         border: 1px solid var(--border); border-radius: 8px; padding: 28px; }}
+  h1 {{ margin: 0 0 6px; font-size: 2rem; letter-spacing: 0; }}
+  p {{ color: var(--muted); margin: 0.6rem 0; }}
+  .status {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+             gap: 10px; margin: 22px 0; }}
+  .tile {{ border: 1px solid var(--border); border-radius: 8px; padding: 12px; }}
+  .label {{ color: var(--muted); font-size: 0.78rem; text-transform: uppercase;
+            font-weight: 700; letter-spacing: 0.04em; }}
+  .value {{ margin-top: 5px; font-weight: 700; overflow-wrap: anywhere; }}
+  a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
+  a:hover {{ text-decoration: underline; }}
+  .links {{ display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }}
+  .dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+          background: var(--ok); margin-right: 7px; }}
+  @media (max-width: 620px) {{ .status {{ grid-template-columns: 1fr; }} }}
+</style>
+</head><body>
+<main>
+  <h1>ForecastPath</h1>
+  <p>The Oracles forecasting agent for Prophet Hacks 2026.</p>
+  <div class="status">
+    <div class="tile"><div class="label">Service</div><div class="value"><span class="dot"></span>online</div></div>
+    <div class="tile"><div class="label">Variant</div><div class="value">{html_escape(_VARIANT_NAME)}</div></div>
+    <div class="tile"><div class="label">Monitor</div><div class="value">{dashboard_status}</div></div>
+  </div>
+  <p>The public API endpoint remains available for Prophet Arena scoring. Live monitoring is restricted during the event.</p>
+  <div class="links">
+    <a href="/healthz">Health</a>
+    <a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a>
+    <a href="https://github.com/Robby955/prophet-hacks">GitHub</a>
+  </div>
+</main>
+</body></html>"""
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -335,7 +451,7 @@ def predict(event: EventRequest) -> PredictionResponse:
 
 
 @app.get("/predictions")
-def predictions() -> dict[str, Any]:
+def predictions(_: None = Depends(_require_dashboard_auth)) -> dict[str, Any]:
     """Last 50 predictions served. Machine-readable."""
     return {
         "count": len(_PREDICTION_HISTORY),
@@ -377,7 +493,9 @@ def _fetch_remote_state() -> dict[str, Any]:
 
 
 @app.get("/events")
-async def events_stream() -> StreamingResponse:
+async def events_stream(
+    _: None = Depends(_require_dashboard_auth),
+) -> StreamingResponse:
     """Server-Sent Events endpoint. /dashboard subscribes to push updates.
 
     Each new prediction served by /predict gets fanned out to every
@@ -534,7 +652,10 @@ def _prob_bars_html(probs: list[dict]) -> str:
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
-def dashboard() -> str:
+def dashboard(
+    request: Request,
+    _: None = Depends(_require_dashboard_auth),
+) -> HTMLResponse:
     """Live HTML dashboard. Auto-refreshes every 30s."""
     remote = _fetch_remote_state()
     ep = remote.get("endpoint") or {}
@@ -653,7 +774,7 @@ def dashboard() -> str:
             "</div>"
         )
 
-    return f"""<!doctype html>
+    html = f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="30">
@@ -789,7 +910,6 @@ def dashboard() -> str:
   <span>team: <strong>CanadaHacks</strong></span>
   <span>variant: <strong>{html_escape(_VARIANT_NAME)}</strong></span>
   <span>uptime: <strong>{_uptime_human()}</strong></span>
-  <span><a href="/docs">API docs</a></span>
   <span><a href="https://prophetarena.co/leaderboard/forecast">Leaderboard</a></span>
   <span><a href="https://github.com/Robby955/prophet-hacks">GitHub</a></span>
 </div>
@@ -869,7 +989,6 @@ def dashboard() -> str:
 <li><code><a href="/predict">/predict</a></code> — the actual endpoint (POST)</li>
 <li><code><a href="/predictions">/predictions</a></code> — last 50 predictions JSON</li>
 <li><code><a href="/events">/events</a></code> — Server-Sent Events live stream</li>
-<li><code><a href="/docs">/docs</a></code> — Swagger UI</li>
 <li><a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a></li>
 <li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
 </ul>
@@ -931,6 +1050,9 @@ async function doTry() {{
 }})();
 </script>
 </body></html>"""
+    response = HTMLResponse(html)
+    _set_dashboard_cookie_if_needed(response, request)
+    return response
 
 
 if __name__ == "__main__":

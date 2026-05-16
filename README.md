@@ -12,11 +12,10 @@ runbook are useful portfolio artifacts.
 
 | Item | Value |
 | --- | --- |
-| Root site | <https://forecastingpath.com/> once the apex domain is bound |
-| Dashboard | <https://agent.forecastingpath.com/dashboard> |
+| Root site | <https://forecastingpath.com/> once DNS propagation finishes |
+| Dashboard | <https://agent.forecastingpath.com/dashboard> (token-protected in production) |
 | Predict endpoint | `POST https://agent.forecastingpath.com/predict` |
 | Health | <https://agent.forecastingpath.com/healthz> |
-| FastAPI docs | <https://agent.forecastingpath.com/docs> |
 | Host | Railway project `mindful-unity`, service `oracles-agent`, environment `production` |
 | Team | `CanadaHacks` |
 | Production variant | `multi_outcome_retrieval` |
@@ -27,8 +26,9 @@ The production service is configured by `railway.toml` and starts with:
 /opt/venv/bin/uvicorn forecast_agent_server:app --host 0.0.0.0 --port $PORT
 ```
 
-The FastAPI root route redirects to `/dashboard`, so the apex domain can point
-at this same service once Railway and Cloudflare DNS are bound.
+The FastAPI root route is a public status page. The live dashboard,
+machine-readable prediction history, and SSE stream are token-protected in
+production; `/predict` remains public because Prophet Arena calls it directly.
 
 ## Install
 
@@ -52,6 +52,7 @@ Copy `.env.example` to `.env` and fill in the keys. `.env` is gitignored.
 | `ANTHROPIC_API_KEY` | for Anthropic variants | Used by Sonnet and Opus variants |
 | `BRAVE_SEARCH_API_KEY` | for `multi_outcome_retrieval` | Used for the production retrieval variant |
 | `PROPHET_AGENT_VARIANT` | no | FastAPI variant. Production uses `multi_outcome_retrieval` |
+| `DASHBOARD_AUTH_TOKEN` | production monitoring | Protects `/dashboard`, `/predictions`, and `/events`; leave unset for local dev |
 | `PROPHET_FORECAST_TRACK_MODEL` | no | Forecast-track Anthropic model. Default: `claude-sonnet-4-6` |
 | `PROPHET_FORECAST_OPENAI_MODEL` | no | Forecast-track OpenAI model. Default: `gpt-5.5` |
 | `PROPHET_FORECAST_MODEL` | no | Trading-track forecast model override |

@@ -2,8 +2,8 @@
 # Feedable to Codex, Claude, or a scheduled briefing job.
 # Keep terse and factual. The richer human view is the live dashboard.
 
-version: 3
-as_of: "2026-05-16T13:21:00-05:00"
+version: 4
+as_of: "2026-05-16T18:46:08Z"
 last_actor: codex
 project_name: The Oracles
 team_name: CanadaHacks
@@ -16,18 +16,19 @@ event:
 
 production:
   root_url: "https://forecastingpath.com/"
-  root_url_status: "blocked on apex Railway custom-domain binding plus Cloudflare DNS record"
+  root_url_status: "Railway custom domain exists; Cloudflare authoritative apex A visible, resolver propagation pending from this shell"
   endpoint_url: "https://agent.forecastingpath.com/predict"
   health_url: "https://agent.forecastingpath.com/healthz"
   dashboard_url: "https://agent.forecastingpath.com/dashboard"
-  docs_url: "https://agent.forecastingpath.com/docs"
+  dashboard_auth: "DASHBOARD_AUTH_TOKEN protects /dashboard, /predictions, and /events in production"
+  docs_url: null
   hosting: "Railway"
   railway_project_name: "mindful-unity"
   railway_project_id: "9a8a6424-51b7-4723-b853-48a0ec33d45e"
   railway_service_name: "oracles-agent"
   railway_service_id: "ff3b8fd2-19c9-4905-8040-94d3f612a8eb"
   railway_environment: "production"
-  latest_deployment_id: "a4acf1aa-d9bb-4582-8f8f-a35491666393"
+  latest_deployment_id: "23aa7725-3fa6-4e55-88b7-b50a82ce6b19"
   latest_deployment_status: "SUCCESS"
   registered_with_prophet_arena: true
   is_active: true
@@ -36,7 +37,7 @@ production:
   last_run_n_predictions: null
   variant_served: "multi_outcome_retrieval"
   current_public_state: "healthy, waiting for first Prophet Arena call"
-  root_route_behavior: "redirects to /dashboard once a hostname points at the service"
+  root_route_behavior: "public status page; live monitor is token-protected at /dashboard"
 
 repo:
   remote: "git@github.com:Robby955/prophet-hacks.git"

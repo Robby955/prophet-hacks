@@ -2,89 +2,106 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prophet Hacks — status</title>
+<title>The Oracles — status</title>
 <style>
-  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; max-width: 980px; margin: 2em auto; padding: 0 1em; color: #1f2933; background: #fafbfc; }
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; max-width: 1080px; margin: 1.5em auto; padding: 0 1em; color: #1f2933; background: #fafbfc; }
   h1 { font-size: 1.4em; margin-bottom: 0.2em; }
   h2 { margin-top: 1.6em; font-size: 1.1em; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.2em; }
   .meta { color: #6b7280; font-size: 0.9em; }
   table { border-collapse: collapse; width: 100%; margin: 0.5em 0 1em; }
-  th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #e5e7eb; }
+  th, td { text-align: left; padding: 0.4em 0.6em; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
   th { background: #f3f4f6; font-weight: 600; }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .bar { background: #eef2ff; height: 8px; border-radius: 4px; overflow: hidden; min-width: 80px; display: inline-block; vertical-align: middle; }
-  .bar > div { background: #6366f1; height: 100%; }
-  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78em; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78em; font-weight: 600; }
   .pill.ok { background: #d1fae5; color: #065f46; }
   .pill.block { background: #fee2e2; color: #991b1b; }
   .pill.todo { background: #fef3c7; color: #92400e; }
+  .pill.live { background: #dbeafe; color: #1e3a8a; }
   ul { padding-left: 1.2em; }
   li { margin: 0.2em 0; }
   code { background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
-  .card { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.8em 1em; }
-  .num-hero { font-size: 2em; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .num-hero.good { color: #065f46; }
-  .num-hero.warn { color: #92400e; }
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8em; margin: 0.8em 0; }
+  .summary > div { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.6em 0.8em; }
+  .summary .label { font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; }
+  .summary .value { font-size: 1.05em; font-weight: 600; margin-top: 0.2em; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
 
-<h1>Prophet Hacks — status</h1>
-<p class="meta">as of 2026-05-16 09:43 CT · last actor: claude-opus-4-7 · primary track: <strong>forecasting</strong> · head: <code>aeba874</code> · <a href="STATUS.yaml">canonical YAML</a></p>
+<h1>The Oracles — status</h1>
+<p class="meta">team <strong>CanadaHacks</strong> · project <strong>The Oracles</strong> · track <strong>forecasting</strong> · as of 2026-05-16 11:24 CT · <a href="STATUS.yaml">canonical YAML</a> · <a href="https://oracles-agent-production.up.railway.app/dashboard">live dashboard</a></p>
+
+<div class="summary">
+  <div><div class="label">endpoint</div><div class="value"><span class="pill live">LIVE on Railway</span></div></div>
+  <div><div class="label">variant served</div><div class="value">multi_outcome</div></div>
+  <div><div class="label">first call?</div><div class="value">not yet</div></div>
+  <div><div class="label">scores</div><div class="value">none yet</div></div>
+</div>
+
+<h2>Production endpoint</h2>
+<ul>
+<li><code>POST <a href="https://oracles-agent-production.up.railway.app/predict">/predict</a></code> — Prophet Arena calls this</li>
+<li><code>GET <a href="https://oracles-agent-production.up.railway.app/healthz">/healthz</a></code> — health JSON</li>
+<li><code>GET <a href="https://oracles-agent-production.up.railway.app/dashboard">/dashboard</a></code> — live HTML view</li>
+<li><code>GET <a href="https://oracles-agent-production.up.railway.app/docs">/docs</a></code> — Swagger UI</li>
+</ul>
 
 <h2>Brier scores on <code>sample-resolved</code> (n=26)</h2>
-<table>
-<thead><tr><th>variant</th><th>module</th><th class="num">Brier</th><th>vs random 0.25</th><th class="num">$/event</th></tr></thead>
-<tbody>
-<tr><td>random reference</td><td>—</td><td class="num">0.250</td><td><span class="bar"><div style="width:100%"></div></span></td><td class="num">0.000</td></tr>
-<tr><td>uniform_prior</td><td><code>forecast_track:predict_uniform_prior</code></td><td class="num">0.219</td><td><span class="bar"><div style="width:88%"></div></span></td><td class="num">0.000</td></tr>
-<tr><td><strong>single_llm</strong></td><td><code>forecast_track:predict_single_llm</code></td><td class="num"><strong>0.190</strong></td><td><span class="bar"><div style="width:76%"></div></span></td><td class="num">~0.005</td></tr>
-<tr><td>perfect</td><td>—</td><td class="num">0.000</td><td><span class="bar"><div style="width:0"></div></span></td><td class="num">—</td></tr>
-</tbody>
-</table>
-<p class="meta">12 YES / 14 NO. Categories: Sports 16, Entertainment 4, Elections 3, Politics 3. Run: <code>python scripts/backtest_forecast.py --variants uniform_prior,single_llm</code>.</p>
+<p class="meta">Two scoring conventions. Legacy uses binary p_yes vs 0/1 actual. Proper uses sum((p_i − 1[outcome_i==winner])^2) per event averaged across events.</p>
 
-<h2>Next steps</h2>
 <table>
-<thead><tr><th>#</th><th>title</th><th>owner</th><th>status</th><th>eta</th><th class="num">est. cost</th></tr></thead>
+<thead><tr><th>variant</th><th class="num">legacy Brier</th><th class="num">proper per-outcome Brier</th><th>in production?</th></tr></thead>
 <tbody>
-<tr><td>NS1</td><td>Get <code>PA_SERVER_API_KEY</code> from <code>prophetarena.co/profile/api-keys</code></td><td>Rob</td><td><span class="pill block">blocks NS2, NS6</span></td><td>5 min</td><td class="num">$0</td></tr>
-<tr><td>NS2</td><td><code>prophet forecast register --team-name &lt;name&gt;</code></td><td>Claude</td><td><span class="pill todo">waiting on NS1</span></td><td>2 min</td><td class="num">$0</td></tr>
-<tr><td>NS3</td><td>Backtest on sample-sports + entertainment + economics</td><td>Claude</td><td><span class="pill todo">approve $0.50?</span></td><td>15 min</td><td class="num">~$0.50</td></tr>
-<tr><td>NS4</td><td>Ensemble (Sonnet 4.6 + GPT-5.5-pro) with agreement gate</td><td>Claude</td><td><span class="pill todo">approve $0.50?</span></td><td>30 min</td><td class="num">~$0.50</td></tr>
-<tr><td>NS5</td><td>Retrieval-augmented variant (web search per event)</td><td>Claude</td><td><span class="pill todo">stretch</span></td><td>60 min</td><td class="num">~$0.30</td></tr>
-<tr><td>NS6</td><td>Pull live hackathon-day events</td><td>Claude</td><td><span class="pill todo">waiting on NS1</span></td><td>5 min</td><td class="num">$0</td></tr>
-<tr><td>NS7</td><td>Calibration plot per category (portfolio artifact)</td><td>Claude</td><td><span class="pill todo">post-NS3</span></td><td>20 min</td><td class="num">$0</td></tr>
-<tr><td>NS8</td><td>Opus 4.7 swap as upper-bound comparison</td><td>Claude</td><td><span class="pill todo">post-NS3</span></td><td>10 min</td><td class="num">~$0.40</td></tr>
+<tr><td>random reference</td><td class="num">0.250</td><td class="num">~0.50 (2-out) ~0.97 (30-out)</td><td>—</td></tr>
+<tr><td>uniform_prior</td><td class="num">0.219</td><td class="num">—</td><td>—</td></tr>
+<tr><td>single_llm (Sonnet 4.6)</td><td class="num">0.193</td><td class="num">0.6742</td><td>no</td></tr>
+<tr><td>opus_47</td><td class="num">0.230</td><td class="num">—</td><td>no</td></tr>
+<tr><td>opus_46 (leaderboard top agent)</td><td class="num">0.237</td><td class="num">—</td><td>no</td></tr>
+<tr><td>gpt55</td><td class="num">0.198</td><td class="num">—</td><td>no</td></tr>
+<tr><td>gpt52</td><td class="num">0.203</td><td class="num">—</td><td>no</td></tr>
+<tr><td>ensemble_logit</td><td class="num">0.193</td><td class="num">—</td><td>no</td></tr>
+<tr><td>sonnet_cot_shrink</td><td class="num">0.194</td><td class="num">—</td><td>no</td></tr>
+<tr><td><strong>multi_outcome</strong></td><td class="num">0.211</td><td class="num"><strong>0.6510 ← winner</strong></td><td><strong>YES</strong></td></tr>
+<tr><td>multi_outcome_sc3 (subagent in flight)</td><td class="num">—</td><td class="num">—</td><td>not yet</td></tr>
 </tbody>
 </table>
 
-<h2>Traps to avoid</h2>
+<h2>What I&apos;m running in the background</h2>
+<table>
+<thead><tr><th>id</th><th>task</th><th>status</th></tr></thead>
+<tbody>
+<tr><td><code>a2531ca5</code></td><td>self-consistency multi_outcome (k=3, parallel)</td><td><span class="pill todo">running</span></td></tr>
+<tr><td><code>a81f59b7</code></td><td>calibration plot + per-category Brier reports</td><td><span class="pill todo">running</span></td></tr>
+</tbody>
+</table>
+
+<h2>Blocked on you</h2>
 <ul>
-<li><strong>No Kalshi API key.</strong> The <code>ai_prophet_core.forecast.kalshi_client</code> module is from a research paper, not the hackathon. Don't add <code>KALSHI_API_KEY</code> anywhere.</li>
-<li><strong>Trading-track patterns are not the submission target.</strong> <code>agent.py</code>/<code>risk.py</code>/<code>BenchmarkSession</code> live in the repo but are for the tick-trading track. The forecasting submission goes through <code>forecast_track.py</code>.</li>
-<li><strong>Module-level model caches.</strong> Edits to <code>config.yaml</code> or the forecast model don't take effect mid-process; restart required.</li>
-<li><strong>Variable outcomes length.</strong> Some events have 2 outcomes, some have 30. Binary YES = <code>resolved_outcome.value == [outcomes[0]]</code>.</li>
+<li><span class="pill block">2 min</span> Add <code>agent.forecastingpath.com</code> custom domain in Railway UI (CLI/MCP rejected the operation). DNS records will print there to paste at your registrar.</li>
+<li><span class="pill block">async</span> Have your other agent push <code>forecastingpath.com</code> root site to a new public repo (<code>Robby955/forecastingpath</code>) and link it to Vercel.</li>
+<li><span class="pill block">5 min</span> Optional: sign up for Brave Search API (free 2k req/mo) and add <code>BRAVE_API_KEY</code> to <code>variables.txt</code> — unlocks the retrieval variant.</li>
 </ul>
 
-<h2>Open questions for Rob</h2>
+<h2>Open questions answered today</h2>
 <ul>
-<li>Team name for <code>prophet forecast register</code>?</li>
-<li>Approve ~$0.50 spend on the three remaining sample-dataset backtests?</li>
-<li>Approve ~$0.50 spend on the ensemble variant test?</li>
-<li>Commit the two leftover playbook PDFs or keep untracked?</li>
+<li>Response shape — <strong>multi-outcome</strong> <code>{probabilities: [...]}</code>, not binary <code>{p_yes}</code> (Tony Yang confirmation + new docs)</li>
+<li>Scoring — Brier, lower better, summed per-outcome per event then averaged</li>
+<li>Submission — endpoint-only, no upload path</li>
+<li>Event posting — continuous, gated on indexer; <code>last_run_at: null</code> means we&apos;re waiting</li>
 </ul>
 
-<h2>Links</h2>
+<h2>Traps already hit, documented in memory so future agents don&apos;t repeat</h2>
 <ul>
-<li>Developer portal: <a href="https://prophetarena.co/developer">prophetarena.co/developer</a></li>
-<li>API keys (self-serve): <a href="https://prophetarena.co/profile/api-keys">prophetarena.co/profile/api-keys</a></li>
-<li>SDK upstream: <a href="https://github.com/ai-prophet/ai-prophet">ai-prophet/ai-prophet</a> · <a href="https://github.com/Robby955/ai-prophet">our fork</a> (cloned at <code>~/Desktop/ai-prophet/</code>)</li>
-<li>Sample datasets doc: <a href="https://github.com/ai-prophet/ai-prophet/blob/main/docs/using_sample_datasets.md">using_sample_datasets.md</a></li>
-<li>Build-a-bot doc: <a href="https://github.com/ai-prophet/ai-prophet/blob/main/docs/build_a_bot.md">build_a_bot.md</a></li>
-<li>Discord: <a href="https://discord.gg/yGUHfHbu5m">discord.gg/yGUHfHbu5m</a></li>
+<li>Trading vs forecasting track confusion (cost ~2h)</li>
+<li>Cloudflare quick tunnels rotate URLs on restart</li>
+<li>Railway nixpacks venv path is not on $PATH for startCommand</li>
+<li><code>fastapi</code> + <code>uvicorn</code> were locally pip-installed but not in <code>requirements.txt</code></li>
+<li>OpenAI GPT-5.x reject <code>max_tokens</code> + <code>temperature</code> overrides</li>
+<li>Anthropic Opus 4.7 rejects <code>temperature</code></li>
 </ul>
+
+<h2>Budget</h2>
+<p>API spend so far: ~$5 (10 variants × ~26 events with mix of Sonnet/Opus/GPT calls, plus smoke tests). Railway: $0 (trial). <strong>Ample headroom</strong> for the parallel agents and a few retrieval-augmented experiments.</p>
 
 </body>
 </html>

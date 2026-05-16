@@ -1,161 +1,177 @@
 # Prophet Hacks — live status artifact
 #
 # Feedable to any agent (Codex, future Claude runs, scheduled briefings).
-# Hand-edited; keep entries terse. Render the human view with:
-#   python scripts/render_status.py docs/STATUS.yaml docs/STATUS.html
+# Hand-edited; keep entries terse. Render the human view at /dashboard
+# on the live agent or open docs/STATUS.html locally.
 
-version: 1
-as_of: "2026-05-16T09:43:00-05:00"
+version: 2
+as_of: "2026-05-16T11:24:00-05:00"
 last_actor: claude-opus-4-7
+project_name: The Oracles
+team_name: CanadaHacks
+
 event:
   name: "Prophet Hacks"
   kickoff_ct: "2026-05-16T09:00:00-05:00"
   duration_hours: 24
   primary_track: "forecasting"
-  notes_on_track: |
-    Forecasting is `prophet forecast {register,events,predict,evaluate,
-    retrieve,leaderboard}`. Scoring is Brier per
-    ai_prophet_core.forecast.evaluate. Trading-track scaffolding still
-    lives in agent.py/risk.py and remains useful as a portfolio artifact
-    but is NOT the submission target.
+
+production:
+  endpoint_url: "https://oracles-agent-production.up.railway.app/predict"
+  health_url: "https://oracles-agent-production.up.railway.app/healthz"
+  dashboard_url: "https://oracles-agent-production.up.railway.app/dashboard"
+  docs_url: "https://oracles-agent-production.up.railway.app/docs"
+  hosting: "Railway (project mindful-unity, service oracles-agent)"
+  registered_with_prophet_arena: true
+  is_active: true
+  last_run_at: null  # Prophet Arena has not yet called our /predict
+  variant_served: "multi_outcome"
 
 repo:
   remote: "git@github.com:Robby955/prophet-hacks.git"
   branch: "main"
-  head_commit: "aeba874"
-  privacy: "private (flip public after Rob review post-event)"
-  pushed: true
+  privacy: "private during sprint; flip public after Rob review post-event"
 
 forecasting_track:
   contract:
-    predict_signature: "predict(event: dict) -> {p_yes: float in [0.01, 0.99], rationale: str}"
-    submission_shape: |
-      {
-        "timestamp": "ISO 8601",
-        "predictions": [{"market_ticker": str, "p_yes": float, "rationale": str}, ...]
-      }
-    actuals_shape: '{"market_ticker": 1.0 | 0.0, ...}'
-    binary_yes_condition: "resolved_outcome.value == [outcomes[0]]"
+    response_shape: |
+      {"probabilities": [{"market": "<outcome label>", "probability": <0..1>}, ...]}
+    actuals_shape: '{"market_ticker": "<winner label string>"}'
+    binary_yes_condition_deprecated: "old docs said {p_yes, rationale}; that is wrong as of 2026-05-16"
+    submission_mechanism: "endpoint-only; /forecast/endpoints/register; no upload path"
+    sla: "10 minutes per event"
 
-  current_variants:
-    - name: "uniform_prior"
-      module: "forecast_track:predict_uniform_prior"
-      brier_sample_resolved: 0.219
+  variants_in_forecast_track_py:
+    - name: uniform_prior
+      description: "deterministic 1/len(outcomes)"
       cost_per_event_usd: 0.0
-      notes: "Deterministic 1/len(outcomes). Free control baseline."
-    - name: "single_llm"
-      module: "forecast_track:predict_single_llm"
-      model: "claude-sonnet-4-6"
-      brier_sample_resolved: 0.190
+    - name: single_llm
+      description: "one Sonnet 4.6 call; emits binary p_yes for outcomes[0]"
       cost_per_event_usd: 0.005
-      wall_time_per_event_sec: 3.7
-      notes: "Single Anthropic call per event with JSON-parse fallback chain."
+    - name: opus_47
+      description: "one Opus 4.7 call"
+      cost_per_event_usd: 0.015
+    - name: opus_46
+      description: "one Opus 4.6 call; leaderboard top agent reference"
+      cost_per_event_usd: 0.015
+    - name: gpt55
+      description: "one GPT-5.5 call (cross-vendor)"
+      cost_per_event_usd: 0.010
+    - name: gpt52
+      description: "one GPT-5.2 call; leaderboard top OpenAI fixed-context"
+      cost_per_event_usd: 0.010
+    - name: ensemble_logit
+      description: "Sonnet 4.6 + GPT-5.5, logit-mean blend"
+      cost_per_event_usd: 0.015
+    - name: ensemble_leaderboard
+      description: "Sonnet 4.6 + Opus 4.6 + GPT-5.2, logit-mean three-way"
+      cost_per_event_usd: 0.025
+    - name: sonnet_cot
+      description: "Sonnet 4.6 with structured CoT JSON prompt"
+      cost_per_event_usd: 0.007
+    - name: sonnet_cot_shrink
+      description: "sonnet_cot + post-hoc shrinkage to prior"
+      cost_per_event_usd: 0.007
+    - name: multi_outcome
+      description: "ONE Sonnet 4.6 call returns per-outcome probabilities"
+      cost_per_event_usd: 0.010
+      currently_in_production: true
+    - name: multi_outcome_sc3
+      description: "k=3 parallel multi_outcome calls, averaged per-outcome (self-consistency)"
+      cost_per_event_usd: 0.030
+      status: "subagent built it; not yet promoted to production"
 
-  reference_brier:
-    random_05: 0.250
-    perfect: 0.000
-    sample_n_events: 26
-    sample_yes_count: 12
-    sample_no_count: 14
-    sample_categories: {Sports: 16, Entertainment: 4, Elections: 3, Politics: 3}
+  brier_baseline_sample_resolved:
+    n_events: 26
+    note: |
+      Two scoring conventions in use. Legacy backtest uses binary p_yes vs
+      binary 1/0 actual (single_llm winner). Proper per-outcome Brier uses
+      sum((p_i - 1[outcome_i==winner])^2) across all outcomes per event
+      (multi_outcome winner). Standard error on n=26 is ~0.05-0.10 so deltas
+      below that are within noise.
+    legacy_p_yes_brier:
+      uniform_prior: 0.219
+      single_llm: 0.193
+      opus_47: 0.230
+      opus_46: 0.237
+      gpt55: 0.198
+      gpt52: 0.203
+      ensemble_logit: 0.193
+      ensemble_leaderboard: 0.208
+      sonnet_cot: 0.207
+      sonnet_cot_shrink: 0.194
+      multi_outcome: 0.211
+    proper_per_outcome_brier:
+      single_llm_distributed: 0.6742
+      multi_outcome_direct: 0.6510  # +0.0232 better; within SE but architecturally correct
 
-next_steps:
+infra:
+  subagents_in_flight:
+    - id_short: "a2531ca5"
+      task: "predict_multi_outcome_sc3 self-consistency variant"
+      worktree: ".claude/worktrees/agent-a2531ca5c2eee0871"
+      status: "appears to have merged its dispatch entry into main forecast_agent_server.py; awaiting full report"
+    - id_short: "a81f59b7"
+      task: "scripts/build_calibration_report.py + reliability/per-category plots"
+      worktree: ".claude/worktrees/agent-a81f59b78206532fe"
+      status: "running"
+  decommissioned:
+    - "cloudflared quick tunnel (replaced by stable Railway URL)"
+    - "scripts/watchdog.sh, scripts/watch_predictions.sh (no longer needed; container is managed)"
+    - "local FastAPI server (Railway hosts the production instance)"
+
+next_steps_blocked_on_rob:
   - id: NS1
-    title: "Get PA_SERVER_API_KEY"
-    owner: "Rob"
-    blocker_for: ["NS2", "NS6"]
-    where: "https://prophetarena.co/profile/api-keys (self-serve)"
-    eta_minutes: 5
-  - id: NS2
-    title: "Register team via `prophet forecast register --team-name <name>`"
-    owner: "Claude"
-    requires: ["NS1"]
+    title: "Add agent.forecastingpath.com custom domain in Railway UI"
+    why_blocked: "CLI/MCP reject custom-domain operations as Unauthorized"
+    path: "Railway dashboard → mindful-unity → oracles-agent → Settings → Networking → Custom Domain"
     eta_minutes: 2
+  - id: NS2
+    title: "Stand up forecastingpath.com root via Vercel (other agent)"
+    why_blocked: "Rob's other agent is doing this; suggested repo Robby955/forecastingpath"
   - id: NS3
-    title: "Run remaining sample datasets (sample-sports, sample-entertainment, sample-economics) for a larger Brier sample"
-    owner: "Claude"
-    expected_impact: "more reliable comparison; current n=26 is small"
-    eta_minutes: 15
-    cost_usd: ~0.5
-  - id: NS4
-    title: "Ensemble variant: Sonnet 4.6 + GPT-5.5-pro with logit-mean + agreement gate"
-    owner: "Claude"
-    expected_impact: "Brier likely 0.17-0.18 (15-25% improvement vs single Sonnet)"
-    eta_minutes: 30
-    cost_per_event_usd: 0.02
-  - id: NS5
-    title: "Retrieval-augmented variant: web search per event when close_time < N days"
-    owner: "Claude"
-    expected_impact: "biggest possible win; risk of over-fitting prompt"
-    eta_minutes: 60
-    cost_per_event_usd: 0.01
-  - id: NS6
-    title: "Pull live hackathon-day events via `prophet forecast events --status open`"
-    owner: "Claude"
-    requires: ["NS1"]
+    title: "BRAVE_API_KEY for retrieval variant"
+    why_blocked: "needs free signup at brave.com/search/api/"
+    when_added: "I wire predict_multi_outcome_retrieval and backtest"
+
+next_steps_i_can_drive:
+  - id: ND1
+    title: "Merge + promote multi_outcome_sc3 if subagent reports green"
     eta_minutes: 5
-  - id: NS7
-    title: "Calibration plot: predicted bucket vs realized rate, per category"
-    owner: "Claude"
-    expected_impact: "portfolio artifact; surfaces over/underconfidence patterns"
-    eta_minutes: 20
-  - id: NS8
-    title: "Opus 4.7 swap (single model, no ensemble) for comparison"
-    owner: "Claude"
-    expected_impact: "Brier delta unclear; 3x cost; sanity check"
-    eta_minutes: 10
-    cost_per_event_usd: 0.015
+  - id: ND2
+    title: "Merge calibration plot subagent's output"
+    eta_minutes: 5
+  - id: ND3
+    title: "Set up scheduled poller (Railway side cron or Python loop) for endpoint state"
+    eta_minutes: 15
+  - id: ND4
+    title: "Run multi_outcome on the unresolved sample datasets (sample-sports/entertainment/economics) so we have predictions queued for when events resolve"
+    eta_minutes: 15
+    cost_usd: 0.5
+  - id: ND5
+    title: "Per-category prompt experiment (e.g. Sports vs Politics need different framing)"
+    eta_minutes: 60
 
-traps_to_avoid:
-  - "DO NOT add KALSHI_API_KEY anywhere. Prophet Hacks goes through Prophet Arena's own API. Kalshi tickers in the data are just identifiers."
-  - "Trading-track patterns (BenchmarkSession tick loop) are NOT for the forecasting submission. They're parallel work for a separate track."
-  - "Module-level caches in forecast_track.py and forecaster.py read config once at import. Restart the process after editing config to see model changes."
-  - "Outcomes lists vary 2..30. Don't assume binary 2-outcome shape — `predict_uniform_prior` handles this; new variants must too."
+budget_spent_usd_estimate: 5.0  # ~10 variants × ~25 events × $0.005-$0.015 plus a few smoke tests
+budget_remaining_usd_hackathon: "ample; Rob authorized aggressive spend"
 
-artifacts_committed:
-  - "CLAUDE.md"
-  - "forecast_track.py"
-  - "scripts/build_actuals.py"
-  - "scripts/backtest_forecast.py"
-  - "data/resolved.json (sample-resolved, 26 events)"
-  - "data/actuals.json (12 YES / 14 NO)"
-  - "data/predictions/{uniform_prior,single_llm}.json"
-  - "data/predictions/backtest_summary.json"
-  - "docs/DECISIONS.md (now 11 entries)"
-  - "docs/STATUS.yaml (this file)"
-
-open_questions_for_rob:
-  - "Team name for `prophet forecast register`?"
-  - "Approve $0.50 spend on sample-sports + sample-entertainment + sample-economics backtests?"
-  - "Approve $0.50 spend on ensemble variant test against the 26 sample-resolved events?"
-  - "Keep monitoring_demo.py + two playbook PDFs untracked (currently the case) or commit?"
-
-deferred_pre_kickoff_gaps_now_closed:
-  trading_track:
-    - "MAX_TRADES_PER_DAY, MAX_GROSS_EXPOSURE, TICK_SUBMISSION_DEADLINE_SECS imported from ai_prophet_core.ruleset with import-time sanity asserts."
-    - "Network-resilient claim_tick with exponential backoff + 5-min blackout alarm."
-    - "complete_tick in a finally block."
-    - "session.put_plan() wired for server-side audit trail."
-    - "finalize(status='FAILED', error_detail=...) carries diagnostic context."
-
-deferred_remaining_for_sprint_iteration:
-  forecasting:
-    - "Ensemble + agreement gate (port from forecaster.agreement_gate)."
-    - "Retrieval-augmented variant (Codex Goal 2 in docs/CODEX_GOALS.md)."
-    - "Stronger model (Opus 4.7) variant for upper-bound."
-    - "Self-consistency (k samples per event, take median)."
-    - "Per-category Brier breakdown for portfolio."
-  trading:
-    - "Fallback chain walking in forecaster._call_model."
-    - "Longshot guard + logit blend port from monitoring_demo into live agent."
-    - "Batched tool_use forecast (upstream pattern: one call covers all markets)."
+traps_already_hit_dont_repeat:
+  - "DO NOT add KALSHI_API_KEY anywhere"
+  - "DO NOT confuse forecasting vs trading tracks; we are forecasting"
+  - "Endpoint response is multi-outcome {probabilities: [...]} per 2026-05-16 docs, NOT binary {p_yes}"
+  - "OpenAI GPT-5.x reject max_tokens (must be max_completion_tokens) AND temperature override"
+  - "Anthropic Opus 4.7 rejects temperature param"
+  - "Cloudflare quick tunnels rotate URLs every restart; Railway custom domain is the right answer"
+  - "Railway nixpacks venv is at /opt/venv but NOT on PATH; startCommand must use absolute path"
+  - "fastapi + uvicorn must be in requirements.txt (not just locally pip-installed)"
 
 links:
   developer_portal: "https://prophetarena.co/developer"
   api_keys: "https://prophetarena.co/profile/api-keys"
+  leaderboard_web: "https://prophetarena.co/leaderboard/forecast?tab=model"
   sdk_repo: "https://github.com/ai-prophet/ai-prophet"
-  sdk_fork: "https://github.com/Robby955/ai-prophet (cloned at ~/Desktop/ai-prophet/)"
+  sdk_fork: "https://github.com/Robby955/ai-prophet"
+  dataset_registry: "https://github.com/ai-prophet/ai-prophet-datasets"
   sample_datasets_doc: "https://github.com/ai-prophet/ai-prophet/blob/main/docs/using_sample_datasets.md"
-  build_a_bot_doc: "https://github.com/ai-prophet/ai-prophet/blob/main/docs/build_a_bot.md"
   discord: "https://discord.gg/yGUHfHbu5m"
-  leaderboard: "(via `prophet forecast leaderboard`)"
+  railway_project: "https://railway.com/project/9a8a6424-51b7-4723-b853-48a0ec33d45e"

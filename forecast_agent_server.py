@@ -1,9 +1,9 @@
 """FastAPI agent server for Prophet Hacks forecasting track.
 
 The Prophet Arena server pulls predictions from a registered HTTP endpoint
-when new events appear. We wrap `forecast_track.predict` (currently the
-single_llm Sonnet 4.6 variant — our best at Brier 0.191 on sample-resolved)
-behind a /predict route and expose it publicly via a cloudflared tunnel.
+when new events appear. We wrap a `predict_*` variant from
+`forecast_track.py` behind a /predict route and expose it publicly via a
+cloudflared tunnel.
 
 Usage:
     # 1. Start the server:
@@ -26,7 +26,17 @@ Health checks:
 
 Variant routing:
     Set PROPHET_AGENT_VARIANT env var to swap which predict_* in
-    forecast_track.py gets called. Defaults to single_llm (our backtest winner).
+    forecast_track.py gets called. Defaults to single_llm. Set to
+    `multi_outcome` to emit real per-outcome probabilities directly from
+    the model.
+
+Response schema (per the 2026-05-16 server docs):
+    {"probabilities": [{"market": "<outcome>", "probability": <0..1>}, ...]}
+
+For legacy single-`p_yes` variants the server distributes p_yes across
+outcomes (outcomes[0] gets p_yes, the rest evenly share 1-p_yes). For the
+`multi_outcome` variant the per-outcome probabilities are taken straight
+from the model.
 """
 from __future__ import annotations
 
@@ -73,6 +83,7 @@ _VARIANT_FN = {
     "ensemble_leaderboard": forecast_track.predict_ensemble_leaderboard,
     "sonnet_cot": forecast_track.predict_sonnet_cot,
     "sonnet_cot_shrink": forecast_track.predict_sonnet_cot_shrink,
+    "multi_outcome": forecast_track.predict_multi_outcome,
 }.get(_VARIANT_NAME, forecast_track.predict_single_llm)
 
 
@@ -145,8 +156,8 @@ def _distribute_p_yes_to_outcomes(
     (1 - p_yes) / (n - 1). For 2-outcome events this is exact (YES/NO).
     For 3+ outcomes it's an uninformed split across the non-favorite
     outcomes, which is the correct expectation when our underlying variant
-    only emits a single p_yes for outcomes[0]. A future variant that emits
-    per-outcome probabilities directly will replace this distribution step.
+    only emits a single p_yes for outcomes[0]. The `multi_outcome` variant
+    emits per-outcome probabilities directly and skips this step.
     """
     if not outcomes:
         return []
@@ -167,6 +178,10 @@ def predict(event: EventRequest) -> PredictionResponse:
     Contract (2026-05-16 docs):
         request:  event JSON from `prophet forecast retrieve`
         response: {"probabilities": [{"market": str, "probability": float}, ...]}
+
+    If the variant returns a `probabilities` field (multi-outcome variants),
+    use it directly; otherwise distribute the variant's single `p_yes`
+    across the outcomes list for backwards compat with binary variants.
     """
     event_dict = event.model_dump()
     outcomes = event.outcomes or []
@@ -180,7 +195,28 @@ def predict(event: EventRequest) -> PredictionResponse:
     p_yes = max(0.01, min(0.99, p_yes))
     rationale = str(result.get("rationale", ""))[:300]
 
-    probs = _distribute_p_yes_to_outcomes(p_yes, outcomes)
+    # Prefer per-outcome probabilities when the variant emits them
+    # (multi-outcome variants per the 2026-05-16 server schema). Fall back
+    # to distributing the single p_yes for legacy binary variants.
+    raw_probs = result.get("probabilities")
+    if (
+        isinstance(raw_probs, list)
+        and raw_probs
+        and all(
+            isinstance(p, dict) and "market" in p and "probability" in p
+            for p in raw_probs
+        )
+    ):
+        probs = [
+            {
+                "market": str(p["market"]),
+                "probability": max(0.01, min(0.99, float(p["probability"]))),
+            }
+            for p in raw_probs
+        ]
+    else:
+        probs = _distribute_p_yes_to_outcomes(p_yes, outcomes)
+
     log.info(
         "predict %s -> p_yes=%.3f over %d outcomes",
         event.market_ticker, p_yes, len(probs),

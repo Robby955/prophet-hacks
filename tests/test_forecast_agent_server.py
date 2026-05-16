@@ -71,13 +71,21 @@ def test_predict_returns_probability_shape(monkeypatch) -> None:
     }
 
 
-def test_favicon_is_empty_no_content() -> None:
+def test_favicon_serves_real_icon_when_static_present() -> None:
+    """Favicon used to be a 204 stub; commit 84d2584 added a real icon
+    served from static/favicon.ico. Test both shapes: if the static dir
+    exists, expect a 200 with the icon; otherwise the 204 fallback path."""
     client = TestClient(server.app)
 
     response = client.get("/favicon.ico")
 
-    assert response.status_code == 204
-    assert response.content == b""
+    if server._STATIC_DIR.exists() and (server._STATIC_DIR / "favicon.ico").exists():
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "image/x-icon"
+        assert len(response.content) > 0
+    else:
+        assert response.status_code == 204
+        assert response.content == b""
 
 
 def test_dashboard_allows_local_access_without_token(monkeypatch) -> None:

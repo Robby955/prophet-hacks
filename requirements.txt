@@ -17,3 +17,5 @@ pytest>=8.0,<9.0
 # fail with "uvicorn: command not found".
 fastapi>=0.115,<1.0
 uvicorn[standard]>=0.30,<1.0
+# Form parsing for POST /login (the PIN-entry endpoint added 2026-05-16).
+python-multipart>=0.0.20,<1.0

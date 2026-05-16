@@ -54,6 +54,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import (
     HTMLResponse,
+    RedirectResponse,
     Response,
     StreamingResponse,
 )
@@ -291,6 +292,63 @@ def _require_dashboard_auth(request: Request) -> None:
     )
 
 
+def _dashboard_pin() -> str:
+    """Optional shareable PIN. Visitors enter this PIN on /login and get
+    issued the DASHBOARD_AUTH_TOKEN cookie. Lets Rob share the dashboard
+    URL without putting a long random token in URLs.
+
+    Set DASHBOARD_PIN env var on Railway. Recommended: 6-8 digit numeric,
+    rotated periodically.
+    """
+    return os.environ.get("DASHBOARD_PIN", "").strip()
+
+
+def _is_safe_redirect(target: str) -> bool:
+    """Allow only same-origin relative paths to prevent open-redirect bugs."""
+    if not target:
+        return False
+    if not target.startswith("/"):
+        return False
+    if target.startswith("//"):  # protocol-relative
+        return False
+    return True
+
+
+def _wants_html(request: Request) -> bool:
+    """Heuristic: browser navigations send Accept: text/html; API clients
+    typically do not. Used to choose between a /login redirect (HTML) and
+    a 401 JSON response (API)."""
+    accept = request.headers.get("accept", "")
+    return "text/html" in accept.lower()
+
+
+def _require_dashboard_auth_redirect(request: Request) -> None:
+    """Browser-friendly variant: if not authorized, redirect to /login
+    with the current path so the user can enter a PIN. Falls back to 401
+    for API callers (Accept != text/html).
+
+    Use this on HTML routes (/dashboard, /compare, /compare-open).
+    Use plain `_require_dashboard_auth` on JSON routes (/predictions, /events).
+    """
+    if _is_dashboard_authorized(request):
+        return
+    if _wants_html(request) and _dashboard_pin():
+        # Bounce to /login. The handler will read ?next=... and round-trip.
+        target = str(request.url.path)
+        if request.url.query:
+            target += "?" + request.url.query
+        from urllib.parse import quote
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            headers={"Location": f"/login?next={quote(target)}"},
+        )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="dashboard authentication required",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
 def _set_dashboard_cookie_if_needed(response: Response, request: Request) -> None:
     expected = _dashboard_auth_token()
     supplied = request.query_params.get("token", "")
@@ -375,6 +433,149 @@ def root() -> str:
   </div>
 </main>
 </body></html>"""
+
+
+# Rate-limit PIN entry to slow brute-force. Per-IP, in-memory; resets on
+# process restart, which is fine for hackathon scope. Production-grade
+# version would use Redis or similar.
+_PIN_ATTEMPTS: dict[str, list[float]] = {}
+_PIN_MAX_PER_MINUTE = 6
+_PIN_LOCKOUT_AFTER = 12  # after this many failed attempts, ignore for 5 min
+_PIN_LOCKOUT_SECONDS = 300
+
+
+def _pin_rate_limit_ok(ip: str) -> tuple[bool, str]:
+    now = time.time()
+    history = _PIN_ATTEMPTS.get(ip, [])
+    # Drop entries older than 5 minutes
+    history = [t for t in history if now - t < _PIN_LOCKOUT_SECONDS]
+    _PIN_ATTEMPTS[ip] = history
+    if len(history) >= _PIN_LOCKOUT_AFTER:
+        return False, "Too many failed attempts. Try again in a few minutes."
+    recent = [t for t in history if now - t < 60]
+    if len(recent) >= _PIN_MAX_PER_MINUTE:
+        return False, "Slow down. Wait a minute before trying again."
+    return True, ""
+
+
+def _record_pin_attempt(ip: str) -> None:
+    _PIN_ATTEMPTS.setdefault(ip, []).append(time.time())
+
+
+def _login_page_html(*, next_path: str, error: str = "") -> str:
+    """The PIN entry form. Same visual language as the public landing."""
+    from html import escape as _esc
+    next_safe = _esc(next_path) if _is_safe_redirect(next_path) else "/dashboard"
+    err_html = (f'<p class="err">{_esc(error)}</p>' if error else "")
+    return f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForecastingPath · sign in</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<style>
+  body {{ margin: 0; min-height: 100vh; display: grid; place-items: center;
+         background: #f7f8fb; color: #111827;
+         font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }}
+  main {{ width: min(420px, calc(100vw - 32px)); background: #ffffff;
+         border: 1px solid #d8dde6; border-radius: 10px; padding: 28px 32px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.04); }}
+  .brand {{ display: flex; align-items: center; gap: 0.6em; margin: 0 0 1em; }}
+  .brand img {{ width: 36px; height: 36px; border-radius: 8px; }}
+  .brand b {{ font-size: 1.05em; letter-spacing: 0.01em; }}
+  h1 {{ margin: 0 0 0.3em; font-size: 1.25em; }}
+  p {{ color: #5b6472; margin: 0.5em 0; font-size: 0.94em; }}
+  .err {{ color: #b91c1c; font-weight: 600; }}
+  form {{ display: grid; gap: 0.7em; margin-top: 1em; }}
+  input[type="password"], input[type="text"] {{
+    width: 100%; padding: 0.7em 0.8em; font: inherit; font-size: 1.05em;
+    border: 1px solid #d8dde6; border-radius: 6px; letter-spacing: 0.2em;
+    text-align: center;
+  }}
+  button {{ width: 100%; padding: 0.75em; font: inherit; font-size: 1em;
+           font-weight: 650; background: #1d4ed8; color: white;
+           border: 0; border-radius: 6px; cursor: pointer; }}
+  button:hover {{ background: #1e40af; }}
+  .foot {{ font-size: 0.84em; text-align: center; margin-top: 1em; }}
+  a {{ color: #1d4ed8; text-decoration: none; font-weight: 650; }}
+  a:hover {{ text-decoration: underline; }}
+</style>
+</head><body>
+<main>
+  <div class="brand">
+    <img src="/static/flaviconlogo.webp" alt="ForecastingPath">
+    <b>ForecastingPath</b>
+  </div>
+  <h1>Sign in to view the dashboard</h1>
+  <p>This dashboard is shared by PIN. Get it from Rob.</p>
+  {err_html}
+  <form method="post" action="/login" autocomplete="off">
+    <input name="pin" type="password" inputmode="numeric" autocomplete="off"
+           placeholder="PIN" autofocus required>
+    <input type="hidden" name="next" value="{next_safe}">
+    <button type="submit">Enter</button>
+  </form>
+  <p class="foot"><a href="/">← back to ForecastingPath</a></p>
+</main>
+</body></html>"""
+
+
+@app.get("/login", response_class=HTMLResponse, include_in_schema=False)
+def login_get(request: Request) -> HTMLResponse:
+    if _is_dashboard_authorized(request):
+        # Already logged in; bounce to wherever they were going.
+        next_path = request.query_params.get("next", "/dashboard")
+        if _is_safe_redirect(next_path):
+            return RedirectResponse(next_path, status_code=303)  # type: ignore[return-value]
+        return RedirectResponse("/dashboard", status_code=303)  # type: ignore[return-value]
+    next_path = request.query_params.get("next", "/dashboard")
+    error = request.query_params.get("error", "")
+    return HTMLResponse(_login_page_html(next_path=next_path, error=error))
+
+
+@app.post("/login", include_in_schema=False)
+async def login_post(request: Request) -> Response:
+    form = await request.form()
+    pin = str(form.get("pin", "")).strip()
+    next_path = str(form.get("next", "/dashboard"))
+    ip = (request.client.host if request.client else "unknown")
+    expected_pin = _dashboard_pin()
+    token = _dashboard_auth_token()
+
+    if not expected_pin or not token:
+        # Misconfigured server; fall back to a friendly error rather than
+        # a 500.
+        return HTMLResponse(
+            _login_page_html(next_path=next_path,
+                             error="Server not configured for PIN auth. Try the ?token=… URL.")
+        )
+
+    ok, msg = _pin_rate_limit_ok(ip)
+    if not ok:
+        return HTMLResponse(_login_page_html(next_path=next_path, error=msg))
+
+    if not secrets.compare_digest(pin, expected_pin):
+        _record_pin_attempt(ip)
+        return HTMLResponse(_login_page_html(next_path=next_path, error="Wrong PIN. Try again."))
+
+    # Success: set the auth-token cookie + redirect.
+    redirect_to = next_path if _is_safe_redirect(next_path) else "/dashboard"
+    response = RedirectResponse(redirect_to, status_code=303)
+    response.set_cookie(
+        "dashboard_token", token,
+        max_age=12 * 60 * 60,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+    )
+    return response
+
+
+@app.post("/logout", include_in_schema=False)
+def logout() -> Response:
+    response = RedirectResponse("/login", status_code=303)
+    response.delete_cookie("dashboard_token")
+    return response
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -653,7 +854,7 @@ def _brier_color(b: float | None) -> str:
 @app.get("/compare", response_class=HTMLResponse)
 def compare(
     request: Request,
-    _: None = Depends(_require_dashboard_auth),
+    _: None = Depends(_require_dashboard_auth_redirect),
 ) -> HTMLResponse:
     """Multi-model multi-event comparison grid for the resolved backtest set."""
     data = _load_compare_data()
@@ -799,7 +1000,7 @@ Ground truth in <code>data/resolved.json</code>. Full methodology + per-decision
 @app.get("/compare-open", response_class=HTMLResponse)
 def compare_open(
     request: Request,
-    _: None = Depends(_require_dashboard_auth),
+    _: None = Depends(_require_dashboard_auth_redirect),
 ) -> HTMLResponse:
     """Browse our production predictions on the 3 open PA datasets
     (sample-economics, sample-entertainment, sample-sports). 42 events,
@@ -1133,7 +1334,7 @@ def _prob_bars_html(probs: list[dict]) -> str:
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(
     request: Request,
-    _: None = Depends(_require_dashboard_auth),
+    _: None = Depends(_require_dashboard_auth_redirect),
 ) -> HTMLResponse:
     """Live HTML dashboard. Auto-refreshes every 30s."""
     remote = _fetch_remote_state()

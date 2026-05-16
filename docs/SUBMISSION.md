@@ -29,7 +29,10 @@ Before submitting, confirm everything works:
 ./scripts/full_check.sh
 ```
 
-Expected: **11/11 pass**. Specifically:
+Expected: all checks pass. The script reports one OK line per check
+(some steps emit multiple, e.g. summary.html + summary.pdf). The
+total OK count varies by environment; the key thing is the
+`FAIL` count is `0`. Specifically the checks are:
 
 1. Verify gate green (~200 tests)
 2. Working tree clean + HEAD pushed
@@ -42,7 +45,8 @@ Expected: **11/11 pass**. Specifically:
 9. Static artifacts (summary.html + summary.pdf) serve 200
 10. Watcher process alive
 
-Last good run (2026-05-16T22:08Z): 11/11 pass against live.
+Last good run (2026-05-16T22:30Z): all checks pass against live;
+zero failures.
 
 ## What Prophet Arena's call to us looks like
 

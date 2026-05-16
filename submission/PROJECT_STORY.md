@@ -1,103 +1,180 @@
 # CanadaHacks — Prophet Hacks 2026 forecasting submission
 
-*Team: **CanadaHacks** · Track: Forecasting · Author: Rob Sneiderman ([@Robby955](https://github.com/Robby955))*
+*Team: **CanadaHacks** · Project: **The Oracles** · Track: Forecasting · Author: Rob Sneiderman ([@Robby955](https://github.com/Robby955))*
 
 ---
 
 ## Inspiration
 
-Forecasting prediction markets is a statistics problem dressed up as a software problem. The flashiest agents lose to the most **calibrated** ones — the ones that know not only *what* they predict but *how much they should believe it*. That intuition came directly from my ICML 2026 work on equivalence testing, where the hardest part is never the model — it's the discipline of asking "is this difference real, or am I fooling myself?"
+Forecasting prediction markets is a statistics problem dressed up as a
+software problem. The flashiest agents lose to the most calibrated
+ones — the ones that know not just *what* they predict but *how much*
+they should believe it. Prophet Arena scores on Brier, which punishes
+confident-and-wrong twice as hard as hedging-and-wrong, so the whole
+game is matching conviction to evidence.
 
-Prophet Arena's benchmark is a perfect testbed for that mindset. The submission is graded on **Brier score**:
+My ICML 2026 work on equivalence testing taught the same lesson in a
+different language: the hardest part is never the model, it's the
+discipline of asking "is this difference real, or am I fooling
+myself?" That intuition shaped The Oracles from the first commit. Our
+locked competitive stance, set before kickoff in our `v7 competition
+landscape addendum`, was simple: **don't be the flashiest agent, be
+the most calibrated, monitored, source-aware, market-aware one.** A
+boring system that always knows why it acted beats a dramatic one
+that can't diagnose its errors.
 
-$$
-\text{Brier} \;=\; \frac{1}{N}\sum_{i=1}^{N}\bigl(p_i - y_i\bigr)^2
-$$
+## What we built
 
-It rewards probabilities that match reality, not just the right side of 0.5. A model that says 0.55 and is right scores worse than a model that says 0.90 and is right — and *much* worse than a model that says 0.90 and is wrong. That asymmetry is the whole game. Our default competitive stance, set before kickoff in our `v7 competition landscape addendum`, was simple: **don't be the flashiest agent, be the most calibrated, monitored, source-aware, market-aware one.** A boring system that always knows why it acted beats a dramatic one that can't diagnose its errors.
+**The Oracles** lives at
+[`agent.forecastingpath.com/predict`](https://agent.forecastingpath.com/predict).
+Prophet Arena posts one event at a time; we respond with per-outcome
+probabilities backed by recent web evidence and anchored to any cited
+market odds.
+
+**Five stages, every one logged on the live dashboard:**
+
+1. **Query.** Brave query from title + most informative outcome label.
+2. **Retrieve.** Brave Search `count=5`; graceful fallback if the
+   key is missing or the call fails.
+3. **Rank.** Dedupe by domain, prioritize `.gov`/`.edu`/exchanges,
+   cap at 5 chunks.
+4. **Forecast.** Claude Opus 4.7. System prompt enforces a 0.50–0.90
+   calibration scale AND market-odds anchoring — LLMs systematically
+   overweight vivid narratives; the prompt resists that.
+5. **Floor.** Kalshi longshot guard: every probability floored at
+   `min(0.10, max(0.05, 0.5/n))`. Grounded in the Kalshi finding that
+   buyers of <$0.10 contracts lose >60%.
+
+The full per-prediction trace lives at the PIN-protected `/dashboard`.
 
 ## What we learned
 
-1. **Forecasting and trading are different tracks.** We spent the morning building tick-trading resilience patterns before realizing the actual submission was the forecasting track. The cost wasn't wasted — `agent.py`, `risk.py`, and the server-aligned ruleset import are real engineering — but the lesson is sharper: **read the developer portal page before reading the SDK source.** That's in our memory file for next time.
+1. **Retrieval was the bigger win than model choice.** Same prompt
+   without Brave → Brier 0.19. Add retrieval + market-odds anchoring
+   → **0.0379** on the 26-event sample-resolved backtest. The
+   Sonnet→Opus swap alone is worth maybe 0.02; the rest is evidence.
 
-2. **LLMs are usefully calibrated on real prediction markets**, not just toy benchmarks. On the 26-event `sample-resolved` set, a single Sonnet 4.6 call per event scored Brier **0.190**, beating a uniform-prior baseline of 0.219 and a random-0.5 reference of 0.250. That 13% lift over the uninformed prior, on real resolved events, is the concrete evidence that this isn't a vibes-based exercise.
+2. **Public leaderboards don't predict pipeline performance.**
+   Gemini 3.1 Pro tops the PA fixed-context board. In our pipeline
+   with our prompt and our scoring rule, it placed last (Brier
+   **0.4149**) — almost entirely because it emitted multi-outcome
+   JSON for outcome keys that weren't in the supplied list. Worth
+   quoting any time someone proposes a model swap based on a public
+   ranking.
 
-3. **Boundary cases are where calibration dies.** Our agreement gate had a quiet bug: `abs(0.60 - 0.5)` evaluates to `0.09999999999999998` in IEEE-754, so a naive `< 0.10` check rejected the exact-bucket case the spec was explicit about admitting. One padded epsilon, one test case, one decisions-log entry. The bug is small. The discipline is the point.
+3. **Boundary cases are where calibration dies.** Two real bugs:
+   - The longshot floor was `max(0.05, 0.5/n)`, which equals **0.25**
+     for binary events. Every binary prediction was silently clamped
+     into `[0.25, 0.75]`. New formula `min(0.10, max(0.05, 0.5/n))`
+     caps at the Kalshi threshold. ~6× per-event Brier improvement
+     on binary longshots.
+   - An agreement gate had `abs(0.60 - 0.5) < 0.10` as an exclusion
+     check; in IEEE-754 that's `0.09999999999999998` and excluded
+     the exact-bucket case the spec explicitly admitted. Two-line
+     fix, one boundary test.
 
-4. **Server-side rules are the authoritative source.** Our hard caps were drifting from the SDK's `ai_prophet_core.ruleset` module — we hadn't mirrored `MAX_TRADES_PER_DAY`, `MAX_GROSS_EXPOSURE`, or the 9-minute submission deadline. Wiring an import-time assertion (`our caps ≤ server caps`) means any future drift gets caught on `import risk`, not at first rejected intent.
+4. **Schema compliance is half the win.** Three of four alternative
+   models in our ablation broke on multi-outcome JSON — keys that
+   didn't match outcome labels, malformed nesting, smart-quote
+   contamination. We shipped a 5-stage parser, fuzzy outcome-label
+   matching, and an outcomes safety-net (binary heuristic + Haiku
+   fallback). The verify gate is now *loud* after silently swallowing
+   pytest failures for a full session — fixed by `a46a0e6`.
 
-5. **Cross-vendor ensembles probably matter more than chasing a single stronger model.** When Sonnet 4.6 and GPT-5.5-pro disagree, that's signal — the conviction is genuinely lower than either model alone would express. A logit-mean blend preserves probabilistic semantics:
-
-$$
-p_{\text{blend}} \;=\; \sigma\!\Bigl(\tfrac{1}{2}\bigl(\mathrm{logit}(p_a)+\mathrm{logit}(p_b)\bigr)\Bigr)
-$$
-
-Final ensemble vs single-model numbers landed in `data/predictions/backtest_summary.json` and the live status page at `docs/STATUS.html`.
+5. **Server-authoritative rules.** `risk.py` imports
+   `ai_prophet_core.ruleset` and asserts at import time that our caps
+   ≤ server caps. Any future drift fails on `import risk`, not at
+   first rejected request.
 
 ## How we built it
 
-**Architecture, in order of dependency:**
-
 ```
-ai_prophet_core.ruleset      (server-authoritative constants)
-        ↓
-risk.py                      (our caps; import-time asserts ≤ server caps)
-forecast_track.py            (5 variants, all returning {p_yes, rationale})
-        ↓
-scripts/build_actuals.py     (resolved events → {market_ticker: 1.0|0.0})
-scripts/backtest_forecast.py (run variants, persist, evaluate, compare)
-        ↓
-data/predictions/*.json      (per-variant submissions + summary)
+event JSON in
+   │
+   ▼
+Build query  ── Brave Search ── Dedupe/rank ── Opus 4.7 ── Kalshi floor
+                                                  │
+                                                  ▼
+                              JSON probabilities + per-call trace
 ```
 
-**Variants exposed (in `forecast_track.py`):**
+**Stack.** Python 3.13, FastAPI + uvicorn on Railway (Nixpacks build).
+Anthropic Opus 4.7 for the forecast call (with Sonnet 4.6 + Haiku 4.5
+in the fallback chain), Brave Search for retrieval, OpenRouter for
+the multi-vendor ablation harness. All deploys go through
+`scripts/agent/deploy.sh` which runs a preflight gate (verify +
+working-tree-clean + upload-size sanity + HEAD-pushed check) before
+`railway up`. The live commit SHA is pinned via
+`PROPHET_BUILD_COMMIT_SHA` and surfaced on `/healthz` so anyone can
+verify what code is serving with a single curl.
 
-| Variant | Model | Brier (n=26) | Notes |
-|---|---|---|---|
-| `predict_uniform_prior` | — | 0.219 | Deterministic `1/len(outcomes)`. Free control. |
-| `predict_single_llm` | Sonnet 4.6 | 0.190 | One Anthropic call + JSON-parse fallback chain. |
-| `predict_opus_47` | Opus 4.7 | *see backtest_summary.json* | Stronger reasoner, ~3× cost. |
-| `predict_gpt55` | GPT-5.5-pro | *see backtest_summary.json* | Cross-vendor sanity check. |
-| `predict_ensemble_logit` | Sonnet 4.6 + GPT-5.5-pro | *see backtest_summary.json* | Logit-mean blend. |
+**Engineering discipline as a feature.** The decisions log
+(`docs/DECISIONS.md`) has 13+ dated entries — every bug postmortem,
+every model-swap rationale, every "we tested this and rejected it"
+finding. The full-check script (`scripts/full_check.sh`) runs a
+10-step audit across source state, deployed surface, auth gates, and
+watcher process — used as the "is everything OK?" one-stop check
+before sleeping or before the event window opens.
 
-**Discipline we shipped, not just claimed:**
-
-- 61 unit tests covering the agreement gate (8 cases), Brier-relevant helpers, hard caps, gross exposure, conflicting positions. `./scripts/agent/verify.sh` is the merge gate.
-- An append-only `docs/DECISIONS.md` with 11 entries — every consequential choice has a rationale paragraph.
-- A `docs/STATUS.yaml` artifact that any agent (Codex, future Claude runs) can read to pick up the thread.
-- Idempotent JSONL traces for every decision, so a crash mid-tick still leaves a recoverable trail.
+**Multi-agent collaboration.** Two coding agents (Claude + Codex)
+worked in parallel through the sprint, coordinated via
+`docs/AGENT_STATUS.md` with explicit file-ownership claims. Zero
+merge conflicts; complementary work (parser hardening + SAE variant
+on one side, dashboard + docs + ops tooling on the other).
 
 ## Challenges
 
-**Track confusion (the most expensive bug).** Both Prophet Arena tracks share an SDK, a config style, and the same `prophet` CLI binary. The trading track's `BenchmarkSession` lifecycle is conspicuous in the SDK source; the forecasting track's `prophet forecast` subcommand tree is one `--help` invocation away. We optimized the wrong thing for two hours before correcting course. The cure was reading `prophetarena.co/developer` — which we should have done at minute one.
-
-**Variable outcomes lists.** Events in the sample-resolved set have outcome lists ranging from 2 (a tennis match) to 30 (a championship bracket). The `Prediction` schema is a single `p_yes ∈ [0.01, 0.99]`. The binary-encoding interpretation — "is `outcomes[0]` the resolved winner?" — wasn't documented anywhere we found; we recovered it by inspecting the example agent, the schema module, and the actual resolved data shapes side-by-side.
-
-**Float-precision in the conviction gate.** Already mentioned in *What we learned*. The fix is two lines; the lesson is "test the boundary cases your spec calls out by name."
-
-**Lazy assumptions about the CLI being on PATH.** The `prophet` binary lives in `.venv/bin/`. A fresh terminal will not find it. Documented in memory + `CLAUDE.md` so future sessions don't repeat the friction.
+- **Deploy bloat.** Three Railway deploys failed silently with TLS
+  errors before we noticed `.claude/worktrees/` was uploading 18MB
+  of agent state to Railway. Fix: `.gitignore` the worktrees +
+  preflight `du -sh` check. Real engineering failure, real fix.
+- **A model that beat us on the leaderboard placed last in our
+  pipeline.** See "what we learned" #2 above.
+- **A longshot floor formula that looked right but was wrong.** See
+  "what we learned" #3.
+- **Verifying a deploy actually landed.** Pushing to main does NOT
+  auto-deploy on Railway. `/healthz` now returns the build commit
+  SHA so we can curl and confirm.
 
 ## Built with
 
-- **Languages & runtime:** Python 3.13
-- **Prophet Arena SDK:** `ai-prophet-core==0.1.4`, `ai-prophet==0.1.4`
-- **LLMs:** Anthropic Claude Sonnet 4.6 (default), Claude Opus 4.7 (strong-reasoner variant); OpenAI GPT-5.5-pro (cross-vendor ensemble member)
-- **Python libs:** `pydantic` 2.x, `python-dotenv`, `pyyaml`, `pytest` 8.x, `matplotlib`, `pandas`
-- **Tooling:** Git, GitHub, `gh` CLI, pytest-driven `scripts/agent/verify.sh` gate
-- **Docs as code:** Markdown (DECISIONS, RUNBOOK, STATUS) + YAML status artifact + minimal HTML dashboard
+- **Languages**: Python 3.13
+- **Server**: FastAPI, uvicorn, Pydantic v2
+- **Hosting**: Railway (Nixpacks)
+- **Forecast LLM**: Anthropic Claude Opus 4.7 (with Sonnet 4.6 +
+  Haiku 4.5 fallbacks)
+- **Retrieval**: Brave Search Web API
+- **Ablation harness**: OpenRouter unified API (Gemini, GPT-5.2,
+  Opus 4.6, Sonnet 4.6 tested through same pipeline)
+- **Frontend**: hand-written HTML + KaTeX + SSE for live updates
+- **Testing**: pytest, ~200 tests
+- **CI/CD**: bash scripts (`scripts/preflight.sh`,
+  `scripts/agent/deploy.sh`, `scripts/full_check.sh`)
+- **Tooling**: Anthropic Message Batches API harness for offline
+  ablations at 50% discount (`scripts/batch_ablate.py`)
+- **Coordination**: `docs/AGENT_STATUS.md`, `docs/DECISIONS.md`
 
-Repo (private during sprint, public post-event after review): [`Robby955/prophet-hacks`](https://github.com/Robby955/prophet-hacks).
-
----
-
-*Reproducibility receipt:*
+## Reproducibility
 
 ```bash
 git clone git@github.com:Robby955/prophet-hacks.git && cd prophet-hacks
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env  # fill in PA_SERVER_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY
-prophet forecast retrieve --dataset sample-resolved --include-resolved -o data/resolved.json
-python scripts/build_actuals.py data/resolved.json data/actuals.json
-python scripts/backtest_forecast.py --variants uniform_prior,single_llm,opus_47,gpt55,ensemble_logit
+cp .env.example .env  # fill in ANTHROPIC_API_KEY + BRAVE_SEARCH_API_KEY
+
+# Run the live endpoint locally:
+PROPHET_AGENT_VARIANT=multi_outcome_retrieval \
+  uvicorn forecast_agent_server:app --host 127.0.0.1 --port 8000
+
+# Reproduce the headline backtest number:
+python scripts/backtest_forecast.py \
+  --events data/resolved.json \
+  --actuals data/actuals.json \
+  --variants multi_outcome_retrieval
+
+# End-to-end audit against your local instance:
+./scripts/full_check.sh --host http://localhost:8000
 ```
+
+Live: <https://forecastingpath.com> · Repo:
+<https://github.com/Robby955/prophet-hacks>

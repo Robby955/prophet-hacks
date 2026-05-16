@@ -43,14 +43,44 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
   - CI/CD: preflight gate, deploy wrapper, `/healthz` commit SHA, dashboard polish (architecture image, brand fix, favicon, OG tags), commit SHA visible on `/` and `/dashboard`.
   - Dashboard try-form overhauled: example dropdown, description + rules fields, validation, latency display.
 
-## codex/sae-variant-wire (HANDOFF — TODO)
+## codex/handoff-todo-list (2026-05-16T22:35Z)
 
-- **Suggested task:** Build `predict_multi_outcome_retrieval_sae` variant in `forecast_track.py`. Drop-in alternative to current production variant using `forecasting/borrowed_strength.py:borrowed_strength_estimate()` for hierarchical shrinkage. Then run `scripts/backtest_forecast.py --variants multi_outcome_retrieval_sae` and compare to the current Brier 0.0379 baseline.
-- **Why this matters now:** Phase 2 backtest decomposition (see DECISIONS.md 2026-05-16 entries) shows multi-outcome events are where Opus regresses vs Sonnet on n=20 events. SAE shrinkage is specifically designed to fix multi-outcome calibration via domain-level Fay-Herriot effects. This is the empirical test.
-- **Files to touch:** new function in `forecast_track.py` (add to `_VARIANT_FN` map, `_VARIANT_COSTS`, `_VARIANT_DESCRIPTIONS` in `forecast_agent_server.py`). Reuse `_build_query`, `_brave_search`, `_dedupe_by_domain`, `_build_retrieval_user_prompt`, `_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT`, `apply_longshot_guard`. The new step is calling `borrowed_strength_estimate()` on the per-outcome probabilities.
-- **Gotchas:** `borrowed_strength_estimate()` expects `p_market` per outcome — we don't have market prices in the /predict path. Options: (a) skip the market-prior term and use uniform 1/n as the prior, (b) try to parse market odds from the Brave evidence snippets (brittle), (c) just use the model-disagreement + domain-shrinkage parts and skip market_prior. (a) or (c) is the honest path.
-- **Don't:** change config.yaml or PROPHET_AGENT_VARIANT env on Railway. New variant is offline-only for testing first. Decision to promote it to production only after backtest shows improvement.
-- **Verify with:** `./scripts/agent/verify.sh` must stay green, `scripts/preflight.sh` must pass before deploying.
+Concrete asks for Codex when they pick up. Ordered by impact-per-effort.
+First refresh state before any claim: `git fetch && git log --oneline -8`
+and `curl -s https://agent.forecastingpath.com/healthz | jq .commit`.
+
+**1. Verify the landing-page deploy landed.** Expected `/healthz.commit = e8c1beb9` (or newer). If it shows older, `./scripts/agent/deploy.sh "re-deploy landing"`.
+
+**2. Wire SAE variant `predict_multi_outcome_retrieval_sae`** (the original handoff). All inputs ready:
+   - Modules: `forecasting/borrowed_strength.py` (Fay-Herriot, domain effects, market prior), `forecasting/sae_shrinkage.py`, `forecasting/reliability_tracking.py`, `forecasting/uncertainty.py`, `forecasting/domain_pools.py` — all in main since `aedde18b`.
+   - Pattern: new function in `forecast_track.py` reusing `_build_query`, `_brave_search`, `_dedupe_by_domain`, `_build_retrieval_user_prompt`, `_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT`, `apply_longshot_guard`. Insert `borrowed_strength_estimate()` between LLM parse and longshot guard.
+   - Gotcha: `borrowed_strength_estimate()` needs `p_market` per outcome. We don't have market prices in `/predict`. Honest path: skip market-prior term, use 1/n as the prior, keep just model-disagreement + domain-shrinkage. Don't try to parse odds from Brave snippets.
+   - Validate: register in `_VARIANT_FN` map + `_VARIANT_COSTS` + `_VARIANT_DESCRIPTIONS`. Run `scripts/backtest_forecast.py --variants multi_outcome_retrieval_sae`. Compare to 0.0379 baseline. If improves multi-outcome Brier specifically (where Opus regresses), promote.
+   - Don't: change `PROPHET_AGENT_VARIANT` on Railway. New variant is offline-only for testing first.
+
+**3. Multi-vendor ablation on open events.** Currently `/compare` covers only the 26-event resolved set. Run `scripts/ablate_openrouter.py` on each open dataset (`sample-economics/-entertainment/-sports` already pulled to `data/datasets/`) for Opus 4.6 + GPT-5.2 + Sonnet 4.6. Cost ~$8 total. Then extend `/compare-open` to show all-model agreement matrix per event — high disagreement = high-information events to flag.
+
+**4. Reliability diagram on `/compare`.** `evaluation/ece.py:reliability_diagram_data()` already returns the bin data we need. Add an SVG calibration curve at the top of `/compare` showing the production model's reliability across all resolved events. Honest about small-n caveats.
+
+**5. PRs #1 + #4 housekeeping.** Both still open. Leave a comment on each summarizing what was selectively merged (PR #4 obs-slice + SAE shrinkage), what was rejected and why (PR #1's decomposition.py, PR #4's connectors stubs). Don't close unless Rob OKs.
+
+**6. Compute-use / SSE streaming demo.** Rob asked for a "moodspan.org-quality" live demo where pipeline stages stream to the UI. Pattern: `POST /demo/start → GET /demo/stream/:run_id (SSE) → GET /demo/result/:run_id`. Synthetic event + real pipeline. Use the existing SSE infrastructure on `/events`. ~3 hrs of work; flag if descoping.
+
+**7. After first PA call lands.** Inspect `/predictions` to see the actual webhook event shape PA sends — confirm `outcomes` field is present (we built a Haiku safety net for the case where it isn't, but verifying live shape is critical). Check `trace.latency_ms.total` per call to confirm we're nowhere near the 10-min/event timeout.
+
+**8. Don't touch.** `DASHBOARD_PIN` env var (Rob's), `PROPHET_BUILD_COMMIT_SHA` (set by deploy script), `multi_outcome_retrieval` variant in production (don't swap without a measured win), the cherry-picked `forecasting/*` and `evaluation/*` modules (stable now). Anything in `static/` (committed assets).
+
+**Active state (refresh before claiming!):**
+- main: `e8c1beb9` (after landing-page deploy lands)
+- production: `multi_outcome_retrieval` (Opus 4.7 + market-anchor + 0.10 floor)
+- watcher: PID 33661, ~3.5h uptime, no PA activity yet
+- backtest Brier: 0.0379 (40.7% better than Sonnet baseline 0.0639)
+- ~177 tests passing
+- spend this session: ~$10
+
+## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
+
+- See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.
 
 ## codex/cicd-healthz-fix
 

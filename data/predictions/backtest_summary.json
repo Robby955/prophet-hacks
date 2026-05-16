@@ -1,0 +1,22 @@
+[
+  {
+    "variant": "uniform_prior",
+    "n_predictions": 26,
+    "brier_local": 0.219219,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.219219",
+      "n_matched": 26,
+      "brier_score": 0.219219
+    }
+  },
+  {
+    "variant": "single_llm",
+    "n_predictions": 26,
+    "brier_local": 0.190065,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.190065",
+      "n_matched": 26,
+      "brier_score": 0.190065
+    }
+  }
+]

@@ -32,11 +32,43 @@ Resume is automatic — re-running with the same `--slug` calls
 
 ## Architecture
 
+### Forecasting track (primary submission)
+
+```
+forecast_track.py             predict(event) -> {p_yes, rationale}; variants
+scripts/build_actuals.py      resolved-events JSON -> {market_ticker: 1.0|0.0}
+scripts/backtest_forecast.py  run variants, persist predictions, run evaluator, compare Brier
+data/resolved.json            sample-resolved dataset, 26 events
+data/actuals.json             derived: outcomes[0] match -> 1.0 else 0.0
+data/predictions/             one *.json per variant + backtest_summary.json
+```
+
+CLI flow (from upstream `ai-prophet`):
+
+```bash
+prophet forecast register --team-name <name> [--endpoint-url URL]
+prophet forecast retrieve --dataset sample-resolved --include-resolved -o data/resolved.json
+prophet forecast events --status open -o data/events.json        # needs PA_SERVER_API_KEY
+prophet forecast predict --events data/events.json --local forecast_track -o predictions.json
+prophet forecast evaluate --submission predictions.json --actuals data/actuals.json
+prophet forecast leaderboard
+```
+
+Reference Brier scores from the 26-event `sample-resolved` backtest:
+
+| Variant | Brier (lower better) |
+|---|---|
+| random 0.5 | 0.250 |
+| `uniform_prior` | 0.219 |
+| `single_llm` (Sonnet 4.6) | **0.190** |
+
+### Trading track (parallel work)
+
 ```
 agent.py             tick lifecycle (BenchmarkSession) + CLI + signal handlers
 forecaster.py        variant dispatch, prompt, LLM callers, agreement gate
 market_filter.py     eligibility checks (sanity, freshness, headroom, conflicts)
-risk.py              hard caps + invariant asserts (authoritative)
+risk.py              hard caps + invariant asserts (authoritative; imports ai_prophet_core.ruleset)
 logger.py            JSONL trace writer + experiment-log appender
 config.yaml          model routing + policy thresholds (mirrors risk.py for visibility)
 ```

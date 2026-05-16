@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T14:41:05.501189+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.05555555555555555,
+      "rationale": "uniform prior over 18 outcomes; p = 1/18 = 0.056"
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.05,
+      "rationale": "uniform prior over 20 outcomes; p = 1/20 = 0.050"
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.05555555555555555,
+      "rationale": "uniform prior over 18 outcomes; p = 1/18 = 0.056"
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.05,
+      "rationale": "uniform prior over 20 outcomes; p = 1/20 = 0.050"
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.3333333333333333,
+      "rationale": "uniform prior over 3 outcomes; p = 1/3 = 0.333"
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.03333333333333333,
+      "rationale": "uniform prior over 30 outcomes; p = 1/30 = 0.033"
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.09090909090909091,
+      "rationale": "uniform prior over 11 outcomes; p = 1/11 = 0.091"
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "rationale": "uniform prior over 20 outcomes; p = 1/20 = 0.050"
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.07142857142857142,
+      "rationale": "uniform prior over 14 outcomes; p = 1/14 = 0.071"
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.05555555555555555,
+      "rationale": "uniform prior over 18 outcomes; p = 1/18 = 0.056"
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.1,
+      "rationale": "uniform prior over 10 outcomes; p = 1/10 = 0.100"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.08333333333333333,
+      "rationale": "uniform prior over 12 outcomes; p = 1/12 = 0.083"
+    }
+  ]
+}

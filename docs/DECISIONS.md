@@ -65,6 +65,23 @@ rationale, who or what made it, and any related commit SHA.
 - Decided by: org-level `models.list()` call against both providers.
 - Commit: this branch.
 
+## 2026-05-16 · forecasting-track scaffolding + first Brier baseline
+
+- We're on the Prophet Hacks **forecasting track**, not the trading track. The CLI is `prophet forecast {register,events,predict,evaluate,retrieve,leaderboard}` and the scoring is Brier against actual outcomes per `ai_prophet_core.forecast.evaluate`.
+- The Prediction contract is `predict(event: dict) -> {"p_yes": float ∈ [0.01, 0.99], "rationale": str}`. The binary YES condition per market is `resolved_outcome.value == [outcomes[0]]` — i.e. is the first listed outcome the winner.
+- Built `forecast_track.py` with two variants exposing the official contract:
+  - `predict_uniform_prior(event)` — deterministic `1/len(outcomes)`, no LLM cost.
+  - `predict_single_llm(event)` — one Anthropic Sonnet 4.6 call per event.
+- Built `scripts/build_actuals.py` to convert the resolved-events JSON into the `{"market_ticker": 1.0_or_0.0}` shape `prophet forecast evaluate` consumes.
+- Built `scripts/backtest_forecast.py` to run variants, persist predictions, invoke the evaluator, and cross-check Brier locally.
+- **First real numbers against `sample-resolved` (26 events, 12 YES / 14 NO, public dataset):**
+  - random-0.5 reference: 0.250
+  - `uniform_prior`: **0.219**
+  - `single_llm` (Sonnet 4.6): **0.190**  ← +13% improvement on a real-data backtest
+- Cost of the single-LLM run: ~95s wall time, well under $0.20. Plenty of budget to iterate with ensembles or stronger models.
+- Decided by: Claude Code (correcting from the trading-track focus after Rob pointed at `prophetarena.co/developer` and `using_sample_datasets.md`).
+- Commit: this branch.
+
 ## 2026-05-16 · risk.py imports from ai_prophet_core.ruleset; new caps wired
 
 - `risk.py` now imports `ai_prophet_core.ruleset` as `_server` and asserts at import time that every one of our caps is at least as strict as the corresponding server cap. A programmer error (raising our cap above the server's) will be caught on first import rather than at first rejected intent.

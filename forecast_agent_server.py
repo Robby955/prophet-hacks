@@ -387,51 +387,221 @@ def root() -> str:
 <style>
   :root {{
     --bg: #f7f8fb;
+    --bg-alt: #eef2f7;
     --panel: #ffffff;
     --border: #d8dde6;
     --text: #111827;
     --muted: #5b6472;
     --accent: #1d4ed8;
+    --accent-soft: #eef2ff;
     --ok: #047857;
+    --good: #86efac;
+    --bad: #fca5a5;
   }}
   * {{ box-sizing: border-box; }}
-  body {{ margin: 0; min-height: 100vh; display: grid; place-items: center;
-         background: var(--bg); color: var(--text);
+  body {{ margin: 0; background: var(--bg); color: var(--text);
          font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }}
-  main {{ width: min(760px, calc(100vw - 32px)); background: var(--panel);
-         border: 1px solid var(--border); border-radius: 8px; padding: 28px; }}
-  h1 {{ margin: 0 0 6px; font-size: 2rem; letter-spacing: 0; }}
-  p {{ color: var(--muted); margin: 0.6rem 0; }}
-  .status {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-             gap: 10px; margin: 22px 0; }}
-  .tile {{ border: 1px solid var(--border); border-radius: 8px; padding: 12px; }}
-  .label {{ color: var(--muted); font-size: 0.78rem; text-transform: uppercase;
-            font-weight: 700; letter-spacing: 0.04em; }}
-  .value {{ margin-top: 5px; font-weight: 700; overflow-wrap: anywhere; }}
-  a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
-  a:hover {{ text-decoration: underline; }}
-  .links {{ display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }}
-  .dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-          background: var(--ok); margin-right: 7px; }}
-  @media (max-width: 620px) {{ .status {{ grid-template-columns: 1fr; }} }}
+  .container {{ max-width: 1080px; margin: 0 auto; padding: 0 24px; }}
+  /* Hero */
+  .hero {{ padding: 4em 0 3.5em; text-align: center; }}
+  .hero-logo {{ width: 96px; height: 96px; border-radius: 18px;
+                box-shadow: 0 10px 36px rgba(29,78,216,0.15);
+                margin-bottom: 1.2em; }}
+  .hero h1 {{ font-size: 2.6rem; margin: 0 0 0.3em; letter-spacing: -0.02em;
+              font-weight: 700; }}
+  .hero h1 .accent {{ color: var(--accent); }}
+  .hero .tagline {{ font-size: 1.15em; color: var(--muted); max-width: 640px;
+                    margin: 0 auto 1.5em; line-height: 1.5; }}
+  .hero .ctas {{ display: inline-flex; gap: 0.7em; flex-wrap: wrap; justify-content: center; }}
+  .btn {{ display: inline-block; padding: 0.75em 1.4em; border-radius: 8px;
+          font-weight: 650; font-size: 1em; cursor: pointer; }}
+  .btn-primary {{ background: var(--accent); color: white;
+                  box-shadow: 0 4px 16px rgba(29,78,216,0.25); }}
+  .btn-primary:hover {{ background: #1e40af; }}
+  .btn-secondary {{ background: var(--panel); color: var(--accent);
+                    border: 1px solid var(--border); }}
+  .btn-secondary:hover {{ background: var(--accent-soft); }}
+  /* Status strip */
+  .status-strip {{ background: var(--panel); border: 1px solid var(--border);
+                   border-radius: 12px; padding: 1em 1.4em; margin-bottom: 3em;
+                   display: flex; flex-wrap: wrap; gap: 1.8em; align-items: center;
+                   justify-content: center; font-size: 0.92em; }}
+  .status-strip .item {{ display: inline-flex; align-items: center; gap: 0.5em; }}
+  .status-strip .label {{ color: var(--muted); font-size: 0.84em;
+                          text-transform: uppercase; letter-spacing: 0.04em;
+                          font-weight: 700; }}
+  .status-strip code {{ background: var(--bg-alt); padding: 0.18em 0.5em;
+                        border-radius: 4px; font-size: 0.92em; }}
+  .dot {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+          background: var(--ok); }}
+  /* Section */
+  section {{ padding: 0 0 3.5em; }}
+  section h2 {{ font-size: 1.55rem; margin: 0 0 0.6em; letter-spacing: -0.01em; }}
+  section .lede {{ color: var(--muted); margin: 0 0 1.5em;
+                   font-size: 1.04em; max-width: 720px; line-height: 1.55; }}
+  /* Method cards */
+  .method-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                  gap: 1em; }}
+  .method-card {{ background: var(--panel); border: 1px solid var(--border);
+                  border-radius: 10px; padding: 1.2em 1.3em; }}
+  .method-card h3 {{ margin: 0 0 0.4em; font-size: 1.05rem; color: var(--accent); }}
+  .method-card p {{ margin: 0; color: var(--muted); font-size: 0.93em; line-height: 1.5; }}
+  /* Results table */
+  .results {{ background: var(--panel); border: 1px solid var(--border);
+              border-radius: 10px; padding: 1.4em 1.6em; overflow-x: auto; }}
+  .results table {{ width: 100%; border-collapse: collapse; }}
+  .results th, .results td {{ padding: 0.6em 0.8em; text-align: left;
+                              border-bottom: 1px solid var(--border); }}
+  .results th {{ font-weight: 700; font-size: 0.85em; color: var(--muted);
+                 text-transform: uppercase; letter-spacing: 0.04em; }}
+  .results tr.highlight {{ background: #ecfdf5; font-weight: 650; }}
+  .results .brier {{ font-variant-numeric: tabular-nums; font-weight: 650; }}
+  .results .note {{ color: var(--muted); font-size: 0.86em; margin-top: 0.9em; }}
+  /* Architecture image */
+  .arch-figure {{ background: var(--panel); border: 1px solid var(--border);
+                  border-radius: 10px; padding: 1em; }}
+  .arch-figure img {{ display: block; width: 100%; height: auto; border-radius: 6px; }}
+  .arch-figure figcaption {{ color: var(--muted); font-size: 0.88em;
+                              text-align: center; margin-top: 0.7em; }}
+  /* Findings list */
+  .findings ul {{ padding-left: 1.2em; color: var(--text); line-height: 1.65; }}
+  .findings li {{ margin-bottom: 0.4em; }}
+  .findings code {{ background: var(--bg-alt); padding: 0.1em 0.45em;
+                    border-radius: 3px; font-size: 0.92em; }}
+  /* Footer */
+  footer {{ background: var(--bg-alt); padding: 2.5em 0; margin-top: 2em;
+            border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9em; }}
+  footer .container {{ display: flex; flex-wrap: wrap; gap: 2em; justify-content: space-between; }}
+  footer a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
+  footer a:hover {{ text-decoration: underline; }}
+  a {{ color: var(--accent); text-decoration: none; }}
+  @media (max-width: 620px) {{
+    .hero h1 {{ font-size: 2rem; }}
+    .status-strip {{ gap: 1em; }}
+  }}
 </style>
 </head><body>
-<main>
-  <h1>ForecastingPath</h1>
-  <p>The Oracles forecasting agent for Prophet Hacks 2026.</p>
-  <div class="status">
-    <div class="tile"><div class="label">Service</div><div class="value"><span class="dot"></span>online</div></div>
-    <div class="tile"><div class="label">Variant</div><div class="value">{html_escape(_VARIANT_NAME)}</div></div>
-    <div class="tile"><div class="label">Commit</div><div class="value"><code>{html_escape(_BUILD_COMMIT_SHA)}</code></div></div>
+<div class="container">
+
+<div class="hero">
+  <img src="/static/flaviconlogo.webp" alt="ForecastingPath logo" class="hero-logo">
+  <h1>Forecasting<span class="accent">Path</span></h1>
+  <p class="tagline">
+    Evidence-grounded forecasting agent for Prophet Hacks 2026.
+    Web evidence retrieval, Claude Opus 4.7 with market-odds anchoring,
+    a Kalshi-paper longshot guard, and a full audit trail per prediction.
+  </p>
+  <div class="ctas">
+    <a class="btn btn-primary" href="/login">View live dashboard</a>
+    <a class="btn btn-secondary" href="https://github.com/Robby955/prophet-hacks">View source</a>
   </div>
-  <p style="font-size:0.86em;color:var(--muted)">Monitor: <strong>{dashboard_status}</strong> · evidence-grounded probabilistic forecasting · Brier-scored.</p>
-  <p>The public API endpoint remains available for Prophet Arena scoring. Live monitoring is restricted during the event.</p>
-  <div class="links">
-    <a href="/healthz">Health</a>
-    <a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a>
-    <a href="https://github.com/Robby955/prophet-hacks">GitHub</a>
+</div>
+
+<div class="status-strip">
+  <span class="item"><span class="dot"></span><strong>online</strong></span>
+  <span class="item"><span class="label">team</span> CanadaHacks · The Oracles</span>
+  <span class="item"><span class="label">variant</span> <code>{html_escape(_VARIANT_NAME)}</code></span>
+  <span class="item"><span class="label">commit</span> <code>{html_escape(_BUILD_COMMIT_SHA)}</code></span>
+  <span class="item"><span class="label">monitor</span> {dashboard_status}</span>
+</div>
+
+<section>
+  <h2>The method</h2>
+  <p class="lede">Three ideas that survived our ablations and made it into the production pipeline:</p>
+  <div class="method-grid">
+    <div class="method-card">
+      <h3>Evidence-grounded</h3>
+      <p>Every event triggers a Brave Search query built from title + most-informative outcome. Top 5 results, deduped by domain with .gov / .edu / official sources prioritized over aggregators. Titles + snippets get injected into the prompt; URLs are kept for audit only.</p>
+    </div>
+    <div class="method-card">
+      <h3>Market-odds anchoring</h3>
+      <p>System prompt instructs the model to <em>anchor</em> to any cited implied probabilities or sportsbook odds in the evidence, and only move &gt; 5pp away with specific contrary signals. LLMs systematically overweight vivid narratives; this resists that.</p>
+    </div>
+    <div class="method-card">
+      <h3>Kalshi longshot guard</h3>
+      <p>Per-outcome probability floored at <code>min(0.10, max(0.05, 0.5/n))</code> after the model returns. Empirically: Kalshi-paper findings show buyers of &lt; $0.10 contracts lose &gt; 60%. The floor caps at the Kalshi threshold; for n=2 it lets binary predictions sit at 0.10 instead of clamping to 0.25 (a real bug we found by smoke-testing).</p>
+    </div>
   </div>
-</main>
+</section>
+
+<section>
+  <h2>Architecture</h2>
+  <p class="lede">Six stages, each logged and recoverable. The full trace per prediction (Brave query, raw model output, parse path, per-stage latency) lives on the auth-protected dashboard.</p>
+  <figure class="arch-figure">
+    <img src="/static/howagentworks.webp" alt="ForecastingPath agent architecture: ingest event payload, gather high-signal web evidence, prioritize and deduplicate sources, estimate per-outcome probabilities with an LLM, apply longshot safeguard, return structured JSON to the scoring server" loading="lazy">
+    <figcaption>Event payload in → structured JSON out. Brier-scored. Every stage observable.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Results — 26-event sample-resolved backtest</h2>
+  <p class="lede">Same pipeline, five different LLMs swapped in for the forecast call. Public-leaderboard ranking does not predict in-pipeline performance.</p>
+  <div class="results">
+    <table>
+      <thead><tr><th>Model</th><th>Mean Brier</th><th>Binary (n=14)</th><th>Multi-outcome (n=12)</th></tr></thead>
+      <tbody>
+        <tr class="highlight"><td><strong>Claude Opus 4.7</strong> (production)</td><td class="brier">0.0379</td><td class="brier">0.0425</td><td class="brier">0.0177</td></tr>
+        <tr><td>Claude Sonnet 4.6 (previous prod)</td><td class="brier">0.0639</td><td class="brier">0.0879</td><td class="brier">—</td></tr>
+        <tr><td>Claude Opus 4.6 (leaderboard top agent)</td><td class="brier">0.2264</td><td class="brier">0.0438</td><td class="brier">0.4396</td></tr>
+        <tr><td>OpenAI GPT-5.2</td><td class="brier">0.2584</td><td class="brier">0.0538</td><td class="brier">0.4971</td></tr>
+        <tr><td>Gemini 3.1 Pro Preview (leaderboard #1)</td><td class="brier">0.4149</td><td class="brier">0.0750</td><td class="brier">0.8115</td></tr>
+        <tr><td><em>random 0.5 baseline</em></td><td class="brier">0.250</td><td>—</td><td>—</td></tr>
+        <tr><td><em>uniform 1/n prior</em></td><td class="brier">0.219</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Lower is better. Random baseline = 0.25 (binary), uniform 1/n prior = 0.22 (across the mix). Honest caveat: 26 events is a small sample skewed toward binary tennis matches. Live Prophet Arena performance may differ — these numbers establish directional credibility, not convergence. Full per-event grid + rationale on the auth-protected <code>/compare</code> page.</p>
+  </div>
+</section>
+
+<section class="findings">
+  <h2>Findings worth keeping</h2>
+  <ul>
+    <li><strong>The win is JSON schema compliance, not raw reasoning.</strong> Three of four alternative models had Brier ≥ 0.22 mean, dominated by catastrophic multi-outcome failures where they emitted malformed JSON or assigned probability to keys not in the outcome list. Opus 4.7 followed our schema reliably; the alternatives didn't.</li>
+    <li><strong>The longshot floor formula had a real bug.</strong> Old: <code>max(0.05, 0.5/n)</code> = 0.25 for binary, silently clamping every binary prediction into [0.25, 0.75]. New: <code>min(0.10, max(0.05, 0.5/n))</code>. ~6× per-event Brier improvement on binary longshots. Found by smoke-testing the post-Opus-swap pipeline against a Chiefs/SB-LXI synthetic.</li>
+    <li><strong>"Leaderboard #1 ≠ best in your pipeline."</strong> Gemini 3 Pro tops the public Prophet Arena fixed-context leaderboard. In our pipeline with our prompt and our scoring rule, it placed last. Worth quoting any time someone proposes a model swap based on a public ranking.</li>
+    <li><strong>Defensive engineering caught real bugs.</strong> Parser hardening (5 stages, trailing-comma repair, smart-quote normalization) + fuzzy outcome-label matching + outcomes safety-net (binary heuristic + Haiku fallback). Verify gate now <em>loud</em> after silently swallowing pytest failures for an entire session.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What to look at</h2>
+  <div class="method-grid">
+    <div class="method-card">
+      <h3>Live dashboard</h3>
+      <p><a href="/login">/login</a> — PIN-protected live monitor: KPIs, recent predictions with rationale, SSE feed, full pipeline trace per call.</p>
+    </div>
+    <div class="method-card">
+      <h3>Model comparison</h3>
+      <p><a href="/login?next=/compare">/compare</a> — 5-model × 26-event grid, color-coded by Brier, hover for rationale.</p>
+    </div>
+    <div class="method-card">
+      <h3>Open events</h3>
+      <p><a href="/login?next=/compare-open">/compare-open</a> — production predictions on 42 unresolved PA events across 3 datasets.</p>
+    </div>
+    <div class="method-card">
+      <h3>Decisions log</h3>
+      <p><a href="https://github.com/Robby955/prophet-hacks/blob/main/docs/DECISIONS.md">DECISIONS.md</a> — every meaningful call this project made + the reasoning. Read like a postmortem.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div>
+      <strong>ForecastingPath</strong><br>
+      Team CanadaHacks · Project <em>The Oracles</em><br>
+      Prophet Hacks 2026
+    </div>
+    <div>
+      <a href="https://github.com/Robby955/prophet-hacks">GitHub</a> ·
+      <a href="https://prophetarena.co/leaderboard/forecast">PA Leaderboard</a> ·
+      <a href="/healthz">/healthz</a>
+    </div>
+  </div>
+</footer>
+
 </body></html>"""
 
 

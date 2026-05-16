@@ -188,6 +188,42 @@ class PredictionResponse(BaseModel):
     rationale: str | None = None  # not required by spec; we keep it for logs
 
 
+def _build_commit_sha() -> str:
+    """First short SHA we find from: a .commit_sha file written by the
+    deploy script, then Railway-set RAILWAY_GIT_COMMIT_SHA, then a local
+    git rev-parse fallback. Returns 'dev' if none found.
+
+    Surfaced on /healthz so anyone (curl, Codex, another agent, Rob)
+    can verify which code is live without Railway dashboard access.
+    Fixes a class of "is the deploy actually current?" confusion that
+    burned an hour 2026-05-16.
+    """
+    try:
+        with open(".commit_sha") as f:
+            sha = f.read().strip()
+            if sha:
+                return sha[:8]
+    except (FileNotFoundError, OSError):
+        pass
+    env_sha = os.environ.get("RAILWAY_GIT_COMMIT_SHA", "").strip()
+    if env_sha:
+        return env_sha[:8]
+    try:
+        import subprocess
+        out = subprocess.run(
+            ["git", "rev-parse", "--short=8", "HEAD"],
+            capture_output=True, text=True, timeout=2,
+        )
+        if out.returncode == 0 and out.stdout.strip():
+            return out.stdout.strip()
+    except Exception:
+        pass
+    return "dev"
+
+
+_BUILD_COMMIT_SHA: str = _build_commit_sha()
+
+
 @app.get("/healthz")
 def healthz() -> dict[str, Any]:
     return {
@@ -196,6 +232,7 @@ def healthz() -> dict[str, Any]:
         "project": "The Oracles",
         "variant": _VARIANT_NAME,
         "version": app.version,
+        "commit": _BUILD_COMMIT_SHA,
     }
 
 

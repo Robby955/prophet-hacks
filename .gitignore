@@ -17,6 +17,9 @@ dist/
 .ruff_cache/
 .coverage
 
+# Build-time SHA file written by scripts/agent/deploy.sh; never committed
+.commit_sha
+
 # Claude Code session state - worktrees can be 10+MB; broke 3 railway deploys 2026-05-16
 .claude/
 # Scratch dir from a different agent; not wired in, not for deploy

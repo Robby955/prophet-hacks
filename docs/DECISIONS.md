@@ -166,3 +166,36 @@ rationale, who or what made it, and any related commit SHA.
 - Added focused tests for Brier/ECE validation, return math, leakage detection, and `/events` dashboard auth.
 - Decided by: Codex after requested code review of commits `2e38088..b5ed6de`.
 - Commit: this branch.
+
+## 2026-05-16 · Opus 4.7 in `predict_multi_outcome_retrieval`
+
+- The production forecast variant now calls `claude-opus-4-7` instead of `claude-sonnet-4-6`. `config.yaml` updated; Sonnet 4.6 prepended to the fallback chain.
+- Rationale: branch smoke-test on a synthetic Chiefs/SB-LXI longshot showed Sonnet returned 0.25 (ignoring the +1500 / ~6% implied price the same Brave search surfaced), while Opus 4.7 returned 0.06 raw with the same evidence. Opus anchors to cited market odds materially better. Cost goes from ~$0.02 to ~$0.10/call; for hackathon volume the absolute cost is trivial vs the Brier upside.
+- Companion change: the multi-outcome retrieval system prompt now has an explicit "market-odds anchoring" block — anchor to cited odds, move >0.05 only with specific contrary evidence.
+- Decided by: Claude during Phase 2 work, authorized by Rob.
+- Commit: `9652016`.
+
+## 2026-05-16 · `longshot_guard_floor` capped at 0.10 (bug fix)
+
+- Old formula `max(0.05, 0.5 / n_outcomes)` set the binary floor to 0.25, silently clamping every binary prediction into [0.25, 0.75]. New formula: `min(0.10, max(0.05, 0.5 / n_outcomes))`. 0.10 is the principled Kalshi-paper empirical threshold (sub-$0.10 contracts lose >60%).
+- Discovered when the post-Opus-swap branch smoke returned 0.06 raw and the guard inflated it to 0.25, destroying ~0.06 of Brier on a single binary event. Per-event improvement on binary longshots is roughly 6x (0.0625 -> 0.0100).
+- A unit test asserting `longshot_guard_floor(2) <= 0.10` would have caught this; backlogged.
+- Decided by: Claude after smoke-test surfaced the clamp. Authorized by Rob.
+- Commit: `9652016`.
+
+## 2026-05-16 · `.claude/` and `proposed_retrieval/` gitignored to fix deploys
+
+- `railway up` uploads all untracked files. Three deploys (`92c5c5f4`, `c897643c`, `872b769a`) failed because `.claude/worktrees/` was 18MB and either corrupted the upload (TLS BadRecordMac) or busted the build with no logs.
+- Fix: gitignore `.claude/` and `proposed_retrieval/`. Subsequent deploy `415edc6e` succeeded cleanly. Smoke confirmed live: Knicks 2027 NBA Finals longshot returned 0.10 (was 0.25 on old code), proving Opus + new floor are running.
+- Lesson: `du -sh` of what `railway up` would actually send should be a pre-deploy step. Added `scripts/preflight.sh` to formalize this.
+- Decided by: Claude after diagnosing the deploy bloat.
+- Commit: `a6cfcc7`.
+
+## 2026-05-16 · CI/CD hardening — preflight, deploy wrapper, /healthz commit SHA
+
+- `scripts/preflight.sh`: runs verify gate, checks working tree clean, confirms HEAD = origin/main, sums upload size (warns >10MB), surfaces deployed-SHA vs local HEAD.
+- `scripts/agent/deploy.sh`: single safe path to deploy. Runs preflight, pins commit SHA to `.commit_sha`, calls `railway up --detach`. Use this instead of raw `railway up`.
+- `forecast_agent_server.py:_build_commit_sha()`: reads `.commit_sha` (preferred), then `RAILWAY_GIT_COMMIT_SHA`, then a `git rev-parse` fallback. Surfaced as `"commit"` field on `/healthz`. Now anyone (curl, Codex, future-Rob) can verify which code is live with a single GET.
+- Rationale: today the question "is the deploy actually current?" cost ~1 hour of confusion. Each of these three hardens a specific failure mode from the day's incidents.
+- Decided by: Claude, authorized by Rob ("All three now, before next PA call").
+- Commit: this commit.

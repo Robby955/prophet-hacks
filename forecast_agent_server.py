@@ -24,7 +24,8 @@ Variant routing:
     Set PROPHET_AGENT_VARIANT env var to swap which predict_* in
     forecast_track.py gets called. The local fallback is single_llm;
     production currently sets `multi_outcome_retrieval`, which uses Brave
-    Search evidence plus the multi-outcome Sonnet prompt.
+    Search evidence plus the multi-outcome Opus 4.7 prompt with market-odds
+    anchoring (Phase 2, 2026-05-16).
 
 Response schema (per the 2026-05-16 server docs):
     {"probabilities": [{"market": "<outcome>", "probability": <0..1>}, ...]}
@@ -1045,14 +1046,38 @@ def dashboard(
 {scores_block}
 
 <h2>Try a prediction yourself</h2>
-<p class="meta">Fills in a real event-shaped request and hits our production endpoint. You'll see the same JSON Prophet Arena will get when they query us.</p>
+<p class="meta">Sends an event-shaped request to our production endpoint. You see the exact JSON Prophet Arena gets. Pick an example or write your own — the pipeline does Brave search, Opus 4.7 reads evidence with market-odds anchoring, longshot guard caps low values.</p>
 <form class="try" onsubmit="event.preventDefault(); doTry();">
-  <label>Event title</label><input id="ti" value="Will the US Federal Reserve cut rates at the December 2026 meeting?">
-  <label>Category</label><input id="ca" value="Economics">
-  <label>Outcomes (comma-separated)</label><input id="ou" value="Yes, No">
-  <label>Close time (ISO 8601)</label><input id="ct" value="2026-12-31T23:59:59Z">
+  <label>Load an example</label>
+  <select id="example-select" onchange="loadExample(this.value)">
+    <option value="">— pick one or write your own below —</option>
+    <option value="fed">Fed rate cut (binary, Economics)</option>
+    <option value="superbowl">Super Bowl LXI winner (multi-outcome, Sports)</option>
+    <option value="election">US 2028 election outcome (multi-outcome, Politics)</option>
+    <option value="agi">AGI declared by 2030 (binary, Tech)</option>
+    <option value="weather">UK record-hot July 2026 (binary, Climate)</option>
+  </select>
+
+  <label>Event title <span class="meta">(required, plain English question)</span></label>
+  <input id="ti" value="Will the US Federal Reserve cut rates at the December 2026 meeting?" required>
+
+  <label>Category</label>
+  <input id="ca" value="Economics">
+
+  <label>Outcomes <span class="meta">(comma-separated, at least 2)</span></label>
+  <input id="ou" value="Yes, No" required>
+
+  <label>Close time <span class="meta">(ISO 8601, must be in the future)</span></label>
+  <input id="ct" value="2026-12-31T23:59:59Z" required>
+
+  <label>Description <span class="meta">(optional, helps the model)</span></label>
+  <textarea id="ds" rows="2" placeholder="Background context that helps the agent understand the question."></textarea>
+
+  <label>Rules <span class="meta">(optional, resolution criteria)</span></label>
+  <textarea id="rs" rows="2" placeholder="Exactly how does this resolve? e.g. 'YES if the FOMC announces a rate cut at the December 2026 meeting.'"></textarea>
+
   <button type="submit">Predict</button>
-  <div id="try-result">Submit a question to see live per-outcome probabilities (takes ~5 seconds — Brave search plus one Sonnet call).</div>
+  <div id="try-result">Submit a question to see live per-outcome probabilities (~5–10 seconds: one Brave search + one Opus 4.7 call).</div>
 </form>
 
 <h2>Variant comparison (26-event backtest)</h2>
@@ -1075,22 +1100,88 @@ def dashboard(
 
 </div>
 <script>
+const EXAMPLES = {{
+  fed: {{ title: "Will the US Federal Reserve cut rates at the December 2026 meeting?",
+         category: "Economics", outcomes: "Yes, No",
+         close_time: "2026-12-31T23:59:59Z",
+         description: "FOMC meets in December 2026 to set the federal funds rate.",
+         rules: "YES if the FOMC announces a rate cut at the December 2026 meeting; otherwise NO." }},
+  superbowl: {{ title: "Who wins Super Bowl LXI in February 2027?",
+         category: "Sports", outcomes: "Kansas City Chiefs, Philadelphia Eagles, Baltimore Ravens, Buffalo Bills, San Francisco 49ers, Detroit Lions, Other",
+         close_time: "2027-02-14T23:59:59Z",
+         description: "Super Bowl LXI is the NFL championship game in February 2027.",
+         rules: "Resolves to the team that wins Super Bowl LXI. 'Other' if winner is none of the listed teams." }},
+  election: {{ title: "Which party wins the 2028 US Presidential Election?",
+         category: "Politics", outcomes: "Democratic, Republican, Third party / Other",
+         close_time: "2028-11-08T23:59:59Z",
+         description: "US presidential election November 2028.",
+         rules: "Resolves to the party of the candidate who wins a majority of Electoral College votes." }},
+  agi: {{ title: "Will a top AI lab publicly declare AGI by end of 2030?",
+         category: "Tech", outcomes: "Yes, No",
+         close_time: "2030-12-31T23:59:59Z",
+         description: "A 'top AI lab' means OpenAI, Anthropic, DeepMind, xAI, Meta, or similar major frontier lab.",
+         rules: "YES if any top AI lab makes a formal public statement claiming to have achieved AGI by Dec 31, 2030." }},
+  weather: {{ title: "Will any UK weather station record above 40C in July 2026?",
+         category: "Climate", outcomes: "Yes, No",
+         close_time: "2026-07-31T23:59:59Z",
+         description: "Reference: UK record is 40.3C set July 2022 at Coningsby.",
+         rules: "YES if at least one UK Met Office-recognized weather station records a temperature above 40.0C in July 2026." }},
+}};
+
+function loadExample(key) {{
+  const ex = EXAMPLES[key];
+  if (!ex) return;
+  document.getElementById("ti").value = ex.title;
+  document.getElementById("ca").value = ex.category;
+  document.getElementById("ou").value = ex.outcomes;
+  document.getElementById("ct").value = ex.close_time;
+  document.getElementById("ds").value = ex.description;
+  document.getElementById("rs").value = ex.rules;
+}}
+
+function validateInputs() {{
+  const errs = [];
+  const title = document.getElementById("ti").value.trim();
+  if (!title || title.length < 10) errs.push("Title must be at least 10 characters.");
+  const outs = document.getElementById("ou").value.split(",").map(s => s.trim()).filter(Boolean);
+  if (outs.length < 2) errs.push("Need at least 2 outcomes (comma-separated).");
+  const ct = document.getElementById("ct").value.trim();
+  if (!/^\\d{{4}}-\\d{{2}}-\\d{{2}}T\\d{{2}}:\\d{{2}}:\\d{{2}}Z?$/.test(ct)) errs.push("Close time must be ISO 8601 (e.g. 2026-12-31T23:59:59Z).");
+  try {{ if (new Date(ct).getTime() < Date.now()) errs.push("Close time should be in the future."); }} catch (_) {{}}
+  return errs;
+}}
+
 async function doTry() {{
   const out = document.getElementById("try-result");
-  out.textContent = "calling /predict ...";
+  const errs = validateInputs();
+  if (errs.length) {{
+    out.textContent = "Fix these first:\\n  - " + errs.join("\\n  - ");
+    return;
+  }}
+  out.textContent = "calling /predict ... (Brave + Opus 4.7 typically takes 5–10s)";
   const outcomes = document.getElementById("ou").value.split(",").map(s => s.trim()).filter(Boolean);
   const body = {{
-    event_ticker: "dashboard-try", market_ticker: "dashboard-try",
-    title: document.getElementById("ti").value,
-    category: document.getElementById("ca").value,
-    close_time: document.getElementById("ct").value,
-    outcomes
+    event_ticker: "dashboard-try-" + Date.now(),
+    market_ticker: "dashboard-try-" + Date.now(),
+    title: document.getElementById("ti").value.trim(),
+    category: document.getElementById("ca").value.trim() || "General",
+    close_time: document.getElementById("ct").value.trim(),
+    outcomes,
+    description: document.getElementById("ds").value.trim() || null,
+    rules: document.getElementById("rs").value.trim() || null,
   }};
+  const t0 = performance.now();
   try {{
     const r = await fetch("/predict", {{method: "POST", headers: {{"content-type": "application/json"}}, body: JSON.stringify(body)}});
+    const dt = ((performance.now() - t0)/1000).toFixed(1);
+    if (!r.ok) {{
+      const errBody = await r.text();
+      out.textContent = `HTTP ${{r.status}} after ${{dt}}s\\n${{errBody.slice(0, 500)}}`;
+      return;
+    }}
     const j = await r.json();
-    out.textContent = JSON.stringify(j, null, 2);
-  }} catch (e) {{ out.textContent = "error: " + e.message; }}
+    out.textContent = `latency: ${{dt}}s\\n` + JSON.stringify(j, null, 2);
+  }} catch (e) {{ out.textContent = "network error: " + e.message; }}
 }}
 
 (function initSSE() {{

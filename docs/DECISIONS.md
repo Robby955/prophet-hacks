@@ -209,3 +209,13 @@ rationale, who or what made it, and any related commit SHA.
 - **Don't overclaim:** 26 events is a tiny sample, and the dataset skews toward binary tennis matches where the longshot guard fix matters disproportionately. Live Prophet Arena events may have a different outcome-count distribution. Treat the 0.0379 number as "directionally validated, not converged."
 - Decided by: Claude after Rob asked for real proof rather than vibes; spend ~$2.60 for the rerun.
 - Commit: this commit.
+
+## 2026-05-16 · Gemini 3.1 Pro Preview ablation — keep Opus 4.7
+
+- Ran `google/gemini-3.1-pro-preview` through OpenRouter using the SAME `predict_multi_outcome_retrieval` pipeline (same Brave retrieval, same anchor prompt, same longshot floor) on the 26-event sample-resolved set.
+- Result: **mean Brier 0.4149 vs Opus 4.7's 0.0379** — Gemini was ~11x worse on this dataset, dominated by catastrophic multi-outcome failures (multi-mean 0.8115). Inspection showed Gemini emitting malformed JSON on multi-outcome events (trailing commas, bogus keys like `"1"` instead of outcome labels) — our prompt's "use EXACT outcome labels supplied" instruction didn't land.
+- Total spend: ~$0.44.
+- **Important lesson:** Gemini 3 Pro is the public Prophet Arena leaderboard's #1 fixed-context model. That ranking is on PA's own harness, not ours. **Leaderboard #1 ≠ best in your pipeline.** Worth quoting in any "model selection" portfolio section.
+- Decision: stay on Opus 4.7 for production. The ablation script `scripts/ablate_openrouter.py` is now the harness for any future "should we swap?" question — run it on the same 26 events before any model swap.
+- Decided by: Claude, authorized by Rob to spend on ablation rather than vibes.
+- Commit: this commit.

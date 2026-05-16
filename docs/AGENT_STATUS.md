@@ -33,10 +33,24 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 
 ## claude/phase-2-and-cicd
 
-- **Current task:** Phase 2 (Opus 4.7 + market anchoring + floor bug fix) shipped + CI/CD hardening (preflight, deploy wrapper, /healthz commit SHA).
-- **Files owned this session:** `forecast_track.py`, `forecast_agent_server.py`, `config.yaml`, `scripts/preflight.sh`, `scripts/agent/deploy.sh`, `scripts/analyze_results.py`, `docs/HANDOFF.md`, `docs/DECISIONS.md`, `.gitignore`.
-- **Last updated:** 2026-05-16T19:58:00Z
-- **Notes:** Deploy is automated and verified-live. Watcher PID 33661 active. Open PRs #1 (calibrator + ensemble — Phase 3 candidate) and #4 (SAE stack — Phase 3 after first PA call). Waiting for first Prophet Arena call.
+- **Current task:** Phase 2 deployed, backtest done, SAE modules pulled, Gemini ablation done, dashboard try-form overhaul shipped. Now handing the live-variant SAE wiring to Codex (see below).
+- **Files owned this session:** `forecast_track.py`, `forecast_agent_server.py`, `config.yaml`, `scripts/preflight.sh`, `scripts/agent/deploy.sh`, `scripts/analyze_results.py`, `scripts/ablate_openrouter.py`, `forecasting/borrowed_strength.py`, `forecasting/sae_shrinkage.py`, `forecasting/reliability_tracking.py`, `forecasting/uncertainty.py`, `forecasting/domain_pools.py`, `tests/test_borrowed_strength.py`, `tests/test_sae_shrinkage.py`, `tests/test_forecast_agent_server.py`, `docs/HANDOFF.md`, `docs/DECISIONS.md`, `.gitignore`, `static/`.
+- **Last updated:** 2026-05-16T21:05:00Z
+- **Real measured wins this session:**
+  - Phase 2 (Opus 4.7 + market-anchor prompt + 0.10 floor cap on `longshot_guard_floor`): backtest mean Brier **0.0379** vs Sonnet baseline 0.0639 (**40.7% relative reduction**). Source of the gain is mostly the floor-bug fix on binary events; Opus anchoring is secondary. Documented in DECISIONS.md.
+  - Gemini 3.1 Pro Preview ablation through OpenRouter: 0.4149 mean Brier (~11x worse, multi-outcome catastrophic). Decision: stay on Opus 4.7. `scripts/ablate_openrouter.py` is now the standard harness for any "swap model?" question.
+  - SAE modules from PR #4 cherry-picked as net-new files; 31 new tests pass; total 127.
+  - CI/CD: preflight gate, deploy wrapper, `/healthz` commit SHA, dashboard polish (architecture image, brand fix, favicon, OG tags), commit SHA visible on `/` and `/dashboard`.
+  - Dashboard try-form overhauled: example dropdown, description + rules fields, validation, latency display.
+
+## codex/sae-variant-wire (HANDOFF — TODO)
+
+- **Suggested task:** Build `predict_multi_outcome_retrieval_sae` variant in `forecast_track.py`. Drop-in alternative to current production variant using `forecasting/borrowed_strength.py:borrowed_strength_estimate()` for hierarchical shrinkage. Then run `scripts/backtest_forecast.py --variants multi_outcome_retrieval_sae` and compare to the current Brier 0.0379 baseline.
+- **Why this matters now:** Phase 2 backtest decomposition (see DECISIONS.md 2026-05-16 entries) shows multi-outcome events are where Opus regresses vs Sonnet on n=20 events. SAE shrinkage is specifically designed to fix multi-outcome calibration via domain-level Fay-Herriot effects. This is the empirical test.
+- **Files to touch:** new function in `forecast_track.py` (add to `_VARIANT_FN` map, `_VARIANT_COSTS`, `_VARIANT_DESCRIPTIONS` in `forecast_agent_server.py`). Reuse `_build_query`, `_brave_search`, `_dedupe_by_domain`, `_build_retrieval_user_prompt`, `_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT`, `apply_longshot_guard`. The new step is calling `borrowed_strength_estimate()` on the per-outcome probabilities.
+- **Gotchas:** `borrowed_strength_estimate()` expects `p_market` per outcome — we don't have market prices in the /predict path. Options: (a) skip the market-prior term and use uniform 1/n as the prior, (b) try to parse market odds from the Brave evidence snippets (brittle), (c) just use the model-disagreement + domain-shrinkage parts and skip market_prior. (a) or (c) is the honest path.
+- **Don't:** change config.yaml or PROPHET_AGENT_VARIANT env on Railway. New variant is offline-only for testing first. Decision to promote it to production only after backtest shows improvement.
+- **Verify with:** `./scripts/agent/verify.sh` must stay green, `scripts/preflight.sh` must pass before deploying.
 
 ## codex/cicd-healthz-fix
 

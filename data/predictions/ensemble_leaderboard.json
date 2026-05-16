@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T15:18:52.749934+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.4832836744057148,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.450, gpt52=0.500) = 0.483. S: No information available about the rankings, form, or head-t | O: This is a W15 (lowest level ITF) match between two relativel | G: I don\u2019t have access to match results here, and no other info"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.5333953238269986,
+      "rationale": "ensemble3 logit-mean(sonnet=0.550, opus46=0.550, gpt52=0.500) = 0.533. S: Francisco Rocha is likely the home favorite playing in Oeira | O: This is a Challenger qualifying R1 match. Rocha, likely a Po | G: I don\u2019t have access to the match result or reliable reportin"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.5,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.500, gpt52=0.500) = 0.500. S: No information available about the rankings, recent form, or | O: This is a future ATP Challenger match (May 2026) between two | G: I don\u2019t have access here to the official match result for th"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.500, gpt52=0.500) = 0.500. S: No specific information available about this match result, p | O: This is a future ATP Challenger match (May 5, 2026) between  | G: With no match result provided and no other concrete signals "
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.500, gpt52=0.500) = 0.500. S: No information available about this specific match outcome o | O: This is a future match (May 5, 2026) for which I have no inf | G: I don\u2019t have access here to the actual May 5, 2026 match res"
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.25647639084791135,
+      "rationale": "ensemble3 logit-mean(sonnet=0.250, opus46=0.200, gpt52=0.330) = 0.256. S: Pakistan is historically a much stronger Test cricket team t | O: In Test cricket, Pakistan has historically been significantl | G: With no match-specific information, I lean toward Pakistan a"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.42985748800076856,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.300, gpt52=0.500) = 0.430. S: No information available about this future cricket match bet | O: In County Championship cricket, home advantage exists but is | G: No match result or contextual information (team strength, ve"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.500, gpt52=0.500) = 0.500. S: No information available about this future match (May 2026). | O: This is a future County Championship cricket match scheduled | G: No match result or contextual information (teams\u2019 form, venu"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.4662625818204466,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.400, gpt52=0.500) = 0.466. S: No information available about this future match or the rela | O: This is a County Championship match between Worcestershire a | G: No match result or relevant performance/lineup information i"
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.6760621297457192,
+      "rationale": "ensemble3 logit-mean(sonnet=0.750, opus46=0.650, gpt52=0.620) = 0.676. S: PSG has dominated Ligue 1 historically, winning 11 of the la | O: PSG has dominated Ligue 1 in recent years, winning 10 of the | G: Without access to the actual 2025-26 final table, I lean on "
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.3056957621871324,
+      "rationale": "ensemble3 logit-mean(sonnet=0.300, opus46=0.350, gpt52=0.270) = 0.306. S: Real Madrid are historically the most successful La Liga clu | O: Real Madrid and Barcelona have dominated La Liga historicall | G: Given no season-specific information, I lean on typical La L"
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.05030159008433894,
+      "rationale": "ensemble3 logit-mean(sonnet=0.070, opus46=0.030, gpt52=0.060) = 0.050. S: SC Braga is a competitive mid-tier Portuguese club that occa | O: The Portuguese league has been dominated by the 'Big Three'  | G: With no season-specific information available, the best esti"
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.13936859906582566,
+      "rationale": "ensemble3 logit-mean(sonnet=0.150, opus46=0.150, gpt52=0.120) = 0.139. S: Napoli are the reigning Serie A champions (2024-25) and have | O: Napoli won the 2024-25 Serie A title under Conte, making the | G: Uninformed prior is 5% (1/20), but title races are typically"
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.3759356369614698,
+      "rationale": "ensemble3 logit-mean(sonnet=0.420, opus46=0.380, gpt52=0.330) = 0.376. S: Breda is listed first and likely the home team in this Eredi | O: Breda is the home team in this match, which gives them a sli | G: I don\u2019t have match-result information for this specific fixt"
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.6021520303983651,
+      "rationale": "ensemble3 logit-mean(sonnet=0.620, opus46=0.680, gpt52=0.500) = 0.602. S: I need to assess the probability that Oklahoma City Thunder  | O: Oklahoma City Thunder have been one of the top teams in the  | G: No reliable information is provided about the actual 2026 Ro"
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.12092409322003678,
+      "rationale": "ensemble3 logit-mean(sonnet=0.120, opus46=0.180, gpt52=0.080) = 0.121. S: Ivan Demidov is widely regarded as one of the top prospects  | O: Ivan Demidov is the Montreal Canadiens' top prospect (5th ov | G: With 30 named contenders the uninformed prior is ~3.3%. Demi"
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.2600220109433537,
+      "rationale": "ensemble3 logit-mean(sonnet=0.700, opus46=0.120, gpt52=0.120) = 0.260. S: Netflix's roast of Kevin Hart was announced and confirmed wi | O: There's no confirmed announcement of Netflix's next roast su | G: With no specific announcement in the prompt about the next N"
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05000000000000001,
+      "rationale": "ensemble3 logit-mean(sonnet=0.050, opus46=0.050, gpt52=0.050) = 0.050. S: I need to determine the probability that Adam Greenberg won  | O: Tournament of Champions Season 7 has not yet aired or conclu | G: With 20 listed possible winners and no additional informatio"
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.07033187767875612,
+      "rationale": "ensemble3 logit-mean(sonnet=0.070, opus46=0.070, gpt52=0.071) = 0.070. S: With 14 possible outcomes and no specific information about  | O: Survivor Season 50 Episode 7 has not yet aired as of my know | G: With no episode-specific spoilers, cast/bootlist information"
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.05730464849830622,
+      "rationale": "ensemble3 logit-mean(sonnet=0.056, opus46=0.060, gpt52=0.056) = 0.057. S: With 18 contestants listed and no specific information about | O: The Masked Singer Season 14 is currently airing (as of mid-2 | G: With no reliable information about Season 14\u2019s actual contes"
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.500, gpt52=0.500) = 0.500. S: This is a future primary election (2026) with no polling dat | O: This is a 2026 Democratic primary for WV-01 between Brit Agu | G: With only two named candidates and no provided polling, endo"
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.24035196380667767,
+      "rationale": "ensemble3 logit-mean(sonnet=0.250, opus46=0.150, gpt52=0.350) = 0.240. S: While P\u00e9ter Magyar and his TISZA party have shown strong pol | O: While P\u00e9ter Magyar and his TISZA party have surged in polls  | G: As of recent cycles, Viktor Orb\u00e1n/Fidesz has repeatedly won "
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.5,
+      "rationale": "ensemble3 logit-mean(sonnet=0.500, opus46=0.500, gpt52=0.500) = 0.500. S: This is a future Democratic primary (closing May 2026) for O | O: I have no specific information about the 2026 Democratic pri | G: With two named outcomes and no provided polling, endorsement"
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.3960648674703397,
+      "rationale": "ensemble3 logit-mean(sonnet=0.350, opus46=0.300, gpt52=0.550) = 0.396. S: Colombian President Gustavo Petro's government alliance has  | O: Colombia's next legislative elections are scheduled for Marc | G: With no hard polling or seat-projection data provided, the b"
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.057091036615785976,
+      "rationale": "ensemble3 logit-mean(sonnet=0.050, opus46=0.030, gpt52=0.120) = 0.057. S: Louisiana v. Callais involves a redistricting case where Lou | O: Louisiana v. Callais involves a challenge to Louisiana's con | G: With no case-specific information about Louisiana v. Callais"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.10307386236623368,
+      "rationale": "ensemble3 logit-mean(sonnet=0.080, opus46=0.150, gpt52=0.090) = 0.103. S: Presidential nominees for Federal Reserve Chair historically | O: Trump has not yet officially announced a Fed Chair pick as o | G: With no information on who the nominee is or the Senate comp"
+    }
+  ]
+}

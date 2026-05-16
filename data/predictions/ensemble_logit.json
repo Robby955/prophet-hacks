@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T15:18:19.552289+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.4597406698132664,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.420) = 0.460. A: No information available about the rankings, recent form, or head-to-head record between Kaja Najzer | O: I don\u2019t have an authoritative result for this lower-level ITF match. With limited information, I lea"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.46395295644584084,
+      "rationale": "ensemble logit-mean(p_anthropic=0.550, p_openai=0.380) = 0.464. A: Francisco Rocha is likely the home favorite playing in Oeiras, Portugal (a Portuguese player), which | O: I do not have an authoritative match-result feed for this 2026 Challenger qualifier. On pre-match st"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.5714285714285714,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.640) = 0.571. A: No information available about the rankings, form, or head-to-head record of these two players in th | O: I don\u2019t have an authoritative post-match result available, so this is an estimate from player streng"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.615911621788925,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.720) = 0.616. A: No information available about this specific match result or the relative rankings/form of Florent B | O: I don't have a definitive result for this 2026 Challenger match, but Florent Bax is the more recogni"
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5402593301867334,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.580) = 0.540. A: No information available about this specific match result or current rankings/form of the players re | O: I don't have the actual May 2026 result available, so this is based on player strength. Heather Wats"
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.29367385052337863,
+      "rationale": "ensemble logit-mean(p_anthropic=0.220, p_openai=0.380) = 0.294. A: Pakistan is historically a significantly stronger Test cricket team than Bangladesh. In head-to-head | O: Bangladesh likely had home advantage, but Pakistan have historically been the stronger Test side and"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.4285714285714286,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.360) = 0.429. A: This is a future cricket match (May 2026) with no available results or strong prior information dist | O: Somerset have generally been a stronger first-class side than Glamorgan in recent County Championshi"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5402593301867334,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.580) = 0.540. A: No information available about this future cricket match between Sussex and Leicestershire in May 20 | O: I don\u2019t have authoritative post-match result data for this May 2026 fixture. On pre-match fundamenta"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.4849864756451869,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.470) = 0.485. A: No information available about this future cricket match between Worcestershire and Durham scheduled | O: Worcestershire likely have home advantage, but Durham have generally been the stronger red-ball side"
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.7163020958901359,
+      "rationale": "ensemble logit-mean(p_anthropic=0.750, p_openai=0.680) = 0.716. A: PSG has dominated Ligue 1 for over a decade, winning 11 of the last 12 titles before 2024-25. They h | O: PSG has an overwhelming structural edge in Ligue 1\u2014budget, squad depth, recent title frequency, and "
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.3577747210701756,
+      "rationale": "ensemble logit-mean(p_anthropic=0.300, p_openai=0.420) = 0.358. A: Real Madrid is historically the most successful La Liga club and a perennial title contender, making | O: Real Madrid should be one of the two clear favorites given their financial/squad strength and recent"
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.04904191847910752,
+      "rationale": "ensemble logit-mean(p_anthropic=0.060, p_openai=0.040) = 0.049. A: SC Braga is a legitimate top-flight Portuguese club but historically trails Sporting, Porto, and Ben | O: SC Braga are typically Portugal\u2019s strongest non-'Big Three' club, but Liga Portugal titles are overw"
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.18240558163087714,
+      "rationale": "ensemble logit-mean(p_anthropic=0.150, p_openai=0.220) = 0.182. A: Napoli won the 2024-25 Serie A title under Antonio Conte, making them defending champions entering 2 | O: Napoli should be one of the leading contenders given their recent title-level squad strength and Ant"
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.3399286633338065,
+      "rationale": "ensemble logit-mean(p_anthropic=0.350, p_openai=0.330) = 0.340. A: In Eredivisie matches, home team win probability is typically around 45-50%, away win around 25-30%, | O: I do not have an authoritative post-match result available for this May 10, 2026 fixture. Pre-match,"
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.690088875120531,
+      "rationale": "ensemble logit-mean(p_anthropic=0.700, p_openai=0.680) = 0.690. A: I need to assess the probability that Oklahoma City Thunder beat the Los Angeles Lakers in the 2026  | O: Oklahoma City would likely be the stronger 2026 team given its young elite core, depth, and probable"
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.17185248442201437,
+      "rationale": "ensemble logit-mean(p_anthropic=0.120, p_openai=0.240) = 0.172. A: Ivan Demidov is one of the top prospects in this draft class, selected 5th overall by Montreal in 20 | O: Ivan Demidov is a plausible preseason favorite: an elite offensive winger likely to have a significa"
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.4613081446662823,
+      "rationale": "ensemble logit-mean(p_anthropic=0.880, p_openai=0.091) = 0.461. A: Netflix announced Kevin Hart as the subject of their next roast special following the Tom Brady roas | O: uniform prior over 11 outcomes; p = 1/11 = 0.091"
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05000000000000001,
+      "rationale": "ensemble logit-mean(p_anthropic=0.050, p_openai=0.050) = 0.050. A: I need to determine if Adam Greenberg won Tournament of Champions Season 7 on Food Network.\n\nTournam | O: uniform prior over 20 outcomes; p = 1/20 = 0.050"
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.07049836140740887,
+      "rationale": "ensemble logit-mean(p_anthropic=0.070, p_openai=0.071) = 0.070. A: With 14 possible outcomes and no specific information about Survivor Season 50 Episode 7's eliminati | O: I don\u2019t have reliable episode-specific spoiler or result information for Survivor 50 Episode 7. With"
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.35032887621081443,
+      "rationale": "ensemble logit-mean(p_anthropic=0.820, p_openai=0.060) = 0.350. A: Based on available information about The Masked Singer Season 14 (aired Fall 2024), 14 Karat Carrot  | O: With 18 listed contestants and no reliable information here indicating the actual winner, the base r"
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.500) = 0.500. A: This is a future Democratic primary (closing May 2026) between two candidates, Brit Aguirre and Vinc | O: I don't have reliable candidate-specific polling, endorsements, fundraising, or official results for"
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.41496497330057114,
+      "rationale": "ensemble logit-mean(p_anthropic=0.300, p_openai=0.540) = 0.415. A: Viktor Orb\u00e1n has won four consecutive supermajority elections and controls significant institutional | O: P\u00e9ter Magyar/TISZA has a plausible path if anti-Orb\u00e1n voters consolidate and polling momentum transl"
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.38408837821107494,
+      "rationale": "ensemble logit-mean(p_anthropic=0.500, p_openai=0.280) = 0.384. A: This is a future 2026 Democratic primary between two candidates (Don Leonard and Adam Miller) for Oh | O: Adam Miller appears to have the stronger profile for this Democratic primary, with prior elected-off"
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.35,
+      "rationale": "ensemble logit-mean(p_anthropic=0.350, p_openai=0.350) = 0.350. A: Colombia's 2026 legislative elections will follow the presidential term of Gustavo Petro, whose gove | O: Petro's governing left alliance entered office as a strong plurality but not a Senate majority, and "
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.040000000000000015,
+      "rationale": "ensemble logit-mean(p_anthropic=0.040, p_openai=0.040) = 0.040. A: A unanimous 0-9 decision against Louisiana (the petitioner) would be extraordinarily rare. With a 6- | O: A 0-vote outcome would mean every justice sides against Louisiana, but this redistricting/VRA disput"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.08949751194817468,
+      "rationale": "ensemble logit-mean(p_anthropic=0.080, p_openai=0.100) = 0.089. A: Trump's Fed Chair pick would need Senate confirmation, and with Republicans holding 53 seats in the  | O: A Trump Fed Chair nominee would likely be chosen for confirmability and, assuming a Republican-contr"
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T15:16:29.677143+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.42,
+      "rationale": "I don\u2019t have the actual 2026 ITF result available, so this is a pre-match style estimate. In a low-level ITF match the baseline is close to 50/50, but Anna Lena Ebster likely had some home-country advantage in Klagenfurt and appears somewhat more established at this level, so I lean modestly against"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.4,
+      "rationale": "I do not have an authoritative post-match result available, so this is a probabilistic estimate rather than a confirmed score. Garrett Johns was likely the stronger/higher-ranked player entering a Challenger qualifying match, while Francisco Rocha had local/clay familiarity, so I lean against Rocha "
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.55,
+      "rationale": "I don\u2019t have authoritative result data for this specific 2026 Challenger match. Based on the limited prior-strength signal for two low-ranked Challenger/ITF-level players, Brandon Perez looks only marginally more likely than a coin flip, so I give a slight lean to him rather than a strong call."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.78,
+      "rationale": "Florent Bax is the much more established professional name at Challenger/ITF level, while Adrian Arcon appears to be a far lower-profile opponent likely entering as a qualifier or wildcard. In a Challenger round-of-32 match that gives Bax a clear but not upset-proof edge."
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.64,
+      "rationale": "Heather Watson has historically been the stronger and more accomplished player, with substantially higher peak level and likely a ranking/experience edge over Kyoka Okamura in a WTA 125 setting. However, Watson's age and lower-tier match volatility keep this from being a strong favorite call."
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.42,
+      "rationale": "Pakistan have generally been the stronger Test side historically, so I lean against Bangladesh as the winner. Bangladesh\u2019s home conditions and their recent success against Pakistan keep the matchup fairly competitive rather than a strong Pakistan edge."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.35,
+      "rationale": "I don't have live/official results for this May 2026 match, so this is a pre-result estimate rather than a confirmed outcome. Somerset have generally been the stronger red-ball county side than Glamorgan in recent years, though Glamorgan home advantage and county cricket variance keep this from bein"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.59,
+      "rationale": "With no match-specific result information available, I lean modestly to Sussex because they are likely the home side and have generally been the stronger red-ball county in recent seasons relative to Leicestershire. County Championship matches have substantial draw/weather uncertainty, so this is on"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.43,
+      "rationale": "This is a future County Championship match with substantial uncertainty around 2026 squads and conditions. Durham have generally looked the stronger red-ball side in recent seasons, while Worcestershire should have some home advantage, so I lean modestly against Worcestershire rather than making a s"
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.72,
+      "rationale": "PSG are structurally dominant in Ligue 1, with far greater financial resources and a recent history of winning the league far more often than any rival. Even allowing for football variance and occasional challenges from Monaco/Marseille/Lille/Lyon, they would typically be a clear preseason favorite "
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.42,
+      "rationale": "Real Madrid are one of the two structural favorites in La Liga, with elite squad strength and a long-run title base rate far above the 1/20 uninformed prior. However Barcelona are typically comparable contenders and Atletico remain a meaningful outside threat, so Real should be treated as a strong p"
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.03,
+      "rationale": "SC Braga are typically the strongest club outside Portugal's 'big three,' but Liga Portugal titles are overwhelmingly won by Benfica, Porto, or Sporting. Without current-season standings, Braga's base-rate title chance is well below the 1/18 uninformed prior, though not impossible."
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.27,
+      "rationale": "Napoli should be treated as a genuine title contender, likely in the top tier with Inter, Juventus and Milan, especially if coming off a strong Conte-era season. But Serie A has several plausible winners and football variance is high, so Napoli is well above the 1/20 listed-outcome prior but far fro"
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.34,
+      "rationale": "Breda/NAC at home gets meaningful home-field advantage, but Heerenveen have generally been the stronger Eredivisie side, so this looks close to a balanced three-way result rather than a clear home edge. With no reliable post-match result available, I only move slightly above the 1/3 uninformed prior"
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.66,
+      "rationale": "Oklahoma City projects as the stronger 2026-side matchup given its younger core and recent trajectory as a top Western contender, while the Lakers\u2019 outlook is more dependent on aging stars and roster uncertainty. That makes OKC a moderate favorite rather than a lock in a playoff series."
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.22,
+      "rationale": "Ivan Demidov is plausibly the preseason Calder favorite: an elite offensive prospect likely to get top-six minutes and power-play opportunity in Montreal, and forwards with scoring roles are the most common Calder winners. Still, the field is large and includes several high-upside rookies, so even a"
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.13,
+      "rationale": "Kevin Hart has a strong Netflix relationship and was central to the Tom Brady roast as host, making him a plausible future target, but there is no concrete public indication that he would be the next roast subject. In a broad 11-outcome field, I\u2019d move only modestly above the 1/11 prior."
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "rationale": "uniform prior over 20 outcomes; p = 1/20 = 0.050"
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.07142857142857142,
+      "rationale": "uniform prior over 14 outcomes; p = 1/14 = 0.071"
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.056,
+      "rationale": "I do not have reliable post-2024 information about the official Season 14 result, and the outcome list appears alphabetically ordered rather than odds-ordered. With no concrete evidence favoring 14 Karat Carrot over the other 17 costumes, I stay at the uninformed prior of about 1/18."
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.44,
+      "rationale": "P\u00e9ter Magyar/TISZA has a plausible path if it consolidates the anti-Fidesz vote and converts polling strength into constituency wins. However, Viktor Orb\u00e1n/Fidesz retains major incumbency advantages, a favorable electoral system, media/resources, and government-formation experience, so I put Magyar "
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.25,
+      "rationale": "Adam Miller appears to have the stronger Democratic profile for OH-15, with prior elected-office experience and likely greater name recognition, while Don Leonard is less prominent. Without official returns in hand this is not near-certain, but Leonard looks like the underdog rather than a coin flip"
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.38,
+      "rationale": "The government-aligned left/Pacto Hist\u00f3rico bloc was strong in 2022, but Colombian Senate elections are highly fragmented and Petro's governing coalition has since faced low approval and defections from centrist parties. The opposition/independent parties have a stronger historical base in Congress,"
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.02,
+      "rationale": "Exactly 0 votes for Louisiana would require every justice to side against the state, which is unlikely in this highly salient redistricting/VRA case. At minimum, the liberal justices are very likely to favor Louisiana\u2019s position defending a remedial majority-Black district, so a unanimous loss for L"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.08333333333333333,
+      "rationale": "uniform prior over 12 outcomes; p = 1/12 = 0.083"
+    }
+  ]
+}

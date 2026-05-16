@@ -12,11 +12,71 @@
   {
     "variant": "single_llm",
     "n_predictions": 26,
-    "brier_local": 0.190065,
+    "brier_local": 0.191473,
     "evaluator_result": {
-      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.190065",
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.191473",
       "n_matched": 26,
-      "brier_score": 0.190065
+      "brier_score": 0.191473
+    }
+  },
+  {
+    "variant": "opus_47",
+    "n_predictions": 26,
+    "brier_local": 0.229965,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.229965",
+      "n_matched": 26,
+      "brier_score": 0.229965
+    }
+  },
+  {
+    "variant": "opus_46",
+    "n_predictions": 26,
+    "brier_local": 0.236958,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.236958",
+      "n_matched": 26,
+      "brier_score": 0.236958
+    }
+  },
+  {
+    "variant": "gpt55",
+    "n_predictions": 26,
+    "brier_local": 0.197788,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.197788",
+      "n_matched": 26,
+      "brier_score": 0.197788
+    }
+  },
+  {
+    "variant": "gpt52",
+    "n_predictions": 26,
+    "brier_local": 0.202599,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.202599",
+      "n_matched": 26,
+      "brier_score": 0.202599
+    }
+  },
+  {
+    "variant": "ensemble_logit",
+    "n_predictions": 26,
+    "brier_local": 0.19283,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.19283",
+      "n_matched": 26,
+      "brier_score": 0.19283
+    }
+  },
+  {
+    "variant": "ensemble_leaderboard",
+    "n_predictions": 26,
+    "brier_local": 0.208079,
+    "evaluator_result": {
+      "raw_stdout": "Predictions: 26\nMatched: 26\nBrier Score: 0.208079",
+      "n_matched": 26,
+      "brier_score": 0.208079
     }
   }
 ]

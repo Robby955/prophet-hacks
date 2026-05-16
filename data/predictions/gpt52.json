@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T15:16:37.147544+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.5,
+      "rationale": "I don\u2019t have access to the match result or reliable pre-match signals (seedings, ratings, odds, or recent form) for this specific 2026 W15 Klagenfurt R32 matchup. With no concrete evidence favoring either player, I default to the uninformed prior of 50/50."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.5,
+      "rationale": "I don\u2019t have access here to the match result or reliable contemporaneous reports. With no concrete evidence favoring either player, I stick to the uninformed 50/50 prior."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.5,
+      "rationale": "I don\u2019t have access to the match result or reliable pre-match information (rankings, odds, recent form) for this specific May 5, 2026 Challenger match. With no concrete signals favoring either player, the best estimate is the uninformed 50/50 prior."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "I don\u2019t have access to the match result or any pre-match signals (ranking, odds, form) to justify moving off the uninformed 50/50 prior between the two outcomes."
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5,
+      "rationale": "I don\u2019t have access to the May 5, 2026 match result here, and no additional evidence about form, seeding, or odds was provided. With two outcomes and genuine uncertainty, I stick to the uninformed prior of 50% for Heather Watson."
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.32,
+      "rationale": "With no match-specific information available, I lean toward Pakistan based on historical Test strength and typical bookmaker baselines where Pakistan would more often be favored over Bangladesh. Home advantage for Bangladesh (if played there) pulls the probability up somewhat, but not to even odds."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.5,
+      "rationale": "No match result information is provided, and without team/news/context this is effectively a coin flip between two outcomes. Using the uninformed prior for a two-outcome market gives 0.50 for Glamorgan to win."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "No match result or pre-match information (team strength, venue, toss/conditions, injuries, or odds) is provided, and the event is in the future relative to the market close time. With two outcomes and no additional signal, the best estimate is the uninformed prior of 50% for Sussex."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.5,
+      "rationale": "With no match result, team news, venue conditions, or standings provided, there\u2019s no concrete basis to favor either side. Using the uninformed two-outcome prior implies a 50/50 probability for Worcestershire to win."
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.72,
+      "rationale": "PSG have dominated recent Ligue 1 seasons and typically enter as clear pre-season favorites due to superior budget and squad depth. Without specific 2025-26 season information, I weight that strong base rate while allowing meaningful upset risk from rivals like Monaco, Lille, Marseille, or Lyon."
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.25,
+      "rationale": "Uninformed prior is 5%, but Real Madrid is typically one of the two dominant title contenders in La Liga and thus has a much higher base-rate chance than an average team. With no season-specific information provided (rosters, odds, standings), I estimate a roughly one-in-four chance they win the 202"
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.06,
+      "rationale": "With no season results available yet, the best starting point is the uninformed prior of 1/18 (~0.056). Braga are a credible contender but historically the title is dominated by Benfica/Porto/Sporting, so only a slight bump above the flat prior is warranted."
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.07,
+      "rationale": "Uninformed prior is 5% for Napoli among 20 teams. Given typical Serie A title concentration among a few elite clubs and Napoli being a recent champion-level side, I nudge above the base rate but keep it low because Juventus/Inter/Milan generally have comparable or better title odds and the season ou"
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.33,
+      "rationale": "I don\u2019t have match result information for this specific May 10, 2026 fixture. With no concrete signals (team strength, home/away, lineups, odds, or reported score), I default to the uninformed 3-outcome prior of 1/3 for Breda winning in regulation."
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.5,
+      "rationale": "With no reliable information provided about the actual 2026 second-round matchup results or even whether this specific series occurred, I default to the uninformed prior in a two-outcome market. Thus Oklahoma City and the Los Angeles Lakers are treated as equally likely winners."
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.07,
+      "rationale": "Uninformed prior is ~3.3% (1/30), but Demidov has a plausible path to becoming a top-six NHL scorer quickly, which is the most common Calder-winning profile. Still, Calder outcomes are highly contingent on NHL roster timing, games played, and competing rookies\u2019 opportunity/health, so I only move to "
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.11,
+      "rationale": "With 11 named candidates and no specific announcement information provided, the best starting point is the uninformed prior (~0.09). I move slightly upward because Kevin Hart is highly associated with Netflix comedy content and roast hosting/producing, making him a plausible next roast subject, but "
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "rationale": "With 20 listed outcomes and no additional information about the Season 7 bracket, performance, or results, the best calibrated estimate is the uninformed prior. That gives Adam Greenberg about a 1/20 chance to be the winner."
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.071,
+      "rationale": "No concrete information is provided about Survivor Season 50 Episode 7\u2019s elimination, so I default to the uninformed prior. With 14 mutually exclusive listed outcomes, the baseline probability for Rizo Velovic being the eliminated contestant is 1/14."
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.056,
+      "rationale": "With 18 possible outcomes and no additional information about Season 14\u2019s cast, performance, or spoilers, the best estimate is the uninformed prior. Therefore I assign 14 Karat Carrot roughly a 1/18 chance to win."
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "With only two listed candidates and no provided polling, endorsements, fundraising, or other signals about the WV-01 Democratic primary, I default to the uninformed 50/50 prior between Brit Aguirre and Vince George."
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.35,
+      "rationale": "As of the last widely known state of Hungarian politics, Viktor Orb\u00e1n/Fidesz had strong incumbency advantages (control of institutions, media environment, and past electoral performance), making a change in PM plausible but not the base case. P\u00e9ter Magyar is a notable opposition figure, but translat"
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.5,
+      "rationale": "With no provided polling, endorsements, fundraising, or other concrete indicators about the 2026 OH-15 Democratic primary between Don Leonard and Adam Miller, the best estimate is the uninformed 50/50 prior."
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.55,
+      "rationale": "With no specific polling/seat-model evidence provided, the best starting point is the 50/50 uninformed prior. I lean slightly toward the Government Alliance because Colombian legislative outcomes often reflect some incumbency/coalition-formation advantages for governing blocs, but the uncertainty is"
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.11,
+      "rationale": "With no case-specific information about Louisiana v. Callais or its likely merits/outcome, the best starting point is the 1/10 uninformed prior that exactly 0 justices vote for Louisiana. I nudge slightly upward from 0.10 because a complete shutout is plausible in many Supreme Court cases (e.g., cle"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.11,
+      "rationale": "Uninformed prior is 1/12\u22480.083. A Trump Fed Chair pick would likely get at least some cross-party support (or near-unanimous support from the GOP if they hold \u226550 seats), making \u226449 yeas less likely than mid/high-50s outcomes, but polarized conditions and a narrow/fragmented Senate keep a nontrivial"
+    }
+  ]
+}

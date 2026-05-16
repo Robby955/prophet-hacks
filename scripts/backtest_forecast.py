@@ -24,6 +24,7 @@ import logging
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -36,6 +37,12 @@ log = logging.getLogger("backtest")
 VARIANTS = {
     "uniform_prior": forecast_track.predict_uniform_prior,
     "single_llm": forecast_track.predict_single_llm,
+    "opus_47": forecast_track.predict_opus_47,
+    "opus_46": forecast_track.predict_opus_46,
+    "gpt55": forecast_track.predict_gpt55,
+    "gpt52": forecast_track.predict_gpt52,
+    "ensemble_logit": forecast_track.predict_ensemble_logit,
+    "ensemble_leaderboard": forecast_track.predict_ensemble_leaderboard,
 }
 
 
@@ -43,27 +50,50 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def run_variant(name: str, events: list[dict]) -> list[dict]:
-    """Run one variant over every event; return prediction dicts."""
+def _predict_one(name: str, fn, event: dict) -> dict:
+    """Predict a single event; never raises — errors become 0.5 fallbacks."""
+    ticker = event.get("market_ticker") or event.get("event_ticker")
+    try:
+        result = fn(event)
+    except Exception as ex:
+        log.warning("[%s] event %s raised: %s", name, ticker, ex)
+        result = {"p_yes": 0.5, "rationale": f"error: {ex}"}
+    return {
+        "market_ticker": ticker,
+        "p_yes": float(result["p_yes"]),
+        "rationale": str(result.get("rationale", ""))[:300],
+    }
+
+
+def run_variant(
+    name: str, events: list[dict], *, max_workers: int = 5,
+) -> list[dict]:
+    """Run one variant over every event in parallel; preserves event order.
+
+    `max_workers` caps concurrent provider API calls. Default 5 is well under
+    most provider RPM limits while still being ~5x faster than serial. Bump
+    to 10-20 if the account tier allows.
+    """
     fn = VARIANTS[name]
-    preds: list[dict] = []
     start = time.monotonic()
-    for i, e in enumerate(events, 1):
-        ticker = e.get("market_ticker") or e.get("event_ticker")
-        try:
-            result = fn(e)
-        except Exception as ex:
-            log.warning("[%s] event %s raised: %s", name, ticker, ex)
-            result = {"p_yes": 0.5, "rationale": f"error: {ex}"}
-        preds.append({
-            "market_ticker": ticker,
-            "p_yes": float(result["p_yes"]),
-            "rationale": str(result.get("rationale", ""))[:300],
-        })
-        if i % 5 == 0 or i == len(events):
-            elapsed = time.monotonic() - start
-            log.info("[%s] %d/%d (%.1fs)", name, i, len(events), elapsed)
-    return preds
+    preds: list[dict | None] = [None] * len(events)
+    completed = 0
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        future_to_idx = {
+            ex.submit(_predict_one, name, fn, e): i
+            for i, e in enumerate(events)
+        }
+        for fut in as_completed(future_to_idx):
+            i = future_to_idx[fut]
+            preds[i] = fut.result()
+            completed += 1
+            if completed % 5 == 0 or completed == len(events):
+                elapsed = time.monotonic() - start
+                log.info(
+                    "[%s] %d/%d (%.1fs, %d workers)",
+                    name, completed, len(events), elapsed, max_workers,
+                )
+    return preds  # type: ignore[return-value]
 
 
 def write_submission(predictions: list[dict], out_path: Path) -> None:
@@ -115,6 +145,10 @@ def main(argv: list[str] | None = None) -> int:
         default="uniform_prior,single_llm",
         help="comma-separated variant names",
     )
+    parser.add_argument(
+        "--max-workers", type=int, default=5,
+        help="concurrent API calls per variant (default 5)",
+    )
     parser.add_argument("--log-level", default="INFO")
     args = parser.parse_args(argv)
 
@@ -140,7 +174,7 @@ def main(argv: list[str] | None = None) -> int:
     summary: list[dict] = []
     for name in variant_names:
         log.info("=== running variant %r ===", name)
-        preds = run_variant(name, events)
+        preds = run_variant(name, events, max_workers=args.max_workers)
         sub_path = out_dir / f"{name}.json"
         write_submission(preds, sub_path)
         log.info("wrote %d predictions to %s", len(preds), sub_path)

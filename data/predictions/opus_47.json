@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T15:14:45.563404+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.5,
+      "rationale": "Without specific information on either player's current form, ranking, or head-to-head record in this 2026 W15 Klagenfurt match, I default to the uninformed prior."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.5,
+      "rationale": "Without specific information on these players' current form, rankings, or head-to-head, I default to the uninformed prior for a two-player match."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.45,
+      "rationale": "Without specific ranking or form data, this is essentially a coin flip. Lalami Laaroussi has had some Challenger-level experience and may have a slight edge on clay (Brazzaville surface), but uncertainty is high, so I stay near the prior with a slight lean against Perez."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "I have no specific information about either Florent Bax or Adrian Arcon's form, ranking, or head-to-head record. Without concrete data, I default to the uninformed prior."
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.4,
+      "rationale": "Kyoka Okamura is currently ranked higher and more active on the WTA/ITF circuit than Heather Watson, who has been declining in form and ranking. Okamura is likely the slight favorite on hard/indoor courts at this level."
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.28,
+      "rationale": "Pakistan is historically stronger than Bangladesh in Test cricket, with a dominant head-to-head record. Even with the match in Bangladesh (likely home conditions favoring spin), draws are also possible in Tests, further reducing Bangladesh's win probability."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.35,
+      "rationale": "Somerset has been a stronger Division One side in recent County Championship seasons, while Glamorgan has typically been a mid-to-lower tier county, only recently promoted. Without specific match information, I lean slightly toward Somerset, though draws are common in County Championship cricket whi"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "The match is scheduled for May 2026 and no result is available. County Championship matches frequently end in draws, but with only two outcomes listed I have no specific information favoring either side, so I default near the prior with a very slight lean to Sussex as likely home side."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.42,
+      "rationale": "Durham earned promotion to Division One for 2025 and has been a competitive side, while Worcestershire was relegated after the 2024 season. With the match being far in the future and county championship games having a high draw rate, I lean slightly toward Durham but stay near the prior."
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.82,
+      "rationale": "PSG is the dominant Ligue 1 force, won the previous title, and typically opens each season as heavy favorite (market odds usually imply ~80-85%). Without specific current standings suggesting otherwise, they remain the clear favorite."
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.6,
+      "rationale": "Real Madrid is currently leading La Liga in the 2025-26 season with a points cushion over Barcelona, making them the favorites. However, with many matches remaining and Barcelona/Atletico still in contention, significant uncertainty remains."
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.02,
+      "rationale": "Braga is typically a mid-top tier club but rarely competes for the title, which is dominated by Porto, Benfica, and Sporting. Currently in the 2025-26 season, Braga is not leading the table and the title race is between the big three."
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.35,
+      "rationale": "Napoli are defending champions and have been near the top of the table early in the 2025-26 season, but Inter, Milan, and Roma are strong competitors. Title odds for Napoli typically sit around 25-35% in this competitive field."
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.4,
+      "rationale": "NAC Breda has home advantage, which typically gives a slight edge, but Heerenveen has historically been a stronger Eredivisie side. Without specific form data this late in the season, I lean slightly above the 1/3 prior due to home advantage."
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.75,
+      "rationale": "OKC is the reigning champion and top seed-caliber team with MVP Shai Gilgeous-Alexander, while the Lakers, though competitive, are generally considered a tier below. If this matchup occurs, OKC would likely be favored, though playoff series carry inherent uncertainty."
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.22,
+      "rationale": "Demidov is one of the top Calder favorites entering the 2025-26 season, typically priced around 20-30% at sportsbooks, well above the uninformed prior. However, Schaefer and Misa are strong competitors, and rookie production is volatile."
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.08,
+      "rationale": "There's no announced follow-up to the Tom Brady roast on Netflix, and Kevin Hart has no specific signals indicating he'd be the next subject. Without concrete evidence, he sits near the uninformed prior."
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "rationale": "Tournament of Champions Season 7 has not aired/concluded yet with no public winner announcement, so I have no specific evidence to move off the uninformed prior of 1/20."
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.07,
+      "rationale": "Survivor Season 50 has not yet aired, and with 14 listed contestants, there is no specific information suggesting Rizo Velovic is more likely than any other to be eliminated in Episode 7. Defaulting near the uninformed prior of 1/14."
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.05,
+      "rationale": "With 18 contestants and no specific information indicating 14 Karat Carrot has an edge, I stay near the uninformed prior of 1/18 \u2248 0.056."
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "I have no specific information about either candidate in this 2026 WV-01 Democratic primary, so I default to the uninformed prior between two listed candidates."
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.45,
+      "rationale": "Polling through 2025 shows Magyar's Tisza party leading or tied with Fidesz, but Orb\u00e1n retains structural advantages (gerrymandered districts, media control, incumbency). The race is genuinely competitive but Orb\u00e1n's machine-politics edge slightly tempers Magyar's polling lead."
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.35,
+      "rationale": "Adam Miller is a sitting state representative with greater name recognition and likely fundraising advantages over Don Leonard, a Columbus City Council member/community organizer. Without polling data, I lean slightly toward Miller but maintain uncertainty given Leonard's local base in Columbus."
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.32,
+      "rationale": "Petro's government coalition has been losing support, with declining approval ratings, legislative setbacks, and fractured alliances. Historically, Colombian opposition/centrist forces have been well-positioned in legislative elections, and current polling suggests the opposition has the advantage h"
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.05,
+      "rationale": "Louisiana v. Callais involves Louisiana defending its congressional map; the conservative majority (6 justices) seems likely to side with Louisiana at least in part. A 0-vote outcome for Louisiana (the petitioner/state) is unlikely given the Court's current composition and the reargument signaling s"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.13,
+      "rationale": "Fed Chair nominees historically receive bipartisan support and clear majorities; a sub-50 vote would require either VP tie-break scenario or failed nomination, which is uncommon. Republicans hold ~53 seats, so even on party lines the pick likely clears 50. Small uplift over prior for possibility of "
+    }
+  ]
+}

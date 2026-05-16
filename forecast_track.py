@@ -15,15 +15,18 @@ CLI integration:
     prophet forecast evaluate --submission predictions.json --actuals actuals.json
 
 Variants exposed (each is a `predict(event: dict) -> dict`):
-- predict_uniform_prior: deterministic 1/len(outcomes), clamped. No LLM cost.
-- predict_single_llm:    one Anthropic Sonnet 4.6 call per event.
+- predict_uniform_prior:      deterministic 1/len(outcomes), clamped. No LLM cost.
+- predict_single_llm:         one Anthropic Sonnet 4.6 call.
+- predict_opus_47:            one Anthropic Opus 4.7 call (stronger reasoner).
+- predict_ensemble_logit:     Sonnet 4.6 + GPT-5.5-pro, logit-mean blend.
 
-Both return ``{"p_yes": float ∈ [0.01, 0.99], "rationale": str}``.
+All return ``{"p_yes": float ∈ [0.01, 0.99], "rationale": str}``.
 """
 from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import re
 from typing import Any
@@ -40,6 +43,23 @@ P_YES_MAX: float = 0.99
 
 _FORECAST_MODEL: str = os.environ.get(
     "PROPHET_FORECAST_TRACK_MODEL", "claude-sonnet-4-6",
+)
+_OPUS_MODEL: str = os.environ.get(
+    "PROPHET_FORECAST_OPUS_MODEL", "claude-opus-4-7",
+)
+# Claude Opus 4.6 leads the Prophet Arena "Default Harness" leaderboard at
+# 0.9438 (per 2026-05-16 snapshot). Newer 4.7 is unproven on this benchmark
+# yet -- worth a head-to-head.
+_OPUS_46_MODEL: str = os.environ.get(
+    "PROPHET_FORECAST_OPUS46_MODEL", "claude-opus-4-6",
+)
+_OPENAI_FORECAST_MODEL: str = os.environ.get(
+    "PROPHET_FORECAST_OPENAI_MODEL", "gpt-5.5",
+)
+# GPT-5.2 is the top OpenAI fixed-context model on the leaderboard
+# (0.9134); gpt-5.5 is newer but unranked.
+_GPT52_MODEL: str = os.environ.get(
+    "PROPHET_FORECAST_GPT52_MODEL", "gpt-5.2",
 )
 
 
@@ -159,9 +179,10 @@ def _parse_json(text: str) -> dict:
 
 
 _anthropic_client = None
+_openai_client = None
 
 
-def _client():
+def _aclient():
     global _anthropic_client
     if _anthropic_client is None:
         import anthropic
@@ -174,33 +195,162 @@ def _client():
     return _anthropic_client
 
 
-def predict_single_llm(event: dict) -> dict:
-    """One Anthropic call per event. Falls back to uniform prior on error."""
+def _oclient():
+    global _openai_client
+    if _openai_client is None:
+        import openai
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "OPENAI_API_KEY not set. Put it in .env or export it.",
+            )
+        _openai_client = openai.OpenAI(api_key=api_key)
+    return _openai_client
+
+
+def _call_anthropic(model: str, system: str, user: str) -> str:
+    """Call Anthropic. Note: Opus 4.7 rejects `temperature` (deprecated for
+    that model), so we omit it -- the model default is fine for forecasting.
+    """
+    resp = _aclient().messages.create(
+        model=model,
+        max_tokens=300,
+        system=system,
+        messages=[{"role": "user", "content": user}],
+    )
+    return resp.content[0].text if resp.content else ""
+
+
+def _call_openai(model: str, system: str, user: str) -> str:
+    """Call OpenAI. Note: GPT-5.x models reject `max_tokens` -- must use
+    `max_completion_tokens`. They also reject `temperature` overrides
+    (default 1.0 only), so we omit it. And: they consume tokens on internal
+    reasoning before the visible response, so the cap must be generous
+    enough that reasoning_tokens + visible_tokens fit. 300 leaves 0 for
+    output; 2000 is comfortable for our short JSON contract.
+    """
+    resp = _oclient().chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        max_completion_tokens=2000,
+        response_format={"type": "json_object"},
+    )
+    return resp.choices[0].message.content or ""
+
+
+def _predict_one_model(event: dict, *, model: str, vendor: str) -> dict:
+    """Generic single-model predict that returns the standard contract."""
+    user = _build_user_prompt(event)
     try:
-        resp = _client().messages.create(
-            model=_FORECAST_MODEL,
-            max_tokens=300,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": _build_user_prompt(event)}],
-            temperature=0.2,
-        )
-        text = resp.content[0].text if resp.content else ""
+        if vendor == "anthropic":
+            text = _call_anthropic(model, SYSTEM_PROMPT, user)
+        elif vendor == "openai":
+            text = _call_openai(model, SYSTEM_PROMPT, user)
+        else:
+            raise ValueError(f"unknown vendor: {vendor}")
         parsed = _parse_json(text)
-        p = _clamp(float(parsed["p_yes"]))
         return {
-            "p_yes": p,
+            "p_yes": _clamp(float(parsed["p_yes"])),
             "rationale": str(parsed.get("rationale", ""))[:300],
         }
     except Exception as e:
         log.warning(
-            "single_llm fallback to uniform prior for %s: %s",
-            event.get("market_ticker", "?"), e,
+            "model %s/%s fallback to uniform prior for %s: %s",
+            vendor, model, event.get("market_ticker", "?"), e,
         )
         return predict_uniform_prior(event)
 
 
-# CLI's --local expects a function named `predict`. We default to single_llm;
-# swap aliases below for batch-comparing variants.
+def predict_single_llm(event: dict) -> dict:
+    """One Anthropic Sonnet 4.6 call per event."""
+    return _predict_one_model(event, model=_FORECAST_MODEL, vendor="anthropic")
+
+
+def predict_opus_47(event: dict) -> dict:
+    """One Anthropic Opus 4.7 call per event. Stronger reasoner, ~3x cost."""
+    return _predict_one_model(event, model=_OPUS_MODEL, vendor="anthropic")
+
+
+def predict_opus_46(event: dict) -> dict:
+    """One Anthropic Opus 4.6 call per event. The proven leaderboard top
+    agent (0.9438 on Default Harness) -- known to perform on this benchmark.
+    """
+    return _predict_one_model(event, model=_OPUS_46_MODEL, vendor="anthropic")
+
+
+def predict_gpt55(event: dict) -> dict:
+    """One OpenAI GPT-5.5 call per event. Cross-vendor diversity."""
+    return _predict_one_model(
+        event, model=_OPENAI_FORECAST_MODEL, vendor="openai",
+    )
+
+
+def predict_gpt52(event: dict) -> dict:
+    """One OpenAI GPT-5.2 call per event. The top OpenAI fixed-context
+    leaderboard model (0.9134) -- proven on this benchmark.
+    """
+    return _predict_one_model(event, model=_GPT52_MODEL, vendor="openai")
+
+
+def _logit(p: float) -> float:
+    p = _clamp(p)
+    return math.log(p / (1.0 - p))
+
+
+def _sigmoid(z: float) -> float:
+    return 1.0 / (1.0 + math.exp(-z))
+
+
+def predict_ensemble_logit(event: dict) -> dict:
+    """Cross-vendor ensemble: Sonnet 4.6 + GPT-5.5, blended in logit space.
+
+    Logit-mean preserves probabilistic semantics better than naive average
+    for asymmetric splits. Falls back to whichever model succeeded if the
+    other errors.
+    """
+    a = _predict_one_model(event, model=_FORECAST_MODEL, vendor="anthropic")
+    o = _predict_one_model(
+        event, model=_OPENAI_FORECAST_MODEL, vendor="openai",
+    )
+    pa, po = float(a["p_yes"]), float(o["p_yes"])
+    blended = _sigmoid((_logit(pa) + _logit(po)) / 2.0)
+    return {
+        "p_yes": _clamp(blended),
+        "rationale": (
+            f"ensemble logit-mean(p_anthropic={pa:.3f}, p_openai={po:.3f}) = {blended:.3f}. "
+            f"A: {a['rationale'][:100]} | O: {o['rationale'][:100]}"
+        )[:300],
+    }
+
+
+def predict_ensemble_leaderboard(event: dict) -> dict:
+    """Three-way ensemble of leaderboard-proven models: Opus 4.6 + GPT-5.2 +
+    Sonnet 4.6. Logit-mean across all three. The Sonnet "anchor" gives us
+    a cheap reliable read; Opus 4.6 contributes the strongest agent-track
+    signal; GPT-5.2 contributes cross-vendor independence.
+    """
+    a1 = _predict_one_model(event, model=_FORECAST_MODEL, vendor="anthropic")
+    a2 = _predict_one_model(event, model=_OPUS_46_MODEL, vendor="anthropic")
+    o1 = _predict_one_model(event, model=_GPT52_MODEL, vendor="openai")
+    ps = [float(a1["p_yes"]), float(a2["p_yes"]), float(o1["p_yes"])]
+    blended = _sigmoid(sum(_logit(p) for p in ps) / len(ps))
+    return {
+        "p_yes": _clamp(blended),
+        "rationale": (
+            f"ensemble3 logit-mean(sonnet={ps[0]:.3f}, opus46={ps[1]:.3f}, "
+            f"gpt52={ps[2]:.3f}) = {blended:.3f}. "
+            f"S: {a1['rationale'][:60]} | O: {a2['rationale'][:60]} | "
+            f"G: {o1['rationale'][:60]}"
+        )[:300],
+    }
+
+
+# CLI's --local expects a function named `predict`. Default to the variant
+# we want to ship; swap by reassigning here or by referencing the named
+# variant from the CLI.
 predict = predict_single_llm
 
 
@@ -208,6 +358,12 @@ __all__ = [
     "predict",
     "predict_uniform_prior",
     "predict_single_llm",
+    "predict_opus_47",
+    "predict_opus_46",
+    "predict_gpt55",
+    "predict_gpt52",
+    "predict_ensemble_logit",
+    "predict_ensemble_leaderboard",
     "P_YES_MIN",
     "P_YES_MAX",
 ]

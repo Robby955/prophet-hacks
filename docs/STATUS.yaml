@@ -71,8 +71,8 @@ forecasting_track:
       - "Build one Brave Search query from event title plus the most informative outcome"
       - "Fetch up to 5 web results"
       - "Dedupe by domain; prefer .gov, .edu, exchanges, and major news"
-      - "Prompt Claude Sonnet 4.6 for per-outcome probabilities"
-      - "Apply Kalshi longshot guard: floor at max(0.05, 0.5 / n_outcomes)"
+      - "Prompt Claude Opus 4.7 for per-outcome probabilities"
+      - "Apply Kalshi longshot guard: floor at min(0.10, max(0.05, 0.5 / n_outcomes))"
       - "Return Prophet Arena probabilities list"
     graceful_degradation:
       - "If BRAVE_SEARCH_API_KEY is missing or Brave fails, fall back to multi_outcome"

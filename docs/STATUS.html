@@ -55,8 +55,8 @@
   <li>Prophet Arena calls <code>/predict</code> with an event and outcome labels.</li>
   <li>The endpoint runs <code>forecast_track.predict_multi_outcome_retrieval</code>.</li>
   <li>Brave Search evidence is deduped by domain and injected as snippets.</li>
-  <li>Claude Sonnet 4.6 returns per-outcome probabilities.</li>
-  <li>The Kalshi longshot guard floors low values at <code>max(0.05, 0.5 / n_outcomes)</code>.</li>
+  <li>Claude Opus 4.7 returns per-outcome probabilities.</li>
+  <li>The Kalshi longshot guard floors low values at <code>min(0.10, max(0.05, 0.5 / n_outcomes))</code>.</li>
   <li>The endpoint returns <code>{"probabilities": [{"market": "...", "probability": ...}]}</code>.</li>
 </ol>
 

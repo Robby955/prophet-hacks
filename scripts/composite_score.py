@@ -53,7 +53,7 @@ def longshot_floor(n_outcomes: int) -> float:
     """Match forecast_track.longshot_guard_floor."""
     if n_outcomes <= 0:
         return 0.05
-    return max(0.05, 0.5 / n_outcomes)
+    return min(0.10, max(0.05, 0.5 / n_outcomes))
 
 
 def distribute_p_yes(p_yes: float, outcomes: list[str]) -> dict[str, float]:

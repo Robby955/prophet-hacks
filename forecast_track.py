@@ -857,7 +857,7 @@ def predict_multi_outcome(event: dict) -> dict:
                     p = prior
             prob_list.append({"market": o, "probability": p})
         rationale = str(parsed.get("rationale", ""))[:300]
-        # Kalshi longshot guard: floor at max(0.05, 0.5/n) and renormalize.
+        # Kalshi longshot guard: floor at min(0.10, max(0.05, 0.5/n)) and renormalize.
         prob_list = apply_longshot_guard(prob_list, len(outs))
         return {
             "p_yes": prob_list[0]["probability"],
@@ -1302,7 +1302,7 @@ def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = Fals
          "Recent evidence (do not invent details): ..." -- titles and
          snippets only; URLs are kept in `evidence_urls` for audit.
       5. Apply the Kalshi longshot guard -- every per-outcome probability
-         floored at `max(0.05, 0.5/n_outcomes)`.
+         floored at `min(0.10, max(0.05, 0.5/n_outcomes))`.
 
     Fallbacks:
       - If `BRAVE_SEARCH_API_KEY` is unset OR the Brave call fails, log a
@@ -1535,9 +1535,8 @@ def predict_hybrid_routed(event: dict) -> dict:
                 {"market": outs[0], "probability": p},
                 {"market": outs[1], "probability": max(0.0, 1.0 - p)},
             ]
-        # Kalshi longshot guard: for n=2 the floor is 0.25, clamping
-        # binary predictions to [0.25, 0.75]. The Kalshi paper finding
-        # is mandatory per project_locked_strategic_decisions memory.
+        # Kalshi longshot guard: for n=2 the floor is 0.10, so binary
+        # predictions may still express real longshots.
         probs = apply_longshot_guard(probs, n)
         return {
             "p_yes": probs[0]["probability"] if probs else p,

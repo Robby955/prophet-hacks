@@ -27,10 +27,10 @@ active, with no calls yet from the platform and no open forecast events.
    title plus the most informative outcome label.
 4. Dedupes evidence by domain and prefers `.gov`, `.edu`, exchanges of record,
    and major news sources.
-5. Calls Claude Sonnet 4.6 for per-outcome probabilities.
+5. Calls Claude Opus 4.7 for per-outcome probabilities.
 6. Applies the Kalshi longshot guard: each outcome is floored at
-   `max(0.05, 0.5 / n_outcomes)`, then the distribution is renormalized when
-   feasible.
+   `min(0.10, max(0.05, 0.5 / n_outcomes))`, then the distribution is
+   renormalized when feasible.
 7. Returns Prophet Arena's required response shape:
 
 ```json

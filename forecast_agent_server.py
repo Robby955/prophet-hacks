@@ -169,6 +169,13 @@ _STATIC_DIR = Path(__file__).resolve().parent / "static"
 if _STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
 
+# OpenAI-compatible /v1/chat/completions adapter for PA's general onboarding
+# at prophetarena.co/onboarding. Implemented as a standalone router so the
+# forecasting path (/predict) and the chat-completions path stay decoupled.
+# Keep this import + include_router line minimal; do not move logic inline.
+from chat_completions_adapter import router as _chat_router  # noqa: E402
+app.include_router(_chat_router)
+
 
 class EventRequest(BaseModel):
     """Loose schema — accept everything `ai_prophet_core.forecast.schemas.Event`

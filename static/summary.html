@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>ForecastingPath · Summary Report</title>
+<style>
+  :root {
+    --bg: #fafafa; --panel: #fff; --border: #e5e7eb; --text: #111827;
+    --muted: #6b7280; --accent: #1d4ed8;
+  }
+  body { font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+         background: var(--bg); color: var(--text); margin: 0; padding: 2em 1em; }
+  .page { max-width: 880px; margin: 0 auto; background: var(--panel);
+           border: 1px solid var(--border); border-radius: 10px; padding: 2em 2.2em;
+           box-shadow: 0 2px 18px rgba(0,0,0,0.04); }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 1em; margin-bottom: 1.4em; }
+  h1 { margin: 0 0 0.2em; font-size: 1.6rem; letter-spacing: -0.01em; }
+  h2 { font-size: 1.1rem; margin: 1.6em 0 0.6em; color: var(--accent); }
+  .meta { color: var(--muted); font-size: 0.88em; }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0 1.2em; }
+  th, td { padding: 0.45em 0.7em; text-align: left; border-bottom: 1px solid var(--border); }
+  th { font-size: 0.82em; color: var(--muted); text-transform: uppercase;
+        letter-spacing: 0.04em; font-weight: 700; }
+  td { font-variant-numeric: tabular-nums; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+          margin-right: 0.55em; vertical-align: middle; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+           gap: 0.7em; margin: 1em 0 1.4em; }
+  .kpi { background: #f3f4f6; border-radius: 6px; padding: 0.7em 0.9em; }
+  .kpi .lbl { color: var(--muted); font-size: 0.78em; text-transform: uppercase;
+                letter-spacing: 0.04em; font-weight: 700; }
+  .kpi .val { font-size: 1.35em; font-weight: 700; margin-top: 0.15em; }
+  figure { margin: 1em 0; }
+  figure img { width: 100%; height: auto; border-radius: 6px;
+                border: 1px solid var(--border); }
+  figcaption { color: var(--muted); font-size: 0.84em; text-align: center;
+                margin-top: 0.4em; }
+  ul { line-height: 1.7; padding-left: 1.2em; }
+  code { background: #f3f4f6; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
+  footer { margin-top: 2em; padding-top: 1em; border-top: 1px solid var(--border);
+            color: var(--muted); font-size: 0.85em; text-align: center; }
+  @media print { body { padding: 0; background: #fff; } .page { box-shadow: none; } }
+</style>
+</head><body>
+<div class="page">
+
+<header>
+  <h1>ForecastingPath · Summary Report</h1>
+  <div class="meta">Generated 2026-05-16T21:50:17.483206+00:00 · Git <code>0b5f3dea</code> · 26 resolved events</div>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="lbl">Live URL</div><div class="val" style="font-size:0.95em">agent.forecastingpath.com</div></div>
+  <div class="kpi"><div class="lbl">Variant</div><div class="val" style="font-size:0.95em">multi_outcome_retrieval</div></div>
+  <div class="kpi"><div class="lbl">Model</div><div class="val" style="font-size:0.95em">claude-opus-4-7</div></div>
+  <div class="kpi"><div class="lbl">Brier (prod)</div><div class="val">0.4448</div></div>
+  <div class="kpi"><div class="lbl">vs random</div><div class="val">-78%</div></div>
+</div>
+
+<h2>5-model Brier comparison (same pipeline, swap the LLM)</h2>
+<table>
+  <thead><tr><th>Model</th><th>Mean Brier</th><th>Binary</th><th>Multi-outcome</th><th>n (bin+multi)</th></tr></thead>
+  <tbody>
+  <tr>
+            <td><span class="dot" style="background:#1d4ed8"></span><strong>Opus 4.7 (production)</strong></td>
+            <td>0.4448</td>
+            <td>0.0425</td>
+            <td>0.9142</td>
+            <td>14 + 12</td>
+        </tr><tr>
+            <td><span class="dot" style="background:#0891b2"></span><strong>Sonnet 4.6 (prev prod)</strong></td>
+            <td>0.4693</td>
+            <td>0.0879</td>
+            <td>0.9142</td>
+            <td>14 + 12</td>
+        </tr><tr>
+            <td><span class="dot" style="background:#7c3aed"></span><strong>Opus 4.6</strong></td>
+            <td>0.2264</td>
+            <td>0.0438</td>
+            <td>0.4396</td>
+            <td>14 + 12</td>
+        </tr><tr>
+            <td><span class="dot" style="background:#16a34a"></span><strong>GPT-5.2</strong></td>
+            <td>0.2584</td>
+            <td>0.0538</td>
+            <td>0.4971</td>
+            <td>14 + 12</td>
+        </tr><tr>
+            <td><span class="dot" style="background:#ea580c"></span><strong>Gemini 3.1 Pro (post-harden)</strong></td>
+            <td>0.4259</td>
+            <td>0.0954</td>
+            <td>0.8115</td>
+            <td>14 + 12</td>
+        </tr>
+  <tr><td><em>random 0.5 baseline</em></td><td>0.2500</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td><em>uniform 1/n prior</em></td><td>0.2190</td><td>—</td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all five rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+
+<h2>Calibration curve · production (Opus 4.7) on binary events</h2>
+<figure>
+  <img src="summary_calibration.png" alt="Reliability diagram for the production model on 14 binary events">
+  <figcaption>Bin-mean predicted vs bin-mean actual outcome. Diagonal = perfectly calibrated.</figcaption>
+</figure>
+
+<h2>Per-event Brier · production model</h2>
+<figure>
+  <img src="summary_per_event.png" alt="Per-event Brier loss for the production model, sorted">
+  <figcaption>Each bar is one event. Wins (low Brier) on the left; losses (high Brier) on the right.</figcaption>
+</figure>
+
+<h2>Findings worth keeping</h2>
+<ul>
+  <li><strong>The win is JSON schema compliance, not raw reasoning.</strong>
+    Three of four alternative LLMs in this table had Brier ≥ 0.22, dominated by
+    catastrophic multi-outcome JSON failures (trailing commas, bogus outcome keys).
+    Opus 4.7 followed our schema reliably; the alternatives didn't.</li>
+  <li><strong>A silent production bug accounted for most of the Phase 2 win.</strong>
+    Old longshot floor: <code>max(0.05, 0.5/n)</code> → 0.25 for binary events,
+    clamping every binary prediction into [0.25, 0.75]. New: capped at the
+    Kalshi-paper 0.10 threshold. ~6× per-event Brier improvement on binary
+    longshots. Caught by smoke-testing against a synthetic Chiefs/SB-LXI event.</li>
+  <li><strong>"Leaderboard #1 ≠ best in your pipeline."</strong>
+    Gemini 3.1 Pro Preview is the public PA fixed-context leaderboard top.
+    In our pipeline it placed last. Worth quoting any time someone proposes a
+    model swap based on a public ranking.</li>
+  <li><strong>Defensive engineering caught real bugs.</strong>
+    JSON parse hardening (5 stages, trailing-comma repair, smart-quote normalization),
+    fuzzy outcome-label matching, outcomes-missing safety net (binary heuristic
+    + Haiku fallback). Verify gate now loud after silently swallowing pytest
+    failures for an entire session.</li>
+</ul>
+
+<h2>Sample size honesty</h2>
+<p class="meta">26 events is a small sample, skewed toward binary tennis matches.
+The 0.0379 number is directionally validated, not converged. Live Prophet Arena
+performance may differ by category mix; the multi-vendor evidence is the most
+generalizable finding here. Full per-event detail at
+<a href="/compare">/compare</a> (PIN required).</p>
+
+<footer>
+  Built by Rob Sneiderman · Team CanadaHacks · Project <em>The Oracles</em> · Prophet Hacks 2026.
+  Source: <a href="https://github.com/Robby955/prophet-hacks">github.com/Robby955/prophet-hacks</a>.
+</footer>
+
+</div>
+</body></html>

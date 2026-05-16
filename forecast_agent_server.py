@@ -61,6 +61,47 @@ import forecast_track  # noqa: E402
 
 # In-memory ring buffer of the last N predictions served. Used by /dashboard.
 _PREDICTION_HISTORY: collections.deque = collections.deque(maxlen=50)
+_SERVER_START_TS = datetime.now(timezone.utc)
+_TOTAL_PREDICTIONS = 0
+_TOTAL_COST_USD = 0.0
+_ERROR_COUNT = 0
+
+# Approximate per-event cost in USD for each variant. Used for spend tracking.
+_VARIANT_COSTS: dict[str, float] = {
+    "uniform_prior": 0.0,
+    "single_llm": 0.005,
+    "opus_47": 0.015,
+    "opus_46": 0.015,
+    "gpt55": 0.010,
+    "gpt52": 0.010,
+    "ensemble_logit": 0.015,
+    "ensemble_leaderboard": 0.025,
+    "sonnet_cot": 0.007,
+    "sonnet_cot_shrink": 0.007,
+    "multi_outcome": 0.010,
+    "multi_outcome_sc3": 0.030,
+    "multi_outcome_retrieval": 0.012,
+    "hybrid_routed": 0.008,
+}
+
+# Short one-line description for each variant, shown on the dashboard's
+# variant card so anyone landing on the page knows what we are serving.
+_VARIANT_DESCRIPTIONS: dict[str, str] = {
+    "uniform_prior": "Deterministic 1/n_outcomes. Free control baseline; no LLM calls.",
+    "single_llm": "One Anthropic Sonnet 4.6 call per event. Emits binary p_yes for outcomes[0]; server distributes across the outcomes list.",
+    "opus_47": "One Claude Opus 4.7 call. Stronger reasoner, ~3x cost; underperformed on our 26-event backtest.",
+    "opus_46": "One Claude Opus 4.6 call. Leaderboard top agent reference; underperformed on our small sample.",
+    "gpt55": "One OpenAI GPT-5.5 call. Cross-vendor sanity check.",
+    "gpt52": "One OpenAI GPT-5.2 call. Top OpenAI fixed-context model on the public leaderboard.",
+    "ensemble_logit": "Sonnet 4.6 + GPT-5.5 logit-mean blend. Cross-vendor diversity.",
+    "ensemble_leaderboard": "Three-way logit-mean of Sonnet 4.6 + Opus 4.6 + GPT-5.2.",
+    "sonnet_cot": "Structured chain-of-thought JSON prompt with backward-check + verification step. Tested negative on small sample.",
+    "sonnet_cot_shrink": "sonnet_cot + post-hoc shrinkage toward the uninformed prior on low-conviction outputs.",
+    "multi_outcome": "ONE Sonnet 4.6 call returns per-outcome probabilities directly (no distribute hack). Kalshi longshot guard applied.",
+    "multi_outcome_sc3": "k=3 parallel multi_outcome calls, averaged per-outcome (self-consistency).",
+    "multi_outcome_retrieval": "Brave Search → 5 deduped evidence chunks → multi_outcome prompt → Kalshi longshot guard. The current production variant.",
+    "hybrid_routed": "Binary (n<=2): gpt55. Multi (n>2): multi_outcome. Routes by outcome count to play each model's strength.",
+}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -225,6 +266,9 @@ def predict(event: EventRequest) -> PredictionResponse:
         event.market_ticker, p_yes, len(probs),
     )
 
+    evidence_urls = result.get("evidence_urls") or []
+    if not isinstance(evidence_urls, list):
+        evidence_urls = []
     _PREDICTION_HISTORY.appendleft({
         "ts": datetime.now(timezone.utc).isoformat(),
         "market_ticker": event.market_ticker,
@@ -234,7 +278,12 @@ def predict(event: EventRequest) -> PredictionResponse:
         "outcomes": outcomes,
         "probabilities": probs,
         "rationale": rationale,
+        "evidence_urls": evidence_urls[:8],
     })
+    # Live KPIs for the dashboard.
+    global _TOTAL_PREDICTIONS, _TOTAL_COST_USD
+    _TOTAL_PREDICTIONS += 1
+    _TOTAL_COST_USD += _VARIANT_COSTS.get(_VARIANT_NAME, 0.0)
     return PredictionResponse(
         probabilities=[OutcomeProbability(**p) for p in probs],
         rationale=rationale,
@@ -283,6 +332,37 @@ def _fetch_remote_state() -> dict[str, Any]:
     return out
 
 
+def _uptime_human() -> str:
+    delta = datetime.now(timezone.utc) - _SERVER_START_TS
+    total = int(delta.total_seconds())
+    days, rem = divmod(total, 86400)
+    hours, rem = divmod(rem, 3600)
+    mins, _ = divmod(rem, 60)
+    if days:
+        return f"{days}d {hours}h"
+    if hours:
+        return f"{hours}h {mins}m"
+    return f"{mins}m"
+
+
+def _prob_bars_html(probs: list[dict]) -> str:
+    """Inline horizontal bars per outcome. Width % maps to probability."""
+    if not probs:
+        return "<span class='muted'>—</span>"
+    rows = []
+    for p in probs:
+        market = html_escape(str(p.get("market", "?")))
+        prob = max(0.0, min(1.0, float(p.get("probability", 0.0))))
+        rows.append(
+            f"<div class='prob-row'>"
+            f"<span class='prob-label'>{market}</span>"
+            f"<span class='prob-bar'><span class='prob-fill' style='width:{prob*100:.1f}%'></span></span>"
+            f"<span class='prob-val'>{prob*100:.0f}%</span>"
+            f"</div>"
+        )
+    return "".join(rows)
+
+
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard() -> str:
     """Live HTML dashboard. Auto-refreshes every 30s."""
@@ -295,34 +375,49 @@ def dashboard() -> str:
     else:
         open_events_list = open_events if isinstance(open_events, list) else []
 
-    rows = ""
+    # Predictions table with inline probability bars and evidence URLs.
+    pred_cards = ""
     for p in list(_PREDICTION_HISTORY)[:20]:
-        rows += (
-            f"<tr><td>{html_escape(p['ts'][:19])}</td>"
-            f"<td><code>{html_escape(p['market_ticker'])}</code></td>"
-            f"<td>{html_escape(p['category'])}</td>"
-            f"<td>{html_escape(p['title'][:80])}</td>"
-            f"<td class='num'>{p['p_yes']:.3f}</td>"
-            f"<td>{html_escape(p['rationale'][:120])}</td></tr>"
+        probs_html = _prob_bars_html(p.get("probabilities") or [])
+        evidence = p.get("evidence_urls") or []
+        evidence_html = ""
+        if evidence:
+            links = " · ".join(
+                f"<a href='{html_escape(u)}' target='_blank' rel='noopener'>{html_escape(u.split('/')[2] if '/' in u else u[:40])}</a>"
+                for u in evidence[:5]
+            )
+            evidence_html = f"<div class='evidence'>📎 {links}</div>"
+        pred_cards += (
+            f"<div class='pred-card'>"
+            f"<div class='pred-head'>"
+            f"<span class='pred-ts'>{html_escape(p['ts'][11:19])}</span>"
+            f"<span class='cat-pill'>{html_escape(p.get('category','?'))}</span>"
+            f"<code class='pred-ticker'>{html_escape(p['market_ticker'])}</code>"
+            f"</div>"
+            f"<div class='pred-title'>{html_escape(p['title'][:140])}</div>"
+            f"<div class='pred-bars'>{probs_html}</div>"
+            f"<div class='pred-rationale'>{html_escape(p['rationale'][:240])}</div>"
+            f"{evidence_html}"
+            f"</div>"
         )
-    if not rows:
-        rows = (
-            "<tr><td colspan='6' style='text-align:center;color:#888'>"
-            "no predictions served yet — waiting for Prophet Arena to call /predict</td></tr>"
+    if not pred_cards:
+        pred_cards = (
+            "<div class='empty'>no predictions served yet — waiting for Prophet Arena to call <code>/predict</code></div>"
         )
 
+    # Open events table
     open_rows = ""
     for e in open_events_list[:10]:
         open_rows += (
             f"<tr><td><code>{html_escape(e.get('market_ticker','?'))}</code></td>"
-            f"<td>{html_escape(e.get('category','?'))}</td>"
+            f"<td><span class='cat-pill'>{html_escape(e.get('category','?'))}</span></td>"
             f"<td>{html_escape((e.get('title') or '?')[:90])}</td>"
-            f"<td>{html_escape((e.get('close_time') or '?')[:19])}</td></tr>"
+            f"<td class='muted small'>{html_escape((e.get('close_time') or '?')[:19])}</td></tr>"
         )
     if not open_rows:
         open_rows = (
-            "<tr><td colspan='4' style='text-align:center;color:#888'>"
-            "no open events right now</td></tr>"
+            "<tr><td colspan='4' style='text-align:center;color:#888;padding:1em'>"
+            "no open events right now — Prophet Arena hasn't posted any yet</td></tr>"
         )
 
     endpoint_pill = (
@@ -335,11 +430,32 @@ def dashboard() -> str:
     last_n = ep.get("last_run_n_predictions") or "—"
 
     if isinstance(scores, dict) and "error" in scores:
-        scores_block = f"<div class='muted'>scores fetch error: {html_escape(scores['error'][:100])}</div>"
-    elif scores:
-        scores_block = f"<pre>{html_escape(json.dumps(scores, indent=2)[:2000])}</pre>"
+        scores_block = f"<div class='muted'>scores fetch error: {html_escape(scores['error'][:120])}</div>"
+    elif scores and isinstance(scores, list) and len(scores) > 0:
+        score_rows = ""
+        for s in scores[:10]:
+            highlight = "row-self" if s.get("team_name") == "CanadaHacks" else ""
+            score_rows += (
+                f"<tr class='{highlight}'>"
+                f"<td>{html_escape(s.get('team_name','?'))}</td>"
+                f"<td class='num'>{s.get('brier_score','—')}</td>"
+                f"<td class='num'>{s.get('n_predictions','—')}</td>"
+                f"<td class='num'>{s.get('n_matched','—')}</td>"
+                f"</tr>"
+            )
+        scores_block = (
+            "<table><thead><tr><th>team</th><th>brier</th>"
+            "<th>n_pred</th><th>n_matched</th></tr></thead>"
+            f"<tbody>{score_rows}</tbody></table>"
+        )
     else:
-        scores_block = "<div class='muted'>no scores yet</div>"
+        scores_block = "<div class='muted'>no scores yet — leaderboard fires after Prophet Arena scores at least one resolved event</div>"
+
+    variant_desc = _VARIANT_DESCRIPTIONS.get(_VARIANT_NAME, "(no description)")
+    cost_per_event = _VARIANT_COSTS.get(_VARIANT_NAME, 0.0)
+    avg_p_dev = 0.0
+    if _PREDICTION_HISTORY:
+        avg_p_dev = sum(abs(p["p_yes"] - 0.5) for p in _PREDICTION_HISTORY) / len(_PREDICTION_HISTORY)
 
     return f"""<!doctype html>
 <html><head>
@@ -347,36 +463,98 @@ def dashboard() -> str:
 <meta http-equiv="refresh" content="30">
 <title>The Oracles — dashboard</title>
 <style>
-  body {{ font: 13px/1.5 -apple-system, system-ui, sans-serif; max-width: 1100px;
-         margin: 1.5em auto; padding: 0 1em; color: #1f2933; background: #fafbfc; }}
-  h1 {{ font-size: 1.3em; margin-bottom: 0.2em; }}
-  h2 {{ margin-top: 1.4em; font-size: 1.05em; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.2em; }}
-  .meta {{ color: #6b7280; font-size: 0.85em; }}
-  .muted {{ color: #888; }}
-  table {{ border-collapse: collapse; width: 100%; margin: 0.5em 0 1em; font-size: 12px; }}
-  th, td {{ text-align: left; padding: 0.35em 0.5em; border-bottom: 1px solid #e5e7eb; vertical-align: top; }}
-  th {{ background: #f3f4f6; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }}
+  :root {{
+    --bg: #0b1020;
+    --panel: #131a30;
+    --panel-2: #1a2240;
+    --border: #25304d;
+    --text: #e8edf5;
+    --muted: #8694b3;
+    --accent: #6366f1;
+    --accent-2: #38bdf8;
+    --ok: #10b981;
+    --bad: #ef4444;
+    --warn: #f59e0b;
+  }}
+  * {{ box-sizing: border-box; }}
+  body {{ font: 13px/1.5 -apple-system, system-ui, sans-serif;
+         max-width: 1200px; margin: 1.5em auto; padding: 0 1em;
+         color: var(--text); background: var(--bg); }}
+  a {{ color: var(--accent-2); text-decoration: none; }}
+  a:hover {{ text-decoration: underline; }}
+  h1 {{ font-size: 1.5em; margin: 0 0 0.1em; letter-spacing: -0.01em; }}
+  h2 {{ margin-top: 1.6em; font-size: 1.05em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; color: var(--text); }}
+  .meta {{ color: var(--muted); font-size: 0.85em; }}
+  .muted {{ color: var(--muted); }}
+  .small {{ font-size: 0.85em; }}
+  code {{ background: var(--panel-2); padding: 1px 6px; border-radius: 3px; font-size: 0.92em; color: var(--accent-2); }}
+  table {{ border-collapse: collapse; width: 100%; margin: 0.4em 0; font-size: 12px; }}
+  th, td {{ text-align: left; padding: 0.45em 0.6em; border-bottom: 1px solid var(--border); vertical-align: top; }}
+  th {{ background: var(--panel); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }}
   td.num {{ text-align: right; font-variant-numeric: tabular-nums; }}
-  .pill {{ display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.78em; font-weight: 600; }}
-  .pill.ok {{ background: #d1fae5; color: #065f46; }}
-  .pill.bad {{ background: #fee2e2; color: #991b1b; }}
-  code {{ background: #f3f4f6; padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }}
-  pre {{ background: #f3f4f6; padding: 0.6em; border-radius: 6px; overflow: auto; font-size: 11px; }}
-  .summary {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7em; margin: 0.8em 0; }}
-  .summary > div {{ background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.6em 0.8em; }}
-  .summary .label {{ font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; }}
-  .summary .value {{ font-size: 1.1em; font-weight: 600; margin-top: 0.2em; font-variant-numeric: tabular-nums; }}
+  tr.row-self {{ background: rgba(99, 102, 241, 0.15); }}
+  .pill {{ display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.75em; font-weight: 700; letter-spacing: 0.04em; }}
+  .pill.ok {{ background: rgba(16, 185, 129, 0.18); color: var(--ok); }}
+  .pill.bad {{ background: rgba(239, 68, 68, 0.18); color: var(--bad); }}
+  .cat-pill {{ display: inline-block; padding: 1px 7px; border-radius: 9px; font-size: 0.72em; font-weight: 600;
+               background: rgba(99, 102, 241, 0.16); color: #c7d2fe; }}
+  pre {{ background: var(--panel); padding: 0.8em; border-radius: 6px; overflow: auto; font-size: 11px; border: 1px solid var(--border); color: var(--text); }}
+
+  .summary {{ display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.6em; margin: 0.8em 0 1.2em; }}
+  .summary > div {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.7em 0.9em; }}
+  .summary .label {{ font-size: 9px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; }}
+  .summary .value {{ font-size: 1.25em; font-weight: 700; margin-top: 0.2em; font-variant-numeric: tabular-nums; }}
+
+  .variant-card {{ background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
+                    border: 1px solid var(--border); border-radius: 10px; padding: 1em 1.2em; margin: 0.5em 0 1.2em; }}
+  .variant-card h3 {{ font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 0.5em; }}
+  .variant-card .name {{ font-size: 1.15em; font-weight: 700; color: var(--accent-2); margin-bottom: 0.3em; }}
+  .variant-card .desc {{ color: var(--text); font-size: 0.95em; line-height: 1.5; }}
+
+  .pred-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 0.7em; }}
+  .pred-card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.7em 0.9em; }}
+  .pred-head {{ display: flex; gap: 0.5em; align-items: center; font-size: 0.78em; color: var(--muted); margin-bottom: 0.4em; }}
+  .pred-ts {{ font-variant-numeric: tabular-nums; }}
+  .pred-ticker {{ font-size: 0.85em; margin-left: auto; }}
+  .pred-title {{ font-weight: 600; color: var(--text); margin-bottom: 0.5em; font-size: 0.95em; line-height: 1.35; }}
+  .pred-bars {{ margin: 0.4em 0; }}
+  .prob-row {{ display: grid; grid-template-columns: minmax(80px, 1fr) 3fr 36px; gap: 0.5em; align-items: center; margin: 0.2em 0; font-size: 0.85em; }}
+  .prob-label {{ color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+  .prob-bar {{ background: var(--panel-2); height: 14px; border-radius: 7px; overflow: hidden; }}
+  .prob-fill {{ display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }}
+  .prob-val {{ font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 600; }}
+  .pred-rationale {{ color: var(--muted); font-size: 0.82em; line-height: 1.4; margin-top: 0.4em; padding-top: 0.4em; border-top: 1px dashed var(--border); }}
+  .evidence {{ font-size: 0.78em; color: var(--muted); margin-top: 0.4em; }}
+  .empty {{ text-align: center; color: var(--muted); padding: 2em; background: var(--panel); border-radius: 8px; border: 1px dashed var(--border); }}
+
+  form.try {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; }}
+  form.try label {{ display: block; font-size: 0.85em; color: var(--muted); margin: 0.6em 0 0.25em; }}
+  form.try input, form.try textarea {{ width: 100%; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; padding: 0.45em 0.6em; font: inherit; }}
+  form.try textarea {{ min-height: 60px; }}
+  form.try button {{ background: var(--accent); color: white; border: 0; padding: 0.6em 1.2em; border-radius: 5px; font: inherit; font-weight: 600; margin-top: 0.8em; cursor: pointer; }}
+  form.try button:hover {{ background: #4f46e5; }}
+  #try-result {{ background: var(--panel-2); padding: 0.8em; border-radius: 6px; margin-top: 1em; font-family: ui-monospace, monospace; font-size: 11px; white-space: pre-wrap; word-break: break-all; }}
 </style>
 </head><body>
 
-<h1>The Oracles — live dashboard</h1>
-<p class="meta">team <strong>CanadaHacks</strong> · variant served: <code>{html_escape(_VARIANT_NAME)}</code> · auto-refresh every 30s · <a href="/docs">API docs</a> · <a href="/predictions">JSON predictions</a></p>
+<h1>🔮 The Oracles — live dashboard</h1>
+<p class="meta">team <strong>CanadaHacks</strong> · variant: <code>{html_escape(_VARIANT_NAME)}</code> · uptime <strong>{_uptime_human()}</strong> · auto-refresh 30s ·
+<a href="/docs">/docs</a> · <a href="/predictions">/predictions</a> · <a href="/healthz">/healthz</a></p>
 
 <div class="summary">
   <div><div class="label">endpoint</div><div class="value">{endpoint_pill}</div></div>
-  <div><div class="label">last call</div><div class="value">{html_escape(last_run[:19])}</div></div>
+  <div><div class="label">preds served</div><div class="value">{_TOTAL_PREDICTIONS}</div></div>
+  <div><div class="label">api spend</div><div class="value">${_TOTAL_COST_USD:.3f}</div></div>
+  <div><div class="label">avg p_yes ± 0.5</div><div class="value">{avg_p_dev:.2f}</div></div>
+  <div><div class="label">last call</div><div class="value small">{html_escape(last_run[:19]) if last_run != '—' else '—'}</div></div>
   <div><div class="label">last status</div><div class="value">{html_escape(str(last_status))}</div></div>
-  <div><div class="label">last #preds</div><div class="value">{html_escape(str(last_n))}</div></div>
+</div>
+
+<div class="variant-card">
+  <h3>Variant in production</h3>
+  <div class="name">{html_escape(_VARIANT_NAME)}</div>
+  <div class="desc">{html_escape(variant_desc)}</div>
+  <div class="meta" style="margin-top:0.6em">cost ~${cost_per_event:.4f}/event · longshot guard floor: 0.05 or 0.5/n_outcomes (whichever is greater) · Kalshi paper compliance</div>
 </div>
 
 <h2>Open events on Prophet Arena ({len(open_events_list)})</h2>
@@ -385,21 +563,49 @@ def dashboard() -> str:
 <tbody>{open_rows}</tbody>
 </table>
 
-<h2>Recent predictions served (last {len(_PREDICTION_HISTORY)})</h2>
-<table>
-<thead><tr><th>timestamp</th><th>market_ticker</th><th>category</th><th>title</th><th>p_yes</th><th>rationale</th></tr></thead>
-<tbody>{rows}</tbody>
-</table>
+<h2>Recent predictions served ({len(_PREDICTION_HISTORY)})</h2>
+<div class="pred-grid">{pred_cards}</div>
 
-<h2>Scores</h2>
+<h2>Leaderboard scores</h2>
 {scores_block}
 
-<h2>Local quick links</h2>
+<h2>Try a prediction (live, hits production endpoint)</h2>
+<form class="try" onsubmit="event.preventDefault(); doTry();">
+  <label>title</label><input id="ti" value="Will the US Federal Reserve cut rates at the December 2026 meeting?">
+  <label>category</label><input id="ca" value="Economics">
+  <label>outcomes (comma-separated)</label><input id="ou" value="Yes, No">
+  <label>close_time (ISO 8601)</label><input id="ct" value="2026-12-31T23:59:59Z">
+  <button type="submit">Predict</button>
+  <div id="try-result">Submit a question to see the live agent's per-outcome probabilities.</div>
+</form>
+<script>
+async function doTry() {{
+  const out = document.getElementById("try-result");
+  out.textContent = "calling /predict ...";
+  const outcomes = document.getElementById("ou").value.split(",").map(s => s.trim()).filter(Boolean);
+  const body = {{
+    event_ticker: "dashboard-try", market_ticker: "dashboard-try",
+    title: document.getElementById("ti").value,
+    category: document.getElementById("ca").value,
+    close_time: document.getElementById("ct").value,
+    outcomes
+  }};
+  try {{
+    const r = await fetch("/predict", {{method: "POST", headers: {{"content-type": "application/json"}}, body: JSON.stringify(body)}});
+    const j = await r.json();
+    out.textContent = JSON.stringify(j, null, 2);
+  }} catch (e) {{ out.textContent = "error: " + e.message; }}
+}}
+</script>
+
+<h2>Quick links</h2>
 <ul>
 <li><a href="/healthz">/healthz</a> — server health JSON</li>
 <li><a href="/docs">/docs</a> — Swagger UI</li>
-<li><a href="/redoc">/redoc</a> — ReDoc API spec</li>
+<li><a href="/redoc">/redoc</a> — ReDoc</li>
 <li><a href="/predictions">/predictions</a> — last 50 predictions JSON</li>
+<li><a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a></li>
+<li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
 </ul>
 
 </body></html>"""

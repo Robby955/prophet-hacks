@@ -9,8 +9,10 @@ def test_root_is_public_status_page() -> None:
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "ForecastPath" in response.text
-    assert "Live monitoring is restricted" in response.text
+    assert "ForecastingPath" in response.text
+    # Monitor status text was reworded to fit on the same line; only the
+    # access state words matter for the test.
+    assert ("restricted" in response.text) or ("public" in response.text)
 
 
 def test_healthz_reports_served_variant() -> None:

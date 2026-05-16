@@ -56,6 +56,7 @@ from fastapi.responses import (
     Response,
     StreamingResponse,
 )
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 
 load_dotenv()
@@ -151,6 +152,13 @@ app = FastAPI(
     redoc_url=None,
     openapi_url=None,
 )
+
+# Mount /static for favicon, OG image, architecture diagram. Cached aggressively
+# by browser; small WebP/ICO assets generated from images/ via the scripts/
+# image optimizer.
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
+if _STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
 
 
 class EventRequest(BaseModel):
@@ -306,7 +314,17 @@ def root() -> str:
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ForecastPath</title>
+<title>ForecastingPath</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="apple-touch-icon" sizes="192x192" href="/static/icon-192.png">
+<meta name="description" content="ForecastingPath: evidence-grounded forecasting agent for Prophet Hacks 2026. Brave-search retrieval + Claude Opus 4.7 + Kalshi longshot guard.">
+<meta property="og:title" content="ForecastingPath">
+<meta property="og:description" content="Evidence-grounded forecasting agent. Live endpoint for Prophet Arena.">
+<meta property="og:image" content="https://forecastingpath.com/static/banner.webp">
+<meta property="og:url" content="https://forecastingpath.com">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://forecastingpath.com/static/banner.webp">
 <style>
   :root {{
     --bg: #f7f8fb;
@@ -340,13 +358,14 @@ def root() -> str:
 </style>
 </head><body>
 <main>
-  <h1>ForecastPath</h1>
+  <h1>ForecastingPath</h1>
   <p>The Oracles forecasting agent for Prophet Hacks 2026.</p>
   <div class="status">
     <div class="tile"><div class="label">Service</div><div class="value"><span class="dot"></span>online</div></div>
     <div class="tile"><div class="label">Variant</div><div class="value">{html_escape(_VARIANT_NAME)}</div></div>
-    <div class="tile"><div class="label">Monitor</div><div class="value">{dashboard_status}</div></div>
+    <div class="tile"><div class="label">Commit</div><div class="value"><code>{html_escape(_BUILD_COMMIT_SHA)}</code></div></div>
   </div>
+  <p style="font-size:0.86em;color:var(--muted)">Monitor: <strong>{dashboard_status}</strong> · evidence-grounded probabilistic forecasting · Brier-scored.</p>
   <p>The public API endpoint remains available for Prophet Arena scoring. Live monitoring is restricted during the event.</p>
   <div class="links">
     <a href="/healthz">Health</a>
@@ -359,6 +378,12 @@ def root() -> str:
 
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon() -> Response:
+    """Serve the real favicon. Falls back to 204 if static/ wasn't bundled
+    (which would be a deploy bug -- preflight checks for it now)."""
+    ico = _STATIC_DIR / "favicon.ico"
+    if ico.exists():
+        return Response(content=ico.read_bytes(), media_type="image/x-icon",
+                        headers={"Cache-Control": "public, max-age=86400"})
     return Response(status_code=204)
 
 
@@ -821,7 +846,13 @@ def dashboard(
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="30">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Oracles · live dashboard</title>
+<title>The Oracles · ForecastingPath live dashboard</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<link rel="apple-touch-icon" sizes="192x192" href="/static/icon-192.png">
+<meta property="og:title" content="ForecastingPath · live dashboard">
+<meta property="og:description" content="Live forecasting agent for Prophet Hacks 2026: Brave-search retrieval + Claude Opus 4.7 + Kalshi longshot guard.">
+<meta property="og:image" content="https://forecastingpath.com/static/banner.webp">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
@@ -952,6 +983,7 @@ def dashboard(
   <span>team: <strong>CanadaHacks</strong></span>
   <span>variant: <strong>{html_escape(_VARIANT_NAME)}</strong></span>
   <span>uptime: <strong>{_uptime_human()}</strong></span>
+  <span>commit: <strong><code>{html_escape(_BUILD_COMMIT_SHA)}</code></strong></span>
   <span><a href="https://prophetarena.co/leaderboard/forecast">Leaderboard</a></span>
   <span><a href="https://github.com/Robby955/prophet-hacks">GitHub</a></span>
 </div>
@@ -970,7 +1002,11 @@ def dashboard(
 
 <h2>What our agent does</h2>
 <div class="card">
-  <p>For every event Prophet Arena sends to our endpoint, we:</p>
+  <figure style="margin:0 0 1.2em;">
+    <img src="/static/howagentworks.webp" alt="ForecastingPath agent architecture: ingest event payload, gather high-signal web evidence, prioritize and deduplicate sources, estimate per-outcome probabilities with an LLM, apply longshot safeguard, return structured JSON" style="display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--border);">
+    <figcaption class="meta" style="margin-top:0.5em;text-align:center;font-size:0.86em;">Pipeline overview. Each event flows through six stages, every stage logged and recoverable.</figcaption>
+  </figure>
+  <p>The text form, for accessibility and detail:</p>
   <div class="pipeline">
     <span class="step">1. Receive event JSON</span>
     <span class="arrow">›</span>

@@ -25,6 +25,9 @@ dist/
 # Scratch dir from a different agent; not wired in, not for deploy
 proposed_retrieval/
 images/
+# But DO commit static/ (optimized assets served by the dashboard).
+# We generate static/* from images/* via Pillow; only static/ ships.
+!static/
 
 # Older monitoring playbook PDFs (superseded by v7; kept locally as reference, not in repo)
 forecasting_agent_monitoring_playbook.pdf

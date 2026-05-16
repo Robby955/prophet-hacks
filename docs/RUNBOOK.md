@@ -69,3 +69,127 @@ SDK lifecycle, and general failure patterns.
   - Are there per-team API spend caps we should know about?
   - Who is paying the LLM bill (us or the platform)?
 - Pre-event questions are listed in `docs/PRE_EVENT_CHECKLIST.md`.
+
+---
+
+## Live forecasting endpoint runbook (2026-05-16 onward)
+
+This is the runbook for `agent.forecastingpath.com/predict` — the live
+Prophet Arena forecasting endpoint. For trading-track incidents, use the
+sections above; for forecast endpoint incidents, use this one.
+
+### How to verify the system is healthy
+
+```bash
+# 1. Endpoint is up + which code is serving
+curl -s https://agent.forecastingpath.com/healthz | jq .
+# expect status=ok, variant=multi_outcome_retrieval, commit=<latest>
+
+# 2. End-to-end pipeline works
+python scripts/stress_test.py --n 1
+# expect: 1/1 succeeded; max single-call latency < 60s
+
+# 3. Multi-call concurrency works (in case PA queues multiple)
+python scripts/stress_test.py --n 5 --workers 5
+# expect: 5/5 succeeded; max latency well under PA's 600s budget
+# 2026-05-16 baseline: 5 concurrent done in 7.2s wall clock
+```
+
+### "Prophet Arena hasn't called us"
+
+Symptom: `/forecast/endpoints/CanadaHacks` shows `last_run_at: null`
+hours into the event window.
+
+Triage:
+1. Confirm endpoint is registered + active. The CLI:
+   `prophet forecast leaderboard` and check we appear.
+2. Confirm `/healthz` returns 200 and the correct variant.
+3. Confirm PA has open events: `prophet forecast events --status open`.
+   If 0 open events, this isn't our problem.
+4. Check Railway service logs for any errors during a recent window.
+5. The watcher (`scripts/watch_predictions.sh`, PID logged at
+   `/tmp/oracles_watch.log`) mac-notifies on first call, open events
+   appearing, or scores posting.
+
+No action needed if PA simply hasn't started; wait.
+
+### "/predict is timing out"
+
+Symptom: PA reports `endpoint timeout` or our pipeline takes > 60s.
+
+PA budget per event: 600s (10 minutes). Our 2026-05-16 baseline is ~5s
+per call, ~7s for 5 concurrent. If we're hitting > 60s something is
+wrong.
+
+Triage:
+1. Hit `/predict` ourselves with a synthetic event:
+   `python scripts/stress_test.py --n 1`
+2. Inspect the trace via `/predictions` (auth required):
+   ```bash
+   curl -s "https://agent.forecastingpath.com/predictions" \
+     -H "x-dashboard-token: $DASHBOARD_AUTH_TOKEN" | jq '.predictions[0].trace.latency_ms'
+   ```
+   This shows per-stage latency (brave / llm / total).
+3. If Brave is slow (> 5s typical): Brave Search may be rate-limited.
+   Check Brave quota.
+4. If LLM is slow (> 30s): Anthropic API may be degraded. Check
+   `https://status.anthropic.com`.
+5. Worst case: trip `BRAVE_SEARCH_API_KEY` to empty to force the
+   no-retrieval `predict_multi_outcome` fallback path. We lose evidence
+   but keep responding. Set the env var back when Brave recovers.
+
+### "/predict returns probabilities=[]"
+
+This is the catastrophic failure mode. Means our pipeline got an event
+with `outcomes` empty AND no title we could infer outcomes from.
+
+Triage:
+1. Check `/predictions` for the event ticker. Look at `trace.warnings`
+   and `trace.outcomes_inferred`.
+2. If `outcomes_inferred=true`, the safety net fired and we tried Haiku
+   inference but failed.
+3. If `outcomes_inferred=false`, the event came in with outcomes already.
+   This shouldn't fail — investigate the rationale field for context.
+
+The 2026-05-16 safety net (binary heuristic + Haiku fallback + last-resort
+["Yes", "No"]) means this should never happen unless title AND outcomes
+are both empty.
+
+### "Deploy failed"
+
+If `./scripts/agent/deploy.sh` fails:
+1. **Preflight failed:** read the error, fix it (untracked file? push HEAD?).
+2. **Upload TLS error (BadRecordMac / Broken pipe):** transient network.
+   Retry the deploy script directly. If it persists, check `du -sh`
+   on what would be uploaded — if > 10MB, that's the bug from 2026-05-16.
+3. **Build failed on Railway:** check the build log URL the script prints.
+   Most common cause: missing dep in `requirements.txt`.
+4. **Healthcheck failed:** the new code starts but `/healthz` returns
+   non-200. Roll back by deploying the previous commit:
+   `git checkout <previous_sha> && ./scripts/agent/deploy.sh "rollback"`.
+
+### "Dashboard shows wrong commit"
+
+`/healthz.commit` should match the latest commit on `main` (and
+`scripts/preflight.sh` reports both side-by-side before deploy).
+
+If they don't match:
+1. Latest deploy probably didn't land. Check
+   `railway deployment list --service oracles-agent --json` for
+   FAILED or REMOVED entries near the top.
+2. Re-deploy via `./scripts/agent/deploy.sh` (NOT raw `railway up`).
+3. After ~2 min, `/healthz.commit` should reflect the new SHA.
+
+### Cost tracking
+
+Per-call cost in production (multi_outcome_retrieval):
+- Brave Search: free tier 2k/month; we use ~30/day at hackathon scale
+- Anthropic Opus 4.7: ~$0.10/call (5500 in + 500 out tokens)
+- Total per event: ~$0.10
+
+Session budget for the 2026-05-16 hackathon: ~$50 expected, well under
+the $200/10d threshold that triggers RunPod OSS-hosting consideration
+(see `docs/RUNPOD_POSTURE.md`).
+
+Spend is visible on the dashboard "API spend" tile (in-memory, resets on
+restart).

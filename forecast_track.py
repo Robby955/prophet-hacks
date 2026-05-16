@@ -78,17 +78,29 @@ def longshot_guard_floor(n_outcomes: int) -> float:
     """Per-outcome probability floor per the Kalshi longshot bias finding.
 
     Kalshi paper (and Whelan writeup): buyers of <$0.10 contracts lose >60%
-    on average. LLMs are prone to vivid-narrative tail predictions on
-    outcomes the prior is already small on. We require every outcome to be
-    at least `max(0.05, 0.5 / n_outcomes)` so we don't get punished on
-    longshots we got wrong.
+    on average. The PRINCIPLED floor from that empirical finding is 0.10,
+    not "half the uniform prior."
 
-    For n=2 the floor is 0.25 (binary predictions clamped to [0.25, 0.75]).
-    For n=10 it's 0.05. For n=30 it's 0.05.
+    Previously this returned `max(0.05, 0.5 / n_outcomes)`, which for
+    binary events (n=2) gave 0.25 -- forcing every binary prediction into
+    [0.25, 0.75]. That's catastrophic when Opus 4.7 correctly anchors a
+    longshot at 0.06 from cited market odds and the guard inflates it to
+    0.25, destroying ~0.06 of Brier per event. Bug found 2026-05-16
+    smoke-testing the Chiefs/SB-LXI synthetic.
+
+    New rule: cap the floor at 0.10 (Kalshi threshold). The 0.5/n logic
+    still narrows the floor on high-n events where the uniform prior is
+    already below 0.10.
+
+    For n=2  the floor is 0.10 (binary can go [0.10, 0.90]).
+    For n=3  the floor is 0.10.
+    For n=5  the floor is 0.10.
+    For n=10 the floor is 0.05.
+    For n=30 the floor is 0.05.
     """
     if n_outcomes <= 0:
         return 0.05
-    return max(0.05, 0.5 / n_outcomes)
+    return min(0.10, max(0.05, 0.5 / n_outcomes))
 
 
 def apply_longshot_guard(
@@ -963,6 +975,15 @@ Calibration scale (apply to each outcome independently):
   0.80 = strong view; hard evidence, clear mechanism.
   0.90 = near-certain; mechanically determined or authoritative source.
 
+Market-odds anchoring (IMPORTANT):
+If the evidence cites explicit market odds, implied probabilities, or
+betting prices for any outcome (e.g. "+1500" implies ~6%, "-200" implies
+~67%, "trading at 0.25" implies 25%), anchor your forecast for that
+outcome strongly to that number. Markets aggregate informed money;
+move more than 0.05 away from a cited market price only when you have
+specific contrary evidence in the snippets (not vibes, not narratives).
+LLMs systematically overweight vivid low-probability stories; resist that.
+
 Rules:
 - Output ONLY valid JSON of the shape:
     {"probabilities": {"<outcome label>": <float>, ...},
@@ -1004,7 +1025,7 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
       2. Hit Brave Search (count=5).
       3. Dedupe by domain, preferring official sources (.gov/.edu, then a
          curated list of exchanges and major outlets), max 5 chunks.
-      4. Run a Sonnet 4.6 multi-outcome call with the evidence injected as
+      4. Run an Opus 4.7 multi-outcome call with the evidence injected as
          "Recent evidence (do not invent details): ..." -- titles and
          snippets only; URLs are kept in `evidence_urls` for audit.
       5. Apply the Kalshi longshot guard -- every per-outcome probability
@@ -1017,9 +1038,9 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
       - If the LLM call fails, falls back to uniform prior with the
         longshot guard applied.
 
-    Cost: ~$0.005 (Sonnet base) + ~$0.002 (enriched prompt context) per
-    event; Brave free tier covers 2k searches/month. 26-event backtest
-    ~$0.20.
+    Cost: ~$0.08-0.12 per event (Opus 4.7 input/output on a ~5500-token
+    enriched prompt + ~500-token JSON response); Brave free tier covers
+    2k searches/month. Sonnet 4.6 fallback exists if the Opus call fails.
 
     Returns:
         {
@@ -1071,10 +1092,17 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
     evidence_urls = [c["url"] for c in chunks if c.get("url")]
 
     # ---- 4. Multi-outcome LLM call with evidence-enriched prompt. ----
+    # Opus 4.7 is our forecast model here -- the leaderboard's "Default
+    # Harness" track is led by Anthropic Agent Opus 4.6 (0.9438 BSS) and
+    # 4.7 is the newer model. For ~5x cost (~$0.10/call vs Sonnet's $0.02)
+    # we get a model that anchors to cited market odds materially better,
+    # which directly attacks the over-estimation pattern smoke-tested
+    # 2026-05-16 on the Chiefs/SB-LXI event.
     user = _build_retrieval_user_prompt(event, chunks)
+    forecast_model = _OPUS_MODEL
     try:
         resp = _aclient().messages.create(
-            model=_FORECAST_MODEL,
+            model=forecast_model,
             max_tokens=900,
             system=_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user}],

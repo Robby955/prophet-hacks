@@ -93,7 +93,7 @@ _VARIANT_COSTS: dict[str, float] = {
     "sonnet_cot_shrink": 0.007,
     "multi_outcome": 0.010,
     "multi_outcome_sc3": 0.030,
-    "multi_outcome_retrieval": 0.012,
+    "multi_outcome_retrieval": 0.10,
     "hybrid_routed": 0.008,
 }
 
@@ -112,7 +112,7 @@ _VARIANT_DESCRIPTIONS: dict[str, str] = {
     "sonnet_cot_shrink": "sonnet_cot + post-hoc shrinkage toward the uninformed prior on low-conviction outputs.",
     "multi_outcome": "ONE Sonnet 4.6 call returns per-outcome probabilities directly (no distribute hack). Kalshi longshot guard applied.",
     "multi_outcome_sc3": "k=3 parallel multi_outcome calls, averaged per-outcome (self-consistency).",
-    "multi_outcome_retrieval": "Brave Search → 5 deduped evidence chunks → multi_outcome prompt → Kalshi longshot guard. The current production variant.",
+    "multi_outcome_retrieval": "Brave Search → 5 deduped evidence chunks → Opus 4.7 multi-outcome call with market-odds anchoring → Kalshi longshot guard. The current production variant.",
     "hybrid_routed": "Binary (n<=2): gpt55. Multi (n>2): multi_outcome. Routes by outcome count to play each model's strength.",
 }
 

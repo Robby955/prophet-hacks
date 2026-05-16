@@ -40,18 +40,21 @@ from the model.
 """
 from __future__ import annotations
 
+import asyncio
 import collections
 import json
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from html import escape as html_escape
+from pathlib import Path
 from typing import Any
 
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 load_dotenv()
@@ -65,6 +68,15 @@ _SERVER_START_TS = datetime.now(timezone.utc)
 _TOTAL_PREDICTIONS = 0
 _TOTAL_COST_USD = 0.0
 _ERROR_COUNT = 0
+
+# Predictions-per-minute history for the dashboard sparkline. Each tick is
+# one minute. Counter resets each minute via the /predict path.
+_PREDICTIONS_PER_MIN: collections.deque = collections.deque(maxlen=30)
+_PPM_CURRENT_MINUTE: int = -1
+_PPM_CURRENT_COUNT: int = 0
+
+# SSE subscribers: asyncio.Queues that get an event each time /predict runs.
+_SSE_SUBSCRIBERS: list = []
 
 # Approximate per-event cost in USD for each variant. Used for spend tracking.
 _VARIANT_COSTS: dict[str, float] = {
@@ -281,9 +293,39 @@ def predict(event: EventRequest) -> PredictionResponse:
         "evidence_urls": evidence_urls[:8],
     })
     # Live KPIs for the dashboard.
-    global _TOTAL_PREDICTIONS, _TOTAL_COST_USD
+    global _TOTAL_PREDICTIONS, _TOTAL_COST_USD, _PPM_CURRENT_MINUTE, _PPM_CURRENT_COUNT
     _TOTAL_PREDICTIONS += 1
     _TOTAL_COST_USD += _VARIANT_COSTS.get(_VARIANT_NAME, 0.0)
+
+    # Per-minute bucket for sparkline. When the minute rolls over, flush
+    # the previous count into the history deque.
+    now_min = int(time.time() // 60)
+    if _PPM_CURRENT_MINUTE != now_min:
+        if _PPM_CURRENT_MINUTE != -1:
+            _PREDICTIONS_PER_MIN.append(_PPM_CURRENT_COUNT)
+        _PPM_CURRENT_MINUTE = now_min
+        _PPM_CURRENT_COUNT = 0
+    _PPM_CURRENT_COUNT += 1
+
+    # Fan out to SSE subscribers so the dashboard can flash + prepend.
+    sse_msg = {
+        "type": "prediction",
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "market_ticker": event.market_ticker,
+        "title": event.title[:200],
+        "category": event.category,
+        "p_yes": p_yes,
+        "probabilities": probs,
+        "rationale": rationale[:240],
+        "evidence_urls": evidence_urls[:5],
+        "total_predictions": _TOTAL_PREDICTIONS,
+        "total_cost_usd": round(_TOTAL_COST_USD, 4),
+    }
+    for q in list(_SSE_SUBSCRIBERS):
+        try:
+            q.put_nowait(sse_msg)
+        except Exception:
+            pass
     return PredictionResponse(
         probabilities=[OutcomeProbability(**p) for p in probs],
         rationale=rationale,
@@ -330,6 +372,132 @@ def _fetch_remote_state() -> dict[str, Any]:
     except Exception as e:
         out["open_events"] = {"error": str(e)[:200]}
     return out
+
+
+@app.get("/events")
+async def events_stream() -> StreamingResponse:
+    """Server-Sent Events endpoint. /dashboard subscribes to push updates.
+
+    Each new prediction served by /predict gets fanned out to every
+    subscriber. Heartbeat pings every 25 seconds keep proxies happy.
+    """
+    q: asyncio.Queue = asyncio.Queue(maxsize=64)
+    _SSE_SUBSCRIBERS.append(q)
+
+    async def gen():
+        try:
+            # Initial snapshot
+            yield (
+                "event: hello\ndata: "
+                + json.dumps({
+                    "total_predictions": _TOTAL_PREDICTIONS,
+                    "total_cost_usd": round(_TOTAL_COST_USD, 4),
+                    "variant": _VARIANT_NAME,
+                })
+                + "\n\n"
+            )
+            while True:
+                try:
+                    msg = await asyncio.wait_for(q.get(), timeout=25.0)
+                    yield f"event: {msg.get('type','message')}\ndata: {json.dumps(msg)}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": heartbeat\n\n"
+        finally:
+            try:
+                _SSE_SUBSCRIBERS.remove(q)
+            except ValueError:
+                pass
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+def _backtest_summary_for_dashboard() -> list[dict]:
+    """Read backtest_summary.json + reports/calibration_summary.md if present.
+
+    Returns a list of {variant, brier, n} dicts, sorted by Brier ascending.
+    Used for the per-variant comparison bar chart on the dashboard.
+    """
+    paths = [
+        Path("data/predictions/backtest_summary.json"),
+        Path(__file__).resolve().parent / "data/predictions/backtest_summary.json",
+    ]
+    for p in paths:
+        if not p.exists():
+            continue
+        try:
+            data = json.loads(p.read_text())
+            rows = []
+            for r in data:
+                ev = r.get("evaluator_result") or {}
+                rows.append({
+                    "variant": r.get("variant", "?"),
+                    "brier": ev.get("brier_score") or r.get("brier_local"),
+                    "n": r.get("n_predictions", 0),
+                })
+            rows = [r for r in rows if r["brier"] is not None]
+            rows.sort(key=lambda r: r["brier"])
+            return rows
+        except Exception:
+            continue
+    return []
+
+
+def _svg_sparkline(values: list[int], width: int = 220, height: int = 36) -> str:
+    """Tiny inline SVG sparkline. values is a list of counts per minute."""
+    if not values:
+        return f"<svg width='{width}' height='{height}'><text x='6' y='22' fill='#8694b3' font-size='11'>no activity yet</text></svg>"
+    n = len(values)
+    vmax = max(values) or 1
+    pts = []
+    for i, v in enumerate(values):
+        x = (i / max(1, n - 1)) * (width - 4) + 2
+        y = height - 4 - (v / vmax) * (height - 8)
+        pts.append(f"{x:.1f},{y:.1f}")
+    path = "M " + " L ".join(pts)
+    fill_path = path + f" L {width-2},{height-4} L 2,{height-4} Z"
+    return (
+        f"<svg width='{width}' height='{height}' viewBox='0 0 {width} {height}'>"
+        f"<path d='{fill_path}' fill='url(#sg)' opacity='0.35'/>"
+        f"<path d='{path}' stroke='#38bdf8' stroke-width='1.5' fill='none'/>"
+        f"<defs><linearGradient id='sg' x1='0' x2='0' y1='0' y2='1'>"
+        f"<stop offset='0' stop-color='#38bdf8'/>"
+        f"<stop offset='1' stop-color='#38bdf8' stop-opacity='0'/>"
+        f"</linearGradient></defs>"
+        f"</svg>"
+    )
+
+
+def _svg_brier_bars(rows: list[dict], width: int = 540, row_h: int = 22) -> str:
+    """Horizontal bar chart of per-variant Brier (lower is better)."""
+    if not rows:
+        return "<div class='muted small'>no backtest data yet (run scripts/backtest_forecast.py)</div>"
+    rows = rows[:14]  # cap
+    height = len(rows) * row_h + 24
+    bmax = max(r["brier"] for r in rows) or 1.0
+    bmin = min(r["brier"] for r in rows)
+    bars = []
+    for i, r in enumerate(rows):
+        y = 12 + i * row_h
+        bw = (r["brier"] / bmax) * (width - 220)
+        # color: best (lowest) = bright accent; worst = muted
+        is_best = i == 0
+        bar_color = "#10b981" if is_best else "#6366f1"
+        text_color = "#e8edf5" if is_best else "#c7d2fe"
+        bars.append(
+            f"<rect x='180' y='{y-9}' width='{bw:.1f}' height='14' fill='{bar_color}' opacity='0.85' rx='2'/>"
+            f"<text x='174' y='{y+2}' fill='{text_color}' font-size='11' text-anchor='end'>{html_escape(r['variant'])}</text>"
+            f"<text x='{180+bw+6:.1f}' y='{y+2}' fill='#e8edf5' font-size='11' font-variant-numeric='tabular-nums'>{r['brier']:.4f}</text>"
+        )
+    return (
+        f"<svg width='{width}' height='{height}' viewBox='0 0 {width} {height}'>"
+        f"<rect x='0' y='0' width='{width}' height='{height}' fill='transparent'/>"
+        + "".join(bars)
+        + "</svg>"
+    )
 
 
 def _uptime_human() -> str:
@@ -457,6 +625,22 @@ def dashboard() -> str:
     if _PREDICTION_HISTORY:
         avg_p_dev = sum(abs(p["p_yes"] - 0.5) for p in _PREDICTION_HISTORY) / len(_PREDICTION_HISTORY)
 
+    # Sparkline + bar chart pieces
+    spark_values = list(_PREDICTIONS_PER_MIN) + [_PPM_CURRENT_COUNT]
+    spark_svg = _svg_sparkline(spark_values)
+    brier_svg = _svg_brier_bars(_backtest_summary_for_dashboard())
+
+    # Category distribution from recent predictions (for a tiny donut)
+    cat_counts: dict[str, int] = {}
+    for p in _PREDICTION_HISTORY:
+        c = p.get("category") or "?"
+        cat_counts[c] = cat_counts.get(c, 0) + 1
+    cat_total = sum(cat_counts.values()) or 1
+    cat_chips = "".join(
+        f"<span class='cat-chip'><strong>{html_escape(k)}</strong> {v}</span>"
+        for k, v in sorted(cat_counts.items(), key=lambda x: -x[1])
+    ) or "<span class='muted small'>none yet</span>"
+
     return f"""<!doctype html>
 <html><head>
 <meta charset="utf-8">
@@ -534,11 +718,24 @@ def dashboard() -> str:
   form.try button {{ background: var(--accent); color: white; border: 0; padding: 0.6em 1.2em; border-radius: 5px; font: inherit; font-weight: 600; margin-top: 0.8em; cursor: pointer; }}
   form.try button:hover {{ background: #4f46e5; }}
   #try-result {{ background: var(--panel-2); padding: 0.8em; border-radius: 6px; margin-top: 1em; font-family: ui-monospace, monospace; font-size: 11px; white-space: pre-wrap; word-break: break-all; }}
+
+  @keyframes flash {{ 0% {{ background: rgba(56, 189, 248, 0.25); }} 100% {{ background: var(--panel); }} }}
+  .pred-card.fresh {{ animation: flash 1.6s ease-out; }}
+  .cat-chip {{ display: inline-block; background: var(--panel-2); border: 1px solid var(--border); padding: 3px 9px; border-radius: 12px; margin: 2px 4px 2px 0; font-size: 0.78em; }}
+  .cat-chip strong {{ color: var(--accent-2); font-weight: 600; }}
+  .arch-card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; }}
+  .arch-flow {{ display: flex; flex-wrap: wrap; gap: 0.4em; align-items: center; font-size: 0.85em; margin-top: 0.5em; }}
+  .arch-step {{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 4px 9px; }}
+  .arch-arrow {{ color: var(--muted); }}
+  .live-pill {{ display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 0.72em; font-weight: 700;
+                background: rgba(239, 68, 68, 0.18); color: #fca5a5; animation: pulse 2s infinite; }}
+  @keyframes pulse {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.55; }} }}
+  .grid-2 {{ display: grid; grid-template-columns: 1fr 1fr; gap: 1em; align-items: start; }}
 </style>
 </head><body>
 
-<h1>🔮 The Oracles — live dashboard</h1>
-<p class="meta">team <strong>CanadaHacks</strong> · variant: <code>{html_escape(_VARIANT_NAME)}</code> · uptime <strong>{_uptime_human()}</strong> · auto-refresh 30s ·
+<h1>🔮 The Oracles — live dashboard <span class="live-pill" id="live-indicator">SSE LIVE</span></h1>
+<p class="meta">team <strong>CanadaHacks</strong> · variant: <code>{html_escape(_VARIANT_NAME)}</code> · uptime <strong>{_uptime_human()}</strong> · auto-refresh 30s · streaming via <code>/events</code> ·
 <a href="/docs">/docs</a> · <a href="/predictions">/predictions</a> · <a href="/healthz">/healthz</a></p>
 
 <div class="summary">
@@ -550,11 +747,46 @@ def dashboard() -> str:
   <div><div class="label">last status</div><div class="value">{html_escape(str(last_status))}</div></div>
 </div>
 
-<div class="variant-card">
-  <h3>Variant in production</h3>
-  <div class="name">{html_escape(_VARIANT_NAME)}</div>
-  <div class="desc">{html_escape(variant_desc)}</div>
-  <div class="meta" style="margin-top:0.6em">cost ~${cost_per_event:.4f}/event · longshot guard floor: 0.05 or 0.5/n_outcomes (whichever is greater) · Kalshi paper compliance</div>
+<div class="grid-2">
+  <div class="variant-card">
+    <h3>Variant in production</h3>
+    <div class="name">{html_escape(_VARIANT_NAME)}</div>
+    <div class="desc">{html_escape(variant_desc)}</div>
+    <div class="meta" style="margin-top:0.6em">cost ~${cost_per_event:.4f}/event · longshot guard floor: 0.05 or 0.5/n_outcomes (whichever is greater) · Kalshi paper compliance</div>
+  </div>
+  <div class="arch-card">
+    <h3 style="font-size:0.85em;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 0.5em">Architecture (multi_outcome_retrieval)</h3>
+    <div class="arch-flow">
+      <span class="arch-step">event JSON</span><span class="arch-arrow">→</span>
+      <span class="arch-step">Brave Search (top 5)</span><span class="arch-arrow">→</span>
+      <span class="arch-step">dedupe by domain priority</span><span class="arch-arrow">→</span>
+      <span class="arch-step">enriched multi-outcome prompt</span><span class="arch-arrow">→</span>
+      <span class="arch-step">Sonnet 4.6</span><span class="arch-arrow">→</span>
+      <span class="arch-step">per-outcome probs</span><span class="arch-arrow">→</span>
+      <span class="arch-step">Kalshi longshot guard</span><span class="arch-arrow">→</span>
+      <span class="arch-step">{{"probabilities": [...]}}</span>
+    </div>
+    <div class="meta" style="margin-top:0.6em">priority domains: <code>.gov</code> · <code>.edu</code> · Kalshi · Polymarket · AP · Reuters · BBC · NPR · then anything</div>
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:1em">
+  <div class="arch-card">
+    <h3 style="font-size:0.85em;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 0.5em">Predictions/min (last 30 min)</h3>
+    <div>{spark_svg}</div>
+    <div class="meta small" style="margin-top:0.4em">total served: <strong>{_TOTAL_PREDICTIONS}</strong> · spend so far: <strong>${_TOTAL_COST_USD:.3f}</strong></div>
+  </div>
+  <div class="arch-card">
+    <h3 style="font-size:0.85em;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 0.5em">Categories in recent predictions</h3>
+    <div>{cat_chips}</div>
+    <div class="meta small" style="margin-top:0.5em">distribution shifts with the events Prophet Arena sends us</div>
+  </div>
+</div>
+
+<h2>Per-variant Brier (lower is better) — from scripts/backtest_forecast.py</h2>
+<div class="arch-card">
+  {brier_svg}
+  <div class="meta small" style="margin-top:0.4em">Brier here is the legacy single-p_yes metric from the local backtest. The proper per-outcome Brier (used for prize scoring) shows the same ranking with different absolute values. Note: <code>multi_outcome_retrieval</code>'s 0.064 is contaminated by data leakage (Brave finds articles about resolved past events); live performance on future events does not leak.</div>
 </div>
 
 <h2>Open events on Prophet Arena ({len(open_events_list)})</h2>
@@ -563,8 +795,8 @@ def dashboard() -> str:
 <tbody>{open_rows}</tbody>
 </table>
 
-<h2>Recent predictions served ({len(_PREDICTION_HISTORY)})</h2>
-<div class="pred-grid">{pred_cards}</div>
+<h2>Recent predictions served (<span id="pred-count">{len(_PREDICTION_HISTORY)}</span>)</h2>
+<div class="pred-grid" id="pred-grid">{pred_cards}</div>
 
 <h2>Leaderboard scores</h2>
 {scores_block}
@@ -596,6 +828,48 @@ async function doTry() {{
     out.textContent = JSON.stringify(j, null, 2);
   }} catch (e) {{ out.textContent = "error: " + e.message; }}
 }}
+
+// SSE live feed: when a new prediction lands, prepend a flashing card.
+(function initSSE() {{
+  if (!window.EventSource) return;
+  const indicator = document.getElementById("live-indicator");
+  const es = new EventSource("/events");
+  es.addEventListener("hello", (ev) => {{
+    indicator.textContent = "SSE LIVE";
+    indicator.style.background = "rgba(16, 185, 129, 0.2)";
+    indicator.style.color = "#10b981";
+  }});
+  es.addEventListener("prediction", (ev) => {{
+    let msg; try {{ msg = JSON.parse(ev.data); }} catch(e) {{ return; }}
+    const grid = document.getElementById("pred-grid");
+    if (!grid) return;
+    const card = document.createElement("div");
+    card.className = "pred-card fresh";
+    const probsHtml = (msg.probabilities || []).map(p => {{
+      const pct = Math.max(0, Math.min(1, +p.probability)) * 100;
+      return `<div class="prob-row"><span class="prob-label">${{p.market}}</span><span class="prob-bar"><span class="prob-fill" style="width:${{pct.toFixed(1)}}%"></span></span><span class="prob-val">${{pct.toFixed(0)}}%</span></div>`;
+    }}).join("");
+    const ev_urls = (msg.evidence_urls || []).slice(0, 4);
+    const ev_html = ev_urls.length
+      ? `<div class="evidence">📎 ${{ev_urls.map(u => {{ try {{ return `<a href="${{u}}" target="_blank">${{new URL(u).host}}</a>`; }} catch (_) {{ return ""; }} }}).join(" · ")}}</div>`
+      : "";
+    card.innerHTML = `
+      <div class="pred-head"><span class="pred-ts">${{msg.ts.slice(11,19)}}</span><span class="cat-pill">${{msg.category||"?"}}</span><code class="pred-ticker">${{msg.market_ticker||"?"}}</code></div>
+      <div class="pred-title">${{(msg.title||"").slice(0,140)}}</div>
+      <div class="pred-bars">${{probsHtml}}</div>
+      <div class="pred-rationale">${{(msg.rationale||"").slice(0,240)}}</div>
+      ${{ev_html}}
+    `;
+    grid.insertBefore(card, grid.firstChild);
+    while (grid.children.length > 20) grid.removeChild(grid.lastChild);
+    document.getElementById("pred-count").textContent = msg.total_predictions;
+  }});
+  es.onerror = () => {{
+    indicator.textContent = "SSE RECONNECTING";
+    indicator.style.background = "rgba(245, 158, 11, 0.2)";
+    indicator.style.color = "#fbbf24";
+  }};
+}})();
 </script>
 
 <h2>Quick links</h2>

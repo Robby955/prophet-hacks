@@ -17,6 +17,11 @@ dist/
 .ruff_cache/
 .coverage
 
+# Claude Code session state - worktrees can be 10+MB; broke 3 railway deploys 2026-05-16
+.claude/
+# Scratch dir from a different agent; not wired in, not for deploy
+proposed_retrieval/
+
 # Older monitoring playbook PDFs (superseded by v7; kept locally as reference, not in repo)
 forecasting_agent_monitoring_playbook.pdf
 prophet_hacks_research_monitoring_playbook_v4.pdf

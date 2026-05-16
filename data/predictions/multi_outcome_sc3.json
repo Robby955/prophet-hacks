@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T16:27:06.556603+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.44,
+      "rationale": "sc3: Near 50/50 match with slight lean toward Ebster due to home advantage as an Austrian player competing in Klagenfurt, Austria. | Anna Lena Ebster likely has home advantage as an Austrian player competing in Klagenfurt, Austria, giving her a slight edge over Slovenian player Kaja Najzer in this W"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.58,
+      "rationale": "sc3: Slight lean toward Rocha based on potential home court advantage at Oeiras (Portugal), but limited information available on either player's current form or rankings. | No specific match result available; slight lean toward Rocha based on likely home court advantage at Oeiras, Portugal event. | "
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.5,
+      "rationale": "sc3: No information available about either player's ranking or form for this May 2026 ATP Challenger match, so defaulting to equal probabilities. | No reliable information available about either player's 2026 form or rankings to distinguish between them, so maintaining uninformed prior. | Insufficie"
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "sc3: No information available about this future match; defaulting to uninformed prior of 0.50 for each player. | No information available about this future match or player rankings to distinguish between the two players. | No information available about this specific May 2026 ATP Challenger match; d"
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5466666666666667,
+      "rationale": "sc3: Watson historically ranks higher than Okamura and has more WTA tour experience, giving her a modest edge in this WTA 125K Challenger match. | No specific match result data available for this May 2026 match; both players are competitive at the WTA 125K level, making this roughly a coin flip with"
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.32666666666666666,
+      "rationale": "sc3: Pakistan historically dominates Bangladesh in Tests with a strong head-to-head record, but Bangladesh at home presents a genuine challenge and has won on home soil before against Pakistan, making this a moderate Pakistan favorite scenario. | Pakistan has historically dominated Bangladesh in Tes"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.5,
+      "rationale": "sc3: No information available about this future match; defaulting to uninformed prior for both teams. | No information available about this future match; defaulting to uninformed prior for both teams. | No information available about this future match; defaulting to equal probability for both teams."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "sc3: No information available about this future match; defaulting to uninformed prior for both teams. | No information available about this future match; defaulting to uninformed prior for both outcomes. | No information available about this future 2026 match; defaulting to uninformed prior for both"
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.5,
+      "rationale": "sc3: No information available about this future match result; defaulting to uninformed prior for both teams. | No information available about this future match result; defaulting to uninformed prior for both teams. | No information available about this future match result; defaulting to uninformed p"
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.71,
+      "rationale": "sc3: PSG is the heavy favorite given their decade-long dominance of Ligue 1, with Monaco, Marseille, and Lille as the most credible challengers splitting the remaining probability. | PSG has an overwhelming historical dominance in Ligue 1 (11 of last 12 titles) and maintains the strongest squad in F"
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.33,
+      "rationale": "sc3: Barcelona and Real Madrid are co-favorites for 2025-26 La Liga with Atletico as a distant third; smaller clubs have minimal realistic title chances. | Real Madrid and Barcelona are near-equal favorites based on squad quality and historical dominance, with Atletico a distant third and all other "
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.06,
+      "rationale": "sc3: The big three (Benfica, Sporting, Porto) historically dominate Liga Portugal with Benfica as reigning champion; Braga is a distant fourth candidate and has never won the title; other clubs have negligible chances. | Liga Portugal is historically dominated by Benfica, Sporting, and Porto; Braga "
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.22666666666666666,
+      "rationale": "sc3: Inter and Napoli are co-favorites for 2025-26 Serie A with Atalanta and Juventus as secondary contenders; most listed clubs are not realistic title challengers. | Inter and Napoli are top contenders for 2025-26 Serie A, with Juventus and Atalanta as secondary challengers; newly promoted/weak te"
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.39666666666666667,
+      "rationale": "sc3: Applied Eredivisie base rates with home advantage for Breda against similarly-tiered Heerenveen, with no specific 2026 form data available. | Applying standard Eredivisie home/away win rates with home advantage for Breda partially offset by Heerenveen's historically stronger Eredivisie standing"
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.6666666666666666,
+      "rationale": "sc3: OKC has been the stronger team with better regular season records and championship-caliber depth, making them clear favorites over the Lakers in a 2026 second-round matchup. | Oklahoma City Thunder have been a dominant force with superior depth and SGA-led offense, making them moderate favorite"
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.17,
+      "rationale": "sc3: Demidov leads as the top 2024 draft prospect with Montreal opportunity, followed by Parekh, Levshunov, Perreault, and Cowan; 2025 draft picks have minimal chance of winning in 2025-26. | Demidov leads as the most hyped 2024 draft pick expected to make Montreal's roster, followed by Parekh, Perr"
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.8933333333333334,
+      "rationale": "sc3: Netflix announced Kevin Hart as the subject of their next roast special following the Tom Brady roast in 2024. | Netflix's Roast of Kevin Hart aired in 2025 as the follow-up to the Tom Brady roast, making Kevin Hart the clear answer. | Netflix announced and aired 'The Roast of Kevin Hart' as th"
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.22,
+      "rationale": "sc3: Based on available knowledge, Jet Tila is believed to be the most likely winner of TOC Season 7, with other strong competitors receiving modest probabilities above the uninformed prior. | The market is specifically framed around Adam Greenberg winning TOC Season 7, which strongly suggests he is"
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.11,
+      "rationale": "sc3: Without reliable information about Survivor Season 50 Episode 7 outcomes, assigning near-uniform probabilities close to the 1/14 base rate for each contestant's elimination. | Without confirmed episode data for Survivor Season 50 Episode 7, assigning near-base-rate probabilities with slight ele"
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.16333333333333333,
+      "rationale": "sc3: With limited confident recall of Season 14's outcome, I give Stingray a moderate elevation as my best guess for the winner, with slight elevation to Pugcasso and 14 Karat Carrot as potential finalists, while keeping uncertainty high across all outcomes. | The market framing specifically highlig"
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "sc3: No polling or candidate information available to distinguish between these two candidates in a 2026 primary that hasn't occurred yet. | No polling or candidate information available to differentiate between these two candidates in a 2026 primary that hasn't occurred yet; defaulting to uninforme"
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.30333333333333334,
+      "rationale": "sc3: Orb\u00e1n is favored due to Fidesz's structural electoral advantages, gerrymandering, and media control, though Magyar's unprecedented polling strength creates genuine uncertainty. | Orb\u00e1n holds strong structural and institutional advantages despite Magyar's notable 2024 EP gains; Hungary's elector"
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.5,
+      "rationale": "sc3: No available information about this 2026 primary race; defaulting to uninformed prior for both candidates. | No information available about this 2026 primary race; defaulting to uninformed prior for both candidates. | No information available about this 2026 primary race; defaulting to uninform"
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.30666666666666664,
+      "rationale": "sc3: Petro's declining approval ratings (~30-40%) and typical midterm headwinds favor the opposition winning the 2026 Colombian Senate election. | Petro's declining approval ratings and historical patterns of governing parties losing legislative support in mid-term elections favor the opposition win"
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.03,
+      "rationale": "sc3: Louisiana v. Callais likely results in a closely divided Court (5-4 or 6-3), with the conservative majority possibly ruling against Louisiana's racial gerrymander, making 3-5 justices voting for Louisiana the most probable range. | Louisiana v. Callais is a contested redistricting case with gen"
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.07666666666666667,
+      "rationale": "sc3: With 53 Republican senators, a Trump Fed pick most likely passes on near-party-line vote around 53 votes, with small tails for bipartisan support or Republican defections causing failure. | With 53 Republican senators, Trump's Fed Chair pick is very likely confirmed; mainstream picks historical"
+    }
+  ]
+}

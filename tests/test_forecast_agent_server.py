@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import time
 
 import forecast_agent_server as server
 
@@ -207,3 +208,140 @@ def test_compare_open_renders_model_agreement_matrix(monkeypatch) -> None:
     assert "Opus 4.6" in response.text
     assert "Sonnet 4.6" in response.text
     assert "GPT-5.2" in response.text
+
+
+def test_demo_routes_require_dashboard_auth(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    client = TestClient(server.app)
+
+    start = client.post("/demo/start")
+    stream = client.get("/demo/stream/missing")
+    result = client.get("/demo/result/missing")
+
+    assert start.status_code == 401
+    assert stream.status_code == 401
+    assert result.status_code == 401
+
+
+def test_demo_start_caps_active_runs(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    with server._DEMO_RUN_LOCK:
+        original_runs = dict(server._DEMO_RUNS)
+        server._DEMO_RUNS.clear()
+        for idx in range(server._DEMO_MAX_ACTIVE_RUNS):
+            server._DEMO_RUNS[f"active-{idx}"] = {
+                "run_id": f"active-{idx}",
+                "status": "running",
+                "created_at": "2026-05-16T00:00:00+00:00",
+                "updated_at": "2026-05-16T00:00:00+00:00",
+                "events": [],
+                "result": None,
+                "error": None,
+            }
+    try:
+        client = TestClient(server.app)
+
+        response = client.post("/demo/start", headers={"x-dashboard-token": "secret-token"})
+
+        assert response.status_code == 429
+        assert response.json()["detail"] == "too many active demo runs"
+    finally:
+        with server._DEMO_RUN_LOCK:
+            server._DEMO_RUNS.clear()
+            server._DEMO_RUNS.update(original_runs)
+
+
+def test_demo_start_runs_pipeline_and_exposes_result(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+
+    def fake_run(run_id: str) -> None:
+        server._record_demo_event(run_id, "build_event", "running", "synthetic event ready")
+        server._record_demo_event(run_id, "forecast", "running", "calling forecast variant")
+        server._finish_demo_run(
+            run_id,
+            {
+                "p_yes": 0.7,
+                "rationale": "test rationale",
+                "probabilities": [
+                    {"market": "Yes", "probability": 0.7},
+                    {"market": "No", "probability": 0.3},
+                ],
+                "_trace": {"latency_ms": {"total": 12}},
+            },
+        )
+
+    monkeypatch.setattr(server, "_run_demo_pipeline", fake_run, raising=False)
+    client = TestClient(server.app)
+
+    started = client.post("/demo/start", headers={"x-dashboard-token": "secret-token"})
+
+    assert started.status_code == 200
+    body = started.json()
+    assert body["run_id"]
+    assert body["stream_url"] == f"/demo/stream/{body['run_id']}"
+    assert body["result_url"] == f"/demo/result/{body['run_id']}"
+
+    result = {}
+    for _ in range(30):
+        result_response = client.get(
+            body["result_url"],
+            headers={"x-dashboard-token": "secret-token"},
+        )
+        assert result_response.status_code == 200
+        result = result_response.json()
+        if result["status"] == "completed":
+            break
+        time.sleep(0.01)
+
+    assert result["status"] == "completed"
+    assert result["result"]["rationale"] == "test rationale"
+    assert [event["stage"] for event in result["events"]] == [
+        "queued",
+        "build_event",
+        "forecast",
+        "completed",
+    ]
+
+
+def test_demo_stream_returns_sse_events(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+
+    def fake_run(run_id: str) -> None:
+        server._record_demo_event(run_id, "forecast", "running", "calling forecast variant")
+        server._finish_demo_run(
+            run_id,
+            {
+                "p_yes": 0.6,
+                "rationale": "stream test",
+                "probabilities": [{"market": "Yes", "probability": 0.6}],
+            },
+        )
+
+    monkeypatch.setattr(server, "_run_demo_pipeline", fake_run, raising=False)
+    client = TestClient(server.app)
+    started = client.post("/demo/start", headers={"x-dashboard-token": "secret-token"})
+    run_id = started.json()["run_id"]
+
+    stream = client.get(
+        f"/demo/stream/{run_id}",
+        headers={"x-dashboard-token": "secret-token"},
+    )
+
+    assert stream.status_code == 200
+    assert stream.headers["content-type"].startswith("text/event-stream")
+    assert "event: demo" in stream.text
+    assert '"stage": "completed"' in stream.text
+
+
+def test_dashboard_contains_demo_console(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert "Run pipeline demo" in response.text
+    assert "/demo/start" in response.text
+    assert "/demo/stream/" in response.text
+    assert "/demo/result/" in response.text

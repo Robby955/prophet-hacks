@@ -1,135 +1,135 @@
 {
-  "timestamp": "2026-05-16T16:58:21.991058+00:00",
+  "timestamp": "2026-05-16T20:39:02.280953+00:00",
   "predictions": [
     {
       "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
-      "p_yes": 0.25,
-      "rationale": "Evidence snippet [2] explicitly states Anna Lena Ebster defeated Kaja Najzer in the W15 Klagenfurt 2026 match."
+      "p_yes": 0.1,
+      "rationale": "Evidence [2] explicitly states Ebster defeated Najzer."
     },
     {
       "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
-      "p_yes": 0.25,
-      "rationale": "TennisStats.com explicitly shows Garrett Johns defeated Francisco Rocha 6-3, 7-6 on May 10, 2026 in the ATP Challenger Oeiras qualifying match."
+      "p_yes": 0.1,
+      "rationale": "Evidence [4] shows Johns defeated Rocha 6-3, 7-6."
     },
     {
       "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
-      "p_yes": 0.25,
-      "rationale": "Snippet [2] explicitly states 'Younes Lalami Laaroussi defeated Brandon Perez' in the Brazzaville Challenger 2026 match."
+      "p_yes": 0.1,
+      "rationale": "Evidence [2] explicitly states Lalami Laaroussi defeated Perez."
     },
     {
       "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
-      "p_yes": 0.5,
-      "rationale": "No explicit match result found in evidence snippets; staying at uninformed prior as neither player is clearly identified as the winner."
+      "p_yes": 0.55,
+      "rationale": "No clear winner indicated in snippets; slight lean to Bax based on listing order/framing but essentially a toss-up."
     },
     {
       "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
-      "p_yes": 0.52,
-      "rationale": "No concrete match result found in evidence snippets; both players are at similar WTA 125K level, so probabilities remain near the uninformed prior with minimal lean toward Watson based on experience."
+      "p_yes": 0.5,
+      "rationale": "No specific evidence on form or odds; both players roughly comparable so default to prior."
     },
     {
       "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
-      "p_yes": 0.75,
-      "rationale": "Multiple evidence snippets confirm Bangladesh won the 1st Test by 104 runs, with Najmul Shanto celebrating Bangladesh's first-ever Test win at home against Pakistan."
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence shows Bangladesh won by 104 runs in the 1st Test."
     },
     {
       "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
-      "p_yes": 0.75,
-      "rationale": "Multiple authoritative sources (Guardian, BBC Sport, ESPN, match report) confirm Glamorgan beat Somerset by two wickets in the May 8-11, 2026 County Championship match."
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple sources confirm Glamorgan beat Somerset by two wickets."
     },
     {
       "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
-      "p_yes": 0.75,
-      "rationale": "Multiple authoritative sources confirm Sussex beat Leicestershire by 222 runs in the April 2026 County Championship match; the May 8 match may be a separate fixture but strong evidence favors Sussex given their dominance over Leicestershire this season."
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence [1] explicitly states Sussex won by 222 runs."
     },
     {
       "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
-      "p_yes": 0.25,
-      "rationale": "Multiple authoritative sources confirm Durham beat Worcestershire by nine wickets in this County Championship Division Two match played May 8-10, 2026."
+      "p_yes": 0.1,
+      "rationale": "Evidence confirms Durham won by nine wickets."
     },
     {
       "market_ticker": "KXLIGUE1-26",
-      "p_yes": 0.78,
-      "rationale": "PSG is historically dominant in Ligue 1 (winning ~10 of the last 13 titles) and evidence shows them currently at the top of the table, making them overwhelming favorites; Marseille, Monaco, and Lille are secondary contenders."
+      "p_yes": 0.82,
+      "rationale": "PSG dominant favorite, leading early season and reigning champions; Marseille main challenger."
     },
     {
       "market_ticker": "KXLALIGA-26",
       "p_yes": 0.05,
-      "rationale": "Multiple evidence snippets confirm Barcelona won the 2025-26 La Liga title by beating Real Madrid 2-0 on May 10 to secure their second consecutive title."
+      "rationale": "Evidence indicates Barcelona clinched the 2025-26 La Liga title with a May 10 win over Real Madrid."
     },
     {
       "market_ticker": "KXLIGAPORTUGAL-26",
       "p_yes": 0.05,
-      "rationale": "Multiple authoritative sources confirm Sporting Lisbon won the 2025-26 Liga Portugal title by beating Vitoria Guimaraes 2-0 on the final day, with SC Braga not the champion."
+      "rationale": "Conflicting evidence: some sources say Sporting retained, one says FC Porto won 2025/26; Braga not mentioned as champion."
     },
     {
       "market_ticker": "KXSERIEA-26",
-      "p_yes": 0.05,
-      "rationale": "Inter and Napoli are co-favorites based on recent form and squad quality, with Juventus, Milan, and Atalanta as secondary contenders; lower-table clubs receive near-floor probabilities."
+      "p_yes": 0.22,
+      "rationale": "Top contenders Inter, Napoli (defending champ), and Milan lead; Roma surprise contender; rest are long shots."
     },
     {
       "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
-      "p_yes": 0.6666666666666667,
-      "rationale": "Multiple sources confirm NAC Breda defeated Heerenveen 2-0 in the Eredivisie match on May 10, 2026."
+      "p_yes": 0.8,
+      "rationale": "Multiple sources confirm NAC Breda won 2-0."
     },
     {
       "market_ticker": "KXNBASERIES-26LALOKCR2",
-      "p_yes": 0.75,
-      "rationale": "ESPN and NBA.com confirm Oklahoma City Thunder swept the Los Angeles Lakers 4-0 in the 2026 NBA Playoffs second round, with Game 4 ending 115-110 on May 11, 2026."
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence states OKC swept Lakers in Game 4 on May 11, 2026."
     },
     {
       "market_ticker": "KXNHLCALDER-26",
       "p_yes": 0.05,
-      "rationale": "Evidence snippet [1] explicitly states Matthew Schaefer won the 2026 Calder Trophy as the youngest winner ever, making him near-certain winner and all others very unlikely."
+      "rationale": "Evidence states Matthew Schaefer won the 2026 Calder Trophy."
     },
     {
       "market_ticker": "KXROASTSUBJECT-30JAN01",
-      "p_yes": 0.4999999999999998,
-      "rationale": "Evidence snippet [3] explicitly states Netflix named Kevin Hart for the next roast after Tom Brady, with Shane Gillis hosting, making Kevin Hart near-certain as the answer."
+      "p_yes": 0.49999999999999983,
+      "rationale": "Evidence directly reports Netflix named Kevin Hart as the next roast subject after Tom Brady."
     },
     {
       "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
-      "p_yes": 0.050000000000000024,
-      "rationale": "Limited evidence shows early round results with Tobias Dorzon and Karen Akunowicz eliminated; Adam Greenberg receives elevated probability due to market framing but no direct evidence of his victory is present in the snippets."
+      "p_yes": 0.05,
+      "rationale": "No winner declared yet in evidence; slight boosts to Round 1 winners (Jet Tila, Claudette Zepeda, Jonathon Sawyer) and reductions to confirmed eliminations."
     },
     {
       "market_ticker": "KXSURVIVORELIMINATION-26APR11",
       "p_yes": 0.05,
-      "rationale": "Multiple sources confirm Dee Valladares was eliminated in Survivor Season 50 Episode 7, while Rizo Velovic was still active in the game during that episode."
+      "rationale": "Multiple sources confirm Dee Valladares was eliminated in episode 7."
     },
     {
       "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
       "p_yes": 0.05,
-      "rationale": "14 Karat Carrot (Judge Greg Mathis) was eliminated in Episode 10 and definitively did not win; the winner came from the four finalists (Galaxy Girl, Pugcasso, Cat Witch, Crane), with Crane/Normani slightly favored as a professional singer but 'surprising winner' language suggests an upset."
+      "rationale": "14 Karat Carrot eliminated in episode 10; finale revealed other winner\u2014Pugcasso (Phillip Phillips) is most likely based on finale recap context."
     },
     {
       "market_ticker": "KXWVPRIMARY-01D26",
-      "p_yes": 0.25,
-      "rationale": "Multiple authoritative sources including the AP confirm Vince George won the Democratic primary for WV-01, defeating Brit Aguirre."
+      "p_yes": 0.1,
+      "rationale": "Multiple sources including AP confirm Vince George defeated Brit Aguirre in the Democratic primary."
     },
     {
       "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
-      "p_yes": 0.75,
-      "rationale": "Multiple authoritative sources confirm P\u00e9ter Magyar was sworn in as Hungary's Prime Minister on May 9, 2026, ending Viktor Orb\u00e1n's 16-year rule after winning a supermajority in the 2026 election."
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple sources confirm Magyar was sworn in as PM on May 9, 2026, ending Orb\u00e1n's rule."
     },
     {
       "market_ticker": "KXOHPRIMARY-15D26",
-      "p_yes": 0.75,
-      "rationale": "Multiple authoritative sources including AP and local news confirm Don Leonard won the Democratic primary for OH-15 with ~53% of the vote."
+      "p_yes": 0.8999999999999999,
+      "rationale": "AP and multiple sources confirm Don Leonard won the Democratic primary."
     },
     {
       "market_ticker": "KXCOLOMBIASENATE-26",
-      "p_yes": 0.7500000000000001,
-      "rationale": "Multiple sources confirm the ruling Historic Pact (Government Alliance under Petro) won the most seats in the 2026 Colombian Senate election, with 16 seats and preliminary results showing the governing coalition leading."
+      "p_yes": 0.82,
+      "rationale": "Multiple sources report the governing Historic Pact coalition won the most seats in the 2026 congressional elections."
     },
     {
       "market_ticker": "KXVRASCOTUSVOTE-26",
       "p_yes": 0.05,
-      "rationale": "Evidence snippet [5] explicitly states the Supreme Court issued a 6-3 opinion in Louisiana v. Callais on April 29, 2026, and snippet [4] indicates the Court affirmed the district court below (against Louisiana), so the minority of 3 justices voted in favor of Louisiana."
+      "rationale": "Evidence indicates a 6-3 decision; Louisiana was the petitioner but the ruling affirmed the district court against Louisiana's map, so 3 justices likely sided with Louisiana."
     },
     {
       "market_ticker": "KXFEDCHAIRCOUNT-27",
       "p_yes": 0.05,
-      "rationale": "Multiple evidence snippets confirm Kevin Warsh was confirmed as Fed chair by a 54-45 Senate vote, making 54 the clear answer."
+      "rationale": "Evidence cites Senate confirming Warsh 54-45 along party lines."
     }
   ]
 }

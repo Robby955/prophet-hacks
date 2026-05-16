@@ -200,3 +200,12 @@ rationale, who or what made it, and any related commit SHA.
 - Decided by: Claude, authorized by Rob ("All three now, before next PA call").
 - Correction: first attempt pinned `.commit_sha`, but `railway up` did not upload that gitignored file and `/healthz.commit` returned `dev`. The env-var pin fixes this for file-upload deploys. Preflight also now blocks untracked files rather than merely counting them, because untracked files would make deployed artifacts differ from `origin/main`.
 - Commit: this commit.
+
+## 2026-05-16 · Phase 2 backtest: 40.7% relative Brier reduction (with caveats)
+
+- Reran the 26-event sample-resolved backtest against current production code (Opus 4.7 + market-odds-anchor prompt + capped 0.10 longshot floor). Result: **mean Brier 0.0379** vs the previous Sonnet-4.6 baseline of 0.0639 — a **40.7% relative reduction** on this dataset.
+- Snapshot of the Phase 1 (Sonnet) predictions saved at `data/predictions/multi_outcome_retrieval.phase1_sonnet.json`; new predictions at `data/predictions/multi_outcome_retrieval.json`; per-event diff at `reports/phase2_vs_phase1_backtest.json`.
+- **Where the win came from (important honesty):** by outcome count, binary events (n=2, 14 of 26) drove almost the entire improvement: Brier 0.0879 → 0.0425 (Δ=−0.0454). All five of the top-5 wins are binary longshots where the old guard floored a confident-correct 0.05–0.10 prediction up to 0.25 (the floor bug). Opus 4.7's stronger anchoring is a secondary effect. Multi-outcome events were mixed — n=3 events improved (one big −0.0711), n=20 events regressed (+0.0459 average) because Opus puts more mass on outcome[0] than Sonnet did, which costs more when outcome[0] isn't the winner.
+- **Don't overclaim:** 26 events is a tiny sample, and the dataset skews toward binary tennis matches where the longshot guard fix matters disproportionately. Live Prophet Arena events may have a different outcome-count distribution. Treat the 0.0379 number as "directionally validated, not converged."
+- Decided by: Claude after Rob asked for real proof rather than vibes; spend ~$2.60 for the rerun.
+- Commit: this commit.

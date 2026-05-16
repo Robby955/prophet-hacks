@@ -93,4 +93,40 @@ def build_decision_record(
     }
 
 
-__all__ = ["TraceWriter", "build_decision_record"]
+def append_experiment_row(
+    *,
+    log_path: str = "docs/EXPERIMENT_LOG.md",
+    slug: str,
+    variant: str,
+    config_hash: str,
+    tick_count: int,
+    outcome: str,
+    notes: str = "",
+) -> None:
+    """Append one row to docs/EXPERIMENT_LOG.md after a tick completes.
+
+    Safe to call repeatedly; pipe-character columns are escaped so
+    free-form ``notes`` cannot break the table.
+    """
+    def _esc(s: str) -> str:
+        return s.replace("|", "\\|").replace("\n", " ").strip()
+
+    row = (
+        f"| {_utcnow_iso()} | {_esc(slug)} | {_esc(variant)} | "
+        f"{_esc(config_hash)} | {tick_count} | {_esc(outcome)} | "
+        f"{_esc(notes)} |\n"
+    )
+    p = Path(log_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists():
+        header = (
+            "# Experiment log\n\n"
+            "| timestamp | slug | variant | config_hash | tick_count | outcome | notes |\n"
+            "| --- | --- | --- | --- | --- | --- | --- |\n"
+        )
+        p.write_text(header, encoding="utf-8")
+    with p.open("a", encoding="utf-8") as fh:
+        fh.write(row)
+
+
+__all__ = ["TraceWriter", "build_decision_record", "append_experiment_row"]

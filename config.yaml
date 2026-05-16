@@ -1,7 +1,12 @@
 models:
-  triage: cheap-fast-model
-  forecast: strong-model
-  fallback: cheap-fast-model
+  triage: openai/gpt-5.4-mini
+  forecast: anthropic/claude-sonnet-4-6
+  fallback_chain:
+    - anthropic/claude-haiku-4-5-20251001
+    - openai/gpt-5.4-mini
+  batch_api:
+    anthropic: true
+    openai: false
 policy:
   max_model_calls_per_tick: 8
   max_markets_forecasted_per_tick: 5
@@ -18,4 +23,4 @@ runtime:
   resume: true
   log_dir: "logs"
   trace_dir: "trace"
-variant: baseline-market-price
+variant: model-forecast-no-retrieval

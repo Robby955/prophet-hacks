@@ -43,40 +43,91 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
   - CI/CD: preflight gate, deploy wrapper, `/healthz` commit SHA, dashboard polish (architecture image, brand fix, favicon, OG tags), commit SHA visible on `/` and `/dashboard`.
   - Dashboard try-form overhauled: example dropdown, description + rules fields, validation, latency display.
 
-## codex/handoff-todo-list (2026-05-16T22:35Z)
+## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
-Concrete asks for Codex when they pick up. Ordered by impact-per-effort.
-First refresh state before any claim: `git fetch && git log --oneline -8`
-and `curl -s https://agent.forecastingpath.com/healthz | jq .commit`.
+Concrete asks for Codex. Items 1-5 from the prior list are DONE. This
+revision is the new working list ordered by impact-per-effort.
 
-**1. Verify the landing-page deploy landed.** Expected `/healthz.commit = e8c1beb9` (or newer). If it shows older, `./scripts/agent/deploy.sh "re-deploy landing"`.
+**Before any claim about state, refresh:**
+```
+git fetch && git log --oneline -8
+curl -s https://agent.forecastingpath.com/healthz | jq .commit
+```
 
-**2. Wire SAE variant `predict_multi_outcome_retrieval_sae`** (the original handoff). All inputs ready:
-   - Modules: `forecasting/borrowed_strength.py` (Fay-Herriot, domain effects, market prior), `forecasting/sae_shrinkage.py`, `forecasting/reliability_tracking.py`, `forecasting/uncertainty.py`, `forecasting/domain_pools.py` — all in main since `aedde18b`.
-   - Pattern: new function in `forecast_track.py` reusing `_build_query`, `_brave_search`, `_dedupe_by_domain`, `_build_retrieval_user_prompt`, `_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT`, `apply_longshot_guard`. Insert `borrowed_strength_estimate()` between LLM parse and longshot guard.
-   - Gotcha: `borrowed_strength_estimate()` needs `p_market` per outcome. We don't have market prices in `/predict`. Honest path: skip market-prior term, use 1/n as the prior, keep just model-disagreement + domain-shrinkage. Don't try to parse odds from Brave snippets.
-   - Validate: register in `_VARIANT_FN` map + `_VARIANT_COSTS` + `_VARIANT_DESCRIPTIONS`. Run `scripts/backtest_forecast.py --variants multi_outcome_retrieval_sae`. Compare to 0.0379 baseline. If improves multi-outcome Brier specifically (where Opus regresses), promote.
-   - Don't: change `PROPHET_AGENT_VARIANT` on Railway. New variant is offline-only for testing first.
+### Boundaries — strict (per Rob)
 
-**3. Multi-vendor ablation on open events.** Currently `/compare` covers only the 26-event resolved set. Run `scripts/ablate_openrouter.py` on each open dataset (`sample-economics/-entertainment/-sports` already pulled to `data/datasets/`) for Opus 4.6 + GPT-5.2 + Sonnet 4.6. Cost ~$8 total. Then extend `/compare-open` to show all-model agreement matrix per event — high disagreement = high-information events to flag.
+**Do not modify:**
+- `submission/` (REPORT.md + PROJECT_STORY.md — Rob's hackathon
+  artifacts, freshly rewritten in `6cd47f1`; mistakes here cost the
+  submission)
+- `docs/DECISIONS.md` (append-only; only ADD dated entries, never
+  rewrite existing ones)
+- `docs/FINDINGS.md` (Rob's research-findings doc; do not edit
+  without explicit ask)
+- `static/` (committed deploy assets)
+- `chat_completions_adapter.py` (just shipped; treat as stable)
+- Any production env var on Railway (`DASHBOARD_PIN`,
+  `DASHBOARD_AUTH_TOKEN`, `PROPHET_AGENT_VARIANT`,
+  `PROPHET_BUILD_COMMIT_SHA`)
+- The `multi_outcome_retrieval` production variant — do not swap
+  without a measured backtest win + Rob's OK
 
-**4. Reliability diagram on `/compare`.** `evaluation/ece.py:reliability_diagram_data()` already returns the bin data we need. Add an SVG calibration curve at the top of `/compare` showing the production model's reliability across all resolved events. Honest about small-n caveats.
+**Tone bar (for any text artifact you write):**
+- No marketing-style AI language ("crushed it", "AI-powered",
+  "agent collaboration", emoji)
+- No speculative claims about Rob's background; stick to what's
+  documented in commits/memory
+- Stanford-bar register: methodological honesty, quantitative claims
+  with provenance, acknowledged limitations
+- If unsure whether a tone fits, default to terse + factual
 
-**5. PRs #1 + #4 housekeeping.** Both still open. Leave a comment on each summarizing what was selectively merged (PR #4 obs-slice + SAE shrinkage), what was rejected and why (PR #1's decomposition.py, PR #4's connectors stubs). Don't close unless Rob OKs.
+### Tasks (do these)
 
-**6. Compute-use / SSE streaming demo.** Rob asked for a "moodspan.org-quality" live demo where pipeline stages stream to the UI. Pattern: `POST /demo/start → GET /demo/stream/:run_id (SSE) → GET /demo/result/:run_id`. Synthetic event + real pipeline. Use the existing SSE infrastructure on `/events`. ~3 hrs of work; flag if descoping.
+**1. SSE streaming demo on /dashboard.** Pattern:
+`POST /demo/start` → `GET /demo/stream/:run_id` (SSE) → `GET /demo/result/:run_id`.
+Synthetic event triggers the real pipeline; stage-by-stage updates
+stream to a small console panel. Uses the existing SSE infrastructure
+on `/events`. ~2-3 hrs. **Touches `forecast_agent_server.py`.**
+Coordinate via this doc before you start.
 
-**7. After first PA call lands.** Inspect `/predictions` to see the actual webhook event shape PA sends — confirm `outcomes` field is present (we built a Haiku safety net for the case where it isn't, but verifying live shape is critical). Check `trace.latency_ms.total` per call to confirm we're nowhere near the 10-min/event timeout.
+**2. After first PA call lands.** Inspect `/predictions` to see the
+actual webhook event shape PA sends. Confirm `outcomes` field is
+present (a Haiku safety net handles the case where it isn't, but
+verifying live shape is critical). Record `trace.latency_ms.total` per
+call — we have a 600s budget; if any approaches 60s, investigate.
 
-**8. Don't touch.** `DASHBOARD_PIN` env var (Rob's), `PROPHET_BUILD_COMMIT_SHA` (set by deploy script), `multi_outcome_retrieval` variant in production (don't swap without a measured win), the cherry-picked `forecasting/*` and `evaluation/*` modules (stable now). Anything in `static/` (committed assets).
+**3. Paired-bootstrap CI on the headline Brier delta.** n=26 is small;
+the Opus 4.7 vs Sonnet 4.6 difference (0.0379 vs 0.0639) deserves a
+confidence interval. ~30 min via numpy in `scripts/`. Quote-able
+addition for the next REPORT revision.
 
-**Active state (refresh before claiming!):**
-- main: `e8c1beb9` (after landing-page deploy lands)
-- production: `multi_outcome_retrieval` (Opus 4.7 + market-anchor + 0.10 floor)
-- watcher: PID 33661, ~3.5h uptime, no PA activity yet
-- backtest Brier: 0.0379 (40.7% better than Sonnet baseline 0.0639)
-- ~177 tests passing
-- spend this session: ~$10
+**4. Re-decompose the headline.** What fraction of the Phase 2 win is
+the floor-bug fix vs the model swap? Re-run the previous Sonnet
+pipeline with the new `min(0.10, max(0.05, 0.5/n))` floor and report.
+Estimated cost ~$0.50. Adds rigor to `docs/FINDINGS.md` §8 item 2.
+
+**5. Watch for PA scoring API readiness.** Once the eval window
+opens, PA will publish resolved outcomes somewhere. When it does, run
+`scripts/analyze_results.py` to compute live Brier vs the public
+leaderboard. Document the gap in `docs/DECISIONS.md`.
+
+**6. Brave reliability monitor.** Silent retrieval degradation is the
+most plausible "we shipped retrieval-less" failure mode and is not
+covered by `scripts/full_check.sh`. Add a check that fires a probe
+query and asserts `len(results) >= 3`. Either a separate
+`scripts/brave_health.sh` or extend `full_check.sh` with step 11.
+
+### Active state (refresh before claiming!)
+
+- main: `19bd1a93` (chat-completions shim) — verify with `git log --oneline -1`
+- production live commit: should match main; verify with `curl -s https://agent.forecastingpath.com/healthz | jq .commit`
+- variant: `multi_outcome_retrieval` (Opus 4.7 + market-anchor + 0.10 floor)
+- tests: ~213 passing
+- session spend: ~$13 of "100s" budget
+- watcher: PID 33661, ~5h uptime, no PA activity yet
+- open PRs on GitHub: 0
+- PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
+- PA general onboarding (prophetarena.co/onboarding): NOT yet submitted — needs `/v1/chat/completions` shim to be live (deploying as of this commit), then Rob submits the form himself
 
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 

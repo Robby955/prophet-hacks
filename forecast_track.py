@@ -479,6 +479,171 @@ def predict_sonnet_cot_shrink(event: dict) -> dict:
     )
 
 
+# ---------------------------------------------------------------------------
+# Variant: multi-outcome direct elicitation (2026-05-16 server schema)
+# ---------------------------------------------------------------------------
+
+_MULTI_OUTCOME_SYSTEM_PROMPT = """\
+You are a calibrated probabilistic forecaster for prediction markets.
+
+Your task: assign a probability to EACH listed outcome of the event. Every
+outcome must receive a probability; do not omit any. Probabilities do NOT
+need to sum to 1 -- the scoring server normalizes them before grading.
+
+Calibration scale (apply to each outcome independently):
+  0.50 = no view; default for genuine uncertainty.
+  0.60 = slight lean; weak base rate or partial evidence.
+  0.70 = real view; concrete reasoning, multiple consistent signals.
+  0.80 = strong view; hard evidence, clear mechanism.
+  0.90 = near-certain; mechanically determined or authoritative source.
+
+Rules:
+- Output ONLY valid JSON of the shape:
+    {"probabilities": {"<outcome label>": <float>, ...},
+     "rationale": "<one-line summary>"}
+- Use the EXACT outcome labels supplied in the prompt as keys.
+- Each probability must be in [0.01, 0.99].
+- Never emit 0.01 or 0.99 unless mechanically determined.
+- The rationale is a single line summarizing your overall reasoning.
+"""
+
+
+def _build_multi_outcome_user_prompt(event: dict) -> str:
+    outs = event.get("outcomes") or []
+    n = len(outs)
+    parts = [f"EVENT: {event.get('title', '?')}"]
+    if event.get("subtitle"):
+        parts.append(f"SUBTITLE: {event['subtitle']}")
+    desc = event.get("description") or event.get("rules") or ""
+    if desc:
+        parts.append(f"DESCRIPTION: {desc[:600]}")
+    parts.append(f"CATEGORY: {event.get('category', '?')}")
+    parts.append(f"CLOSE TIME: {event.get('close_time', '?')}")
+    if outs:
+        parts.append(f"OUTCOMES ({n}):")
+        for o in outs:
+            parts.append(f"  - {o}")
+        parts.append(f"UNINFORMED PRIOR PER OUTCOME: 1/{n} = {1.0 / n:.3f}")
+    parts.append(
+        "\nReturn JSON of the shape "
+        '{"probabilities": {"<outcome label>": <float>, ...}, '
+        '"rationale": "<one-line summary>"}. '
+        "Include every outcome label as a key, using the exact strings above."
+    )
+    return "\n".join(parts)
+
+
+def _parse_multi_outcome_json(text: str) -> dict:
+    """Extract {"probabilities": {...}, "rationale": "..."} from model output.
+
+    Direct -> embedded JSON object -> regex extraction of the probabilities map.
+    """
+    s = text.strip()
+    if s.startswith("```"):
+        s = s.split("\n", 1)[1] if "\n" in s else s[3:]
+    if s.endswith("```"):
+        s = s.rsplit("```", 1)[0]
+    try:
+        return json.loads(s)
+    except json.JSONDecodeError:
+        pass
+    # Stage 2: find a JSON object that contains "probabilities".
+    m = re.search(r'\{[\s\S]*"probabilities"\s*:\s*\{[\s\S]*?\}[\s\S]*?\}', s)
+    if m:
+        try:
+            return json.loads(m.group())
+        except json.JSONDecodeError:
+            pass
+    # Stage 3: find just the inner probabilities map.
+    m = re.search(r'"probabilities"\s*:\s*(\{[^{}]*\})', s)
+    if m:
+        try:
+            return {
+                "probabilities": json.loads(m.group(1)),
+                "rationale": text[:200],
+            }
+        except json.JSONDecodeError:
+            pass
+    raise ValueError(f"unparseable multi-outcome model output: {text[:200]}")
+
+
+def predict_multi_outcome(event: dict) -> dict:
+    """One Anthropic Sonnet 4.6 call that emits per-outcome probabilities.
+
+    Aligned with the 2026-05-16 Prophet Arena server schema, which expects
+    a `probabilities` list of `{market, probability}` pairs (one per
+    outcome). The model assigns a probability to EACH outcome directly --
+    no single-`p_yes` distribution step needed.
+
+    Returns the standard variant contract plus a NEW `probabilities` list:
+        {
+            "p_yes": <prob assigned to outcomes[0]>,
+            "rationale": "<one-line summary>",
+            "probabilities": [
+                {"market": "<outcome>", "probability": <float>},
+                ...
+            ],
+        }
+
+    Callers reading only `p_yes` keep working; callers that understand the
+    new field (the live agent server) use it as authoritative per-outcome
+    output. Probabilities do not have to sum to 1; the server normalizes.
+    """
+    outs = event.get("outcomes") or []
+    if not outs:
+        return {"p_yes": 0.5, "rationale": "no outcomes", "probabilities": []}
+    user = _build_multi_outcome_user_prompt(event)
+    try:
+        # max_tokens=900 leaves comfortable room for 20-30 outcome JSON.
+        resp = _aclient().messages.create(
+            model=_FORECAST_MODEL,
+            max_tokens=900,
+            system=_MULTI_OUTCOME_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user}],
+        )
+        text = resp.content[0].text if resp.content else ""
+        parsed = _parse_multi_outcome_json(text)
+        raw_probs = parsed.get("probabilities") or {}
+        if not isinstance(raw_probs, dict):
+            raise ValueError(
+                f"probabilities not a dict: {type(raw_probs).__name__}",
+            )
+        # Build per-outcome list in input order; clamp each value. For any
+        # outcome the model omitted, fall back to the uninformed prior.
+        prior = 1.0 / len(outs)
+        prob_list: list[dict] = []
+        for o in outs:
+            v = raw_probs.get(o)
+            if v is None:
+                p = prior
+            else:
+                try:
+                    p = _clamp(float(v))
+                except (TypeError, ValueError):
+                    p = prior
+            prob_list.append({"market": o, "probability": p})
+        rationale = str(parsed.get("rationale", ""))[:300]
+        return {
+            "p_yes": prob_list[0]["probability"],
+            "rationale": rationale,
+            "probabilities": prob_list,
+        }
+    except Exception as e:
+        log.warning(
+            "multi_outcome model %s fallback to uniform prior for %s: %s",
+            _FORECAST_MODEL, event.get("market_ticker", "?"), e,
+        )
+        base = predict_uniform_prior(event)
+        p = float(base["p_yes"])
+        return {
+            "p_yes": p,
+            "rationale": base["rationale"],
+            "probabilities": [
+                {"market": o, "probability": p} for o in outs
+            ],
+        }
+
+
 def predict_ensemble_leaderboard(event: dict) -> dict:
     """Three-way ensemble of leaderboard-proven models: Opus 4.6 + GPT-5.2 +
     Sonnet 4.6. Logit-mean across all three. The Sonnet "anchor" gives us
@@ -519,6 +684,7 @@ __all__ = [
     "predict_ensemble_leaderboard",
     "predict_sonnet_cot",
     "predict_sonnet_cot_shrink",
+    "predict_multi_outcome",
     "P_YES_MIN",
     "P_YES_MAX",
 ]

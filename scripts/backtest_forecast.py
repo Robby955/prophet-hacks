@@ -45,6 +45,7 @@ VARIANTS = {
     "ensemble_leaderboard": forecast_track.predict_ensemble_leaderboard,
     "sonnet_cot": forecast_track.predict_sonnet_cot,
     "sonnet_cot_shrink": forecast_track.predict_sonnet_cot_shrink,
+    "multi_outcome": forecast_track.predict_multi_outcome,
 }
 
 

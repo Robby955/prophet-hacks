@@ -1,0 +1,1234 @@
+{
+  "timestamp": "2026-05-16T16:09:09Z",
+  "model": "google/gemini-3.1-pro-preview",
+  "predictions": [
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.1,
+      "rationale": "Evidence snippet [4] explicitly states the result of the recent match on May 10, 2026, showing that Garrett Johns defeated Francisco Rocha with set scores of 6-3, 7-6.",
+      "probabilities": [
+        {
+          "market": "Francisco Rocha",
+          "probability": 0.1
+        },
+        {
+          "market": "Garrett Johns",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "evidence_urls": [
+        "https://www.atptour.com/en/scores/stats-centre/live/2026/9475/QS021",
+        "https://www.igscore.net/tennis-match/l5erg1fdkkdwr8k/MatchLive/",
+        "https://www.sofascore.com/tennis/match/garrett-johns-francisco-rocha/fnQbsrZVb#id:16155113",
+        "https://tennisstats.com/h2h/garrett-johns-vs-francisco-rocha-89085"
+      ]
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.1,
+      "rationale": "Evidence clearly shows that Younes Lalami Laaroussi defeated Brandon Perez in the 2026 Brazzaville Challenger match.",
+      "probabilities": [
+        {
+          "market": "Brandon Perez",
+          "probability": 0.1
+        },
+        {
+          "market": "Younes Lalami Laaroussi",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "evidence_urls": [
+        "https://www.tennislive.net/atp/match/younes-lalami-laaroussi-VS-brandon-perez/brazzaville-challenger-2026/",
+        "https://tennistonic.com/stat-tournaments/?m=atp&tid=21659&p1=66499&p2=65138&Younes-Lalami-LaaroussivsBrandon-Perez=",
+        "https://www.flashscore.info/match/tennis/lalami-laaroussi-younes-hKm7dYh5/perez-brandon-z3i3vgV4/",
+        "https://24live.com/compare/tennis-10/85454/122353",
+        "https://www.sofascore.com/tennis/match/younes-lalami-laaroussi-brandon-perez/yrgcsHXhc"
+      ]
+    },
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.1,
+      "rationale": "Evidence snippet [2] explicitly states that Anna Lena Ebster beats Kaja Najzer in the 2026 W15 Klagenfurt match.",
+      "probabilities": [
+        {
+          "market": "Kaja Najzer",
+          "probability": 0.1
+        },
+        {
+          "market": "Anna Lena Ebster",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "evidence_urls": [
+        "https://www.tennislive.net/wta/match/kaja-najzer-VS-anna-lena-ebster/w15-klagenfurt-2026/",
+        "https://tennistonic.com/stat-tournaments/?m=wta&tid=16997&p1=74844&p2=85696&Anna-Lena-EbstervsKaja-Najzer=",
+        "https://www.sofascore.com/tennis/match/kaja-najzer-anna-lena-ebster/xuedsjkMd",
+        "https://azscore.com/tennis/game/kaja-najzer-anna-lena-ebster-2026-05-12"
+      ]
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "```json\n{\"probabilities\": {\"Florent Bax\": 0.50, \"Adrian Arcon\": 0.50}, \"rationale\": \"The provided",
+      "probabilities": [
+        {
+          "market": "Florent Bax",
+          "probability": 0.5
+        },
+        {
+          "market": "Adrian Arcon",
+          "probability": 0.5
+        }
+      ],
+      "evidence_urls": [
+        "https://www.atptour.com/en/scores/stats-centre/archive/2026/2961/ms016",
+        "https://scores24.live/en/tennis/m-05-05-2026-bax-florent-arcon-adrian",
+        "https://www.tennislive.net/atp/match/florent-bax-VS-adrian-arcon/brazzaville-challenger-2026/",
+        "https://tennistonic.com/tennis-news/993211/h2h-prediction-of-adrian-arcon-vs-florent-bax-in-brazzaville-challenger-with-odds-preview-pick-6th-may-2026/"
+      ]
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple clear and specific match reports from BBC Sport, ESPN, and The Guardian explicitly state that Glamorgan defeated Somerset by two wickets in the May 2026 County Championship Division One match.",
+      "probabilities": [
+        {
+          "market": "Glamorgan",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Somerset",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.theguardian.com/sport/live/2026/may/11/nottinghamshire-v-surrey-glamorgan-v-somerset-and-more-county-cricket-live",
+        "https://www.espncricinfo.com/series/county-championship-division-one-2026-1513323/glamorgan-vs-somerset-24th-match-1513349/match-report",
+        "https://www.bbc.co.uk/sport/cricket/articles/cvgz7y0ejpyo",
+        "https://www.espn.com/cricket/series/8052/report/1513349/day/2/glamorgan-vs-somerset-24th-match-8052"
+      ]
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.73,
+      "rationale": "No result is provided in the available evidence; based on historical rankings and class, former top-40 player Heather Watson enters as a significant favorite over ITF-level player Kyoka Okamura.",
+      "probabilities": [
+        {
+          "market": "Heather Watson",
+          "probability": 0.73
+        },
+        {
+          "market": "Kyoka Okamura",
+          "probability": 0.27
+        }
+      ],
+      "evidence_urls": [
+        "https://www.wtatennis.com/players/316981/heather-watson/matches",
+        "https://www.flashscore.com/match/tennis/okamura-kyoka-SE54TO51/watson-heather-OMXPbN89/",
+        "https://www.sofascore.com/tennis/player/watson-heather/41404",
+        "https://www.usopen.org/en_US/players/overview/heather-watson/wta316981.html"
+      ]
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.8999999999999999,
+      "rationale": "```json\n{\n  \"probabilities\": {\n    \"Bangladesh\": 0.98,\n    \"Pakistan\": 0.02\n  },\n  \"rationale\": \"Multiple evidence snippets, including explicit scorecards and match reports, confirm that Bangladesh wo",
+      "probabilities": [
+        {
+          "market": "Bangladesh",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Pakistan",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.espncricinfo.com/series/pakistan-in-bangladesh-2026-1532478/bangladesh-vs-pakistan-1st-test-1532486/full-scorecard",
+        "https://www.cricbuzz.com/live-cricket-scores/153780/ban-vs-pak-1st-test-pakistan-tour-of-bangladesh-2026",
+        "https://liquipedia.net/lab/Cricket/Pakistan_tour_of_Bangladesh/2026/Test"
+      ]
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "```json\n{\"probabilities\": {\"Sussex\": 0.50, \"Leicestershire\": 0.50}, \"rationale\": \"",
+      "probabilities": [
+        {
+          "market": "Sussex",
+          "probability": 0.5
+        },
+        {
+          "market": "Leicestershire",
+          "probability": 0.5
+        }
+      ],
+      "evidence_urls": [
+        "https://www.espncricinfo.com/series/county-championship-division-one-2026-1513323/leicestershire-vs-sussex-4th-match-1513329/live-cricket-score",
+        "https://en.wikipedia.org/wiki/2026_County_Championship",
+        "https://www.espn.com/cricket/series/8052/report/1513350/sussex-vs-leicestershire-25th-match-county-championship-division-one-2026"
+      ]
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.1,
+      "rationale": "Multiple match reports explicitly confirm that Durham defeated Worcestershire by nine wickets in the scheduled May 2026 matchup.",
+      "probabilities": [
+        {
+          "market": "Worcestershire",
+          "probability": 0.1
+        },
+        {
+          "market": "Durham",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "evidence_urls": [
+        "https://www.espncricinfo.com/series/county-championship-division-two-2026-1513324/worcestershire-vs-durham-19th-match-1513414/match-report",
+        "https://www.theguardian.com/sport/live/2026/may/10/nottinghamshire-surrey-county-cricket-championship-live",
+        "https://www.espn.com/cricket/series/8204/report/1513414/day/3/worcestershire-vs-durham-19th-match-8204"
+      ]
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.05,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Real Madrid\": 0.01,\n    \"Barcelona\": 0.99,\n    ",
+      "probabilities": [
+        {
+          "market": "Real Madrid",
+          "probability": 0.05
+        },
+        {
+          "market": "Barcelona",
+          "probability": 0.05
+        },
+        {
+          "market": "Atletico Madrid",
+          "probability": 0.05
+        },
+        {
+          "market": "Villarreal",
+          "probability": 0.05
+        },
+        {
+          "market": "Athletic Bilbao",
+          "probability": 0.05
+        },
+        {
+          "market": "Betis",
+          "probability": 0.05
+        },
+        {
+          "market": "Real Sociedad",
+          "probability": 0.05
+        },
+        {
+          "market": "Girona",
+          "probability": 0.05
+        },
+        {
+          "market": "Celta Vigo",
+          "probability": 0.05
+        },
+        {
+          "market": "Valencia",
+          "probability": 0.05
+        },
+        {
+          "market": "Sevilla",
+          "probability": 0.05
+        },
+        {
+          "market": "Getafe",
+          "probability": 0.05
+        },
+        {
+          "market": "Espanyol",
+          "probability": 0.05
+        },
+        {
+          "market": "Osasuna",
+          "probability": 0.05
+        },
+        {
+          "market": "Alaves",
+          "probability": 0.05
+        },
+        {
+          "market": "Mallorca",
+          "probability": 0.05
+        },
+        {
+          "market": "Levante",
+          "probability": 0.05
+        },
+        {
+          "market": "Rayo Vallecano",
+          "probability": 0.05
+        },
+        {
+          "market": "Elche",
+          "probability": 0.05
+        },
+        {
+          "market": "Oviedo",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://en.wikipedia.org/wiki/2025%E2%80%9326_La_Liga",
+        "https://sports.yahoo.com/articles/la-liga-2025-26-season-151235306.html",
+        "https://www.worldfootball.net/competition/co97/spain-primera-division/records-winners-list/",
+        "https://www.sportingnews.com/us/soccer/news/most-la-liga-titles-won-club-barcelona-real-madrid-all-time-list/2db35fa79c97d7fc13f73a72"
+      ]
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.05555555555555555,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"PSG\": 0.82,\n    \"Lille\": 0.04,\n    \"",
+      "probabilities": [
+        {
+          "market": "PSG",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Lille",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Monaco",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Lyon",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Strasbourg Alsace",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Stade Rennes",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Marseille",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Lens",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Nice",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Toulouse",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Paris",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Angers",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Le Havre",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Nantes",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Auxerre",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Lorient",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Stade Brest 29",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Metz",
+          "probability": 0.05555555555555555
+        }
+      ],
+      "evidence_urls": [
+        "https://en.wikipedia.org/wiki/2025%E2%80%9326_Ligue_1",
+        "https://www.foxsports.com/soccer/strasbourg-team-standings",
+        "https://www.espn.com/soccer/team/_/id/180/strasbourg"
+      ]
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.05,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Napoli\": 0.15,\n    \"Juventus\": 0.25,\n",
+      "probabilities": [
+        {
+          "market": "Napoli",
+          "probability": 0.05
+        },
+        {
+          "market": "Juventus",
+          "probability": 0.05
+        },
+        {
+          "market": "Cremonese",
+          "probability": 0.05
+        },
+        {
+          "market": "Udinese",
+          "probability": 0.05
+        },
+        {
+          "market": "Milan",
+          "probability": 0.05
+        },
+        {
+          "market": "Roma",
+          "probability": 0.05
+        },
+        {
+          "market": "Atalanta",
+          "probability": 0.05
+        },
+        {
+          "market": "Cagliari",
+          "probability": 0.05
+        },
+        {
+          "market": "Como",
+          "probability": 0.05
+        },
+        {
+          "market": "Torino",
+          "probability": 0.05
+        },
+        {
+          "market": "Inter",
+          "probability": 0.05
+        },
+        {
+          "market": "Lazio",
+          "probability": 0.05
+        },
+        {
+          "market": "Bologna",
+          "probability": 0.05
+        },
+        {
+          "market": "Sassuolo",
+          "probability": 0.05
+        },
+        {
+          "market": "Genoa",
+          "probability": 0.05
+        },
+        {
+          "market": "Fiorentina",
+          "probability": 0.05
+        },
+        {
+          "market": "Hellas Verona",
+          "probability": 0.05
+        },
+        {
+          "market": "Pisa",
+          "probability": 0.05
+        },
+        {
+          "market": "Parma Calcio",
+          "probability": 0.05
+        },
+        {
+          "market": "Lecce",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://en.wikipedia.org/wiki/2025%E2%80%9326_Serie_A",
+        "https://www.worldfootball.net/competition/co111/italy-serie-a/results-and-standings/",
+        "https://en.legaseriea.it/team/hellas-verona",
+        "https://www.espn.co.uk/football/team/results/_/id/119/league/ITA.1"
+      ]
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.05555555555555555,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"SC Braga\": 0.01,\n    \"Sporting Lisbon\": 0.95,",
+      "probabilities": [
+        {
+          "market": "SC Braga",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Sporting Lisbon",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "FC Porto",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "SL Benfica",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Vitoria SC Guimaraes",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Santa Clara Azores",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Nacional da Madeira",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Moreirense FC",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Rio Ave FC",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "FC Arouca",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Estoril Praia",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Casa Pia Lisbon",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "CD Tondela",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "FC Famalicao",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Estrela Amadora",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "AVS Futebol SAD",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Gil Vicente Barcelos",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "FC Alverca SAD",
+          "probability": 0.05555555555555555
+        }
+      ],
+      "evidence_urls": [
+        "https://www.reuters.com/sports/soccer/sporting-beat-vitoria-clinch-portuguese-title-2025-05-17/",
+        "https://en.wikipedia.org/wiki/Vit%C3%B3ria_S.C.",
+        "https://www.flashscore.com/news/soccer-liga-portugal-sporting-lisbon-retain-portuguese-league-title-with-victory-over-vitoria-guimaraes/dbKFGb84/",
+        "https://clubofmozambique.com/news/sporting-beat-vitoria-to-clinch-portuguese-title-282634/",
+        "https://www.espn.com/soccer/standings/_/league/por.1"
+      ]
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.8,
+      "rationale": "Multiple sources confirm that NAC Breda defeated Heerenveen 2-0 in the Eredivisie match on May 10, 2026.",
+      "probabilities": [
+        {
+          "market": "Breda",
+          "probability": 0.8
+        },
+        {
+          "market": "Heerenveen",
+          "probability": 0.1
+        },
+        {
+          "market": "Tie",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bbc.com/sport/football/live/cd0pjxvvvz5t",
+        "https://www.espn.com/football/match?gameId=741267",
+        "https://www.sportsmole.co.uk/football/eredivisie/nac-breda-vs-heerenveen_game_247595.html",
+        "https://www.skysports.com/football/nac-breda-vs-heerenveen/live/531118"
+      ]
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.8999999999999999,
+      "rationale": "The provided ESPN snippet confirms the Oklahoma City Thunder swept the Los Angeles Lakers out of the second round of the 2026 NBA playoffs.",
+      "probabilities": [
+        {
+          "market": "Oklahoma City",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Los Angeles L",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.espn.com/nba/game/_/gameId/401871329/thunder-lakers",
+        "https://www.nba.com/game/lal-vs-okc-0042500222"
+      ]
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.49999999999999994,
+      "rationale": "Recent news confirms that Netflix has named Kevin Hart as the subject of their next live celebrity roast, hosted by Shane Gillis.",
+      "probabilities": [
+        {
+          "market": "Kevin Hart",
+          "probability": 0.49999999999999994
+        },
+        {
+          "market": "Elon Musk",
+          "probability": 0.05
+        },
+        {
+          "market": "Taylor Swift",
+          "probability": 0.05
+        },
+        {
+          "market": "Drake",
+          "probability": 0.05
+        },
+        {
+          "market": "Joe Rogan",
+          "probability": 0.05
+        },
+        {
+          "market": "Logan Paul",
+          "probability": 0.05
+        },
+        {
+          "market": "MrBeast",
+          "probability": 0.05
+        },
+        {
+          "market": "Theo Von",
+          "probability": 0.05
+        },
+        {
+          "market": "Shane Gillis",
+          "probability": 0.05
+        },
+        {
+          "market": "Andrew Schulz",
+          "probability": 0.05
+        },
+        {
+          "market": "Jake Paul",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.usmagazine.com/entertainment/news/andrew-schulz-wants-to-roast-tiger-woods-after-tom-brady-netflix-roast/",
+        "https://www.netflixjunkie.com/netflix-news-the-roast-of-kevin-hart-cast-release-date-where-to-watch-and-everything-to-know/",
+        "https://www.thedailybeast.com/obsessed/netflix-names-kevin-hart-for-next-big-roast-after-tom-brady/",
+        "https://www.netflix.com/title/81577726",
+        "https://www.yahoo.com/entertainment/comedian-andrew-schulz-wants-roast-161117255.html"
+      ]
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.05,
+      "rationale": "llm error: unparseable multi-outcome model output: {\"probabilities\": {\"Ivan Demidov\": 0.02, \"Matthew Schaefer\": 0.9, \"Michael Misa\": 0.02, \"",
+      "probabilities": [
+        {
+          "market": "Ivan Demidov",
+          "probability": 0.05
+        },
+        {
+          "market": "Matthew Schaefer",
+          "probability": 0.05
+        },
+        {
+          "market": "Michael Misa",
+          "probability": 0.05
+        },
+        {
+          "market": "Zeev Buium",
+          "probability": 0.05
+        },
+        {
+          "market": "Isaac Howard",
+          "probability": 0.05
+        },
+        {
+          "market": "Jimmy Snuggerud",
+          "probability": 0.05
+        },
+        {
+          "market": "Alexander Nikishin",
+          "probability": 0.05
+        },
+        {
+          "market": "Zayne Parekh",
+          "probability": 0.05
+        },
+        {
+          "market": "Maxim Shabanov",
+          "probability": 0.05
+        },
+        {
+          "market": "Ryan Leonard",
+          "probability": 0.05
+        },
+        {
+          "market": "Yaroslav Askarov",
+          "probability": 0.05
+        },
+        {
+          "market": "Gabe Perreault",
+          "probability": 0.05
+        },
+        {
+          "market": "Matthew Savoie",
+          "probability": 0.05
+        },
+        {
+          "market": "Axel Sandin-Pellikka",
+          "probability": 0.05
+        },
+        {
+          "market": "Bradly Nadeau",
+          "probability": 0.05
+        },
+        {
+          "market": "Jesper Wallstedt",
+          "probability": 0.05
+        },
+        {
+          "market": "Rutger McGroarty",
+          "probability": 0.05
+        },
+        {
+          "market": "Sam Dickinson",
+          "probability": 0.05
+        },
+        {
+          "market": "Sam Rinzel",
+          "probability": 0.05
+        },
+        {
+          "market": "Ville Koivunen",
+          "probability": 0.05
+        },
+        {
+          "market": "Artyom Levshunov",
+          "probability": 0.05
+        },
+        {
+          "market": "Easton Cowan",
+          "probability": 0.05
+        },
+        {
+          "market": "Arseni Gritsyuk",
+          "probability": 0.05
+        },
+        {
+          "market": "Beckett Sennecke",
+          "probability": 0.05
+        },
+        {
+          "market": "Calum Ritchie",
+          "probability": 0.05
+        },
+        {
+          "market": "Jonathan Lekkerimaki",
+          "probability": 0.05
+        },
+        {
+          "market": "Berkly Catton",
+          "probability": 0.05
+        },
+        {
+          "market": "Danila Yurov",
+          "probability": 0.05
+        },
+        {
+          "market": "Leevi Merilaninen",
+          "probability": 0.05
+        },
+        {
+          "market": "Alex Bump",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.nhl.com/news/nhl-calder-memorial-trophy-winners-complete-list-287749198",
+        "https://records.nhl.com/awards/trophies/calder-memorial-trophy",
+        "https://www.espn.com/nhl/story/_/id/45381153/who-won-nhl-rookie-year-winners-year-list",
+        "https://www.hockey-reference.com/awards/calder.html"
+      ]
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.07142857142857142,
+      "rationale": "llm error: unparseable multi-outcome model output: {\"probabilities\": {\"Rizo Velovic\": 0.01, \"Aubry Bracco\": 0.01, \"Ozzy Lusth\": 0",
+      "probabilities": [
+        {
+          "market": "Rizo Velovic",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Aubry Bracco",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Ozzy Lusth",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Chrissy Hofbeck",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Christian Hubicki",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Cirie Fields",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Benjamin \u201cCoach\u201d Wade",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Rick Devens",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Dee Valladares",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Emily Flippen",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Tiffany Nicole Ervin",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Stephenie LaGrossa Kendrick",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Joe Hunter",
+          "probability": 0.07142857142857142
+        },
+        {
+          "market": "Jonathan Young",
+          "probability": 0.07142857142857142
+        }
+      ],
+      "evidence_urls": [
+        "https://www.cincinnati.com/story/entertainment/television/2026/05/07/who-got-voted-off-survivor-last-night-ozzy-lusth-emily-flippen/89973940007/",
+        "https://en.wikipedia.org/wiki/Stephenie_LaGrossa_Kendrick",
+        "https://people.com/who-was-voted-off-survivor-50-last-night-11914476",
+        "https://www.palmbeachpost.com/story/entertainment/television/2026/04/22/when-survivor-50-streams-paramount-who-voted-off-contestants-list/89729605007/",
+        "https://www.cosmopolitan.com/entertainment/tv/g70173084/survivor-50-cast-tribes-eliminations/"
+      ]
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Adam Greenberg\": 0.05,\n    \"Adam Sobel\": 0.0",
+      "probabilities": [
+        {
+          "market": "Adam Greenberg",
+          "probability": 0.05
+        },
+        {
+          "market": "Adam Sobel",
+          "probability": 0.05
+        },
+        {
+          "market": "Britt Rescigno",
+          "probability": 0.05
+        },
+        {
+          "market": "Bryan Voltaggio",
+          "probability": 0.05
+        },
+        {
+          "market": "Carlos Anthony",
+          "probability": 0.05
+        },
+        {
+          "market": "Claudette Zepeda",
+          "probability": 0.05
+        },
+        {
+          "market": "Dale Talde",
+          "probability": 0.05
+        },
+        {
+          "market": "David Viana",
+          "probability": 0.05
+        },
+        {
+          "market": "Jet Tila",
+          "probability": 0.05
+        },
+        {
+          "market": "Joe Sasto",
+          "probability": 0.05
+        },
+        {
+          "market": "Jonathon Sawyer",
+          "probability": 0.05
+        },
+        {
+          "market": "Kaleena Bliss",
+          "probability": 0.05
+        },
+        {
+          "market": "Karen Akunowicz",
+          "probability": 0.05
+        },
+        {
+          "market": "Kevin Lee",
+          "probability": 0.05
+        },
+        {
+          "market": "Lee Anne Wong",
+          "probability": 0.05
+        },
+        {
+          "market": "Marcel Vigneron",
+          "probability": 0.05
+        },
+        {
+          "market": "Nini Nguyen",
+          "probability": 0.05
+        },
+        {
+          "market": "Sara Bradley",
+          "probability": 0.05
+        },
+        {
+          "market": "Shirley Chung",
+          "probability": 0.05
+        },
+        {
+          "market": "Tobias Dorzon",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.foodnetwork.com/shows/tournament-of-champions/articles/tournament-of-champion-vii-episodic-updates",
+        "https://www.foodnetworkgossip.com/2026/02/tournament-of-champions-7-toc-vii.html",
+        "https://www.primetimer.com/features/tournament-of-champions-season-7-premiere-recap-jet-tila-s-big-win-and-a-shocking-elimination"
+      ]
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.05555555555555555,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"14 Karat Carrot\": 0.01,\n    \"Calla Lily\":",
+      "probabilities": [
+        {
+          "market": "14 Karat Carrot",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Calla Lily",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Cat Witch",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Crane",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "The Croissants",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Eggplant",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Galaxy Girl",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Googly Eyes",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Handyman",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "High Voltage",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Le Who Who",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Owl",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Pangolin",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Pugcasso",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Queen Corgi",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Scarab",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Snow Cone",
+          "probability": 0.05555555555555555
+        },
+        {
+          "market": "Stingray",
+          "probability": 0.05555555555555555
+        }
+      ],
+      "evidence_urls": [
+        "https://www.cincinnati.com/story/entertainment/television/2026/03/19/masked-singer-season14-who-went-home-stingray-14-karot-carrot/89224679007/",
+        "https://en.wikipedia.org/wiki/The_Masked_Singer_(American_TV_series)_season_14",
+        "https://www.tvline.com/2138174/the-masked-singer-season-14-finale-winner-full-cast-revealed/",
+        "https://variety.com/2026/tv/news/the-masked-singer-season-14-finale-winner-ashlee-simpson-1236704931/",
+        "https://lifestyle.si.com/celebrities/masked-singer-season-14-finale-live-recap"
+      ]
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple authoritative sources, including an Associated Press call, confirm that Don Leonard won the Democratic primary for Ohio's 15th Congressional District.",
+      "probabilities": [
+        {
+          "market": "Don Leonard",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Adam Miller",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.dispatch.com/story/news/politics/elections/congressional/2026/05/05/democratic-primary-results-for-leonard-vs-miller-15th-congressional-district/89889538007/",
+        "https://www.daytondailynews.com/local/leonard-wins-democratic-primary-for-u-s-house-seat-will-face-carey-in-the-fall/article_efa08e3e-56f0-51d5-b92c-8c65ee350ce5.html",
+        "https://www.caledonianrecord.com/news/national/don-leonard-wins-democratic-nomination-for-u-s-house-in-ohios-15th-congressional-district/article_4f92dd04-3473-5a6d-a4ac-ce96afa55eef.html",
+        "https://ballotpedia.org/Ohio's_15th_Congressional_District_election,_2026",
+        "https://www.nytimes.com/interactive/2026/us/elections/results-ohio-us-house-15-primary.html"
+      ]
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Brit Aguirre\": 0.01,\n    \"Vince George\": 0.99\n",
+      "probabilities": [
+        {
+          "market": "Brit Aguirre",
+          "probability": 0.5
+        },
+        {
+          "market": "Vince George",
+          "probability": 0.5
+        }
+      ],
+      "evidence_urls": [
+        "https://wchstv.com/news/local/vince-george-wins-democratic-nod-in-us-house-district-1-race",
+        "https://www.cbsnews.com/pittsburgh/news/election-results-west-virginia-primary-2026/",
+        "https://therealwv.com/2026/05/13/primary-election-results-incumbent-legislators-dominate-while-incumbent-judges-are-swept/",
+        "https://ballotpedia.org/Britta_Aguirre",
+        "https://www.wvgazettemail.com/elections/live-updates-polls-officially-closed-in-wv/article_e35d3502-61e5-448c-8a09-08f3db6c8134.html"
+      ]
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple cited news sources definitively report that P\u00e9ter Magyar won the 2026 parliamentary election in a landslide and was sworn in as Hungary's Prime Minister on May 9, 2026, replacing Viktor Orb\u00e1n.",
+      "probabilities": [
+        {
+          "market": "P\u00e9ter Magyar",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Viktor Orb\u00e1n",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.npr.org/2026/04/13/nx-s1-5783657/peter-magyar-hungary-prime-minister-orban-election",
+        "https://en.wikipedia.org/wiki/P%C3%A9ter_Magyar",
+        "https://www.foxnews.com/world/hungarys-new-leader-once-idolized-orban-now-hes-man-who-brought-him-down",
+        "https://www.nytimes.com/2026/05/09/world/europe/peter-magyar-hungary-viktor-orban.html",
+        "https://www.cbsnews.com/news/peter-magyar-sworn-in-hungary-prime-minister-end-viktor-orban-rule/"
+      ]
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.35,
+      "rationale": "```json\n{\n  \"probabilities\": {\n    \"Government Alliance\": 0.35,\n    \"Opposition\": 0.65\n  },\n",
+      "probabilities": [
+        {
+          "market": "Government Alliance",
+          "probability": 0.35
+        },
+        {
+          "market": "Opposition",
+          "probability": 0.65
+        }
+      ],
+      "evidence_urls": [
+        "https://en.wikipedia.org/wiki/2026_Colombian_parliamentary_election",
+        "https://justiceforcolombia.org/progressive-historic-pact-is-biggest-winner-in-congressional-elections/",
+        "https://www.electionguide.org/elections/id/5050/",
+        "https://www.as-coa.org/articles/four-takeaways-colombias-legislative-and-presidential-primary-vote",
+        "https://www.aa.com.tr/en/americas/ruling-historical-pact-alliance-wins-colombia-s-congressional-elections/3855989"
+      ]
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.08333333333333333,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"49 or below\": 0.01,\n    \"50\": 0",
+      "probabilities": [
+        {
+          "market": "49 or below",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "50",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "51",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "52",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "53",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "54",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "55",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "56",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "57",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "58",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "59",
+          "probability": 0.08333333333333333
+        },
+        {
+          "market": "60 or above",
+          "probability": 0.08333333333333333
+        }
+      ],
+      "evidence_urls": [
+        "https://thehill.com/homenews/senate/5873160-warsh-federal-reserve/",
+        "https://www.theguardian.com/business/2026/may/13/kevin-warsh-federal-reserve-chair",
+        "https://www.cbsnews.com/news/kevin-warsh-senate-confirmation-fed-chair/"
+      ]
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.1,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"0\": 0.01,\n    \"1\": 0.01,",
+      "probabilities": [
+        {
+          "market": "0",
+          "probability": 0.1
+        },
+        {
+          "market": "1",
+          "probability": 0.1
+        },
+        {
+          "market": "2",
+          "probability": 0.1
+        },
+        {
+          "market": "3",
+          "probability": 0.1
+        },
+        {
+          "market": "4",
+          "probability": 0.1
+        },
+        {
+          "market": "5",
+          "probability": 0.1
+        },
+        {
+          "market": "6",
+          "probability": 0.1
+        },
+        {
+          "market": "7",
+          "probability": 0.1
+        },
+        {
+          "market": "8",
+          "probability": 0.1
+        },
+        {
+          "market": "9",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.supremecourt.gov/opinions/25pdf/24-109_21o3.pdf",
+        "https://www.law.cornell.edu/supremecourt/text/24-109_2026-04-29",
+        "https://en.wikipedia.org/wiki/Louisiana_v._Callais",
+        "https://www.brennancenter.org/our-work/research-reports/louisiana-v-callais",
+        "https://www.americanprogress.org/article/the-supreme-courts-callais-decisions-undermine-the-voting-rights-act-and-sow-election-chaos/"
+      ]
+    }
+  ]
+}

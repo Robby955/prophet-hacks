@@ -65,6 +65,20 @@ rationale, who or what made it, and any related commit SHA.
 - Decided by: org-level `models.list()` call against both providers.
 - Commit: this branch.
 
+## 2026-05-16 · agreement_gate float-precision pad
+
+- `forecaster.agreement_gate` now uses a `_CONVICTION_EPSILON = 1e-9` pad so the exact-threshold boundary case (`abs(p - 0.5) == 0.10`) is admitted, matching Codex Goal 3's `>= 0.10` spec.
+- Rationale: `abs(0.60 - 0.5)` evaluates to `0.09999999999999998` in float, so the naive `< 0.10` check incorrectly rejected the exact-bucket case `agreement_gate(0.60, 0.60)`. `test_exact_threshold` was failing as a result. Bucketed probabilities snap to `[0.10, 0.20, ..., 0.90]`, so exact-boundary inputs are a real and frequent case in practice.
+- The pad lives on the LHS of the comparison, so the gate still cleanly rejects any input genuinely below the threshold (e.g., 0.55 → `abs - 0.5 + eps = 0.0500000001 < 0.10` → reject).
+- Decided by: Claude Code (taking initiative; bug surfaced in pytest, spec was unambiguous).
+- Commit: this branch.
+
+## 2026-05-16 · pytest added to requirements.txt
+
+- `pytest>=8.0,<9.0` added under a "Test runner" comment. `scripts/agent/verify.sh` was silently skipping `pytest tests/` because the dep wasn't installable from `requirements.txt`. Now `verify.sh` actually exercises the 47-test suite.
+- Decided by: Claude Code (verify.sh gate is the merge signal; it can't be silently skipping tests).
+- Commit: this branch.
+
 ## 2026-05-16 · python baseline bumped from 3.11 to 3.13
 
 - `.python-version` now reads `3.13`. README and `docs/PRE_EVENT_CHECKLIST.md` updated to "3.11+ (3.13 is the dev baseline as of 2026-05-16)".

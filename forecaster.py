@@ -396,6 +396,13 @@ def _get_triage_model() -> str:
     return _TRIAGE_MODEL
 
 
+_CONVICTION_THRESHOLD: float = 0.10
+# Float-precision pad. abs(0.60 - 0.5) evaluates to 0.09999999999999998,
+# so a naive `< 0.10` would reject the exact-bucket case. Codex Goal 3
+# spec is `>= 0.10`, so the boundary at 0.10 must be admitted.
+_CONVICTION_EPSILON: float = 1e-9
+
+
 def agreement_gate(p_a: float, p_b: float) -> float | None:
     """Return averaged forecast only when both models agree.
 
@@ -411,8 +418,11 @@ def agreement_gate(p_a: float, p_b: float) -> float | None:
     if a_yes != b_yes:
         return None  # direction conflict
 
-    # Check magnitude (conviction threshold)
-    if abs(p_a - 0.5) < 0.10 or abs(p_b - 0.5) < 0.10:
+    # Check magnitude (conviction threshold). EPSILON pad on the LHS so
+    # exact-threshold inputs like 0.60 and 0.40 (which round-trip through
+    # float as 0.5 +/- 0.0999...98) are admitted, matching the >= spec.
+    if (abs(p_a - 0.5) + _CONVICTION_EPSILON < _CONVICTION_THRESHOLD
+            or abs(p_b - 0.5) + _CONVICTION_EPSILON < _CONVICTION_THRESHOLD):
         return None  # one model too uncertain
 
     return (p_a + p_b) / 2.0

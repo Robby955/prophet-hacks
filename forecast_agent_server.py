@@ -796,6 +796,148 @@ Ground truth in <code>data/resolved.json</code>. Full methodology + per-decision
     return response
 
 
+@app.get("/compare-open", response_class=HTMLResponse)
+def compare_open(
+    request: Request,
+    _: None = Depends(_require_dashboard_auth),
+) -> HTMLResponse:
+    """Browse our production predictions on the 3 open PA datasets
+    (sample-economics, sample-entertainment, sample-sports). 42 events,
+    no actuals yet -- this is a research/showcase view, not a Brier table.
+
+    Per Rob's ask: 'browse all these visually, see how or what my model
+    said, find any bugs or such too'. Shows category + title + Opus 4.7's
+    per-outcome probabilities + rationale + evidence URLs for every event.
+    """
+    base = Path(__file__).resolve().parent / "data/predictions"
+    sources = [
+        ("sample-economics", base / "open_sample-economics.json"),
+        ("sample-entertainment", base / "open_sample-entertainment.json"),
+        ("sample-sports", base / "open_sample-sports.json"),
+    ]
+    sections_html: list[str] = []
+    total = 0
+    for ds_name, path in sources:
+        if not path.exists():
+            continue
+        data = json.loads(path.read_text())
+        preds = data.get("predictions", []) if isinstance(data, dict) else data
+        cards = []
+        for p in preds:
+            ev = p.get("_event", {})
+            title = ev.get("title") or p.get("title", "")
+            cat = ev.get("category") or p.get("category", "?")
+            ticker = ev.get("market_ticker") or p.get("market_ticker", "?")
+            close_time = ev.get("close_time", "")
+            probs = p.get("probabilities") or []
+            rationale = (p.get("rationale") or "")[:300]
+            ev_urls = (p.get("evidence_urls") or [])[:4]
+            prob_rows = []
+            for pp in probs:
+                pct = max(0.0, min(1.0, float(pp.get("probability", 0.0)))) * 100
+                prob_rows.append(
+                    f"<div class='prob-row'>"
+                    f"<span class='prob-label'>{html_escape(str(pp.get('market','?'))[:50])}</span>"
+                    f"<span class='prob-bar'><span class='prob-fill' style='width:{pct:.1f}%'></span></span>"
+                    f"<span class='prob-val'>{pct:.0f}%</span></div>"
+                )
+            ev_html = ""
+            if ev_urls:
+                hosts = []
+                for u in ev_urls:
+                    try:
+                        from urllib.parse import urlparse
+                        hosts.append(html_escape(urlparse(u).netloc))
+                    except Exception:
+                        pass
+                ev_html = "<div class='evidence muted small'>Evidence: " + " · ".join(hosts) + "</div>"
+            cards.append(
+                f"<div class='pred-card'>"
+                f"<div class='pred-head'>"
+                f"<span class='cat-pill'>{html_escape(cat)}</span>"
+                f"<code class='small muted'>{html_escape(ticker[:48])}</code>"
+                f"<span class='small muted'>closes {html_escape(close_time[:10])}</span>"
+                f"</div>"
+                f"<div class='pred-title'>{html_escape(title[:140])}</div>"
+                f"<div class='pred-bars'>{''.join(prob_rows)}</div>"
+                f"<div class='pred-rationale'>{html_escape(rationale)}</div>"
+                f"{ev_html}"
+                f"</div>"
+            )
+        total += len(preds)
+        sections_html.append(
+            f"<h2>{ds_name} <span class='muted small'>({len(preds)} events)</span></h2>"
+            f"<div class='pred-list'>{''.join(cards)}</div>"
+        )
+    body_html = "\n".join(sections_html) or "<p>No open-event predictions yet.</p>"
+
+    html = f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForecastingPath · Open-event predictions</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<style>
+  :root {{
+    --bg: #f7f8fb; --panel: #ffffff; --border: #d8dde6;
+    --text: #111827; --muted: #5b6472; --accent: #1d4ed8;
+  }}
+  * {{ box-sizing: border-box; }}
+  body {{ margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }}
+  .page {{ max-width: 1200px; margin: 0 auto; padding: 1.5em 1em 3em; }}
+  h1 {{ margin: 0 0 0.4em; font-size: 1.7rem; }}
+  h2 {{ margin: 1.6em 0 0.6em; font-size: 1.15rem; color: var(--accent);
+        border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }}
+  .meta {{ color: var(--muted); font-size: 0.92em; }}
+  .muted {{ color: var(--muted); }}
+  .small {{ font-size: 0.84em; }}
+  .pred-list {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+                gap: 0.85em; }}
+  .pred-card {{ background: var(--panel); border: 1px solid var(--border);
+                border-radius: 8px; padding: 0.95em 1em; }}
+  .pred-head {{ display: flex; gap: 0.5em; align-items: center;
+                flex-wrap: wrap; margin-bottom: 0.5em; }}
+  .cat-pill {{ background: #eef2ff; color: var(--accent); padding: 0.15em 0.55em;
+               border-radius: 4px; font-size: 0.78em; font-weight: 700;
+               text-transform: uppercase; letter-spacing: 0.03em; }}
+  .pred-title {{ font-weight: 650; margin-bottom: 0.55em; line-height: 1.35; }}
+  .pred-bars {{ display: flex; flex-direction: column; gap: 0.32em; }}
+  .prob-row {{ display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(80px, 2fr) 44px;
+               gap: 0.5em; align-items: center; font-size: 0.88em; }}
+  .prob-label {{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+  .prob-bar {{ height: 9px; background: #f1f3f7; border-radius: 4px; overflow: hidden;
+               border: 1px solid #e2e6ed; }}
+  .prob-fill {{ display: block; height: 100%; background: var(--accent); }}
+  .prob-val {{ text-align: right; font-variant-numeric: tabular-nums;
+               font-weight: 650; color: var(--text); }}
+  .pred-rationale {{ margin-top: 0.55em; font-size: 0.88em;
+                     color: var(--muted); line-height: 1.4; }}
+  .evidence {{ margin-top: 0.35em; }}
+  a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
+  a:hover {{ text-decoration: underline; }}
+</style>
+</head><body>
+<div class="page">
+<h1>Open-event predictions <span class="muted small">({total} events across 3 datasets)</span></h1>
+<p class="meta">
+Our production agent (Opus 4.7 + Brave retrieval + market-anchor prompt + 0.10 longshot floor)
+run against PA's three open dataset releases — <code>sample-economics</code>, <code>sample-entertainment</code>,
+<code>sample-sports</code>. These events are unresolved, so there's no Brier scoring yet —
+this view is for inspecting the agent's reasoning on a wider variety of events than the resolved set.
+For the scored comparison vs other models, see <a href="/compare">/compare</a>.
+</p>
+{body_html}
+<p class="meta" style="margin-top:2em">
+Source: <code>data/predictions/open_sample-*.json</code>. <a href="/dashboard">← back to live dashboard</a>
+</p>
+</div>
+</body></html>"""
+    response = HTMLResponse(html)
+    _set_dashboard_cookie_if_needed(response, request)
+    return response
+
+
 def _fetch_remote_state() -> dict[str, Any]:
     """Pull endpoint + leaderboard state from Prophet Arena. Best-effort."""
     api_key = os.environ.get("PA_SERVER_API_KEY", "")
@@ -1362,6 +1504,7 @@ def dashboard(
 <h2>Quick links</h2>
 <ul>
 <li><strong><a href="/compare">/compare</a></strong> — multi-model multi-event comparison grid (26 resolved + 5 models, color-coded by Brier)</li>
+<li><strong><a href="/compare-open">/compare-open</a></strong> — Opus 4.7 predictions on the 42 open events from sample-economics/-entertainment/-sports</li>
 <li><code><a href="/healthz">/healthz</a></code> — server health JSON</li>
 <li><code><a href="/predict">/predict</a></code> — the actual endpoint (POST)</li>
 <li><code><a href="/predictions">/predictions</a></code> — last 50 predictions JSON</li>

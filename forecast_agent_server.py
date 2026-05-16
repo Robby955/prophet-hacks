@@ -913,7 +913,7 @@ def dashboard(
   <span><a href="https://github.com/Robby955/prophet-hacks">GitHub</a></span>
 </div>
 
-<p class="meta">A calibrated forecasting agent for Prophet Hacks 2026. Each event we receive is enriched with web evidence, scored by Claude Sonnet 4.6, and protected by a Kalshi longshot floor before the probabilities are returned.</p>
+<p class="meta">A calibrated forecasting agent for Prophet Hacks 2026. Each event we receive is enriched with web evidence, scored by Claude Opus 4.7 with explicit market-odds anchoring, and protected by a Kalshi longshot floor before the probabilities are returned.</p>
 
 {waiting_banner}
 
@@ -935,7 +935,7 @@ def dashboard(
     <span class="arrow">›</span>
     <span class="step">3. Dedupe by source priority (.gov / .edu first)</span>
     <span class="arrow">›</span>
-    <span class="step">4. Sonnet 4.6 reads evidence, assigns probability per outcome</span>
+    <span class="step">4. Opus 4.7 reads evidence (anchors on any cited market odds), assigns per-outcome probability</span>
     <span class="arrow">›</span>
     <span class="step">5. Kalshi longshot guard floors low values</span>
     <span class="arrow">›</span>
@@ -948,7 +948,7 @@ def dashboard(
   </div>
   <div class="math-box">
     <div class="label">Kalshi longshot guard (applied per outcome)</div>
-    $$ p_o \\;\\gets\\; \\max\\!\\left(p_o, \\; \\max\\!\\left(0.05, \\frac{{0.5}}{{|O_e|}}\\right)\\right) $$
+    $$ p_o \\;\\gets\\; \\max\\!\\left(p_o, \\; \\min\\!\\left(0.10, \\; \\max\\!\\left(0.05, \\frac{{0.5}}{{|O_e|}}\\right)\\right)\\right) $$
   </div>
   <p class="meta">Why the guard: Whelan's analysis of Kalshi shows buyers of contracts priced under $0.10 lose &gt;60% on average. LLMs are especially prone to dropping unlikely outcomes to near-zero on vivid narratives, so we floor them.</p>
 </div>

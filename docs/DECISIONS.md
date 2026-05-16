@@ -65,6 +65,29 @@ rationale, who or what made it, and any related commit SHA.
 - Decided by: org-level `models.list()` call against both providers.
 - Commit: this branch.
 
+## 2026-05-16 · risk.py imports from ai_prophet_core.ruleset; new caps wired
+
+- `risk.py` now imports `ai_prophet_core.ruleset` as `_server` and asserts at import time that every one of our caps is at least as strict as the corresponding server cap. A programmer error (raising our cap above the server's) will be caught on first import rather than at first rejected intent.
+- Three new server-mirrored constants: `MAX_TRADES_PER_DAY = 100` (server rolling 24h cap), `MAX_GROSS_EXPOSURE = 10_000.0` (server total exposure cap), `TICK_SUBMISSION_DEADLINE_SECS = 540` (server 9-min submission window). None of these existed previously and each represents a real way the live server could reject our intents.
+- New helpers: `compute_gross_exposure(positions)` sums `shares * avg_entry_price` across open positions; `assert_under_gross_exposure(new_notional, current_gross)` and `assert_under_daily_trade_count(trades_in_last_24h)` mirror the existing assert-style helpers.
+- Rationale: pre-kickoff read of `docs/build_a_bot.md` and `ai_prophet_core.ruleset` (in the forked `ai-prophet/ai-prophet` repo at `~/Desktop/ai-prophet/`) surfaced these caps as concrete server-side enforcement points we hadn't mirrored. The 5-min CLAUDE.md table is now wrong but the code is right; the table will be updated in the same commit.
+- Decided by: Claude Code (pre-kickoff initiative; gaps confirmed against upstream SDK source).
+- Commit: this branch.
+
+## 2026-05-16 · agent.py: network-resilient claim_tick, finally pattern, put_plan, error_detail
+
+- `agent.py` ported four resilience patterns from upstream `prophet-agent/agent.py`:
+  1. **`_claim_tick_with_backoff`** — exponential backoff on transient network errors during `session.claim_tick()`. Base 30s, doubles, capped at 300s. A blackout exceeding 5 min escalates from WARN to ERROR so a long outage is visible.
+  2. **`complete_tick` in a `finally` block** — guarantees the lease is released even if the tick body raises mid-forecast. Previously the lease could leak if `run_one_tick` raised between `claim_tick` and `complete_tick`.
+  3. **`finalize(status="FAILED", error_detail=...)`** — passes the first 200 chars of the exception to the server so the experiment record has actual diagnostic context, not just `error_code="TICK_ERROR"`.
+  4. **`session.put_plan(lease, idx, plan_json)`** — persists the per-tick decision list server-side so it shows up in `/experiments/{id}/reasoning` and the `prophet trade dashboard` view. Best-effort: a `put_plan` failure logs WARN and does not fail the tick. Free portfolio-artifact win.
+- `run_one_tick` no longer calls `session.finalize` or `session.complete_tick` itself; both are owned by `run_continuous`'s try/except/finally wrapper. Return value is now `(summary, updated_lease)` so the wrapper has the post-`load_candidates` lease.
+- `upsert_participant` now passes `rep=0` to match upstream convention; lets future variants run under one experiment.
+- Gross-exposure check added inside the per-market risk gate: `assert_under_gross_exposure(notional, running_gross)`, where `running_gross` is the portfolio exposure at tick start plus any trades accepted so far in this tick.
+- Rationale: same upstream read as the risk.py decision. The `finally` pattern is the single biggest survivability improvement — without it, one mid-tick exception leaks a lease and blocks the experiment for `lease_sec` (600s default). `put_plan` is the highest-portfolio-value low-effort addition.
+- Decided by: Claude Code (pre-kickoff initiative).
+- Commit: this branch.
+
 ## 2026-05-16 · agreement_gate float-precision pad
 
 - `forecaster.agreement_gate` now uses a `_CONVICTION_EPSILON = 1e-9` pad so the exact-threshold boundary case (`abs(p - 0.5) == 0.10`) is admitted, matching Codex Goal 3's `>= 0.10` spec.

@@ -61,15 +61,22 @@ Read from `config.yaml` (or `PROPHET_FORECAST_MODEL` / `PROPHET_TRIAGE_MODEL` en
 
 ## Hard caps (live in `risk.py`)
 
-| Constant | Value | Note |
-| --- | --- | --- |
-| `EDGE_THRESHOLD` | 0.08 | YES-edge or NO-edge must clear this |
-| `MAX_TRADES_PER_TICK` | 3 | server allows 20 |
-| `MAX_MARKETS_ANALYZED_PER_TICK` | 5 | bounds model spend |
-| `MAX_NOTIONAL_PER_NEW_POSITION` | $100 | per-trade blast radius |
-| `MAX_NOTIONAL_PER_MARKET` | $1,000 | matches server |
-| `MAX_OPEN_POSITIONS` | 30 | matches server |
-| `P_YES_MIN` / `P_YES_MAX` | 0.01 / 0.99 | never emit 0/1 |
+`risk.py` imports `ai_prophet_core.ruleset` and asserts at import time that
+every cap is at least as strict as the corresponding server cap. A
+programmer error is caught on first import, not at first rejected intent.
+
+| Constant | Our value | Server value | Note |
+| --- | --- | --- | --- |
+| `EDGE_THRESHOLD` | 0.08 | n/a | YES-edge or NO-edge must clear this |
+| `MAX_TRADES_PER_TICK` | 3 | 20 | bounds within-tick concentration |
+| `MAX_TRADES_PER_DAY` | 100 | 100 | rolling 24h cap; matches server |
+| `MAX_MARKETS_ANALYZED_PER_TICK` | 5 | n/a | bounds model spend |
+| `MAX_NOTIONAL_PER_NEW_POSITION` | $100 | n/a | per-trade blast radius |
+| `MAX_NOTIONAL_PER_MARKET` | $1,000 | $1,000 | matches server |
+| `MAX_OPEN_POSITIONS` | 30 | 30 | matches server |
+| `MAX_GROSS_EXPOSURE` | $10,000 | $10,000 | matches server |
+| `TICK_SUBMISSION_DEADLINE_SECS` | 540 | 540 | 9 min after tick_ts |
+| `P_YES_MIN` / `P_YES_MAX` | 0.01 / 0.99 | 0.0 / 1.0 | never emit 0/1 |
 
 Probability forecasts snap to `BUCKETS = [0.10, 0.20, …, 0.90]`. Calibration
 table tying each bucket to a verbal meaning is in `SUBMISSION_NOTES.md`.

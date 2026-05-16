@@ -28,6 +28,7 @@ import os
 import signal
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,14 @@ log = logging.getLogger("prophet-hacks")
 
 # Graceful shutdown flag
 _shutdown = False
+
+# Network resilience constants. Pattern lifted from upstream's
+# prophet-agent/agent.py: exponential backoff for transient claim_tick
+# failures, with a separate "blackout alarm" log level so a short network
+# blip stays at WARN but a multi-minute outage escalates to ERROR.
+_NETWORK_BACKOFF_BASE_SEC: int = 30
+_NETWORK_BACKOFF_MAX_SEC: int = 300
+_NETWORK_BLACKOUT_ALARM_SEC: int = 300
 
 
 def _handle_signal(signum, _frame):
@@ -145,6 +154,61 @@ def _decide_for_market(market, p_yes: float):
     )
 
 
+def _claim_tick_with_backoff(session) -> tuple[Any, int]:
+    """Claim a tick, retrying transient errors with exponential backoff.
+
+    Returns ``(lease, fail_count)``. The caller is responsible for honoring
+    ``lease.available`` and ``lease.reason``. Pattern lifted from upstream's
+    `prophet-agent/agent.py` -- a short network blip stays at WARN, a
+    multi-minute outage escalates to ERROR.
+    """
+    fail_count = 0
+    blackout_started: datetime | None = None
+    while True:
+        try:
+            lease = session.claim_tick()
+        except Exception as net_err:
+            fail_count += 1
+            if blackout_started is None:
+                blackout_started = datetime.now(timezone.utc)
+            blackout_s = (datetime.now(timezone.utc) - blackout_started).total_seconds()
+            delay = min(
+                _NETWORK_BACKOFF_BASE_SEC * (2 ** (fail_count - 1)),
+                _NETWORK_BACKOFF_MAX_SEC,
+            )
+            if blackout_s >= _NETWORK_BLACKOUT_ALARM_SEC:
+                log.error(
+                    "claim_tick BLACKOUT %.1f min, retry #%d: %s; next attempt in %ds",
+                    blackout_s / 60, fail_count, net_err, delay,
+                )
+            else:
+                log.warning(
+                    "claim_tick network error #%d: %s; retrying in %ds",
+                    fail_count, net_err, delay,
+                )
+            time.sleep(delay)
+            continue
+        return lease, fail_count
+
+
+def _build_plan_json(decisions: list[dict], total_cost: float) -> dict:
+    """Construct the audit JSON persisted server-side via ``put_plan``.
+
+    Mirrors the trace JSONL fields but in a single object the dashboard can
+    render at ``/experiments/{id}/reasoning``. The server stores this as
+    opaque JSON; no schema is enforced server-side.
+    """
+    return {
+        "decisions": decisions,
+        "summary": {
+            "decisions_count": len(decisions),
+            "trades": sum(1 for d in decisions if d.get("action") == "BUY"),
+            "skips": sum(1 for d in decisions if d.get("action") == "SKIP"),
+            "total_cost_usd": round(total_cost, 4),
+        },
+    }
+
+
 def run_one_tick(
     *,
     session,
@@ -153,11 +217,14 @@ def run_one_tick(
     config: dict,
     slug: str,
     variant: str,
-) -> dict:
-    """One full tick: load -> forecast -> submit -> finalize -> complete.
+) -> tuple[dict, Any]:
+    """One full tick BODY: load -> forecast -> submit -> put_plan.
 
-    The session has already claimed the tick (lease is valid).
-    Returns a small summary dict for stdout.
+    The session has already claimed the tick. ``finalize`` and
+    ``complete_tick`` are handled by the caller's try/finally wrapper so the
+    lease is always released even if this function raises.
+
+    Returns ``(summary, updated_lease)``.
     """
     config_hash = _config_hash(config)
     trace = TraceWriter(
@@ -173,40 +240,48 @@ def run_one_tick(
 
     portfolio = session.get_portfolio(participant_idx=participant_idx)
     positions = portfolio.positions if portfolio else []
+    current_gross = risk.compute_gross_exposure(positions)
 
     # Filter and cap
     eligible = market_filter.filter_candidates(candidates.markets, positions)
     eligible = eligible[: risk.MAX_MARKETS_ANALYZED_PER_TICK]
 
     log.info(
-        "tick %s: %d candidates, %d eligible (capped at %d)",
+        "tick %s: %d candidates, %d eligible (capped at %d), "
+        "gross_exposure=$%.2f",
         lease.tick_id, len(candidates.markets), len(eligible),
-        risk.MAX_MARKETS_ANALYZED_PER_TICK,
+        risk.MAX_MARKETS_ANALYZED_PER_TICK, current_gross,
     )
 
     # Forecast and build intents
     from ai_prophet_core import TradeIntentRequest
     intents: list[TradeIntentRequest] = []
+    decisions_for_plan: list[dict] = []
     trades_this_tick = 0
     total_cost = 0.0
+    running_gross = current_gross  # updated as we accept trades in this tick
 
     for m in eligible:
         try:
             fcast = forecaster.forecast(m, variant=variant)
         except NotImplementedError as e:
-            trace.write(build_decision_record(
+            skip_record = build_decision_record(
                 tick_id=lease.tick_id, market_id=m.market_id, question=m.question,
                 bid=float(m.quote.best_bid), ask=float(m.quote.best_ask),
                 action="SKIP", skip_reason=f"variant not wired: {e}",
                 config_hash=config_hash,
-            ))
+            )
+            trace.write(skip_record)
+            decisions_for_plan.append(skip_record)
             continue
 
         p_yes = fcast["p_yes"]
         action, side, size, notional, skip_reason, (y_edge, n_edge) = _decide_for_market(m, p_yes)
         total_cost += fcast.get("cost_estimate_usd", 0.0)
 
-        # Risk gate
+        # Risk gate. Order: cheapest checks first; gross-exposure last because
+        # it depends on running_gross, which only matters once we'd actually
+        # add to the book.
         if action == "BUY":
             try:
                 risk.assert_under_trades_per_tick(trades_this_tick)
@@ -218,6 +293,7 @@ def run_one_tick(
                     if p.market_id == m.market_id
                 )
                 risk.assert_under_notional_cap(notional, current_market_notional)
+                risk.assert_under_gross_exposure(notional, running_gross)
             except risk.RiskViolation as rv:
                 action, side, size, notional, skip_reason = "SKIP", None, 0, 0.0, str(rv)
 
@@ -226,8 +302,9 @@ def run_one_tick(
                 market_id=m.market_id, side=side, size=size, tick_id=lease.tick_id,
             ))
             trades_this_tick += 1
+            running_gross += notional
 
-        trace.write(build_decision_record(
+        decision_record = build_decision_record(
             tick_id=lease.tick_id, market_id=m.market_id, question=m.question,
             bid=float(m.quote.best_bid), ask=float(m.quote.best_ask),
             model_provider=fcast["model_provider"], model=fcast["model"],
@@ -240,7 +317,21 @@ def run_one_tick(
             cost_estimate_usd=fcast["cost_estimate_usd"],
             evidence_urls=fcast.get("evidence", []),
             notes=fcast.get("confidence_note", ""),
-        ))
+        )
+        trace.write(decision_record)
+        decisions_for_plan.append(decision_record)
+
+    # Persist plan server-side so it shows up in /experiments/{id}/reasoning
+    # and in the `prophet trade dashboard` view. Best-effort: a put_plan
+    # failure should not fail the tick.
+    try:
+        session.put_plan(
+            lease,
+            participant_idx=participant_idx,
+            plan_json=_build_plan_json(decisions_for_plan, total_cost),
+        )
+    except Exception as plan_err:
+        log.warning("put_plan failed (non-fatal): %s", plan_err)
 
     # Submit intents
     submission = None
@@ -256,10 +347,6 @@ def run_one_tick(
     else:
         log.info("tick %s: no intents to submit (all skipped)", lease.tick_id)
 
-    # Finalize and complete
-    session.finalize(lease, participant_idx=participant_idx)
-    session.complete_tick(lease)
-
     # Log to experiment log
     append_experiment_row(
         slug=slug, variant=variant, config_hash=config_hash, tick_count=1,
@@ -273,7 +360,7 @@ def run_one_tick(
         ),
     )
 
-    return {
+    summary = {
         "status": "ok",
         "tick_id": lease.tick_id,
         "candidates_seen": len(candidates.markets),
@@ -282,7 +369,9 @@ def run_one_tick(
         "accepted": submission.accepted if submission else 0,
         "rejected": submission.rejected if submission else 0,
         "total_cost_usd": round(total_cost, 4),
+        "gross_exposure_usd": round(running_gross, 2),
     }
+    return summary, lease
 
 
 def run_continuous(
@@ -307,18 +396,25 @@ def run_continuous(
     )
     log.info("experiment %s (slug=%s)", exp.experiment_id, slug)
 
-    # Register participant
+    # Register participant. rep=0 matches the upstream convention; varying it
+    # lets multiple strategy variants run under one experiment.
     part = session.upsert_participant(
         model=model_tag,
+        rep=0,
         starting_cash=float(risk.STARTING_BANKROLL),
     )
     participant_idx = part.participant_idx
-    log.info("participant idx=%d model=%s", participant_idx, model_tag)
+    log.info(
+        "participant idx=%d model=%s (created=%s)",
+        participant_idx, model_tag, getattr(part, "created", "?"),
+    )
 
     tick_count = 0
     while not _shutdown:
-        # Claim the next tick
-        lease = session.claim_tick()
+        # Claim the next tick with network-resilient backoff
+        lease, retries = _claim_tick_with_backoff(session)
+        if retries > 0:
+            log.info("claim_tick recovered after %d retries", retries)
 
         if not lease.available:
             if lease.reason == "experiment_completed":
@@ -338,9 +434,11 @@ def run_continuous(
             time.sleep(wait)
             continue
 
-        # Run the tick
+        # Run the tick body with guaranteed finalize + complete_tick. The
+        # finally block runs even if the body raises, so the lease is always
+        # released. Pattern lifted from upstream's prophet-agent/agent.py.
         try:
-            summary = run_one_tick(
+            summary, lease = run_one_tick(
                 session=session,
                 lease=lease,
                 participant_idx=participant_idx,
@@ -353,18 +451,28 @@ def run_continuous(
                 "tick %d complete: %s",
                 tick_count, json.dumps(summary, default=str),
             )
-        except Exception:
+            try:
+                session.finalize(lease, participant_idx=participant_idx)
+            except Exception as fe:
+                log.warning("finalize (happy path) failed: %s", fe)
+        except Exception as exc:
             log.exception("tick failed (lease=%s)", lease.tick_id)
-            # Finalize as FAILED so the experiment can advance
             try:
                 session.finalize(
                     lease, participant_idx=participant_idx,
                     status="FAILED",
                     error_code="TICK_ERROR",
+                    error_detail=str(exc)[:200],
                 )
-                session.complete_tick(lease)
             except Exception:
-                log.exception("failed to finalize/complete after error")
+                log.exception("failed to finalize after error")
+        finally:
+            # complete_tick releases the lease; ALWAYS attempt it so a stuck
+            # lease can't block the experiment from advancing.
+            try:
+                session.complete_tick(lease)
+            except Exception as ce:
+                log.warning("complete_tick failed: %s", ce)
 
         if once:
             return 0

@@ -5,16 +5,22 @@ import pytest
 from risk import (
     RiskViolation,
     assert_no_conflicting_position,
+    assert_under_daily_trade_count,
+    assert_under_gross_exposure,
     assert_under_notional_cap,
     assert_under_position_count,
     assert_under_trades_per_tick,
+    compute_gross_exposure,
     position_size_for_notional,
     clamp_p_yes,
     EDGE_THRESHOLD,
+    MAX_GROSS_EXPOSURE,
+    MAX_TRADES_PER_DAY,
     MAX_TRADES_PER_TICK,
     MAX_NOTIONAL_PER_NEW_POSITION,
     MAX_NOTIONAL_PER_MARKET,
     MAX_OPEN_POSITIONS,
+    TICK_SUBMISSION_DEADLINE_SECS,
 )
 
 
@@ -102,6 +108,56 @@ class TestPositionSize:
         assert position_size_for_notional(100.0, -0.1) == 0
 
 
+class TestDailyTradeCount:
+    def test_under_cap(self):
+        assert_under_daily_trade_count(50)
+
+    def test_at_cap(self):
+        with pytest.raises(RiskViolation):
+            assert_under_daily_trade_count(MAX_TRADES_PER_DAY)
+
+    def test_over_cap(self):
+        with pytest.raises(RiskViolation):
+            assert_under_daily_trade_count(MAX_TRADES_PER_DAY + 5)
+
+
+class TestGrossExposure:
+    def test_compute_empty(self):
+        assert compute_gross_exposure([]) == 0.0
+
+    def test_compute_single(self):
+        pos = [FakePosition("m1", "YES", shares=10, avg_entry_price=0.5)]
+        assert compute_gross_exposure(pos) == 5.0
+
+    def test_compute_multiple(self):
+        pos = [
+            FakePosition("m1", "YES", shares=10, avg_entry_price=0.5),
+            FakePosition("m2", "NO", shares=20, avg_entry_price=0.3),
+        ]
+        # 10*0.5 + 20*0.3 = 5 + 6 = 11
+        assert compute_gross_exposure(pos) == 11.0
+
+    def test_compute_ignores_zero_shares(self):
+        pos = [
+            FakePosition("m1", "YES", shares=0, avg_entry_price=0.5),
+            FakePosition("m2", "YES", shares=10, avg_entry_price=0.5),
+        ]
+        assert compute_gross_exposure(pos) == 5.0
+
+    def test_assert_under_cap(self):
+        assert_under_gross_exposure(new_notional=100.0, current_gross=5000.0)
+
+    def test_assert_at_cap(self):
+        # 9000 + 1000 == MAX_GROSS_EXPOSURE (10000) exactly. Edge: NOT a violation.
+        assert_under_gross_exposure(new_notional=1000.0, current_gross=9000.0)
+
+    def test_assert_over_cap(self):
+        with pytest.raises(RiskViolation):
+            assert_under_gross_exposure(
+                new_notional=1000.0, current_gross=9500.0,
+            )
+
+
 class TestConstants:
     """Verify constants match the documented values."""
 
@@ -111,6 +167,9 @@ class TestConstants:
     def test_max_trades(self):
         assert MAX_TRADES_PER_TICK == 3
 
+    def test_max_trades_per_day(self):
+        assert MAX_TRADES_PER_DAY == 100
+
     def test_max_notional(self):
         assert MAX_NOTIONAL_PER_NEW_POSITION == 100.0
 
@@ -119,3 +178,31 @@ class TestConstants:
 
     def test_max_positions(self):
         assert MAX_OPEN_POSITIONS == 30
+
+    def test_max_gross_exposure(self):
+        assert MAX_GROSS_EXPOSURE == 10000.0
+
+    def test_tick_submission_deadline(self):
+        assert TICK_SUBMISSION_DEADLINE_SECS == 540
+
+
+class TestServerInvariant:
+    """Our caps must never exceed the server's caps."""
+
+    def test_imports_with_invariants_holding(self):
+        # The assertions live at the bottom of risk.py and run at import time.
+        # If they failed, this test file wouldn't have imported. The mere fact
+        # that we got here means the invariants hold.
+        from ai_prophet_core import ruleset as server
+        from risk import (
+            MAX_TRADES_PER_TICK as our_tpt,
+            MAX_TRADES_PER_DAY as our_tpd,
+            MAX_OPEN_POSITIONS as our_pos,
+            MAX_NOTIONAL_PER_MARKET as our_npm,
+            MAX_GROSS_EXPOSURE as our_gross,
+        )
+        assert our_tpt <= server.MAX_TRADES_PER_TICK
+        assert our_tpd <= server.MAX_TRADES_PER_DAY
+        assert our_pos <= server.MAX_OPEN_POSITIONS
+        assert our_npm <= server.MAX_NOTIONAL_PER_MARKET
+        assert our_gross <= server.MAX_GROSS_EXPOSURE

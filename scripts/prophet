@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Wrapper so `prophet ...` works from any directory without manually
+# activating the venv or exporting PA_SERVER_API_KEY.
+#
+# Usage:
+#   bash scripts/prophet forecast leaderboard
+#   bash scripts/prophet forecast events --status open
+#
+# Or symlink for true one-word invocation:
+#   ln -s "$(pwd)/scripts/prophet" /usr/local/bin/prophet-oracles
+#   prophet-oracles forecast leaderboard
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
+VENV_PROPHET="$REPO_ROOT/.venv/bin/prophet"
+ENV_FILE="$REPO_ROOT/.env"
+
+if [[ ! -x "$VENV_PROPHET" ]]; then
+  echo "ERROR: $VENV_PROPHET not found. Run: cd $REPO_ROOT && python3 -m venv .venv && pip install -r requirements.txt" >&2
+  exit 1
+fi
+
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "WARN: $ENV_FILE missing. Run: bash $REPO_ROOT/scripts/sync_env_from_variables.sh" >&2
+fi
+
+# Load .env into the environment for this command only. The CLI reads
+# PA_SERVER_API_KEY directly from the environment, not from .env.
+if [[ -f "$ENV_FILE" ]]; then
+  set -o allexport
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +o allexport
+fi
+
+exec "$VENV_PROPHET" "$@"

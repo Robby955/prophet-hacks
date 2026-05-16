@@ -1,135 +1,135 @@
 {
-  "timestamp": "2026-05-16T15:14:35.605331+00:00",
+  "timestamp": "2026-05-16T16:17:51.278132+00:00",
   "predictions": [
     {
       "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
-      "p_yes": 0.47,
+      "p_yes": 0.45,
       "rationale": "I need to assess the probability that Kaja Najzer wins against Anna Lena Ebster in the 2026 W15 Klagenfurt Round of 32.\n\nLet me consider what I know about these players:\n\n- Kaja Najzer is a Slovenian "
     },
     {
       "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
       "p_yes": 0.55,
-      "rationale": "Francisco Rocha is likely playing as a home favorite in Oeiras (Portugal), which may give a slight edge. Without specific ranking data or match results available, I apply a modest lean toward the home player in a qualification match, but uncertainty remains high."
+      "rationale": "Francisco Rocha is likely the home/local favorite playing in Oeiras (Portugal), which could give him a slight edge. Without specific ranking data or match results, I lean slightly toward Rocha given the home advantage in a Challenger qualification match, but this is a weak signal. Defaulting near th"
     },
     {
       "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
       "p_yes": 0.5,
-      "rationale": "No information available about the relative rankings or recent form of Brandon Perez vs Younes Lalami Laaroussi in this ATP Challenger Brazzaville match. With no concrete data to differentiate the two players, I default to the uninformed prior of 0.50."
+      "rationale": "No information available about the relative rankings or form of these two players in this specific ATP Challenger match. With no concrete evidence to differentiate between them, I default to the uninformed prior of 0.50."
     },
     {
       "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
       "p_yes": 0.5,
-      "rationale": "No information available about this specific match outcome, player rankings, or head-to-head record to deviate from the uninformed prior of 0.5 for a two-outcome event."
+      "rationale": "No information available about this specific match outcome, player rankings, or head-to-head record for this May 2026 ATP Challenger match. With no concrete evidence to move off the uninformed prior, I default to 0.50."
     },
     {
       "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
       "p_yes": 0.5,
-      "rationale": "No information available about this specific match outcome or current rankings/form of these players in May 2026. Without concrete evidence about either player's current form, head-to-head record, or tournament seedings, I default to the uninformed prior of 0.50."
+      "rationale": "No information available about this specific match outcome or the relative rankings/form of Watson vs Okamura at this event. With no concrete evidence to move off the uninformed prior for a two-outcome market, I default to 0.50."
     },
     {
       "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
-      "p_yes": 0.22,
-      "rationale": "Pakistan has historically been a stronger Test cricket team than Bangladesh. Pakistan's Test record against Bangladesh is dominant - they have won the vast majority of their head-to-head Test matches. Bangladesh has improved in recent years but remains a significant underdog against Pakistan in Test"
+      "p_yes": 0.25,
+      "rationale": "Pakistan is historically a much stronger Test cricket team than Bangladesh. Pakistan's head-to-head record against Bangladesh in Tests is overwhelmingly in Pakistan's favor, winning the vast majority of encounters. Bangladesh has improved in recent years but remains a significant underdog against Pa"
     },
     {
       "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
       "p_yes": 0.5,
-      "rationale": "No specific information available about this May 2026 match outcome. Both teams are County Championship sides and without current form data, standings, or match results for this future/recent event, I default to the uninformed prior of 0.50."
+      "rationale": "No information available about this future match (May 2026). Without any data on current form, standings, or other relevant factors, I default to the uninformed prior of 0.50 for a two-outcome cricket match."
     },
     {
       "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
       "p_yes": 0.5,
-      "rationale": "No information available about this future cricket match between Sussex and Leicestershire in May 2026. With no prior knowledge of current team form, standings, or other relevant factors, the uninformed prior of 0.50 is appropriate for this binary outcome."
+      "rationale": "No information available about this future cricket match between Sussex and Leicestershire in May 2026. Without data on current team form, standings, or other relevant factors, I default to the uninformed prior of 0.50 for a two-outcome market."
     },
     {
       "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
       "p_yes": 0.5,
-      "rationale": "No information available about this future cricket match between Worcestershire and Durham in May 2026. Without any prior performance data, current standings, or other relevant signals, I default to the uninformed prior of 0.50 for a two-outcome event."
+      "rationale": "No information available about this future cricket match between Worcestershire and Durham scheduled for May 8, 2026. Without team form data, standings, or other relevant signals, I default to the uninformed prior of 0.50 for a two-outcome market."
     },
     {
       "market_ticker": "KXLIGUE1-26",
       "p_yes": 0.75,
-      "rationale": "PSG has dominated Ligue 1 in recent years, winning the title in the vast majority of seasons over the past decade. Despite occasional challenges from Lille, Monaco, and Marseille, PSG's financial superiority and squad depth make them overwhelming favorites in most seasons. The base rate of PSG winni"
+      "rationale": "PSG has dominated Ligue 1 in recent years, winning the title in the vast majority of seasons over the past decade. Despite some competition from Lille, Monaco, and Marseille in certain years, PSG's financial resources and squad depth make them heavy favorites in any given season. Their historical do"
     },
     {
       "market_ticker": "KXLALIGA-26",
       "p_yes": 0.3,
-      "rationale": "Real Madrid is historically the most successful La Liga club and perennial title contender, typically winning roughly 30-40% of seasons in recent decades. However, Barcelona and Atletico Madrid are strong competitors, and Barcelona has been dominant in 2024-25. With 20 possible outcomes but only 2-3"
+      "rationale": "Real Madrid are historically the most successful La Liga club and perennial title contenders, but Barcelona and Atletico Madrid are strong rivals. Real Madrid have won La Liga roughly 35 times in ~90 seasons, giving a historical base rate around 38%, but in recent years Barcelona has been dominant ("
     },
     {
       "market_ticker": "KXLIGAPORTUGAL-26",
-      "p_yes": 0.07,
-      "rationale": "SC Braga is a mid-tier Portuguese club that occasionally finishes in the top 3 but rarely challenges for the title. The league is typically dominated by Benfica, Porto, and Sporting. Braga has a small chance but is unlikely to win, so I move only slightly above the uninformed prior of 1/18 (~0.056)."
+      "p_yes": 0.06,
+      "rationale": "SC Braga is a mid-tier Portuguese club that rarely challenges for the title. The Liga Portugal is typically dominated by the 'Big Three' (Sporting, Porto, Benfica), with Braga occasionally finishing 4th. With 18 outcomes and no strong evidence favoring Braga, the probability is close to the uninform"
     },
     {
       "market_ticker": "KXSERIEA-26",
-      "p_yes": 0.18,
-      "rationale": "Napoli are the reigning Serie A champions (2024-25) and are a strong contender for 2025-26. Italian football has seen back-to-back title wins from the same club before, and Napoli's squad quality and continuity under De Laurentiis give them a real shot. However, with 20 teams listed and strong compe"
+      "p_yes": 0.22,
+      "rationale": "Looking at the 2025-26 Serie A season, I need to assess Napoli's chances.\n\nNapoli won the 2022-23 Serie A title and finished second in 2024-25 (coming close to winning but ultimately losing to Inter)."
     },
     {
       "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
-      "p_yes": 0.35,
-      "rationale": "Without specific knowledge of this future match, I rely on base rates. In Eredivisie matches, home teams win roughly 45% of the time, away teams ~28%, draws ~27%. Breda (NAC Breda) is likely the home team given they're listed first, which gives a slight edge over the uninformed prior of 1/3. However"
+      "p_yes": 0.38,
+      "rationale": "Looking at this match between Breda (NAC Breda) and Heerenveen in the Eredivisie on May 10, 2026.\n\nNAC Breda was promoted to the Eredivisie for the 2024-25 season after years in lower divisions. Heere"
     },
     {
       "market_ticker": "KXNBASERIES-26LALOKCR2",
-      "p_yes": 0.65,
-      "rationale": "I need to assess the probability that Oklahoma City Thunder beats the Los Angeles Lakers in the 2026 NBA Playoffs Round 2.\n\nKey considerations:\n- This is a future event (close time May 2026), so I'm r"
+      "p_yes": 0.5,
+      "rationale": "uniform prior over 2 outcomes; p = 1/2 = 0.500"
     },
     {
       "market_ticker": "KXNHLCALDER-26",
       "p_yes": 0.12,
-      "rationale": "Ivan Demidov is widely regarded as one of the top prospects entering the NHL in 2025-26, drafted 5th overall by Montreal in 2024. He showed flashes of brilliance in the KHL and is expected to make an immediate impact. However, with 30 candidates and uncertain ice time/role, plus competition from oth"
+      "rationale": "Ivan Demidov is a highly touted prospect (5th overall pick in 2024) expected to make his NHL debut in 2025-26 with the Montreal Canadiens. He has significant upside and pre-season buzz as a Calder favorite. However, with 30 candidates and considerable uncertainty about which rookies will have breako"
     },
     {
       "market_ticker": "KXROASTSUBJECT-30JAN01",
       "p_yes": 0.7,
-      "rationale": "Netflix's roast of Kevin Hart was announced and confirmed after the Tom Brady roast, with Kevin Hart being named as the next subject in Netflix's live roast series. Multiple credible reports indicated Netflix planned a Kevin Hart roast as the follow-up to the Brady roast, making this well above the "
+      "rationale": "After the Tom Brady roast in 2024, Netflix announced Kevin Hart as the subject of their next live roast special. This was widely reported in entertainment media, with Kevin Hart confirmed as the primary target and his name appearing in official promotional materials for the roast. This makes Kevin H"
     },
     {
       "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
-      "p_yes": 0.07,
-      "rationale": "I need to determine the probability that Adam Greenberg won Tournament of Champions Season 7 on Food Network.\n\nTournament of Champions Season 7 aired in 2024. Let me reason through what I know:\n\n- TOC"
+      "p_yes": 0.05,
+      "rationale": "With 20 competitors and no specific information about Tournament of Champions Season 7 results, I have no concrete reason to deviate from the uninformed prior of 1/20 = 0.05. All competitors are presumably skilled chefs competing on equal footing in this tournament format."
     },
     {
       "market_ticker": "KXSURVIVORELIMINATION-26APR11",
       "p_yes": 0.07,
-      "rationale": "With 14 possible outcomes and no specific information about Survivor Season 50 Episode 7 (which hasn't aired yet or results aren't available), I default close to the uninformed prior of 1/14 \u2248 0.071. There's no concrete evidence to move significantly off this prior."
+      "rationale": "Without specific information about Survivor Season 50 Episode 7 outcomes, I default close to the uninformed prior of 1/14 \u2248 0.071. There are 14 possible eliminated contestants listed, and I have no concrete evidence favoring Rizo Velovic over others."
     },
     {
       "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
       "p_yes": 0.06,
-      "rationale": "With 18 contestants listed, the uninformed prior is 1/18 \u2248 0.056. Without specific knowledge of which contestant won The Masked Singer Season 14, I have no concrete reason to deviate significantly from the base rate, so I remain near the uninformed prior."
+      "rationale": "I need to assess the probability that \"14 Karat Carrot\" wins The Masked Singer Season 14.\n\nKey considerations:\n1. The uninformed prior is 1/18 \u2248 0.056 since there are 18 contestants listed.\n2. The Mas"
     },
     {
       "market_ticker": "KXWVPRIMARY-01D26",
       "p_yes": 0.5,
-      "rationale": "This is a future Democratic primary for West Virginia's 1st Congressional District with two candidates listed. I have no specific polling, fundraising data, or candidate background information to distinguish between Brit Aguirre and Vince George. With no concrete evidence favoring either candidate, "
+      "rationale": "This is a future primary election (2026) with no polling data or candidate filing information available to differentiate between Brit Aguirre and Vince George. With two candidates and no concrete evidence favoring either, the uninformed prior of 0.50 is appropriate."
     },
     {
       "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
       "p_yes": 0.25,
-      "rationale": "Viktor Orb\u00e1n has been entrenched in power since 2010 with a supermajority, controlling media, courts, and electoral rules. While P\u00e9ter Magyar's TISZA party has shown strong polling momentum since 2024, challenging an incumbent with such structural advantages is historically very difficult. Polls sho"
+      "rationale": "Viktor Orb\u00e1n has been dominant in Hungarian politics since 2010, with strong institutional advantages including control of media, electoral rules, and state resources. P\u00e9ter Magyar's Tisza party has shown significant polling gains but faces a deeply entrenched incumbent system. Historical base rates"
     },
     {
       "market_ticker": "KXOHPRIMARY-15D26",
       "p_yes": 0.5,
-      "rationale": "This is a future primary election (closing May 2026) between two candidates in Ohio's 15th Congressional District Democratic primary. Without specific polling data, fundraising figures, endorsements, or other concrete signals distinguishing Don Leonard from Adam Miller, I default to the uninformed p"
+      "rationale": "This is a future Democratic primary (closing May 2026) between two candidates, Don Leonard and Adam Miller, for Ohio's 15th Congressional District. I have no specific polling, fundraising data, or endorsement information to distinguish between these two candidates, so I default to the uninformed pri"
     },
     {
       "market_ticker": "KXCOLOMBIASENATE-26",
       "p_yes": 0.35,
-      "rationale": "Colombian President Gustavo Petro's government coalition has been losing support since 2022, with coalition partners defecting and approval ratings declining significantly. Historical patterns in Latin American politics show governing coalitions often underperform in midterm/subsequent elections, es"
+      "rationale": "Colombian President Gustavo Petro's approval ratings have been declining, and his coalition has faced significant fragmentation and legislative defeats. Historical patterns in Latin American midterm-style elections often show incumbent coalitions losing ground. The opposition in Colombia is fragment"
     },
     {
       "market_ticker": "KXVRASCOTUSVOTE-26",
       "p_yes": 0.05,
-      "rationale": "Louisiana v. Callais involves a redistricting case where Louisiana is the petitioner. In major redistricting cases before the Supreme Court, it is extremely rare for the Court to rule unanimously against a state (0 justices in favor), as even contentious cases typically have some justices siding wit"
+      "rationale": "Louisiana v. Callais involves a redistricting case where Louisiana is defending its congressional map. The case involves the Voting Rights Act and racial gerrymandering questions. A unanimous 0-9 ruling against Louisiana would be extremely rare - it would mean every single justice voted against the "
     },
     {
       "market_ticker": "KXFEDCHAIRCOUNT-27",
       "p_yes": 0.08,
-      "rationale": "Fed Chair nominations historically pass with strong bipartisan support (Powell received 84-13 in 2022, Bernanke 70-30 in 2006, etc.). Republicans currently hold 53 Senate seats, so even with zero Democratic support Trump's pick would likely get at least 50 votes if Republicans stay unified. A failed"
+      "rationale": "Presidential nominees for Fed Chair typically receive majority Senate confirmation - a failed confirmation (below 50 votes) would be historically unprecedented and politically damaging for Trump. Republicans hold a Senate majority and would likely confirm Trump's pick. The uninformed prior is 1/12 \u2248"
     }
   ]
 }

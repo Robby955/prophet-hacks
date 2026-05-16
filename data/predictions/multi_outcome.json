@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T16:18:19.501472+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.45,
+      "rationale": "Slight lean toward Ebster given home court advantage at Austrian tournament, but both players are similarly ranked ITF competitors with limited distinguishing information available."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.58,
+      "rationale": "Slight lean toward Rocha based on likely home advantage at a Portuguese ATP Challenger event, but significant uncertainty remains without specific ranking data."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.5,
+      "rationale": "Insufficient information about player rankings or form for this future ATP Challenger match; staying at uninformed prior."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "rationale": "No information available about this future match; defaulting to uninformed prior for both players."
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.58,
+      "rationale": "Watson has historically shown stronger results at WTA 125K level with more experience, giving her a slight edge over Okamura, though the match is genuinely competitive."
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.37,
+      "rationale": "Pakistan is historically stronger in Tests, but Bangladesh's significant home advantage on spinning pitches narrows the gap considerably."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.5,
+      "rationale": "No information available about this future match; defaulting to uninformed prior for both teams."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.5,
+      "rationale": "No information available about this future match; defaulting to uninformed prior for both teams."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.5,
+      "rationale": "No information available about this future match result; defaulting to uninformed prior for both teams."
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.65,
+      "rationale": "PSG remains overwhelming favorite due to decade-long Ligue 1 dominance and financial superiority, though Monaco and Marseille are realistic challengers in 2025-26."
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.31,
+      "rationale": "La Liga is historically dominated by Real Madrid and Barcelona (~30-33% each), with Atletico Madrid as a distant third (~13%), and all other clubs having minimal title chances based on historical patterns and squad quality."
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.08,
+      "rationale": "The Big Three (Sporting, Benfica, Porto) dominate Portuguese football with Braga as the most likely outsider; smaller clubs have negligible title chances."
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.27,
+      "rationale": "Inter and Napoli (defending champions under Conte) are the clear favorites for 2025-26 Serie A, with Juventus and Atalanta as secondary contenders; smaller/promoted clubs have negligible chances."
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.3,
+      "rationale": "Heerenveen likely the stronger Eredivisie side vs recently-promoted Breda, though home advantage provides Breda some boost; draw rates are typical in Dutch football."
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.7,
+      "rationale": "OKC Thunder, led by SGA with strong depth and the best record in the West, would be favored over the Lakers in a 2026 Round 2 matchup based on team trajectory and relative strength."
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.18,
+      "rationale": "Demidov leads as the most hyped 2024 draft prospect expected to make NHL impact in 2025-26, with Parekh, Levshunov, Schaefer, Misa, Perreault, and Cowan as secondary candidates across a wide field."
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.88,
+      "rationale": "Netflix announced and released 'The Roast of Kevin Hart' as the follow-up to the Tom Brady roast in 2025, making Kevin Hart the strong answer."
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.72,
+      "rationale": "The market's specific framing around Adam Greenberg as the winner condition strongly suggests he is the actual Season 7 champion, with residual probability spread across other strong competitors like Jet Tila, Karen Akunowicz, and Shirley Chung."
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.15,
+      "rationale": "Without confirmed episode data, applying near-uniform priors with a slight bump to Rizo Velovic given the market is specifically framed around their potential elimination."
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.35,
+      "rationale": "The market is framed specifically around 14 Karat Carrot winning Season 14, suggesting elevated probability, but uncertainty remains about the actual Season 14 winner among 18 contestants."
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.5,
+      "rationale": "No available information about this 2026 primary race; defaulting to uninformed prior of 0.50 for each candidate."
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.22,
+      "rationale": "Orb\u00e1n holds massive structural advantages (gerrymandering, media control, incumbent benefits) that have delivered supermajorities since 2010, though Magyar's TISZA party shows unprecedented opposition strength polling around 30-35%, making this the most competitive Hungarian election in over a decad"
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.5,
+      "rationale": "No information available about this 2026 primary race; defaulting to equal probability for both candidates."
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.35,
+      "rationale": "Petro's declining approval ratings and Colombia's fragmented legislature make it more likely the opposition outperforms the government alliance in the 2026 Senate elections, though significant uncertainty remains."
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.03,
+      "rationale": "This complex redistricting/VRA case is likely decided by a narrow majority; outcomes of 4-6 justices voting for Louisiana are most probable, with 5 being the modal outcome in close SCOTUS cases."
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.08,
+      "rationale": "With 53 Republican senators, Trump's Fed Chair pick most likely confirms with 50-54 votes in a polarized environment, with small chances of broader bipartisan support or failure if the nominee is controversial."
+    }
+  ]
+}

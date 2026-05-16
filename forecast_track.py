@@ -753,6 +753,58 @@ def predict_multi_outcome_sc3(event: dict) -> dict:
     return _self_consistency_multi_outcome(event, k=3)
 
 
+def predict_hybrid_routed(event: dict) -> dict:
+    """Route by outcome count: binary -> gpt55, multi-outcome -> multi_outcome.
+
+    Motivation (from the 26-event calibration report, see
+    docs/reports/calibration_summary.md): aggregate per-outcome Brier puts
+    gpt55 at 0.670 (best) while multi_outcome lands at 0.699 (mid-pack),
+    BUT on the 12 multi-outcome events alone multi_outcome scores 0.84 vs
+    uniform 0.91 -- it pays off where designed. The aggregate is dragged
+    up by 16 binary sports matchups where leaning hard off 0.5 hurt the
+    multi-outcome prompt. This hybrid plays each strength to its category:
+
+      n <= 2 outcomes (binary): predict_gpt55 (best aggregate)
+      n  > 2 outcomes (multi):  predict_multi_outcome (designed for this)
+
+    For consistency we still emit the per-outcome `probabilities` shape on
+    both branches: gpt55 returns binary p_yes only, so we distribute it
+    across outcomes the way the server endpoint does for legacy variants.
+    """
+    outs = event.get("outcomes") or []
+    n = len(outs)
+    if n <= 2:
+        # Binary path: gpt55 emits p_yes only; synthesize multi-outcome
+        # probabilities by giving outcomes[0] p_yes and the other (if any)
+        # the remainder. This matches what the server endpoint does for
+        # legacy binary variants.
+        base = predict_gpt55(event)
+        p = float(base["p_yes"])
+        probs: list[dict] = []
+        if n == 0:
+            probs = []
+        elif n == 1:
+            probs = [{"market": outs[0], "probability": p}]
+        else:
+            probs = [
+                {"market": outs[0], "probability": p},
+                {"market": outs[1], "probability": max(0.0, 1.0 - p)},
+            ]
+        return {
+            "p_yes": p,
+            "rationale": f"hybrid(binary->gpt55): {base.get('rationale','')[:240]}",
+            "probabilities": probs,
+        }
+    # Multi-outcome path
+    base = predict_multi_outcome(event)
+    rat = base.get("rationale", "")
+    return {
+        "p_yes": float(base["p_yes"]),
+        "rationale": f"hybrid(multi->multi_outcome): {rat[:240]}",
+        "probabilities": base.get("probabilities", []),
+    }
+
+
 def predict_ensemble_leaderboard(event: dict) -> dict:
     """Three-way ensemble of leaderboard-proven models: Opus 4.6 + GPT-5.2 +
     Sonnet 4.6. Logit-mean across all three. The Sonnet "anchor" gives us
@@ -791,6 +843,7 @@ __all__ = [
     "predict_gpt52",
     "predict_ensemble_logit",
     "predict_ensemble_leaderboard",
+    "predict_hybrid_routed",
     "predict_sonnet_cot",
     "predict_sonnet_cot_shrink",
     "predict_multi_outcome",

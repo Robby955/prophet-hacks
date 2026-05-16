@@ -326,6 +326,159 @@ def predict_ensemble_logit(event: dict) -> dict:
     }
 
 
+_COT_SYSTEM_PROMPT = """\
+You are a calibrated probabilistic forecaster for binary prediction markets.
+
+Your task: estimate the probability that the FIRST listed outcome
+(outcomes[0]) is the resolved winner.
+
+Follow this structured reasoning trace, then commit a final number. The
+trace is required; outputting only p_yes without the trace is rejected.
+
+Required JSON shape:
+{
+  "subgoals": ["<resolution criterion>", "<what would force YES>", "<what would force NO>"],
+  "backward_check": "<work back from the close_time: what must be true?>",
+  "p_initial": <float 0.01-0.99>,
+  "verification": "<is p_initial consistent with base rates AND time-to-resolution? flag if not>",
+  "p_yes": <float 0.01-0.99>,
+  "rationale": "<1-2 sentence summary>"
+}
+
+Calibration scale:
+  0.50 = no view; equal to the uninformed prior.
+  0.60 = slight lean; weak base rate.
+  0.70 = real view; concrete reasoning, multiple consistent signals.
+  0.80 = strong view; hard evidence, clear mechanism.
+  0.90 = near-certain; mechanically determined or authoritative source.
+
+ABSTAIN RULE: If verification flags inconsistency or you have no
+informational edge over the uninformed prior, p_yes MUST move toward the
+uninformed prior (`1/len(outcomes)`), not away from it. Outputting near the
+prior is the correct answer when uncertain -- it is not a failure.
+
+Never emit 0.01 or 0.99 unless mechanically determined.
+"""
+
+
+def _build_cot_user_prompt(event: dict) -> str:
+    """User prompt for the CoT variant. Adds an explicit abstain anchor."""
+    yes_outcome = _yes_outcome(event)
+    outs = event.get("outcomes") or []
+    n = len(outs)
+    prior = 1.0 / n if n else 0.5
+    parts = [f"EVENT: {event.get('title', '?')}"]
+    if event.get("subtitle"):
+        parts.append(f"SUBTITLE: {event['subtitle']}")
+    desc = event.get("description") or event.get("rules") or ""
+    if desc:
+        parts.append(f"DESCRIPTION: {desc[:600]}")
+    parts.append(f"CATEGORY: {event.get('category', '?')}")
+    parts.append(f"CLOSE TIME: {event.get('close_time', '?')}")
+    if outs:
+        parts.append(f"OUTCOMES ({n}): {', '.join(outs)}")
+        parts.append(f"YES CONDITION: resolved_outcome == \"{yes_outcome}\"")
+        parts.append(
+            f"UNINFORMED PRIOR: 1/{n} = {prior:.3f}. If you have no edge, "
+            f"output p_yes within 0.02 of this prior."
+        )
+    parts.append(
+        "\nReturn the full structured-CoT JSON. Do not skip any field."
+    )
+    return "\n".join(parts)
+
+
+def _maybe_shrink_to_prior(
+    p_model: float, rationale: str, prior: float,
+    *, short_threshold_chars: int = 80, model_weight: float = 0.85,
+) -> tuple[float, bool]:
+    """If the model's rationale is short, shrink toward the prior.
+
+    Low-conviction signal proxy: a rationale of <80 chars suggests the model
+    didn't develop strong reasoning. Blend 85/15 model/prior in that case.
+    Returns (p_blended, was_shrunk).
+    """
+    if len(rationale or "") < short_threshold_chars:
+        blended = model_weight * p_model + (1.0 - model_weight) * prior
+        return _clamp(blended), True
+    return p_model, False
+
+
+def _predict_one_model_cot(
+    event: dict, *, model: str, vendor: str, shrink: bool = False,
+) -> dict:
+    """CoT-prompted single-model predict. Optional post-hoc shrinkage to prior."""
+    user = _build_cot_user_prompt(event)
+    outs = event.get("outcomes") or []
+    prior = 1.0 / len(outs) if outs else 0.5
+    try:
+        if vendor == "anthropic":
+            # Bigger token cap because CoT JSON has 6 fields, not 2.
+            import anthropic  # noqa: F401
+            resp = _aclient().messages.create(
+                model=model, max_tokens=600,
+                system=_COT_SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": user}],
+            )
+            text = resp.content[0].text if resp.content else ""
+        elif vendor == "openai":
+            resp = _oclient().chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": _COT_SYSTEM_PROMPT},
+                    {"role": "user", "content": user},
+                ],
+                max_completion_tokens=3000,
+                response_format={"type": "json_object"},
+            )
+            text = resp.choices[0].message.content or ""
+        else:
+            raise ValueError(f"unknown vendor: {vendor}")
+        parsed = _parse_json(text)
+        p_raw = _clamp(float(parsed["p_yes"]))
+        rationale = str(parsed.get("rationale", ""))[:300]
+        shrunk = False
+        if shrink:
+            p_raw, shrunk = _maybe_shrink_to_prior(p_raw, rationale, prior)
+        return {
+            "p_yes": p_raw,
+            "rationale": (
+                f"{rationale}"
+                + (f" [shrunk toward prior {prior:.3f}]" if shrunk else "")
+            )[:300],
+        }
+    except Exception as e:
+        log.warning(
+            "cot model %s/%s fallback to uniform prior for %s: %s",
+            vendor, model, event.get("market_ticker", "?"), e,
+        )
+        return predict_uniform_prior(event)
+
+
+def predict_sonnet_cot(event: dict) -> dict:
+    """Sonnet 4.6 with structured CoT JSON prompt (no shrinkage).
+
+    Tests change #1 from docs/research_notes.md (arxiv 2503.01307: structured
+    reasoning with verification step). A/B against predict_single_llm.
+    """
+    return _predict_one_model_cot(
+        event, model=_FORECAST_MODEL, vendor="anthropic", shrink=False,
+    )
+
+
+def predict_sonnet_cot_shrink(event: dict) -> dict:
+    """Sonnet 4.6 + structured CoT + post-hoc shrinkage to prior.
+
+    Combines change #1 and change #2 from docs/research_notes.md
+    (CoT JSON + Scott Alexander's "abstain to mid" via shrinkage when
+    rationale is short = low conviction proxy). A/B against
+    predict_single_llm and predict_sonnet_cot.
+    """
+    return _predict_one_model_cot(
+        event, model=_FORECAST_MODEL, vendor="anthropic", shrink=True,
+    )
+
+
 def predict_ensemble_leaderboard(event: dict) -> dict:
     """Three-way ensemble of leaderboard-proven models: Opus 4.6 + GPT-5.2 +
     Sonnet 4.6. Logit-mean across all three. The Sonnet "anchor" gives us
@@ -364,6 +517,8 @@ __all__ = [
     "predict_gpt52",
     "predict_ensemble_logit",
     "predict_ensemble_leaderboard",
+    "predict_sonnet_cot",
+    "predict_sonnet_cot_shrink",
     "P_YES_MIN",
     "P_YES_MAX",
 ]

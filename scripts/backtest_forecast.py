@@ -43,6 +43,8 @@ VARIANTS = {
     "gpt52": forecast_track.predict_gpt52,
     "ensemble_logit": forecast_track.predict_ensemble_logit,
     "ensemble_leaderboard": forecast_track.predict_ensemble_leaderboard,
+    "sonnet_cot": forecast_track.predict_sonnet_cot,
+    "sonnet_cot_shrink": forecast_track.predict_sonnet_cot_shrink,
 }
 
 

@@ -606,38 +606,123 @@ def _build_multi_outcome_user_prompt(event: dict) -> str:
     return "\n".join(parts)
 
 
+def _clean_loose_json(s: str) -> str:
+    """Repair the JSON quirks our 2026-05-16 multi-vendor ablation exposed.
+
+    Failure modes observed across Gemini 3.1 Pro, GPT-5.2, and Opus 4.6:
+      - trailing commas before } or ]
+      - smart-quote / unicode quote characters
+      - leading prose before the JSON
+      - explanation text after the closing brace
+    """
+    # Smart quotes -> straight
+    s = s.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+    # Trailing commas (before } or ])
+    s = re.sub(r",(\s*[}\]])", r"\1", s)
+    return s
+
+
 def _parse_multi_outcome_json(text: str) -> dict:
     """Extract {"probabilities": {...}, "rationale": "..."} from model output.
 
-    Direct -> embedded JSON object -> regex extraction of the probabilities map.
+    Five-stage parse, robust against the JSON quirks the 2026-05-16
+    multi-vendor ablation surfaced (trailing commas, smart quotes,
+    prose before/after the JSON). Stages, in increasing leniency:
+
+      0. Strip ``` code fences, json.loads as-is.
+      1. _clean_loose_json then json.loads as-is.
+      2. Regex find a JSON object containing "probabilities", parse it.
+      3. Regex find a JSON object containing "probabilities" after
+         _clean_loose_json, parse it.
+      4. Regex find just the inner probabilities map and return it
+         standalone (rationale becomes the first 200 chars).
+
+    Stage 4 is the safety net: even if the surrounding JSON is broken,
+    we can usually still pull `"probabilities": {...}` out as long as
+    that one object is well-formed (after trailing-comma cleanup).
     """
     s = text.strip()
     if s.startswith("```"):
         s = s.split("\n", 1)[1] if "\n" in s else s[3:]
     if s.endswith("```"):
         s = s.rsplit("```", 1)[0]
+
+    # Stage 0: direct
     try:
         return json.loads(s)
     except json.JSONDecodeError:
         pass
-    # Stage 2: find a JSON object that contains "probabilities".
-    m = re.search(r'\{[\s\S]*"probabilities"\s*:\s*\{[\s\S]*?\}[\s\S]*?\}', s)
+
+    # Stage 1: clean common quirks, retry full parse
+    cleaned = _clean_loose_json(s)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # Stage 2: find a JSON object containing "probabilities"
+    m = re.search(r'\{[\s\S]*?"probabilities"\s*:\s*\{[\s\S]*?\}[\s\S]*?\}', s)
     if m:
         try:
             return json.loads(m.group())
         except json.JSONDecodeError:
             pass
-    # Stage 3: find just the inner probabilities map.
-    m = re.search(r'"probabilities"\s*:\s*(\{[^{}]*\})', s)
+
+    # Stage 3: same regex, on the cleaned text
+    m = re.search(r'\{[\s\S]*?"probabilities"\s*:\s*\{[\s\S]*?\}[\s\S]*?\}', cleaned)
     if m:
         try:
+            return json.loads(m.group())
+        except json.JSONDecodeError:
+            pass
+
+    # Stage 4: just the inner probabilities map, with trailing-comma cleanup
+    m = re.search(r'"probabilities"\s*:\s*(\{[^{}]*\})', cleaned)
+    if m:
+        inner = _clean_loose_json(m.group(1))
+        try:
             return {
-                "probabilities": json.loads(m.group(1)),
+                "probabilities": json.loads(inner),
                 "rationale": text[:200],
             }
         except json.JSONDecodeError:
             pass
+
     raise ValueError(f"unparseable multi-outcome model output: {text[:200]}")
+
+
+def _match_outcome_label(raw_key: str, candidates: list[str]) -> str | None:
+    """Resolve a raw model-emitted key to the closest candidate outcome label.
+
+    Models sometimes return slightly different casing or whitespace than
+    the canonical outcome labels (e.g. "yes" vs "Yes", " Lakers " vs "Lakers").
+    The 2026-05-16 multi-vendor ablation showed this is a real failure mode;
+    when probabilities assigned to unrecognized keys, our caller fell back
+    to uniform prior and lost the event.
+
+    Strategy: exact match -> case-insensitive -> stripped -> normalized
+    (collapse whitespace + strip non-alphanumeric). Return None if no
+    candidate within those four passes is unique; caller treats as miss
+    and uses prior. We do NOT do Levenshtein/fuzzy substring -- those
+    risk silently mapping the wrong outcome.
+    """
+    if not raw_key:
+        return None
+    if raw_key in candidates:
+        return raw_key
+    raw_low = raw_key.lower()
+    lows = [c.lower() for c in candidates]
+    if raw_low in lows:
+        return candidates[lows.index(raw_low)]
+    raw_str = raw_low.strip()
+    strs = [c.lower().strip() for c in candidates]
+    if raw_str in strs and strs.count(raw_str) == 1:
+        return candidates[strs.index(raw_str)]
+    norm = re.sub(r"[^a-z0-9]", "", raw_str)
+    norms = [re.sub(r"[^a-z0-9]", "", c.lower()) for c in candidates]
+    if norm and norm in norms and norms.count(norm) == 1:
+        return candidates[norms.index(norm)]
+    return None
 
 
 def predict_multi_outcome(event: dict) -> dict:
@@ -1114,17 +1199,24 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
             raise ValueError(
                 f"probabilities not a dict: {type(raw_probs).__name__}",
             )
+        # Build a normalized lookup of model-emitted probabilities so that
+        # slightly off keys (case, whitespace, punctuation) still match.
+        # 2026-05-16 multi-vendor ablation showed Opus 4.6 / GPT-5.2 /
+        # Gemini all hit this failure mode on multi-outcome events;
+        # fuzzy matching keeps us functional when Opus 4.7 has a bad day.
         prior = 1.0 / n
+        resolved_probs: dict[str, float] = {}
+        for raw_key, raw_val in raw_probs.items():
+            canonical = _match_outcome_label(str(raw_key), outs)
+            if canonical is None or canonical in resolved_probs:
+                continue
+            try:
+                resolved_probs[canonical] = _clamp(float(raw_val))
+            except (TypeError, ValueError):
+                pass
         prob_list: list[dict] = []
         for o in outs:
-            v = raw_probs.get(o)
-            if v is None:
-                p = prior
-            else:
-                try:
-                    p = _clamp(float(v))
-                except (TypeError, ValueError):
-                    p = prior
+            p = resolved_probs.get(o, prior)
             prob_list.append({"market": o, "probability": p})
         rationale = str(parsed.get("rationale", ""))[:300]
     except Exception as e:

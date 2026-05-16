@@ -845,7 +845,11 @@ def dashboard(
     html = f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="30">
+<!-- Auto-refresh DISABLED. Was every 30s, wiping the try-form result
+     after a user submitted a prediction (Rob hit this 2026-05-16:
+     "result disappeared or glitched"). Page state updates via the
+     SSE /events stream now, so the meta refresh was redundant and
+     destructive. -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Oracles · ForecastingPath live dashboard</title>
 <link rel="icon" type="image/x-icon" href="/static/favicon.ico">

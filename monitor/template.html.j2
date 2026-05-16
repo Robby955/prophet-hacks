@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="{{ refresh_seconds }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>prophet-hacks live monitor</title>
+  <style>
+    :root {
+      --bg: #0b0f15;
+      --panel: #11151c;
+      --panel-2: #161b25;
+      --border: #2a313f;
+      --fg: #e8edf5;
+      --fg-dim: #99a4b8;
+      --accent: #f0a868;
+      --good: #7cd99f;
+      --bad: #f08988;
+      --info: #64a8f8;
+      --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fa;
+        --panel: #ffffff;
+        --panel-2: #f0f2f6;
+        --border: #d8dde6;
+        --fg: #11151c;
+        --fg-dim: #5b6478;
+      }
+    }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      font-size: 14px;
+    }
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 16px;
+      flex-wrap: wrap;
+    }
+    header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+    header .badge {
+      font-family: var(--mono); font-size: 12px;
+      color: var(--good); background: rgba(124, 217, 159, 0.12);
+      padding: 2px 8px; border-radius: 4px;
+      border: 1px solid rgba(124, 217, 159, 0.3);
+    }
+    header .meta { color: var(--fg-dim); font-size: 12px; font-family: var(--mono); }
+    main {
+      padding: 16px 24px 32px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 880px) {
+      main { grid-template-columns: 1fr; }
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    section h2 {
+      margin: 0 0 12px 0; font-size: 13px; font-weight: 600;
+      color: var(--fg-dim); text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 600px) {
+      .cards { grid-template-columns: repeat(5, 1fr); }
+    }
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .card .label {
+      color: var(--fg-dim); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .card .value {
+      font-family: var(--mono); font-size: 18px;
+      margin-top: 2px;
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-family: var(--mono); font-size: 12px;
+    }
+    th, td {
+      padding: 6px 8px; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--fg-dim); font-weight: 500; }
+    tr.buy { background: rgba(124, 217, 159, 0.06); }
+    tr.skip { color: var(--fg-dim); }
+    .edge-pos { color: var(--good); }
+    .edge-neg { color: var(--bad); }
+    .charts {
+      grid-column: 1 / -1;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    }
+    @media (max-width: 880px) {
+      .charts { grid-template-columns: 1fr; }
+    }
+    .chart img { width: 100%; height: auto; display: block; }
+    footer {
+      padding: 12px 24px; color: var(--fg-dim);
+      border-top: 1px solid var(--border);
+      font-family: var(--mono); font-size: 11px;
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>prophet-hacks live monitor</h1>
+    <span class="badge">auto-refresh {{ refresh_seconds }}s</span>
+    <span class="meta">rendered {{ rendered_at }}</span>
+    <span class="meta">last record {{ last_timestamp }}</span>
+  </header>
+
+  <main>
+    <section style="grid-column: 1 / -1;">
+      <h2>Live stats</h2>
+      <div class="cards">
+        {% for label, value in cards %}
+          <div class="card">
+            <div class="label">{{ label }}</div>
+            <div class="value">{{ value }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section style="grid-column: 1 / -1;">
+      <h2>Recent decisions (most recent first)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>time</th><th>action</th><th>side</th><th>market</th>
+            <th>p_yes</th><th>p_market</th><th>p_final</th>
+            <th>edge</th><th>size</th><th>skip reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent %}
+            {% set action = (r.get('action') or '')|upper %}
+            {% set side = (r.get('side') or '') %}
+            {% set p_yes = r.get('p_yes') %}
+            {% set p_market = r.get('p_market') %}
+            {% set p_final = r.get('p_final') %}
+            {% set edge = r.get('yes_edge') if side|upper == 'YES' else r.get('no_edge') %}
+            <tr class="{{ 'buy' if action == 'BUY' else 'skip' }}">
+              <td>{{ (r.get('timestamp') or '')[:19] }}</td>
+              <td>{{ action }}</td>
+              <td>{{ side }}</td>
+              <td>{{ (r.get('question') or '')[:60] }}</td>
+              <td>{% if p_yes is number %}{{ '%.3f'|format(p_yes) }}{% endif %}</td>
+              <td>{% if p_market is number %}{{ '%.3f'|format(p_market) }}{% endif %}</td>
+              <td>{% if p_final is number %}{{ '%.3f'|format(p_final) }}{% endif %}</td>
+              <td class="{% if edge is number and edge > 0 %}edge-pos{% elif edge is number and edge < 0 %}edge-neg{% endif %}">
+                {% if edge is number %}{{ '%+.3f'|format(edge) }}{% endif %}
+              </td>
+              <td>{{ r.get('size') or '' }}</td>
+              <td>{{ (r.get('skip_reason') or '')[:80] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <div class="charts">
+      <section class="chart">
+        <h2>Skip reasons</h2>
+        <img src="{{ chart_skips }}" alt="skip reasons">
+      </section>
+      <section class="chart">
+        <h2>p_yes distribution</h2>
+        <img src="{{ chart_p_yes }}" alt="p_yes histogram">
+      </section>
+      <section class="chart">
+        <h2>Provider mix</h2>
+        <img src="{{ chart_providers }}" alt="provider mix">
+      </section>
+      <section class="chart">
+        <h2>Model disagreement</h2>
+        <img src="{{ chart_disagreement }}" alt="disagreement histogram">
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <span>trace dir: {{ trace_dir }}</span>
+    <span>refresh: {{ refresh_seconds }}s</span>
+    <span>read-only — does not modify the trace</span>
+  </footer>
+</body>
+</html>

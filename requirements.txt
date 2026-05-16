@@ -12,3 +12,8 @@ pandas>=2.0,<3.0
 # Test runner. Required for scripts/agent/verify.sh to actually exercise
 # tests/ rather than silently skipping when pytest isn't installed.
 pytest>=8.0,<9.0
+# Live forecasting endpoint (forecast_agent_server.py). Railway deploys
+# from this file; missing them caused the first two Railway deploys to
+# fail with "uvicorn: command not found".
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0

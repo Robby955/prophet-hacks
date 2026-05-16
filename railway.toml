@@ -1,0 +1,20 @@
+# Railway deployment config for The Oracles forecast agent.
+# Detected automatically by Railway on deploy; documents the build/start
+# contract so the deploy is reproducible from a fresh checkout.
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+# Nixpacks puts the venv at /opt/venv but doesn't add it to PATH for the
+# startCommand shell. Use the absolute path or the start command fails with
+# `uvicorn: command not found` (cost us deploy #1).
+startCommand = "/opt/venv/bin/uvicorn forecast_agent_server:app --host 0.0.0.0 --port $PORT"
+# Health check used by Railway to gate traffic; matches our FastAPI route.
+healthcheckPath = "/healthz"
+# Cold-start budget: ai-prophet-core + anthropic + openai + pydantic imports
+# take ~5-10s; 90s is comfortable, prevents flaky "service unavailable" loops.
+healthcheckTimeout = 90
+# Restart on crash to recover from transient Anthropic/OpenAI hiccups.
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

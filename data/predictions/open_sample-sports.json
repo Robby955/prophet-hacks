@@ -1,0 +1,1298 @@
+{
+  "timestamp": "2026-05-16T16:17:16Z",
+  "dataset": "sample-sports",
+  "predictions": [
+    {
+      "p_yes": 0.1,
+      "rationale": "Evidence reports Spurs won Game 6 139-109 to eliminate Minnesota.",
+      "probabilities": [
+        {
+          "market": "Minnesota",
+          "probability": 0.1
+        },
+        {
+          "market": "San Antonio",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "evidence_urls": [
+        "https://www.azcentral.com/story/sports/nba/2026/05/13/san-antonio-spurs-minnesota-timberwolves-picks-predictions-odds-nba-playoffs-game-6/90033341007/",
+        "https://www.outlookindia.com/sports/minnesota-timberwolves-vs-san-antonio-spurs-nba-2026-playoffs-western-conference-semifinals-game-6-in-pics",
+        "https://www.olympics.com/en/news/nba-playoffs-2026-schedule-results-and-scores",
+        "https://www.sportingnews.com/us/nba/san-antonio-spurs/news/spurs-vs-timberwolves-live-score-updates-highlights-game-6-2026-nba-playoffs-2nd-round-series/fbb60f16fe0d04695ebd9a8f",
+        "https://www.nytimes.com/athletic/7251438/2026/05/04/nba-playoffs-schedule-second-round-how-to-watch-2026/"
+      ],
+      "_event": {
+        "event_ticker": "KXNBAGAME-26MAY15SASMIN",
+        "market_ticker": "KXNBAGAME-26MAY15SASMIN",
+        "title": "Will Minnesota beat San Antonio in NBA Western Conference Game 6 on May 15, 2026?",
+        "category": "Sports",
+        "outcomes": [
+          "Minnesota",
+          "San Antonio"
+        ],
+        "description": "If Minnesota wins the Game 6: San Antonio at Minnesota professional basketball game originally scheduled for May 15, 2026, then the market resolves to Yes.",
+        "rules": "If Minnesota wins the Game 6: San Antonio at Minnesota professional basketball game originally scheduled for May 15, 2026, then the market resolves to Yes.",
+        "close_time": "2026-05-15T20:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence confirms Spurs clinched the series in Game 6.",
+      "probabilities": [
+        {
+          "market": "San Antonio",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Minnesota",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.nytimes.com/athletic/live-blogs/spurs-vs-timberwolves-live-updates-nba-playoffs-game-6-score-result/SINIFqmnjnzV/",
+        "https://www.azcentral.com/story/sports/nba/2026/05/13/san-antonio-spurs-minnesota-timberwolves-picks-predictions-odds-nba-playoffs-game-6/90033341007/",
+        "https://www.espn.com/nba/story/_/id/48676289/2026-nba-playoffs-conference-semifinals-round-2-takeaways",
+        "https://www.sportsnet.ca/nba/article/nba-announces-round-2-playoff-schedule/",
+        "https://www.nba.com/playoffs/2026/west-semifinal-2"
+      ],
+      "_event": {
+        "event_ticker": "KXNBASERIES-26MINSASR2",
+        "market_ticker": "KXNBASERIES-26MINSASR2",
+        "title": "Who will win the NBA Round 2 series between Minnesota (6) and San Antonio (2)?",
+        "category": "Sports",
+        "outcomes": [
+          "San Antonio",
+          "Minnesota"
+        ],
+        "description": "If San Antonio wins the Minnesota vs San Antonio 2nd Round series in the 2026 Pro Basketball Playoffs, then the market resolves to Yes.",
+        "rules": "If San Antonio wins the Minnesota vs San Antonio 2nd Round series in the 2026 Pro Basketball Playoffs, then the market resolves to Yes.",
+        "close_time": "2026-05-20T00:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.52,
+      "rationale": "Evidence [5] suggests Cincinnati won 7-5, though Cleveland was favored pregame; leaning slightly toward Cincinnati based on apparent result.",
+      "probabilities": [
+        {
+          "market": "Cincinnati",
+          "probability": 0.52
+        },
+        {
+          "market": "Cleveland",
+          "probability": 0.48
+        }
+      ],
+      "evidence_urls": [
+        "https://www.redlegnation.com/2026/05/15/cincinnati-reds-vs-cleveland-guardians-may-15-2026/",
+        "https://www.thescore.com/mlb/event/99754",
+        "https://www.espn.com/mlb/preview/_/gameId/401815347",
+        "https://www.dimers.com/news/cincinnati-reds-vs-cleveland-guardians-prediction-mlb-friday-05-15-2026-ac",
+        "https://www.beaconjournal.com/story/sports/mlb/cleveland-guardians/2026/05/15/guardians-game-score-tonight-live-updates-lineup-stats-reds/90082104007/"
+      ],
+      "_event": {
+        "event_ticker": "KXMLBGAME-26MAY151910CINCLE",
+        "market_ticker": "KXMLBGAME-26MAY151910CINCLE",
+        "title": "Will Cincinnati beat Cleveland in the MLB game on May 15, 2026 (7:10 PM EDT)?",
+        "category": "Sports",
+        "outcomes": [
+          "Cincinnati",
+          "Cleveland"
+        ],
+        "description": "If Cincinnati wins the Cincinnati vs Cleveland professional baseball game originally scheduled for May 15, 2026 at 7:10 PM EDT, then the market resolves to Yes.",
+        "rules": "If Cincinnati wins the Cincinnati vs Cleveland professional baseball game originally scheduled for May 15, 2026 at 7:10 PM EDT, then the market resolves to Yes.",
+        "close_time": "2026-05-16T02:10:00Z"
+      }
+    },
+    {
+      "p_yes": 0.62,
+      "rationale": "Phillies favored at home per odds (+1.5 runline at -204 implies ML favorite around -150).",
+      "probabilities": [
+        {
+          "market": "Philadelphia",
+          "probability": 0.62
+        },
+        {
+          "market": "Pittsburgh",
+          "probability": 0.38
+        }
+      ],
+      "evidence_urls": [
+        "https://www.covers.com/mlb/phillies-vs-pirates-prediction-picks-odds-friday-5-15-2026",
+        "https://www.espn.com/mlb/boxscore/_/gameId/401815350",
+        "https://oddsindex.com/sports/mlb/game-previews/44992912-philadelphia-phillies-at-pittsburgh-pirates",
+        "https://www.cbssports.com/mlb/gametracker/recap/MLB_20260515_PHI@PIT/",
+        "https://www.nytimes.com/athletic/mlb/game/philadelphia-phillies-vs-pittsburgh-pirates/jZHq73ur7Popc578/"
+      ],
+      "_event": {
+        "event_ticker": "KXMLBGAME-26MAY151840PHIPIT",
+        "market_ticker": "KXMLBGAME-26MAY151840PHIPIT",
+        "title": "Will Philadelphia beat Pittsburgh in the MLB game on May 15, 2026 (6:40 PM EDT)?",
+        "category": "Sports",
+        "outcomes": [
+          "Philadelphia",
+          "Pittsburgh"
+        ],
+        "description": "If Philadelphia wins the Philadelphia vs Pittsburgh professional baseball game originally scheduled for May 15, 2026 at 6:40 PM EDT, then the market resolves to Yes.",
+        "rules": "If Philadelphia wins the Philadelphia vs Pittsburgh professional baseball game originally scheduled for May 15, 2026 at 6:40 PM EDT, then the market resolves to Yes.",
+        "close_time": "2026-05-16T01:40:00Z"
+      }
+    },
+    {
+      "p_yes": 0.1,
+      "rationale": "Box score confirms Atlanta beat Boston 3-2.",
+      "probabilities": [
+        {
+          "market": "Boston",
+          "probability": 0.1
+        },
+        {
+          "market": "Atlanta",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "evidence_urls": [
+        "https://contests.covers.com/consensus/matchupconsensusdetails/d63ba8ea-da5b-4a31-9564-b38c00fe371a",
+        "https://www.baseball-reference.com/boxes/ATL/ATL202605150.shtml",
+        "https://www.nytimes.com/athletic/mlb/game/atlanta-braves-vs-boston-red-sox/Zs8rpGei09SQv0FP/",
+        "https://www.sofascore.com/baseball/match/atlanta-braves-boston-red-sox/Wxbsgyb",
+        "https://www.usatoday.com/story/sports/mlb/2026/05/15/boston-red-sox-atlanta-braves-channel-stream-time-mlb-5-15-2026/90093670007/"
+      ],
+      "_event": {
+        "event_ticker": "KXMLBGAME-26MAY151915BOSATL",
+        "market_ticker": "KXMLBGAME-26MAY151915BOSATL",
+        "title": "Will Boston beat Atlanta in the MLB game on May 15, 2026 (7:15 PM EDT)?",
+        "category": "Sports",
+        "outcomes": [
+          "Boston",
+          "Atlanta"
+        ],
+        "description": "If Boston wins the Boston vs Atlanta professional baseball game originally scheduled for May 15, 2026 at 7:15 PM EDT, then the market resolves to Yes.",
+        "rules": "If Boston wins the Boston vs Atlanta professional baseball game originally scheduled for May 15, 2026 at 7:15 PM EDT, then the market resolves to Yes.",
+        "close_time": "2026-05-16T02:15:00Z"
+      }
+    },
+    {
+      "p_yes": 0.58,
+      "rationale": "Odds 1.71 vs 1.99 imply Piros ~54%, with prior H2H win supporting slight edge.",
+      "probabilities": [
+        {
+          "market": "Zsombor Piros",
+          "probability": 0.58
+        },
+        {
+          "market": "Lukas Neumayer",
+          "probability": 0.42
+        }
+      ],
+      "evidence_urls": [
+        "https://kalshi.com/markets/kxatpchallengermatch/challenger-atp-/kxatpchallengermatch-26may14pirneu",
+        "https://polymarket.com/sports/atp/atp-piros-neumaye-2026-05-14",
+        "https://www.atptour.com/en/scores/stats-centre/live/2026/9500/ms007",
+        "https://tennistonic.com/tennis-news/997675/h2h-prediction-of-zsombor-piros-vs-lukas-neumayer-in-zagreb-challenger-with-odds-preview-pick-15th-may-2026/",
+        "https://www.mykhel.com/tennis/zagreb-open-2026-mens-singles-quarter-finals-live-scoreboard-427429/"
+      ],
+      "_event": {
+        "event_ticker": "KXATPCHALLENGERMATCH-26MAY14PIRNEU",
+        "market_ticker": "KXATPCHALLENGERMATCH-26MAY14PIRNEU",
+        "title": "Will Zsombor Piros beat Lukas Neumayer in the ATP Challenger Zagreb Quarterfinal on May 15, 2026?",
+        "category": "Sports",
+        "outcomes": [
+          "Zsombor Piros",
+          "Lukas Neumayer"
+        ],
+        "description": "If Zsombor Piros wins the Piros vs Neumayer professional tennis match in the 2026 ATP Challenger Zagreb Quarterfinal after a ball has been played, then the market resolves to Yes.",
+        "rules": "If Zsombor Piros wins the Piros vs Neumayer professional tennis match in the 2026 ATP Challenger Zagreb Quarterfinal after a ball has been played, then the market resolves to Yes.",
+        "close_time": "2026-05-15T16:55:00Z"
+      }
+    },
+    {
+      "p_yes": 0.6,
+      "rationale": "Cleveland is home favorite per prediction site, but Detroit is desperate in must-win; modest lean to Cavs.",
+      "probabilities": [
+        {
+          "market": "Cleveland",
+          "probability": 0.6
+        },
+        {
+          "market": "Detroit",
+          "probability": 0.4
+        }
+      ],
+      "evidence_urls": [
+        "https://www.azcentral.com/story/sports/nba/2026/05/14/cleveland-cavaliers-detroit-pistons-picks-predictions-odds-nba-playoffs-game-6/90038504007/",
+        "https://www.nbcnewyork.com/nba/conference-finals-schedule-2026/6500285/",
+        "https://www.nba.com/game/det-vs-cle-0042500206",
+        "https://www.freep.com/story/sports/nba/pistons/2026/05/13/pistons-cavs-game-5-score-nba-playoffs/90066310007/",
+        "https://www.si.com/nba/knicks/onsi/knicks-schedule-conference-finals-everything-we-know-01krbngrxr3d"
+      ],
+      "_event": {
+        "event_ticker": "KXNBAGAME-26MAY15DETCLE",
+        "market_ticker": "KXNBAGAME-26MAY15DETCLE",
+        "title": "Will Cleveland beat Detroit in NBA Eastern Conference Game 6 on May 15, 2026?",
+        "category": "Sports",
+        "outcomes": [
+          "Cleveland",
+          "Detroit"
+        ],
+        "description": "If Cleveland wins the Game 6: Detroit at Cleveland professional basketball game originally scheduled for May 15, 2026, then the market resolves to Yes.",
+        "rules": "If Cleveland wins the Game 6: Detroit at Cleveland professional basketball game originally scheduled for May 15, 2026, then the market resolves to Yes.",
+        "close_time": "2026-05-15T20:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.98,
+      "rationale": "Bayern already crowned champions; Leverkusen, Dortmund, Stuttgart/Frankfurt/Leipzig contend for remaining top-4 spots.",
+      "probabilities": [
+        {
+          "market": "Bayern Munich",
+          "probability": 0.98
+        },
+        {
+          "market": "Dortmund",
+          "probability": 0.7
+        },
+        {
+          "market": "FC Cologne",
+          "probability": 0.15
+        },
+        {
+          "market": "St. Pauli",
+          "probability": 0.05
+        },
+        {
+          "market": "Frankfurt",
+          "probability": 0.55
+        },
+        {
+          "market": "Hoffenheim",
+          "probability": 0.1
+        },
+        {
+          "market": "Leipzig",
+          "probability": 0.55
+        },
+        {
+          "market": "Wolfsburg",
+          "probability": 0.1
+        },
+        {
+          "market": "Bremen",
+          "probability": 0.1
+        },
+        {
+          "market": "Leverkusen",
+          "probability": 0.75
+        },
+        {
+          "market": "Augsburg",
+          "probability": 0.05
+        },
+        {
+          "market": "Stuttgart",
+          "probability": 0.55
+        },
+        {
+          "market": "Freiburg",
+          "probability": 0.3
+        },
+        {
+          "market": "Union Berlin",
+          "probability": 0.1
+        },
+        {
+          "market": "Mainz",
+          "probability": 0.1
+        },
+        {
+          "market": "M\u00b4gladbach",
+          "probability": 0.08
+        },
+        {
+          "market": "Hamburg",
+          "probability": 0.05
+        },
+        {
+          "market": "Heidenheim",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bundesliga.com/en/bundesliga/table",
+        "https://en.wikipedia.org/wiki/2025%E2%80%9326_Bundesliga",
+        "https://www.worldfootball.net/competition/co12/germany-bundesliga/results-and-standings/",
+        "https://www.goal.com/en/team/bayern-munich/table/apoawtpvac4zqlancmvw4nk4o"
+      ],
+      "_event": {
+        "event_ticker": "KXBUNDESLIGATOP4-26",
+        "market_ticker": "KXBUNDESLIGATOP4-26",
+        "title": "Which clubs will finish in the top 4 of the 2025-26 Bundesliga season?",
+        "category": "Sports",
+        "outcomes": [
+          "Bayern Munich",
+          "Dortmund",
+          "FC Cologne",
+          "St. Pauli",
+          "Frankfurt",
+          "Hoffenheim",
+          "Leipzig",
+          "Wolfsburg",
+          "Bremen",
+          "Leverkusen",
+          "Augsburg",
+          "Stuttgart",
+          "Freiburg",
+          "Union Berlin",
+          "Mainz",
+          "M\u00b4gladbach",
+          "Hamburg",
+          "Heidenheim"
+        ],
+        "description": "If Bayern Munich is a Top 4 Finisher in the 2025-26 Bundesliga season, then the market resolves to Yes.",
+        "rules": "If Bayern Munich is a Top 4 Finisher in the 2025-26 Bundesliga season, then the market resolves to Yes.",
+        "close_time": "2026-05-17T02:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.05,
+      "rationale": "Evidence snippets are inconsistent/speculative; spread probability across top Premier League sides with Liverpool a top-tier contender.",
+      "probabilities": [
+        {
+          "market": "Liverpool",
+          "probability": 0.05
+        },
+        {
+          "market": "Manchester City",
+          "probability": 0.05
+        },
+        {
+          "market": "Arsenal",
+          "probability": 0.05
+        },
+        {
+          "market": "Chelsea",
+          "probability": 0.05
+        },
+        {
+          "market": "Newcastle",
+          "probability": 0.05
+        },
+        {
+          "market": "Tottenham",
+          "probability": 0.05
+        },
+        {
+          "market": "Manchester United",
+          "probability": 0.05
+        },
+        {
+          "market": "Aston Villa",
+          "probability": 0.05
+        },
+        {
+          "market": "Nottingham",
+          "probability": 0.05
+        },
+        {
+          "market": "Brighton",
+          "probability": 0.05
+        },
+        {
+          "market": "Bournemouth",
+          "probability": 0.05
+        },
+        {
+          "market": "Fulham",
+          "probability": 0.05
+        },
+        {
+          "market": "Everton",
+          "probability": 0.05
+        },
+        {
+          "market": "Crystal Palace",
+          "probability": 0.05
+        },
+        {
+          "market": "West Ham",
+          "probability": 0.05
+        },
+        {
+          "market": "Brentford",
+          "probability": 0.05
+        },
+        {
+          "market": "Wolverhampton",
+          "probability": 0.05
+        },
+        {
+          "market": "Leeds United",
+          "probability": 0.05
+        },
+        {
+          "market": "Sunderland",
+          "probability": 0.05
+        },
+        {
+          "market": "Burnley",
+          "probability": 0.05
+        },
+        {
+          "market": "Southampton",
+          "probability": 0.05
+        },
+        {
+          "market": "Leicester",
+          "probability": 0.05
+        },
+        {
+          "market": "Ipswich",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.manutd.com/en/matches/first-team/2025-26/fa-cup",
+        "https://www.goal.com/en-us/news/fa-cup-2025-26-draw-fixtures-results/blt7fc2aa7c6a5e6351",
+        "https://www.nbcsports.com/soccer/news/fa-cup-schedule-watch-live-scores-highlights",
+        "https://en.wikipedia.org/wiki/2025%E2%80%9326_FA_Cup"
+      ],
+      "_event": {
+        "event_ticker": "KXFACUP-26",
+        "market_ticker": "KXFACUP-26",
+        "title": "Who will win the 2025-26 FA Cup?",
+        "category": "Sports",
+        "outcomes": [
+          "Liverpool",
+          "Manchester City",
+          "Arsenal",
+          "Chelsea",
+          "Newcastle",
+          "Tottenham",
+          "Manchester United",
+          "Aston Villa",
+          "Nottingham",
+          "Brighton",
+          "Bournemouth",
+          "Fulham",
+          "Everton",
+          "Crystal Palace",
+          "West Ham",
+          "Brentford",
+          "Wolverhampton",
+          "Leeds United",
+          "Sunderland",
+          "Burnley",
+          "Southampton",
+          "Leicester",
+          "Ipswich"
+        ],
+        "description": "If Liverpool wins the FA Cup, then the market resolves to Yes.",
+        "rules": "If Liverpool wins the FA Cup, then the market resolves to Yes.",
+        "close_time": "2026-05-17T14:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.18,
+      "rationale": "Arsenal favored with Liverpool and Man City as main challengers; evidence snippets uninformative so using prior season knowledge.",
+      "probabilities": [
+        {
+          "market": "Liverpool",
+          "probability": 0.18
+        },
+        {
+          "market": "Arsenal",
+          "probability": 0.42
+        },
+        {
+          "market": "Man City",
+          "probability": 0.22
+        },
+        {
+          "market": "Chelsea",
+          "probability": 0.08
+        },
+        {
+          "market": "Newcastle",
+          "probability": 0.05
+        },
+        {
+          "market": "Man Utd",
+          "probability": 0.05
+        },
+        {
+          "market": "Tottenham",
+          "probability": 0.05
+        },
+        {
+          "market": "Aston Villa",
+          "probability": 0.05
+        },
+        {
+          "market": "Nottingham Forest",
+          "probability": 0.05
+        },
+        {
+          "market": "Brighton",
+          "probability": 0.05
+        },
+        {
+          "market": "Bournemouth",
+          "probability": 0.05
+        },
+        {
+          "market": "Everton",
+          "probability": 0.05
+        },
+        {
+          "market": "Crystal Palace",
+          "probability": 0.05
+        },
+        {
+          "market": "West Ham",
+          "probability": 0.05
+        },
+        {
+          "market": "Leeds",
+          "probability": 0.05
+        },
+        {
+          "market": "Fulham",
+          "probability": 0.05
+        },
+        {
+          "market": "Brentford",
+          "probability": 0.05
+        },
+        {
+          "market": "Wolves",
+          "probability": 0.05
+        },
+        {
+          "market": "Burnley",
+          "probability": 0.05
+        },
+        {
+          "market": "Sunderland",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.nbcsports.com/soccer/news/premier-league-2025-26-table-teams-standings-for-the-new-season",
+        "https://www.premierleague.com/en/clubs/17/nottingham-forest/overview",
+        "https://khelnow.com/football/world-football-manchester-united-vs-nottingham-forest-preview-202605",
+        "https://www.espn.com/soccer/standings",
+        "https://theanalyst.com/articles/premier-league-match-predictions"
+      ],
+      "_event": {
+        "event_ticker": "KXPREMIERLEAGUE-26",
+        "market_ticker": "KXPREMIERLEAGUE-26",
+        "title": "Who will win the 2025-26 English Premier League?",
+        "category": "Sports",
+        "outcomes": [
+          "Liverpool",
+          "Arsenal",
+          "Man City",
+          "Chelsea",
+          "Newcastle",
+          "Man Utd",
+          "Tottenham",
+          "Aston Villa",
+          "Nottingham Forest",
+          "Brighton",
+          "Bournemouth",
+          "Everton",
+          "Crystal Palace",
+          "West Ham",
+          "Leeds",
+          "Fulham",
+          "Brentford",
+          "Wolves",
+          "Burnley",
+          "Sunderland"
+        ],
+        "description": "If Liverpool wins the English Premier League, then the market resolves to Yes.",
+        "rules": "If Liverpool wins the English Premier League, then the market resolves to Yes.",
+        "close_time": "2026-05-24T14:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.05,
+      "rationale": "Valencia is a returning team without elite title pedigree; Fenerbahce, Olympiakos, Panathinaikos, Monaco lead favorites.",
+      "probabilities": [
+        {
+          "market": "Valencia Basket",
+          "probability": 0.05
+        },
+        {
+          "market": "AS Monaco",
+          "probability": 0.1284313725490196
+        },
+        {
+          "market": "KK Crvena zvezda Belgrade",
+          "probability": 0.05
+        },
+        {
+          "market": "Panathinaikos BC",
+          "probability": 0.1284313725490196
+        },
+        {
+          "market": "FC Barcelona",
+          "probability": 0.09901960784313726
+        },
+        {
+          "market": "BC Olympiakos Piraeus",
+          "probability": 0.1284313725490196
+        },
+        {
+          "market": "Fenerbahce Istanbul",
+          "probability": 0.14803921568627448
+        },
+        {
+          "market": "Hapoel Tel-Aviv",
+          "probability": 0.09901960784313726
+        },
+        {
+          "market": "Real Madrid",
+          "probability": 0.11862745098039215
+        },
+        {
+          "market": "BC Zalgiris Kaunas",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.euroleaguebasketball.net/sr/euroleague/teams/crvena-zvezda-meridianbet-belgrade/red/",
+        "https://en.wikipedia.org/wiki/2025%E2%80%9326_EuroLeague"
+      ],
+      "_event": {
+        "event_ticker": "KXEUROLEAGUE-26",
+        "market_ticker": "KXEUROLEAGUE-26",
+        "title": "Who will win the 2025-26 EuroLeague basketball championship?",
+        "category": "Sports",
+        "outcomes": [
+          "Valencia Basket",
+          "AS Monaco",
+          "KK Crvena zvezda Belgrade",
+          "Panathinaikos BC",
+          "FC Barcelona",
+          "BC Olympiakos Piraeus",
+          "Fenerbahce Istanbul",
+          "Hapoel Tel-Aviv",
+          "Real Madrid",
+          "BC Zalgiris Kaunas"
+        ],
+        "description": "If Valencia Basket wins the 2025-26 EuroLeague Championship, then the market resolves to Yes.",
+        "rules": "If Valencia Basket wins the 2025-26 EuroLeague Championship, then the market resolves to Yes.",
+        "close_time": "2026-06-01T02:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.36523437500000006,
+      "rationale": "Littler is bookies' favourite to regain title; MVG won opening night and Humphries defending, others longer shots.",
+      "probabilities": [
+        {
+          "market": "Luke Littler",
+          "probability": 0.36523437500000006
+        },
+        {
+          "market": "Luke Humphries",
+          "probability": 0.154296875
+        },
+        {
+          "market": "Michael van Gerwen",
+          "probability": 0.154296875
+        },
+        {
+          "market": "Gian van Veen",
+          "probability": 0.076171875
+        },
+        {
+          "market": "Stephen Bunting",
+          "probability": 0.0625
+        },
+        {
+          "market": "Gerwyn Price",
+          "probability": 0.0625
+        },
+        {
+          "market": "Josh Rock",
+          "probability": 0.0625
+        },
+        {
+          "market": "Jonny Clayton",
+          "probability": 0.0625
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bbc.com/sport/darts/articles/cgl8r6j3r1lo",
+        "https://en.wikipedia.org/wiki/Michael_van_Gerwen",
+        "https://www.skysports.com/darts/news/12040/13504059/premier-league-darts-table-2026-latest-standings-as-luke-littler-luke-humphries-michael-van-gerwen-challenge-for-title",
+        "https://www.espn.com/darts/story/_/id/47538578/premier-league-darts-2026-explained-schedule-results-table-how-watch-prize-money-format-venues-dates-more"
+      ],
+      "_event": {
+        "event_ticker": "KXPREMDARTS-26",
+        "market_ticker": "KXPREMDARTS-26",
+        "title": "Who will be the 2026 Premier League Darts champion?",
+        "category": "Sports",
+        "outcomes": [
+          "Luke Littler",
+          "Luke Humphries",
+          "Michael van Gerwen",
+          "Gian van Veen",
+          "Stephen Bunting",
+          "Gerwyn Price",
+          "Josh Rock",
+          "Jonny Clayton"
+        ],
+        "description": "If Luke Littler is the 2026 Premier League Darts champion, then the market resolves to Yes.",
+        "rules": "If Luke Littler is the 2026 Premier League Darts champion, then the market resolves to Yes.",
+        "close_time": "2026-05-29T02:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.1333333333333333,
+      "rationale": "Detroit is the East's top seed in early 2026 playoff picture per ESPN, with NYK and Cleveland as main rivals.",
+      "probabilities": [
+        {
+          "market": "Detroit",
+          "probability": 0.1333333333333333
+        },
+        {
+          "market": "Atlanta",
+          "probability": 0.05
+        },
+        {
+          "market": "Boston",
+          "probability": 0.06923076923076922
+        },
+        {
+          "market": "Brooklyn",
+          "probability": 0.05
+        },
+        {
+          "market": "Charlotte",
+          "probability": 0.05
+        },
+        {
+          "market": "Chicago",
+          "probability": 0.05
+        },
+        {
+          "market": "Cleveland",
+          "probability": 0.09487179487179484
+        },
+        {
+          "market": "Indiana",
+          "probability": 0.05
+        },
+        {
+          "market": "Miami",
+          "probability": 0.05
+        },
+        {
+          "market": "Milwaukee",
+          "probability": 0.05
+        },
+        {
+          "market": "New York",
+          "probability": 0.1333333333333333
+        },
+        {
+          "market": "Orlando",
+          "probability": 0.05
+        },
+        {
+          "market": "Philadelphia",
+          "probability": 0.06923076923076922
+        },
+        {
+          "market": "Toronto",
+          "probability": 0.05
+        },
+        {
+          "market": "Washington",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/nba-playoffs-eastern-conference-champion",
+        "https://www.nba.com/playoffs/2026/east-final",
+        "https://www.espn.com/nba/story/_/id/48419498/nba-playoffs-2026-play-finals-schedule-scores-news-highlights-bracket-dates",
+        "https://www.nbcnewyork.com/nba/conference-finals-schedule-2026/6500285/"
+      ],
+      "_event": {
+        "event_ticker": "KXNBAEAST-26",
+        "market_ticker": "KXNBAEAST-26",
+        "title": "Who will win the 2026 NBA Eastern Conference championship?",
+        "category": "Sports",
+        "outcomes": [
+          "Detroit",
+          "Atlanta",
+          "Boston",
+          "Brooklyn",
+          "Charlotte",
+          "Chicago",
+          "Cleveland",
+          "Indiana",
+          "Miami",
+          "Milwaukee",
+          "New York",
+          "Orlando",
+          "Philadelphia",
+          "Toronto",
+          "Washington"
+        ],
+        "description": "If Detroit wins the 2026 Pro Basketball Eastern Conference Championship, then the market resolves to Yes.",
+        "rules": "If Detroit wins the 2026 Pro Basketball Eastern Conference Championship, then the market resolves to Yes.",
+        "close_time": "2026-06-30T14:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.05,
+      "rationale": "OKC is heavy favorite as top seed on historic pace; Lakers, Nuggets, Spurs, Rockets are secondary contenders; Dallas missed playoffs.",
+      "probabilities": [
+        {
+          "market": "Dallas",
+          "probability": 0.05
+        },
+        {
+          "market": "Denver",
+          "probability": 0.07430555555555556
+        },
+        {
+          "market": "Houston",
+          "probability": 0.06736111111111112
+        },
+        {
+          "market": "Los Angeles L",
+          "probability": 0.08472222222222223
+        },
+        {
+          "market": "Los Angeles C",
+          "probability": 0.05
+        },
+        {
+          "market": "Memphis",
+          "probability": 0.05
+        },
+        {
+          "market": "Minnesota",
+          "probability": 0.06041666666666667
+        },
+        {
+          "market": "New Orleans",
+          "probability": 0.05
+        },
+        {
+          "market": "Oklahoma City",
+          "probability": 0.18888888888888888
+        },
+        {
+          "market": "Phoenix",
+          "probability": 0.05
+        },
+        {
+          "market": "Portland",
+          "probability": 0.05
+        },
+        {
+          "market": "Sacramento",
+          "probability": 0.05
+        },
+        {
+          "market": "Utah",
+          "probability": 0.05
+        },
+        {
+          "market": "San Antonio",
+          "probability": 0.07430555555555556
+        },
+        {
+          "market": "Golden State",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.espn.com/nba/story/_/id/48419498/nba-playoffs-2026-play-finals-schedule-scores-news-highlights-bracket-dates",
+        "https://www.cbssports.com/nba/news/2026-nba-playoff-bracket-matchups-schedule/",
+        "https://www.wsn.com/nba/western-conference-winner-predictions/",
+        "https://en.wikipedia.org/wiki/2026_NBA_playoffs",
+        "https://www.facebook.com/Jason1Gameplay/posts/will-the-los-angeles-lakers-win-game-1-of-the-2026-nba-western-conference-semi-f/1482789436972172/"
+      ],
+      "_event": {
+        "event_ticker": "KXNBAWEST-26",
+        "market_ticker": "KXNBAWEST-26",
+        "title": "Who will win the 2026 NBA Western Conference championship?",
+        "category": "Sports",
+        "outcomes": [
+          "Dallas",
+          "Denver",
+          "Houston",
+          "Los Angeles L",
+          "Los Angeles C",
+          "Memphis",
+          "Minnesota",
+          "New Orleans",
+          "Oklahoma City",
+          "Phoenix",
+          "Portland",
+          "Sacramento",
+          "Utah",
+          "San Antonio",
+          "Golden State"
+        ],
+        "description": "If Dallas wins the 2026 Pro Basketball Western Conference Championship, then the market resolves to Yes.",
+        "rules": "If Dallas wins the 2026 Pro Basketball Western Conference Championship, then the market resolves to Yes.",
+        "close_time": "2026-06-30T14:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.05,
+      "rationale": "OKC favored as defending champ; Cavs, Rockets, Knicks, Lakers strong contenders; Atlanta is a longshot.",
+      "probabilities": [
+        {
+          "market": "Atlanta",
+          "probability": 0.05
+        },
+        {
+          "market": "Boston",
+          "probability": 0.05
+        },
+        {
+          "market": "Brooklyn",
+          "probability": 0.05
+        },
+        {
+          "market": "Charlotte",
+          "probability": 0.05
+        },
+        {
+          "market": "Chicago",
+          "probability": 0.05
+        },
+        {
+          "market": "Cleveland",
+          "probability": 0.08
+        },
+        {
+          "market": "Dallas",
+          "probability": 0.05
+        },
+        {
+          "market": "Denver",
+          "probability": 0.06
+        },
+        {
+          "market": "Detroit",
+          "probability": 0.05
+        },
+        {
+          "market": "Golden State",
+          "probability": 0.05
+        },
+        {
+          "market": "Houston",
+          "probability": 0.08
+        },
+        {
+          "market": "Indiana",
+          "probability": 0.05
+        },
+        {
+          "market": "Los Angeles C",
+          "probability": 0.05
+        },
+        {
+          "market": "Los Angeles L",
+          "probability": 0.05
+        },
+        {
+          "market": "Memphis",
+          "probability": 0.05
+        },
+        {
+          "market": "Miami",
+          "probability": 0.05
+        },
+        {
+          "market": "Milwaukee",
+          "probability": 0.05
+        },
+        {
+          "market": "Minnesota",
+          "probability": 0.05
+        },
+        {
+          "market": "New Orleans",
+          "probability": 0.05
+        },
+        {
+          "market": "New York",
+          "probability": 0.06
+        },
+        {
+          "market": "Oklahoma City",
+          "probability": 0.25
+        },
+        {
+          "market": "Orlando",
+          "probability": 0.05
+        },
+        {
+          "market": "Philadelphia",
+          "probability": 0.05
+        },
+        {
+          "market": "Phoenix",
+          "probability": 0.05
+        },
+        {
+          "market": "Portland",
+          "probability": 0.05
+        },
+        {
+          "market": "Sacramento",
+          "probability": 0.05
+        },
+        {
+          "market": "San Antonio",
+          "probability": 0.05
+        },
+        {
+          "market": "Toronto",
+          "probability": 0.05
+        },
+        {
+          "market": "Utah",
+          "probability": 0.05
+        },
+        {
+          "market": "Washington",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/2026-nba-champion",
+        "https://www.nba.com/playoffs/2026/nba-finals",
+        "https://www.basketball-reference.com/playoffs/NBA_2026.html",
+        "https://sports.yahoo.com/articles/2026-nba-championship-odds-thunder-150100421.html",
+        "https://www.msn.com/en-us/sports/nba/the-2026-nba-finals-who-can-win-the-championship-and-why/ar-AA22S0EF"
+      ],
+      "_event": {
+        "event_ticker": "KXNBA-26",
+        "market_ticker": "KXNBA-26",
+        "title": "Who will win the 2026 NBA Finals?",
+        "category": "Sports",
+        "outcomes": [
+          "Atlanta",
+          "Boston",
+          "Brooklyn",
+          "Charlotte",
+          "Chicago",
+          "Cleveland",
+          "Dallas",
+          "Denver",
+          "Detroit",
+          "Golden State",
+          "Houston",
+          "Indiana",
+          "Los Angeles C",
+          "Los Angeles L",
+          "Memphis",
+          "Miami",
+          "Milwaukee",
+          "Minnesota",
+          "New Orleans",
+          "New York",
+          "Oklahoma City",
+          "Orlando",
+          "Philadelphia",
+          "Phoenix",
+          "Portland",
+          "Sacramento",
+          "San Antonio",
+          "Toronto",
+          "Utah",
+          "Washington"
+        ],
+        "description": "If Atlanta win the 2026 Pro Basketball Finals, then the market resolves to Yes.",
+        "rules": "If Atlanta win the 2026 Pro Basketball Finals, then the market resolves to Yes.",
+        "close_time": "2026-06-30T14:00:00Z"
+      }
+    },
+    {
+      "p_yes": 0.18,
+      "rationale": "McDavid remains top favorite with MacKinnon, Kaprizov, Draisaitl, Kucherov as main challengers; evidence is sparse on specific 2025-26 leaders.",
+      "probabilities": [
+        {
+          "market": "Connor McDavid",
+          "probability": 0.18
+        },
+        {
+          "market": "Nathan MacKinnon",
+          "probability": 0.11
+        },
+        {
+          "market": "Kirill Kaprizov",
+          "probability": 0.08
+        },
+        {
+          "market": "Leon Draisaitl",
+          "probability": 0.07
+        },
+        {
+          "market": "Nikita Kucherov",
+          "probability": 0.07
+        },
+        {
+          "market": "Auston Matthews",
+          "probability": 0.05
+        },
+        {
+          "market": "David Pastrnak",
+          "probability": 0.05
+        },
+        {
+          "market": "Jack Eichel",
+          "probability": 0.05
+        },
+        {
+          "market": "Connor Hellebuyck",
+          "probability": 0.05
+        },
+        {
+          "market": "Jack Hughes",
+          "probability": 0.05
+        },
+        {
+          "market": "Cale Makar",
+          "probability": 0.06
+        },
+        {
+          "market": "Mitch Marner",
+          "probability": 0.05
+        },
+        {
+          "market": "Quinn Hughes",
+          "probability": 0.05
+        },
+        {
+          "market": "Mikko Rantanen",
+          "probability": 0.05
+        },
+        {
+          "market": "Artemi Panarin",
+          "probability": 0.05
+        },
+        {
+          "market": "Igor Shesterkin",
+          "probability": 0.05
+        },
+        {
+          "market": "Kyle Connor",
+          "probability": 0.05
+        },
+        {
+          "market": "Matthew Tkachuk",
+          "probability": 0.05
+        },
+        {
+          "market": "William Nylander",
+          "probability": 0.05
+        },
+        {
+          "market": "Andrei Vasilevskiy",
+          "probability": 0.05
+        },
+        {
+          "market": "Brady Tkachuk",
+          "probability": 0.05
+        },
+        {
+          "market": "Connor Bedard",
+          "probability": 0.05
+        },
+        {
+          "market": "Dustin Wolf",
+          "probability": 0.05
+        },
+        {
+          "market": "Macklin Celebrini",
+          "probability": 0.05
+        },
+        {
+          "market": "Nick Suzuki",
+          "probability": 0.05
+        },
+        {
+          "market": "Adam Fox",
+          "probability": 0.05
+        },
+        {
+          "market": "Adrian Kempe",
+          "probability": 0.05
+        },
+        {
+          "market": "Alex Debrincat",
+          "probability": 0.05
+        },
+        {
+          "market": "Alex Ovechkin",
+          "probability": 0.05
+        },
+        {
+          "market": "Alexander Nikishin",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.nytimes.com/athletic/7213379/2026/04/21/nhl-awards-predictions-2026-hart-norris-calder/",
+        "https://www.nhl.com/news/vezina-trophy-finalists-for-best-goalie-for-2025-26-announced-by-nhl",
+        "https://sports.yahoo.com/articles/hart-trophy-finalists-announced-favorites-172205841.html",
+        "https://www.usatoday.com/story/sports/nhl/2026/05/08/hart-trophy-finalists-nhl-mvp/89986543007/",
+        "https://bleacherreport.com/articles/25407260-re-ranking-top-contenders-2026-hart-trophy-nhl-mvp"
+      ],
+      "_event": {
+        "event_ticker": "KXNHLHART-26",
+        "market_ticker": "KXNHLHART-26",
+        "title": "Who will win the 2025-26 NHL Hart Memorial Trophy (MVP)?",
+        "category": "Sports",
+        "outcomes": [
+          "Connor McDavid",
+          "Nathan MacKinnon",
+          "Kirill Kaprizov",
+          "Leon Draisaitl",
+          "Nikita Kucherov",
+          "Auston Matthews",
+          "David Pastrnak",
+          "Jack Eichel",
+          "Connor Hellebuyck",
+          "Jack Hughes",
+          "Cale Makar",
+          "Mitch Marner",
+          "Quinn Hughes",
+          "Mikko Rantanen",
+          "Artemi Panarin",
+          "Igor Shesterkin",
+          "Kyle Connor",
+          "Matthew Tkachuk",
+          "William Nylander",
+          "Andrei Vasilevskiy",
+          "Brady Tkachuk",
+          "Connor Bedard",
+          "Dustin Wolf",
+          "Macklin Celebrini",
+          "Nick Suzuki",
+          "Adam Fox",
+          "Adrian Kempe",
+          "Alex Debrincat",
+          "Alex Ovechkin",
+          "Alexander Nikishin"
+        ],
+        "description": "If Connor McDavid wins the NHL Hart Memorial Trophy in the 2025-26 NHL season, then the market resolves to Yes.",
+        "rules": "If Connor McDavid wins the NHL Hart Memorial Trophy in the 2025-26 NHL season, then the market resolves to Yes.",
+        "close_time": "2026-06-30T14:00:00Z"
+      }
+    }
+  ]
+}

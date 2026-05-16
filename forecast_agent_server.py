@@ -527,6 +527,275 @@ def predictions(_: None = Depends(_require_dashboard_auth)) -> dict[str, Any]:
     }
 
 
+# -- /compare --------------------------------------------------------------
+# Multi-model multi-event comparison page. Built 2026-05-16 to give the
+# evaluator/showcase view Rob asked for: "browse all these visually,
+# see how or what my model said or what different models said if they
+# took different routes in the pipeline, measure and view things."
+
+
+_ABLATION_FILES = {
+    # label -> filename (under data/predictions/)
+    "Opus 4.7 (production)": "multi_outcome_retrieval.json",
+    "Sonnet 4.6 (prev prod)": "multi_outcome_retrieval.phase1_sonnet.json",
+    "Opus 4.6": "ablation_claude-opus-4-6.json",
+    "GPT-5.2": "ablation_gpt-5-2.json",
+    "Gemini 3.1 Pro (post-harden)": "ablation_gemini-3-1-pro-preview-postharden.json",
+}
+
+
+def _load_compare_data() -> dict[str, Any]:
+    """Merge all ablation prediction files + resolved.json ground truth
+    into a per-event-per-model view."""
+    base = Path(__file__).resolve().parent
+    pred_dir = base / "data/predictions"
+
+    # Ground truth from resolved.json
+    resolved_path = base / "data/resolved.json"
+    if not resolved_path.exists():
+        return {"events": [], "models": list(_ABLATION_FILES.keys()), "summary": {}}
+    resolved = json.loads(resolved_path.read_text())
+    by_ticker: dict[str, dict[str, Any]] = {e["market_ticker"]: e for e in resolved}
+
+    # Per-model predictions (market_ticker -> p_yes + probabilities)
+    model_preds: dict[str, dict[str, dict[str, Any]]] = {}
+    for label, fname in _ABLATION_FILES.items():
+        p = pred_dir / fname
+        if not p.exists():
+            model_preds[label] = {}
+            continue
+        data = json.loads(p.read_text())
+        preds = data.get("predictions") if isinstance(data, dict) else data
+        if not isinstance(preds, list):
+            model_preds[label] = {}
+            continue
+        model_preds[label] = {x.get("market_ticker"): x for x in preds if x.get("market_ticker")}
+
+    # Build per-event rows
+    rows = []
+    summary_briers: dict[str, list[float]] = {label: [] for label in _ABLATION_FILES}
+    for ticker, ev in by_ticker.items():
+        outs = ev.get("outcomes") or []
+        ro = ev.get("resolved_outcome") or {}
+        winner_list = ro.get("value") if isinstance(ro, dict) else None
+        winner = winner_list[0] if winner_list else None
+        if not outs or winner not in outs:
+            continue
+        winner_idx = outs.index(winner)
+        actual_binary = 1 if winner_idx == 0 else 0
+
+        per_model: dict[str, Any] = {}
+        for label in _ABLATION_FILES:
+            pr = model_preds.get(label, {}).get(ticker)
+            if not pr:
+                per_model[label] = {"p_yes": None, "brier": None, "rationale": "", "probs": []}
+                continue
+            p_yes = pr.get("p_yes")
+            probs = pr.get("probabilities") or []
+            if len(outs) == 2 and p_yes is not None:
+                b = (p_yes - actual_binary) ** 2
+            elif probs:
+                # multi-outcome Brier
+                prob_map = {p.get("market"): p.get("probability", 0.0) for p in probs}
+                b = sum(
+                    (prob_map.get(o, 1.0 / len(outs)) - (1.0 if i == winner_idx else 0.0)) ** 2
+                    for i, o in enumerate(outs)
+                )
+            else:
+                b = None
+            per_model[label] = {
+                "p_yes": p_yes, "brier": b,
+                "rationale": (pr.get("rationale") or "")[:240],
+                "probs": probs,
+            }
+            if b is not None:
+                summary_briers[label].append(b)
+
+        rows.append({
+            "ticker": ticker,
+            "title": ev.get("title", ""),
+            "category": ev.get("category", "?"),
+            "n_outcomes": len(outs),
+            "winner": winner,
+            "outcomes": outs,
+            "models": per_model,
+        })
+
+    # Sort by max delta between models to show interesting events first
+    def _delta(r: dict) -> float:
+        bs = [m["brier"] for m in r["models"].values() if m["brier"] is not None]
+        return (max(bs) - min(bs)) if len(bs) >= 2 else 0.0
+    rows.sort(key=_delta, reverse=True)
+
+    summary = {
+        label: {
+            "mean_brier": (sum(bs) / len(bs)) if bs else None,
+            "n": len(bs),
+        }
+        for label, bs in summary_briers.items()
+    }
+    return {"events": rows, "models": list(_ABLATION_FILES.keys()), "summary": summary}
+
+
+def _brier_color(b: float | None) -> str:
+    """Map a Brier value to a CSS color (green=good, red=bad)."""
+    if b is None:
+        return "#e5e7eb"
+    # Brier on binary is in [0, 1]; multi-outcome can exceed 1.
+    # Bin: <0.05 deep green, <0.10 green, <0.25 yellow, <0.50 orange, else red.
+    if b < 0.05: return "#86efac"  # green-300
+    if b < 0.10: return "#bef264"  # lime-300
+    if b < 0.25: return "#fde68a"  # amber-200
+    if b < 0.50: return "#fdba74"  # orange-300
+    return "#fca5a5"  # red-300
+
+
+@app.get("/compare", response_class=HTMLResponse)
+def compare(
+    request: Request,
+    _: None = Depends(_require_dashboard_auth),
+) -> HTMLResponse:
+    """Multi-model multi-event comparison grid for the resolved backtest set."""
+    data = _load_compare_data()
+    models = data["models"]
+    events = data["events"]
+    summary = data["summary"]
+
+    # Summary header
+    summary_cells = []
+    for label in models:
+        s = summary.get(label, {})
+        mb = s.get("mean_brier")
+        mb_str = f"{mb:.4f}" if mb is not None else "—"
+        color = _brier_color(mb)
+        summary_cells.append(
+            f"<div class='sum-cell' style='border-left:6px solid {color}'>"
+            f"<div class='sum-label'>{html_escape(label)}</div>"
+            f"<div class='sum-brier'>{mb_str}</div>"
+            f"<div class='sum-n'>n={s.get('n', 0)} resolved</div></div>"
+        )
+
+    # Per-event rows
+    header_cells = "".join(f"<th>{html_escape(m)}</th>" for m in models)
+    body_rows = []
+    for r in events:
+        cells = []
+        cells.append(f"<td class='cat-cell'>{html_escape(r['category'])}</td>")
+        cells.append(
+            f"<td class='title-cell'><strong>{html_escape(r['title'][:90])}</strong>"
+            f"<div class='muted small'>n={r['n_outcomes']} winner: {html_escape(r['winner'][:40])}</div></td>"
+        )
+        for label in models:
+            m = r["models"][label]
+            b = m["brier"]
+            color = _brier_color(b)
+            p_yes = m["p_yes"]
+            p_str = f"{p_yes:.2f}" if p_yes is not None else "—"
+            b_str = f"{b:.3f}" if b is not None else "—"
+            tooltip = html_escape((m.get("rationale") or "")[:200])
+            cells.append(
+                f"<td class='b-cell' style='background:{color}' title='{tooltip}'>"
+                f"<div class='b-prob'>p={p_str}</div>"
+                f"<div class='b-brier'>brier {b_str}</div></td>"
+            )
+        body_rows.append(f"<tr>{''.join(cells)}</tr>")
+
+    rows_html = "\n".join(body_rows)
+    n_events = len(events)
+    summary_html = "\n".join(summary_cells)
+
+    html = f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForecastingPath · Model comparison</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<style>
+  :root {{
+    --bg: #f7f8fb; --panel: #ffffff; --border: #d8dde6;
+    --text: #111827; --muted: #5b6472; --accent: #1d4ed8;
+  }}
+  * {{ box-sizing: border-box; }}
+  body {{ margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.45 -apple-system, "Segoe UI", system-ui, sans-serif; }}
+  .page {{ max-width: 1400px; margin: 0 auto; padding: 1.5em 1em 3em; }}
+  h1 {{ margin: 0 0 0.4em; font-size: 1.7rem; }}
+  .meta {{ color: var(--muted); font-size: 0.92em; }}
+  .summary-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                   gap: 0.8em; margin: 1.2em 0; }}
+  .sum-cell {{ background: var(--panel); border: 1px solid var(--border);
+               border-radius: 8px; padding: 0.9em 1em; }}
+  .sum-label {{ font-size: 0.84em; color: var(--muted); font-weight: 700;
+                text-transform: uppercase; letter-spacing: 0.04em; }}
+  .sum-brier {{ font-size: 1.6em; font-weight: 700; margin: 0.1em 0; }}
+  .sum-n {{ font-size: 0.82em; color: var(--muted); }}
+  table {{ width: 100%; border-collapse: separate; border-spacing: 0;
+           background: var(--panel); border: 1px solid var(--border);
+           border-radius: 8px; overflow: hidden; }}
+  th, td {{ padding: 0.55em 0.7em; text-align: left;
+            border-bottom: 1px solid var(--border); vertical-align: top; }}
+  thead th {{ background: #f1f3f7; position: sticky; top: 0; z-index: 2;
+              font-weight: 700; font-size: 0.84em; text-transform: uppercase;
+              letter-spacing: 0.04em; color: var(--muted); }}
+  .title-cell {{ min-width: 260px; max-width: 360px; }}
+  .cat-cell {{ font-weight: 700; color: var(--accent); white-space: nowrap; }}
+  .b-cell {{ text-align: center; min-width: 90px; }}
+  .b-prob {{ font-weight: 700; font-size: 1.02em; }}
+  .b-brier {{ font-size: 0.78em; color: #374151; opacity: 0.85; }}
+  .muted {{ color: var(--muted); }}
+  .small {{ font-size: 0.84em; }}
+  .legend {{ display: flex; flex-wrap: wrap; gap: 0.6em; margin: 0.7em 0; font-size: 0.85em; }}
+  .legend-item {{ display: inline-flex; align-items: center; gap: 0.35em; }}
+  .legend-swatch {{ width: 14px; height: 14px; border-radius: 3px; border: 1px solid #cbd5e1; }}
+  a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
+  a:hover {{ text-decoration: underline; }}
+</style>
+</head><body>
+<div class="page">
+
+<h1>Model comparison — 26-event sample-resolved set</h1>
+<p class="meta">
+Same pipeline (Brave retrieval + market-anchor prompt + 0.10 longshot floor), five different LLMs.
+Each cell shows <code>p</code> = probability assigned to <em>outcome[0]</em> and <code>brier</code> = Brier loss for the resolved outcome.
+Hover any cell for the model's rationale on that event.
+Rows sorted by inter-model spread — most contested events first.
+Lower Brier = better. Random binary baseline = 0.25, uniform-prior baseline = 0.22.
+</p>
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch" style="background:#86efac"></span> &lt; 0.05 (excellent)</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#bef264"></span> &lt; 0.10</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#fde68a"></span> &lt; 0.25</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#fdba74"></span> &lt; 0.50</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#fca5a5"></span> ≥ 0.50 (catastrophic)</span>
+</div>
+
+<div class="summary-grid">
+{summary_html}
+</div>
+
+<p class="meta">{n_events} events × {len(models)} models = {n_events * len(models)} predictions in the grid below. Tooltips show rationale.</p>
+
+<table>
+<thead><tr><th>Category</th><th>Event (outcomes; resolved winner)</th>{header_cells}</tr></thead>
+<tbody>
+{rows_html}
+</tbody>
+</table>
+
+<p class="meta" style="margin-top:1.4em">
+Source files in <code>data/predictions/ablation_*.json</code> + <code>data/predictions/multi_outcome_retrieval{{.phase1_sonnet,}}.json</code>.
+Ground truth in <code>data/resolved.json</code>. Full methodology + per-decision postmortem in <code>docs/DECISIONS.md</code>.
+<a href="/dashboard">← back to live dashboard</a>
+</p>
+
+</div>
+</body></html>"""
+    response = HTMLResponse(html)
+    _set_dashboard_cookie_if_needed(response, request)
+    return response
+
+
 def _fetch_remote_state() -> dict[str, Any]:
     """Pull endpoint + leaderboard state from Prophet Arena. Best-effort."""
     api_key = os.environ.get("PA_SERVER_API_KEY", "")
@@ -1092,6 +1361,7 @@ def dashboard(
 
 <h2>Quick links</h2>
 <ul>
+<li><strong><a href="/compare">/compare</a></strong> — multi-model multi-event comparison grid (26 resolved + 5 models, color-coded by Brier)</li>
 <li><code><a href="/healthz">/healthz</a></code> — server health JSON</li>
 <li><code><a href="/predict">/predict</a></code> — the actual endpoint (POST)</li>
 <li><code><a href="/predictions">/predictions</a></code> — last 50 predictions JSON</li>

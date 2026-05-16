@@ -1207,23 +1207,38 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
             "evidence_urls": [<str>, ...],
         }
     """
+    import time as _time  # local import to keep module import surface stable
+    t_start = _time.time()
+    trace: dict = {
+        "brave_query": None,
+        "brave_n_results": 0,
+        "chunks": [],
+        "forecast_model": None,
+        "raw_llm_text": None,
+        "parse_path": None,
+        "fuzzy_matches": [],
+        "outcomes_inferred": False,
+        "longshot_guard_applied": False,
+        "latency_ms": {},
+        "warnings": [],
+    }
+
     # Safety net: PA's /predict webhook *may* send events without outcomes.
-    # If we got here with outcomes already present, this is a no-op.
-    # If not, infer them (binary heuristic, then Haiku fallback). Anything
-    # is better than returning probabilities=[] which scores worst-case.
     outcomes_inferred = not bool(event.get("outcomes"))
+    trace["outcomes_inferred"] = outcomes_inferred
     outs = _infer_outcomes_when_missing(event)
     n = len(outs)
     if n == 0:
+        trace["warnings"].append("no outcomes and no title to infer from")
+        trace["latency_ms"]["total"] = int((_time.time() - t_start) * 1000)
         return {
             "p_yes": 0.5,
             "rationale": "no outcomes and no title to infer from",
             "probabilities": [],
             "evidence_urls": [],
+            "_trace": trace,
         }
     if outcomes_inferred:
-        # Splice inferred outcomes back onto the event so downstream prompt
-        # builders (which read event.get("outcomes")) see them.
         event = {**event, "outcomes": outs}
 
     # ---- 1-3. Retrieve evidence (degrade gracefully). ----
@@ -1232,38 +1247,51 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
             "BRAVE_SEARCH_API_KEY missing; %s falling back to predict_multi_outcome",
             event.get("market_ticker", "?"),
         )
+        trace["warnings"].append("BRAVE_SEARCH_API_KEY missing; fell through to predict_multi_outcome")
         base = predict_multi_outcome(event)
         guarded = apply_longshot_guard(base.get("probabilities", []), n)
+        trace["longshot_guard_applied"] = True
+        trace["latency_ms"]["total"] = int((_time.time() - t_start) * 1000)
         return {
             "p_yes": guarded[0]["probability"] if guarded else 0.5,
             "rationale": base.get("rationale", "")[:300],
             "probabilities": guarded,
             "evidence_urls": [],
+            "_trace": trace,
         }
 
     chunks: list[dict] = []
     query = _build_query(event)
+    trace["brave_query"] = query
+    t_brave = _time.time()
     try:
         raw = _brave_search(query, count=5)
         chunks = _dedupe_by_domain(raw)
+        trace["brave_n_results"] = len(raw) if raw else 0
     except RuntimeError as e:
         log.warning(
             "Brave search failed for %s: %s -- continuing without evidence",
             event.get("market_ticker", "?"), e,
         )
+        trace["warnings"].append(f"brave search failed: {str(e)[:120]}")
         chunks = []
-
+    trace["latency_ms"]["brave"] = int((_time.time() - t_brave) * 1000)
+    trace["chunks"] = [
+        {
+            "title": (c.get("title") or "")[:140],
+            "snippet": (c.get("snippet") or "")[:200],
+            "url": c.get("url") or "",
+            "host": (c.get("url") or "").split("/")[2] if "://" in (c.get("url") or "") else "",
+        }
+        for c in chunks[:5]
+    ]
     evidence_urls = [c["url"] for c in chunks if c.get("url")]
 
     # ---- 4. Multi-outcome LLM call with evidence-enriched prompt. ----
-    # Opus 4.7 is our forecast model here -- the leaderboard's "Default
-    # Harness" track is led by Anthropic Agent Opus 4.6 (0.9438 BSS) and
-    # 4.7 is the newer model. For ~5x cost (~$0.10/call vs Sonnet's $0.02)
-    # we get a model that anchors to cited market odds materially better,
-    # which directly attacks the over-estimation pattern smoke-tested
-    # 2026-05-16 on the Chiefs/SB-LXI event.
     user = _build_retrieval_user_prompt(event, chunks)
     forecast_model = _OPUS_MODEL
+    trace["forecast_model"] = forecast_model
+    t_llm = _time.time()
     try:
         resp = _aclient().messages.create(
             model=forecast_model,
@@ -1272,27 +1300,29 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
             messages=[{"role": "user", "content": user}],
         )
         text = resp.content[0].text if resp.content else ""
+        trace["raw_llm_text"] = text[:1500]
         parsed = _parse_multi_outcome_json(text)
+        trace["parse_path"] = parsed.get("_parse_path") or "direct"
         raw_probs = parsed.get("probabilities") or {}
         if not isinstance(raw_probs, dict):
             raise ValueError(
                 f"probabilities not a dict: {type(raw_probs).__name__}",
             )
-        # Build a normalized lookup of model-emitted probabilities so that
-        # slightly off keys (case, whitespace, punctuation) still match.
-        # 2026-05-16 multi-vendor ablation showed Opus 4.6 / GPT-5.2 /
-        # Gemini all hit this failure mode on multi-outcome events;
-        # fuzzy matching keeps us functional when Opus 4.7 has a bad day.
         prior = 1.0 / n
         resolved_probs: dict[str, float] = {}
         for raw_key, raw_val in raw_probs.items():
             canonical = _match_outcome_label(str(raw_key), outs)
-            if canonical is None or canonical in resolved_probs:
+            if canonical is None:
+                trace["fuzzy_matches"].append({"raw": str(raw_key)[:60], "matched": None})
                 continue
+            if canonical in resolved_probs:
+                continue
+            if canonical != str(raw_key):
+                trace["fuzzy_matches"].append({"raw": str(raw_key)[:60], "matched": canonical[:60]})
             try:
                 resolved_probs[canonical] = _clamp(float(raw_val))
             except (TypeError, ValueError):
-                pass
+                trace["warnings"].append(f"non-numeric probability for {canonical[:30]!r}: {raw_val!r}")
         prob_list: list[dict] = []
         for o in outs:
             p = resolved_probs.get(o, prior)
@@ -1303,15 +1333,20 @@ def predict_multi_outcome_retrieval(event: dict) -> dict:
             "multi_outcome_retrieval LLM call failed for %s: %s; uniform fallback",
             event.get("market_ticker", "?"), e,
         )
+        trace["warnings"].append(f"llm call failed: {str(e)[:160]}")
         prior = 1.0 / n
         prob_list = [{"market": o, "probability": prior} for o in outs]
         rationale = f"llm error: {e}"
+    trace["latency_ms"]["llm"] = int((_time.time() - t_llm) * 1000)
 
     # ---- 5. Apply Kalshi longshot guard (always). ----
     guarded = apply_longshot_guard(prob_list, n)
+    trace["longshot_guard_applied"] = True
+    trace["latency_ms"]["total"] = int((_time.time() - t_start) * 1000)
     return {
         "p_yes": guarded[0]["probability"] if guarded else 0.5,
         "rationale": rationale,
+        "_trace": trace,
         "probabilities": guarded,
         "evidence_urls": evidence_urls,
     }

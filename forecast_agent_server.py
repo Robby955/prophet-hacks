@@ -668,6 +668,10 @@ def predict(event: EventRequest) -> PredictionResponse:
     evidence_urls = result.get("evidence_urls") or []
     if not isinstance(evidence_urls, list):
         evidence_urls = []
+    # Pipeline trace from the variant. Stored in /predictions for inspection
+    # but explicitly NOT returned to Prophet Arena (their schema is just
+    # `probabilities`). Surfaced on /dashboard for debugging.
+    trace = result.get("_trace") if isinstance(result.get("_trace"), dict) else None
     _PREDICTION_HISTORY.appendleft({
         "ts": datetime.now(timezone.utc).isoformat(),
         "market_ticker": event.market_ticker,
@@ -678,6 +682,7 @@ def predict(event: EventRequest) -> PredictionResponse:
         "probabilities": probs,
         "rationale": rationale,
         "evidence_urls": evidence_urls[:8],
+        "trace": trace,
     })
     # Live KPIs for the dashboard.
     global _TOTAL_PREDICTIONS, _TOTAL_COST_USD, _PPM_CURRENT_MINUTE, _PPM_CURRENT_COUNT

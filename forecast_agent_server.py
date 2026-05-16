@@ -641,153 +641,187 @@ def dashboard() -> str:
         for k, v in sorted(cat_counts.items(), key=lambda x: -x[1])
     ) or "<span class='muted small'>none yet</span>"
 
+    waiting_banner = ""
+    if last_run == "—":
+        waiting_banner = (
+            "<div class='banner waiting'>"
+            "<strong>Waiting for first call.</strong> Prophet Arena has not yet "
+            "sent us any events. When they do, predictions will appear below in "
+            "real time."
+            "</div>"
+        )
+
     return f"""<!doctype html>
-<html><head>
+<html lang="en"><head>
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="30">
-<title>The Oracles — dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Oracles · live dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {{delimiters: [
+    {{left: '$$', right: '$$', display: true}},
+    {{left: '$', right: '$', display: false}}
+  ]}});"></script>
 <style>
   :root {{
-    --bg: #0b1020;
-    --panel: #131a30;
-    --panel-2: #1a2240;
-    --border: #25304d;
-    --text: #e8edf5;
-    --muted: #8694b3;
-    --accent: #6366f1;
-    --accent-2: #38bdf8;
-    --ok: #10b981;
-    --bad: #ef4444;
-    --warn: #f59e0b;
+    --bg: #f7f8fb;
+    --panel: #ffffff;
+    --panel-2: #f1f3f7;
+    --border: #d8dde6;
+    --text: #111827;
+    --text-2: #374151;
+    --muted: #6b7280;
+    --accent: #1d4ed8;
+    --accent-soft: #dbeafe;
+    --ok: #047857;
+    --ok-soft: #d1fae5;
+    --bad: #b91c1c;
+    --bad-soft: #fee2e2;
+    --warn: #b45309;
+    --warn-soft: #fef3c7;
   }}
   * {{ box-sizing: border-box; }}
-  body {{ font: 13px/1.5 -apple-system, system-ui, sans-serif;
-         max-width: 1200px; margin: 1.5em auto; padding: 0 1em;
+  html, body {{ margin: 0; padding: 0; }}
+  body {{ font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif;
          color: var(--text); background: var(--bg); }}
-  a {{ color: var(--accent-2); text-decoration: none; }}
+  .page {{ max-width: 1080px; margin: 0 auto; padding: 1.5em 1.4em 4em; }}
+  a {{ color: var(--accent); text-decoration: none; }}
   a:hover {{ text-decoration: underline; }}
-  h1 {{ font-size: 1.5em; margin: 0 0 0.1em; letter-spacing: -0.01em; }}
-  h2 {{ margin-top: 1.6em; font-size: 1.05em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; color: var(--text); }}
-  .meta {{ color: var(--muted); font-size: 0.85em; }}
-  .muted {{ color: var(--muted); }}
-  .small {{ font-size: 0.85em; }}
-  code {{ background: var(--panel-2); padding: 1px 6px; border-radius: 3px; font-size: 0.92em; color: var(--accent-2); }}
-  table {{ border-collapse: collapse; width: 100%; margin: 0.4em 0; font-size: 12px; }}
-  th, td {{ text-align: left; padding: 0.45em 0.6em; border-bottom: 1px solid var(--border); vertical-align: top; }}
-  th {{ background: var(--panel); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }}
+  h1 {{ font-size: 1.7em; margin: 0 0 0.15em; font-weight: 700; letter-spacing: -0.01em; }}
+  h2 {{ font-size: 1.15em; margin: 2em 0 0.6em; font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 0.3em; }}
+  p, li, td {{ font-size: 1em; line-height: 1.55; color: var(--text-2); }}
+  .meta {{ color: var(--muted); font-size: 0.92em; }}
+  .small {{ font-size: 0.92em; }}
+  code {{ background: var(--panel-2); padding: 1px 6px; border-radius: 4px; font-size: 0.95em; color: var(--text); }}
+
+  .topline {{ display: flex; flex-wrap: wrap; gap: 0.6em 1.2em; align-items: center; margin-bottom: 0.5em; color: var(--muted); }}
+  .topline strong {{ color: var(--text); }}
+  .live-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--ok); margin-right: 6px; animation: pulse 2s infinite; }}
+  .live-dot.warn {{ background: var(--warn); }}
+  @keyframes pulse {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.45; }} }}
+
+  .banner {{ padding: 1em 1.2em; border-radius: 8px; margin: 1em 0; border: 1px solid var(--border); font-size: 1.02em; }}
+  .banner.waiting {{ background: var(--warn-soft); border-color: #fcd34d; color: #78350f; }}
+  .banner.active {{ background: var(--ok-soft); border-color: #6ee7b7; color: #064e3b; }}
+
+  .kpis {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8em; margin: 1.2em 0; }}
+  @media (max-width: 720px) {{ .kpis {{ grid-template-columns: repeat(2, 1fr); }} }}
+  .kpi {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.9em 1em; }}
+  .kpi .label {{ font-size: 0.78em; text-transform: uppercase; color: var(--muted); letter-spacing: 0.06em; font-weight: 600; }}
+  .kpi .value {{ font-size: 1.55em; font-weight: 700; margin-top: 0.25em; font-variant-numeric: tabular-nums; color: var(--text); }}
+  .kpi .sub {{ font-size: 0.88em; color: var(--muted); margin-top: 0.15em; }}
+
+  .pill {{ display: inline-block; padding: 3px 10px; border-radius: 11px; font-size: 0.82em; font-weight: 700; }}
+  .pill.ok {{ background: var(--ok-soft); color: var(--ok); }}
+  .pill.bad {{ background: var(--bad-soft); color: var(--bad); }}
+  .pill.warn {{ background: var(--warn-soft); color: var(--warn); }}
+  .cat-pill {{ display: inline-block; padding: 1px 8px; border-radius: 9px; font-size: 0.82em; font-weight: 600;
+               background: var(--accent-soft); color: var(--accent); }}
+
+  table {{ border-collapse: collapse; width: 100%; margin: 0.4em 0 1em; font-size: 0.97em; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }}
+  th, td {{ text-align: left; padding: 0.65em 0.85em; border-bottom: 1px solid var(--border); vertical-align: top; }}
+  th {{ background: var(--panel-2); font-weight: 700; font-size: 0.85em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }}
+  tr:last-child td {{ border-bottom: 0; }}
   td.num {{ text-align: right; font-variant-numeric: tabular-nums; }}
-  tr.row-self {{ background: rgba(99, 102, 241, 0.15); }}
-  .pill {{ display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.75em; font-weight: 700; letter-spacing: 0.04em; }}
-  .pill.ok {{ background: rgba(16, 185, 129, 0.18); color: var(--ok); }}
-  .pill.bad {{ background: rgba(239, 68, 68, 0.18); color: var(--bad); }}
-  .cat-pill {{ display: inline-block; padding: 1px 7px; border-radius: 9px; font-size: 0.72em; font-weight: 600;
-               background: rgba(99, 102, 241, 0.16); color: #c7d2fe; }}
-  pre {{ background: var(--panel); padding: 0.8em; border-radius: 6px; overflow: auto; font-size: 11px; border: 1px solid var(--border); color: var(--text); }}
+  tr.row-self {{ background: var(--accent-soft); font-weight: 600; }}
 
-  .summary {{ display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.6em; margin: 0.8em 0 1.2em; }}
-  .summary > div {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.7em 0.9em; }}
-  .summary .label {{ font-size: 9px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; }}
-  .summary .value {{ font-size: 1.25em; font-weight: 700; margin-top: 0.2em; font-variant-numeric: tabular-nums; }}
+  .card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; margin-bottom: 0.7em; }}
+  .card h3 {{ margin: 0 0 0.5em; font-size: 1em; font-weight: 700; }}
+  .card p {{ margin: 0.4em 0; }}
 
-  .variant-card {{ background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
-                    border: 1px solid var(--border); border-radius: 10px; padding: 1em 1.2em; margin: 0.5em 0 1.2em; }}
-  .variant-card h3 {{ font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 0.5em; }}
-  .variant-card .name {{ font-size: 1.15em; font-weight: 700; color: var(--accent-2); margin-bottom: 0.3em; }}
-  .variant-card .desc {{ color: var(--text); font-size: 0.95em; line-height: 1.5; }}
+  .pipeline {{ display: flex; flex-wrap: wrap; gap: 0.4em 0.5em; align-items: center; margin-top: 0.6em; }}
+  .pipeline span.step {{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 0.9em; }}
+  .pipeline span.arrow {{ color: var(--muted); font-weight: 700; }}
 
-  .pred-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 0.7em; }}
-  .pred-card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.7em 0.9em; }}
-  .pred-head {{ display: flex; gap: 0.5em; align-items: center; font-size: 0.78em; color: var(--muted); margin-bottom: 0.4em; }}
+  .pred-list {{ display: grid; grid-template-columns: 1fr; gap: 0.8em; }}
+  @media (min-width: 800px) {{ .pred-list {{ grid-template-columns: 1fr 1fr; }} }}
+  .pred-card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.95em 1.1em; }}
+  .pred-head {{ display: flex; gap: 0.6em; align-items: baseline; font-size: 0.88em; color: var(--muted); margin-bottom: 0.5em; }}
   .pred-ts {{ font-variant-numeric: tabular-nums; }}
-  .pred-ticker {{ font-size: 0.85em; margin-left: auto; }}
-  .pred-title {{ font-weight: 600; color: var(--text); margin-bottom: 0.5em; font-size: 0.95em; line-height: 1.35; }}
-  .pred-bars {{ margin: 0.4em 0; }}
-  .prob-row {{ display: grid; grid-template-columns: minmax(80px, 1fr) 3fr 36px; gap: 0.5em; align-items: center; margin: 0.2em 0; font-size: 0.85em; }}
-  .prob-label {{ color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
-  .prob-bar {{ background: var(--panel-2); height: 14px; border-radius: 7px; overflow: hidden; }}
-  .prob-fill {{ display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }}
-  .prob-val {{ font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 600; }}
-  .pred-rationale {{ color: var(--muted); font-size: 0.82em; line-height: 1.4; margin-top: 0.4em; padding-top: 0.4em; border-top: 1px dashed var(--border); }}
-  .evidence {{ font-size: 0.78em; color: var(--muted); margin-top: 0.4em; }}
-  .empty {{ text-align: center; color: var(--muted); padding: 2em; background: var(--panel); border-radius: 8px; border: 1px dashed var(--border); }}
+  .pred-ticker {{ margin-left: auto; font-size: 0.85em; }}
+  .pred-title {{ font-weight: 600; color: var(--text); font-size: 1.02em; line-height: 1.4; margin-bottom: 0.6em; }}
+  .prob-row {{ display: grid; grid-template-columns: minmax(100px, 1.3fr) 3fr 50px; gap: 0.6em; align-items: center; margin: 0.35em 0; font-size: 0.95em; }}
+  .prob-label {{ color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }}
+  .prob-bar {{ background: var(--panel-2); height: 18px; border-radius: 9px; overflow: hidden; border: 1px solid var(--border); }}
+  .prob-fill {{ display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #3b82f6); }}
+  .prob-val {{ font-variant-numeric: tabular-nums; text-align: right; color: var(--text); font-weight: 700; }}
+  .pred-rationale {{ color: var(--text-2); font-size: 0.93em; line-height: 1.5; margin-top: 0.6em; padding-top: 0.6em; border-top: 1px solid var(--border); }}
+  .evidence {{ font-size: 0.88em; color: var(--muted); margin-top: 0.5em; }}
+  .evidence a {{ margin-right: 0.6em; }}
+  .empty {{ text-align: center; color: var(--muted); padding: 2em; background: var(--panel); border-radius: 8px; border: 1px dashed var(--border); font-size: 1em; }}
 
   form.try {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; }}
-  form.try label {{ display: block; font-size: 0.85em; color: var(--muted); margin: 0.6em 0 0.25em; }}
-  form.try input, form.try textarea {{ width: 100%; background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 5px; padding: 0.45em 0.6em; font: inherit; }}
-  form.try textarea {{ min-height: 60px; }}
-  form.try button {{ background: var(--accent); color: white; border: 0; padding: 0.6em 1.2em; border-radius: 5px; font: inherit; font-weight: 600; margin-top: 0.8em; cursor: pointer; }}
-  form.try button:hover {{ background: #4f46e5; }}
-  #try-result {{ background: var(--panel-2); padding: 0.8em; border-radius: 6px; margin-top: 1em; font-family: ui-monospace, monospace; font-size: 11px; white-space: pre-wrap; word-break: break-all; }}
+  form.try label {{ display: block; font-size: 0.9em; color: var(--muted); margin: 0.8em 0 0.3em; font-weight: 600; }}
+  form.try input {{ width: 100%; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 0.55em 0.7em; font: inherit; }}
+  form.try input:focus {{ outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }}
+  form.try button {{ background: var(--accent); color: white; border: 0; padding: 0.7em 1.4em; border-radius: 6px; font: inherit; font-weight: 700; margin-top: 1em; cursor: pointer; font-size: 1em; }}
+  form.try button:hover {{ background: #1e40af; }}
+  #try-result {{ background: var(--panel-2); padding: 0.9em; border-radius: 6px; margin-top: 1em; font-family: ui-monospace, "SF Mono", monospace; font-size: 0.85em; white-space: pre-wrap; word-break: break-all; line-height: 1.4; color: var(--text-2); border: 1px solid var(--border); }}
 
-  @keyframes flash {{ 0% {{ background: rgba(56, 189, 248, 0.25); }} 100% {{ background: var(--panel); }} }}
-  .pred-card.fresh {{ animation: flash 1.6s ease-out; }}
-  .cat-chip {{ display: inline-block; background: var(--panel-2); border: 1px solid var(--border); padding: 3px 9px; border-radius: 12px; margin: 2px 4px 2px 0; font-size: 0.78em; }}
-  .cat-chip strong {{ color: var(--accent-2); font-weight: 600; }}
-  .arch-card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 1em 1.2em; }}
-  .arch-flow {{ display: flex; flex-wrap: wrap; gap: 0.4em; align-items: center; font-size: 0.85em; margin-top: 0.5em; }}
-  .arch-step {{ background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 4px 9px; }}
-  .arch-arrow {{ color: var(--muted); }}
-  .live-pill {{ display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 0.72em; font-weight: 700;
-                background: rgba(239, 68, 68, 0.18); color: #fca5a5; animation: pulse 2s infinite; }}
-  @keyframes pulse {{ 0%, 100% {{ opacity: 1; }} 50% {{ opacity: 0.55; }} }}
-  .grid-2 {{ display: grid; grid-template-columns: 1fr 1fr; gap: 1em; align-items: start; }}
+  @keyframes flash {{ 0% {{ background: var(--ok-soft); }} 100% {{ background: var(--panel); }} }}
+  .pred-card.fresh {{ animation: flash 1.8s ease-out; }}
+
+  .math-box {{ background: var(--panel-2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; padding: 0.7em 1.1em; margin: 0.6em 0; font-size: 0.97em; }}
+  .math-box .label {{ font-size: 0.85em; color: var(--muted); font-weight: 600; margin-bottom: 0.4em; }}
 </style>
 </head><body>
+<div class="page">
 
-<h1>🔮 The Oracles — live dashboard <span class="live-pill" id="live-indicator">SSE LIVE</span></h1>
-<p class="meta">team <strong>CanadaHacks</strong> · variant: <code>{html_escape(_VARIANT_NAME)}</code> · uptime <strong>{_uptime_human()}</strong> · auto-refresh 30s · streaming via <code>/events</code> ·
-<a href="/docs">/docs</a> · <a href="/predictions">/predictions</a> · <a href="/healthz">/healthz</a></p>
-
-<div class="summary">
-  <div><div class="label">endpoint</div><div class="value">{endpoint_pill}</div></div>
-  <div><div class="label">preds served</div><div class="value">{_TOTAL_PREDICTIONS}</div></div>
-  <div><div class="label">api spend</div><div class="value">${_TOTAL_COST_USD:.3f}</div></div>
-  <div><div class="label">avg p_yes ± 0.5</div><div class="value">{avg_p_dev:.2f}</div></div>
-  <div><div class="label">last call</div><div class="value small">{html_escape(last_run[:19]) if last_run != '—' else '—'}</div></div>
-  <div><div class="label">last status</div><div class="value">{html_escape(str(last_status))}</div></div>
+<h1>The Oracles</h1>
+<div class="topline">
+  <span><span class="live-dot" id="live-dot"></span><strong id="live-status">Live</strong></span>
+  <span>team: <strong>CanadaHacks</strong></span>
+  <span>variant: <strong>{html_escape(_VARIANT_NAME)}</strong></span>
+  <span>uptime: <strong>{_uptime_human()}</strong></span>
+  <span><a href="/docs">API docs</a></span>
+  <span><a href="https://prophetarena.co/leaderboard/forecast">Leaderboard</a></span>
+  <span><a href="https://github.com/Robby955/prophet-hacks">GitHub</a></span>
 </div>
 
-<div class="grid-2">
-  <div class="variant-card">
-    <h3>Variant in production</h3>
-    <div class="name">{html_escape(_VARIANT_NAME)}</div>
-    <div class="desc">{html_escape(variant_desc)}</div>
-    <div class="meta" style="margin-top:0.6em">cost ~${cost_per_event:.4f}/event · longshot guard floor: 0.05 or 0.5/n_outcomes (whichever is greater) · Kalshi paper compliance</div>
-  </div>
-  <div class="arch-card">
-    <h3 style="font-size:0.85em;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 0.5em">Architecture (multi_outcome_retrieval)</h3>
-    <div class="arch-flow">
-      <span class="arch-step">event JSON</span><span class="arch-arrow">→</span>
-      <span class="arch-step">Brave Search (top 5)</span><span class="arch-arrow">→</span>
-      <span class="arch-step">dedupe by domain priority</span><span class="arch-arrow">→</span>
-      <span class="arch-step">enriched multi-outcome prompt</span><span class="arch-arrow">→</span>
-      <span class="arch-step">Sonnet 4.6</span><span class="arch-arrow">→</span>
-      <span class="arch-step">per-outcome probs</span><span class="arch-arrow">→</span>
-      <span class="arch-step">Kalshi longshot guard</span><span class="arch-arrow">→</span>
-      <span class="arch-step">{{"probabilities": [...]}}</span>
-    </div>
-    <div class="meta" style="margin-top:0.6em">priority domains: <code>.gov</code> · <code>.edu</code> · Kalshi · Polymarket · AP · Reuters · BBC · NPR · then anything</div>
-  </div>
+<p class="meta">A calibrated forecasting agent for Prophet Hacks 2026. Each event we receive is enriched with web evidence, scored by Claude Sonnet 4.6, and protected by a Kalshi longshot floor before the probabilities are returned.</p>
+
+{waiting_banner}
+
+<h2>Status right now</h2>
+<div class="kpis">
+  <div class="kpi"><div class="label">Endpoint</div><div class="value">{endpoint_pill}</div><div class="sub">registered with Prophet Arena</div></div>
+  <div class="kpi"><div class="label">Predictions served</div><div class="value">{_TOTAL_PREDICTIONS}</div><div class="sub">since process start</div></div>
+  <div class="kpi"><div class="label">API spend</div><div class="value">${_TOTAL_COST_USD:.3f}</div><div class="sub">~${cost_per_event:.4f} per event</div></div>
+  <div class="kpi"><div class="label">Last call from Prophet Arena</div><div class="value">{html_escape(last_run[:10]) if last_run != '—' else 'never'}</div><div class="sub">{html_escape(str(last_status))}</div></div>
 </div>
 
-<div class="grid-2" style="margin-top:1em">
-  <div class="arch-card">
-    <h3 style="font-size:0.85em;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 0.5em">Predictions/min (last 30 min)</h3>
-    <div>{spark_svg}</div>
-    <div class="meta small" style="margin-top:0.4em">total served: <strong>{_TOTAL_PREDICTIONS}</strong> · spend so far: <strong>${_TOTAL_COST_USD:.3f}</strong></div>
+<h2>What our agent does</h2>
+<div class="card">
+  <p>For every event Prophet Arena sends to our endpoint, we:</p>
+  <div class="pipeline">
+    <span class="step">1. Receive event JSON</span>
+    <span class="arrow">›</span>
+    <span class="step">2. Search Brave for top 5 evidence URLs</span>
+    <span class="arrow">›</span>
+    <span class="step">3. Dedupe by source priority (.gov / .edu first)</span>
+    <span class="arrow">›</span>
+    <span class="step">4. Sonnet 4.6 reads evidence, assigns probability per outcome</span>
+    <span class="arrow">›</span>
+    <span class="step">5. Kalshi longshot guard floors low values</span>
+    <span class="arrow">›</span>
+    <span class="step">6. Return JSON to scoring server</span>
   </div>
-  <div class="arch-card">
-    <h3 style="font-size:0.85em;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin:0 0 0.5em">Categories in recent predictions</h3>
-    <div>{cat_chips}</div>
-    <div class="meta small" style="margin-top:0.5em">distribution shifts with the events Prophet Arena sends us</div>
+  <p style="margin-top:0.8em">Scoring is the standard Brier score, averaged across all outcomes per event:</p>
+  <div class="math-box">
+    <div class="label">Per-event Brier (lower is better)</div>
+    $$ \\mathrm{{Brier}}_{{e}} = \\sum_{{o \\in O_e}} \\bigl( p_o - \\mathbb{{1}}[o = \\text{{winner}}] \\bigr)^2 $$
   </div>
+  <div class="math-box">
+    <div class="label">Kalshi longshot guard (applied per outcome)</div>
+    $$ p_o \\;\\gets\\; \\max\\!\\left(p_o, \\; \\max\\!\\left(0.05, \\frac{{0.5}}{{|O_e|}}\\right)\\right) $$
+  </div>
+  <p class="meta">Why the guard: Whelan's analysis of Kalshi shows buyers of contracts priced under $0.10 lose &gt;60% on average. LLMs are especially prone to dropping unlikely outcomes to near-zero on vivid narratives, so we floor them.</p>
 </div>
 
-<h2>Per-variant Brier (lower is better) — from scripts/backtest_forecast.py</h2>
-<div class="arch-card">
-  {brier_svg}
-  <div class="meta small" style="margin-top:0.4em">Brier here is the legacy single-p_yes metric from the local backtest. The proper per-outcome Brier (used for prize scoring) shows the same ranking with different absolute values. Note: <code>multi_outcome_retrieval</code>'s 0.064 is contaminated by data leakage (Brave finds articles about resolved past events); live performance on future events does not leak.</div>
-</div>
+<h2>Recent predictions (<span id="pred-count">{len(_PREDICTION_HISTORY)}</span>)</h2>
+<div class="pred-list" id="pred-grid">{pred_cards}</div>
 
 <h2>Open events on Prophet Arena ({len(open_events_list)})</h2>
 <table>
@@ -795,21 +829,40 @@ def dashboard() -> str:
 <tbody>{open_rows}</tbody>
 </table>
 
-<h2>Recent predictions served (<span id="pred-count">{len(_PREDICTION_HISTORY)}</span>)</h2>
-<div class="pred-grid" id="pred-grid">{pred_cards}</div>
-
-<h2>Leaderboard scores</h2>
+<h2>Leaderboard</h2>
 {scores_block}
 
-<h2>Try a prediction (live, hits production endpoint)</h2>
+<h2>Try a prediction yourself</h2>
+<p class="meta">Fills in a real event-shaped request and hits our production endpoint. You'll see the same JSON Prophet Arena will get when they query us.</p>
 <form class="try" onsubmit="event.preventDefault(); doTry();">
-  <label>title</label><input id="ti" value="Will the US Federal Reserve cut rates at the December 2026 meeting?">
-  <label>category</label><input id="ca" value="Economics">
-  <label>outcomes (comma-separated)</label><input id="ou" value="Yes, No">
-  <label>close_time (ISO 8601)</label><input id="ct" value="2026-12-31T23:59:59Z">
+  <label>Event title</label><input id="ti" value="Will the US Federal Reserve cut rates at the December 2026 meeting?">
+  <label>Category</label><input id="ca" value="Economics">
+  <label>Outcomes (comma-separated)</label><input id="ou" value="Yes, No">
+  <label>Close time (ISO 8601)</label><input id="ct" value="2026-12-31T23:59:59Z">
   <button type="submit">Predict</button>
-  <div id="try-result">Submit a question to see the live agent's per-outcome probabilities.</div>
+  <div id="try-result">Submit a question to see live per-outcome probabilities (takes ~5 seconds — Brave search plus one Sonnet call).</div>
 </form>
+
+<h2>Variant comparison (26-event backtest)</h2>
+<div class="card">
+  {brier_svg}
+  <p class="meta" style="margin-top:0.8em">Brier here is the legacy single-<em>p</em> metric from the local backtest. The <strong>multi_outcome_retrieval</strong> 0.064 number is contaminated by data leakage (Brave can find articles about resolved past events); live performance on future events does not leak.</p>
+</div>
+
+<h2>Quick links</h2>
+<ul>
+<li><code><a href="/healthz">/healthz</a></code> — server health JSON</li>
+<li><code><a href="/predict">/predict</a></code> — the actual endpoint (POST)</li>
+<li><code><a href="/predictions">/predictions</a></code> — last 50 predictions JSON</li>
+<li><code><a href="/events">/events</a></code> — Server-Sent Events live stream</li>
+<li><code><a href="/docs">/docs</a></code> — Swagger UI</li>
+<li><a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a></li>
+<li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
+</ul>
+
+<p class="meta" style="margin-top:2em">Page auto-refreshes every 30s. New predictions stream in via Server-Sent Events with a brief highlight animation.</p>
+
+</div>
 <script>
 async function doTry() {{
   const out = document.getElementById("try-result");
@@ -829,16 +882,12 @@ async function doTry() {{
   }} catch (e) {{ out.textContent = "error: " + e.message; }}
 }}
 
-// SSE live feed: when a new prediction lands, prepend a flashing card.
 (function initSSE() {{
   if (!window.EventSource) return;
-  const indicator = document.getElementById("live-indicator");
+  const dot = document.getElementById("live-dot");
+  const status = document.getElementById("live-status");
   const es = new EventSource("/events");
-  es.addEventListener("hello", (ev) => {{
-    indicator.textContent = "SSE LIVE";
-    indicator.style.background = "rgba(16, 185, 129, 0.2)";
-    indicator.style.color = "#10b981";
-  }});
+  es.addEventListener("hello", () => {{ status.textContent = "Live"; dot.classList.remove("warn"); }});
   es.addEventListener("prediction", (ev) => {{
     let msg; try {{ msg = JSON.parse(ev.data); }} catch(e) {{ return; }}
     const grid = document.getElementById("pred-grid");
@@ -851,37 +900,22 @@ async function doTry() {{
     }}).join("");
     const ev_urls = (msg.evidence_urls || []).slice(0, 4);
     const ev_html = ev_urls.length
-      ? `<div class="evidence">📎 ${{ev_urls.map(u => {{ try {{ return `<a href="${{u}}" target="_blank">${{new URL(u).host}}</a>`; }} catch (_) {{ return ""; }} }}).join(" · ")}}</div>`
+      ? `<div class="evidence">Evidence: ${{ev_urls.map(u => {{ try {{ return `<a href="${{u}}" target="_blank" rel="noopener">${{new URL(u).host}}</a>`; }} catch (_) {{ return ""; }} }}).join("")}}</div>`
       : "";
     card.innerHTML = `
       <div class="pred-head"><span class="pred-ts">${{msg.ts.slice(11,19)}}</span><span class="cat-pill">${{msg.category||"?"}}</span><code class="pred-ticker">${{msg.market_ticker||"?"}}</code></div>
-      <div class="pred-title">${{(msg.title||"").slice(0,140)}}</div>
+      <div class="pred-title">${{(msg.title||"").slice(0,160)}}</div>
       <div class="pred-bars">${{probsHtml}}</div>
-      <div class="pred-rationale">${{(msg.rationale||"").slice(0,240)}}</div>
+      <div class="pred-rationale">${{(msg.rationale||"").slice(0,260)}}</div>
       ${{ev_html}}
     `;
     grid.insertBefore(card, grid.firstChild);
     while (grid.children.length > 20) grid.removeChild(grid.lastChild);
     document.getElementById("pred-count").textContent = msg.total_predictions;
   }});
-  es.onerror = () => {{
-    indicator.textContent = "SSE RECONNECTING";
-    indicator.style.background = "rgba(245, 158, 11, 0.2)";
-    indicator.style.color = "#fbbf24";
-  }};
+  es.onerror = () => {{ status.textContent = "Reconnecting"; dot.classList.add("warn"); }};
 }})();
 </script>
-
-<h2>Quick links</h2>
-<ul>
-<li><a href="/healthz">/healthz</a> — server health JSON</li>
-<li><a href="/docs">/docs</a> — Swagger UI</li>
-<li><a href="/redoc">/redoc</a> — ReDoc</li>
-<li><a href="/predictions">/predictions</a> — last 50 predictions JSON</li>
-<li><a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a></li>
-<li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
-</ul>
-
 </body></html>"""
 
 

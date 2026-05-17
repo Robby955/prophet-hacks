@@ -132,6 +132,89 @@ logging.basicConfig(
 log = logging.getLogger("oracles.agent")
 
 
+def _prediction_store_path() -> Path:
+    """Append-only JSONL store for served predictions.
+
+    Defaults to ignored local `logs/` so tests and local runs do not dirty the
+    repo. Railway can opt into a mounted volume or explicit path without code
+    changes.
+    """
+    explicit = os.environ.get("PROPHET_PREDICTION_STORE_PATH", "").strip()
+    if explicit:
+        return Path(explicit)
+    volume = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH", "").strip()
+    if volume:
+        return Path(volume) / "forecastingpath" / "predictions.jsonl"
+    return Path(__file__).resolve().parent / "logs" / "live_predictions.jsonl"
+
+
+def _append_prediction_record(record: dict[str, Any], path: Path | None = None) -> None:
+    """Persist one prediction record. Never fail /predict because disk failed."""
+    store_path = path or _prediction_store_path()
+    try:
+        store_path.parent.mkdir(parents=True, exist_ok=True)
+        with store_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+    except Exception as exc:
+        log.warning("prediction persistence failed: %s", str(exc)[:160])
+
+
+def _load_prediction_history_from_disk(
+    path: Path | None = None,
+    limit: int = 50,
+) -> list[dict[str, Any]]:
+    """Load latest persisted predictions, newest first.
+
+    Malformed lines are ignored so one bad write cannot break the dashboard.
+    """
+    store_path = path or _prediction_store_path()
+    if not store_path.exists():
+        return []
+    records: list[dict[str, Any]] = []
+    try:
+        lines = store_path.read_text(encoding="utf-8").splitlines()
+    except Exception as exc:
+        log.warning("prediction persistence read failed: %s", str(exc)[:160])
+        return []
+    for line in lines[-max(limit * 3, limit):]:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            parsed = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict):
+            records.append(parsed)
+    return list(reversed(records[-limit:]))
+
+
+def _prediction_store_count(path: Path | None = None) -> int:
+    store_path = path or _prediction_store_path()
+    if not store_path.exists():
+        return 0
+    count = 0
+    try:
+        with store_path.open(encoding="utf-8") as f:
+            for line in f:
+                try:
+                    if isinstance(json.loads(line), dict):
+                        count += 1
+                except json.JSONDecodeError:
+                    continue
+    except Exception:
+        return 0
+    return count
+
+
+def _prediction_history_snapshot(limit: int = 50) -> list[dict[str, Any]]:
+    """Recent predictions from memory, lazily restored from disk if empty."""
+    if not _PREDICTION_HISTORY:
+        for record in reversed(_load_prediction_history_from_disk(limit=limit)):
+            _PREDICTION_HISTORY.appendleft(record)
+    return list(_PREDICTION_HISTORY)[:limit]
+
+
 # Which variant to serve from /predict. Defaults to the Brier-winning one
 # from the sample-resolved backtest.
 _VARIANT_NAME = os.environ.get("PROPHET_AGENT_VARIANT", "single_llm")
@@ -513,8 +596,10 @@ def observatory(
     during active scoring: exact variant, model-decision notes, scoring
     caveats, and operational failure modes.
     """
-    prediction_count = len(_PREDICTION_HISTORY)
-    last_prediction = _PREDICTION_HISTORY[-1] if _PREDICTION_HISTORY else None
+    history = _prediction_history_snapshot()
+    prediction_count = len(history)
+    persisted_count = _prediction_store_count()
+    last_prediction = history[0] if history else None
     last_title = str(last_prediction.get("title") or last_prediction.get("market_ticker") or "") if last_prediction else "waiting for first Prophet Arena call"
     last_latency = "not observed yet"
     if last_prediction:
@@ -523,10 +608,55 @@ def observatory(
         if isinstance(latency, dict) and latency.get("total") is not None:
             last_latency = f"{int(latency.get('total', 0))} ms"
 
+    recent_rows = ""
+    for row in history[:10]:
+        trace = row.get("trace") if isinstance(row.get("trace"), dict) else {}
+        latency = trace.get("latency_ms") if isinstance(trace, dict) else {}
+        total_latency = "—"
+        if isinstance(latency, dict) and latency.get("total") is not None:
+            total_latency = f"{int(latency.get('total', 0))} ms"
+        parse_path = str(trace.get("parse_path") or trace.get("parser_path") or trace.get("parse") or "—")
+        warnings_raw = trace.get("warnings") if isinstance(trace, dict) else None
+        if isinstance(warnings_raw, list):
+            warnings = "; ".join(str(w) for w in warnings_raw[:3]) or "—"
+        elif warnings_raw:
+            warnings = str(warnings_raw)
+        else:
+            warnings = "—"
+        probs = row.get("probabilities") if isinstance(row.get("probabilities"), list) else []
+        prob_label = "—"
+        if probs:
+            pairs = []
+            for p in probs[:3]:
+                if not isinstance(p, dict):
+                    continue
+                try:
+                    pairs.append(f"{p.get('market', '?')}: {float(p.get('probability', 0.0)):.2f}")
+                except (TypeError, ValueError):
+                    pairs.append(f"{p.get('market', '?')}: ?")
+            prob_label = ", ".join(pairs) if pairs else "—"
+        recent_rows += (
+            "<tr>"
+            f"<td><code>{html_escape(str(row.get('market_ticker', '?')))}</code><br><span class='small muted'>{html_escape(str(row.get('ts', ''))[:19])}</span></td>"
+            f"<td>{html_escape(str(row.get('title', '?'))[:96])}<br><span class='small muted'>{html_escape(str(row.get('category', '?')))}</span></td>"
+            f"<td class='small'>{html_escape(prob_label)}</td>"
+            f"<td class='num nowrap'>{html_escape(total_latency)}</td>"
+            f"<td>{html_escape(parse_path)}</td>"
+            f"<td class='small'>{html_escape(warnings)}</td>"
+            "</tr>"
+        )
+    if not recent_rows:
+        recent_rows = (
+            "<tr><td colspan='6' class='muted' style='text-align:center;padding:18px'>"
+            "No persisted predictions yet. The first Prophet Arena call will write here."
+            "</td></tr>"
+        )
+
     rows = [
         ("Live commit", _BUILD_COMMIT_SHA),
         ("Production variant", _VARIANT_NAME),
         ("Predictions in memory", str(prediction_count)),
+        ("Persisted records", str(persisted_count)),
         ("Last PA call", last_title[:90]),
         ("Last total latency", last_latency),
         ("Server uptime", _uptime_human()),
@@ -572,6 +702,7 @@ def observatory(
   th, td {{ padding: 10px 8px; text-align: left; border-bottom: 1px solid #edf1f7; vertical-align: top; }}
   th {{ color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; }}
   td.num {{ font-variant-numeric: tabular-nums; font-weight: 700; }}
+  .small {{ font-size: 0.86rem; }} .muted {{ color: var(--muted); }} .nowrap {{ white-space: nowrap; }}
   .ok {{ color: var(--good); }} .warn {{ color: var(--warn); }}
   .callout {{ border-left: 4px solid var(--accent); background: #eef2ff; padding: 14px 16px; border-radius: 8px; }}
   .callout p {{ margin: 0; }}
@@ -625,6 +756,13 @@ def observatory(
   </section>
 
   <section id="experiments" class="grid">
+    <div class="panel span12">
+      <h2>Recent persisted predictions</h2>
+      <table>
+        <thead><tr><th>Market</th><th>Event</th><th>Probabilities</th><th>Latency</th><th>Parse path</th><th>Warnings</th></tr></thead>
+        <tbody>{recent_rows}</tbody>
+      </table>
+    </div>
     <div class="panel span12">
       <h2>Experiment board</h2>
       <table>
@@ -905,18 +1043,24 @@ def predict(event: EventRequest) -> PredictionResponse:
     # but explicitly NOT returned to Prophet Arena (their schema is just
     # `probabilities`). Surfaced on /dashboard for debugging.
     trace = result.get("_trace") if isinstance(result.get("_trace"), dict) else None
-    _PREDICTION_HISTORY.appendleft({
+    prediction_record = {
         "ts": datetime.now(timezone.utc).isoformat(),
+        "event_ticker": event.event_ticker,
         "market_ticker": event.market_ticker,
         "title": event.title,
         "category": event.category,
+        "close_time": event.close_time,
         "p_yes": p_yes,
         "outcomes": outcomes,
         "probabilities": probs,
         "rationale": rationale,
         "evidence_urls": evidence_urls[:8],
+        "variant": _VARIANT_NAME,
+        "commit": _BUILD_COMMIT_SHA,
         "trace": trace,
-    })
+    }
+    _PREDICTION_HISTORY.appendleft(prediction_record)
+    _append_prediction_record(prediction_record)
     # Live KPIs for the dashboard.
     global _TOTAL_PREDICTIONS, _TOTAL_COST_USD, _PPM_CURRENT_MINUTE, _PPM_CURRENT_COUNT
     _TOTAL_PREDICTIONS += 1
@@ -960,9 +1104,11 @@ def predict(event: EventRequest) -> PredictionResponse:
 @app.get("/predictions")
 def predictions(_: None = Depends(_require_dashboard_auth)) -> dict[str, Any]:
     """Last 50 predictions served. Machine-readable."""
+    history = _prediction_history_snapshot()
     return {
-        "count": len(_PREDICTION_HISTORY),
-        "predictions": list(_PREDICTION_HISTORY),
+        "count": len(history),
+        "persisted_count": _prediction_store_count(),
+        "predictions": history,
     }
 
 

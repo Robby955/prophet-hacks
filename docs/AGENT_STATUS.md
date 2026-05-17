@@ -50,6 +50,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T02:04:09Z
 - **Notes:** No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Public `/` intentionally omits exact model names, retrieval vendor, scoring formulas, GPT/Gemini comparison, and source links during active scoring. Internal `/observatory` keeps the live commit, variant, prediction count, first-call watch, GPT-5.5 answer, experiment board, and adversarial-review notes behind dashboard auth. Verified by focused auth/frontend tests, full `pytest tests/`, local content scrub check, and `./scripts/agent/verify.sh`.
 
+## codex/persistent-observatory
+
+- **Current task:** Completed disk-backed prediction history plus observatory trace table.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T02:28:26Z
+- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `chat_completions_adapter.py`, or Railway env vars changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, and `./scripts/agent/verify.sh`.
+
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
 Concrete asks for Codex. Items 1-5 from the prior list are DONE. This

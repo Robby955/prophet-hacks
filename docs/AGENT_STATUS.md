@@ -43,6 +43,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
   - CI/CD: preflight gate, deploy wrapper, `/healthz` commit SHA, dashboard polish (architecture image, brand fix, favicon, OG tags), commit SHA visible on `/` and `/dashboard`.
   - Dashboard try-form overhauled: example dropdown, description + rules fields, validation, latency display.
 
+## codex/live-frontend-observatory
+
+- **Current task:** Completed public/private frontend split: `/` is now a restrained public status page, `/observatory` is the PIN-gated research and operations console.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `tests/test_pin_auth.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T02:04:09Z
+- **Notes:** No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Public `/` intentionally omits exact model names, retrieval vendor, scoring formulas, GPT/Gemini comparison, and source links during active scoring. Internal `/observatory` keeps the live commit, variant, prediction count, first-call watch, GPT-5.5 answer, experiment board, and adversarial-review notes behind dashboard auth. Verified by focused auth/frontend tests, full `pytest tests/`, local content scrub check, and `./scripts/agent/verify.sh`.
+
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
 Concrete asks for Codex. Items 1-5 from the prior list are DONE. This

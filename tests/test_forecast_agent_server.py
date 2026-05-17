@@ -15,6 +15,58 @@ def test_root_is_public_status_page() -> None:
     assert ("restricted" in response.text) or ("public" in response.text)
 
 
+def test_root_does_not_expose_competition_internals() -> None:
+    client = TestClient(server.app)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "ForecastingPath" in response.text
+    assert "View observatory" in response.text
+    sensitive_terms = [
+        server._VARIANT_NAME,
+        "claude-opus",
+        "Claude Opus",
+        "Brave Search",
+        "Kalshi",
+        "min(0.10",
+        "GPT-5.5",
+        "Gemini",
+        "DECISIONS.md",
+        "View source",
+    ]
+    for term in sensitive_terms:
+        assert term not in response.text
+
+
+def test_observatory_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    monkeypatch.setenv("DASHBOARD_PIN", "123456")
+    client = TestClient(server.app, follow_redirects=False)
+
+    response = client.get("/observatory", headers={"accept": "text/html"})
+
+    assert response.status_code == 303
+    assert response.headers["location"].startswith("/login")
+    assert "next=%2Fobservatory" in response.headers["location"]
+
+
+def test_observatory_renders_private_research_console(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/observatory")
+
+    assert response.status_code == 200
+    assert "ForecastingPath Observatory" in response.text
+    assert "GPT-5.5 was tried" in response.text
+    assert "0.0920" in response.text
+    assert "single-binary" in response.text
+    assert "Public surface" in response.text
+    assert server._VARIANT_NAME in response.text
+
+
 def test_healthz_reports_served_variant() -> None:
     client = TestClient(server.app)
 

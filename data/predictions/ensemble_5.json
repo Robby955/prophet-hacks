@@ -1,0 +1,995 @@
+{
+  "n_runs_ensembled": 6,
+  "predictions": [
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "outcomes": [
+        "Florent Bax",
+        "Adrian Arcon"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.55,
+        0.55,
+        0.55,
+        0.55,
+        0.55,
+        0.55
+      ],
+      "p_yes_mean": 0.55,
+      "p_yes_median": 0.55,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Florent Bax": 0.55,
+        "Adrian Arcon": 0.45
+      },
+      "brier_mean_ensemble": 0.20249999999999996,
+      "brier_median_ensemble": 0.20249999999999996
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "outcomes": [
+        "Brandon Perez",
+        "Younes Lalami Laaroussi"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "p_yes_mean": 0.1,
+      "p_yes_median": 0.1,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Brandon Perez": 0.10000000000000003,
+        "Younes Lalami Laaroussi": 0.9
+      },
+      "brier_mean_ensemble": 0.010000000000000002,
+      "brier_median_ensemble": 0.010000000000000002
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "outcomes": [
+        "Francisco Rocha",
+        "Garrett Johns"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "p_yes_mean": 0.1,
+      "p_yes_median": 0.1,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Francisco Rocha": 0.10000000000000003,
+        "Garrett Johns": 0.9
+      },
+      "brier_mean_ensemble": 0.010000000000000002,
+      "brier_median_ensemble": 0.010000000000000002
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "outcomes": [
+        "Government Alliance",
+        "Opposition"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.82,
+        0.82,
+        0.82,
+        0.82,
+        0.82,
+        0.82
+      ],
+      "p_yes_mean": 0.82,
+      "p_yes_median": 0.82,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Government Alliance": 0.82,
+        "Opposition": 0.18000000000000002
+      },
+      "brier_mean_ensemble": 0.03240000000000002,
+      "brier_median_ensemble": 0.03240000000000002
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "outcomes": [
+        "Worcestershire",
+        "Durham"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "p_yes_mean": 0.1,
+      "p_yes_median": 0.1,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Worcestershire": 0.10000000000000003,
+        "Durham": 0.9
+      },
+      "brier_mean_ensemble": 0.010000000000000002,
+      "brier_median_ensemble": 0.010000000000000002
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "outcomes": [
+        "Sussex",
+        "Leicestershire"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999
+      ],
+      "p_yes_mean": 0.8999999999999999,
+      "p_yes_median": 0.8999999999999999,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Sussex": 0.9,
+        "Leicestershire": 0.10000000000000003
+      },
+      "brier_mean_ensemble": 0.010000000000000018,
+      "brier_median_ensemble": 0.010000000000000018
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "outcomes": [
+        "Glamorgan",
+        "Somerset"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999
+      ],
+      "p_yes_mean": 0.8999999999999999,
+      "p_yes_median": 0.8999999999999999,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Glamorgan": 0.9,
+        "Somerset": 0.10000000000000003
+      },
+      "brier_mean_ensemble": 0.010000000000000018,
+      "brier_median_ensemble": 0.010000000000000018
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "outcomes": [
+        "Bangladesh",
+        "Pakistan"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999
+      ],
+      "p_yes_mean": 0.8999999999999999,
+      "p_yes_median": 0.8999999999999999,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Bangladesh": 0.9,
+        "Pakistan": 0.10000000000000003
+      },
+      "brier_mean_ensemble": 0.010000000000000018,
+      "brier_median_ensemble": 0.010000000000000018
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "outcomes": [
+        "Breda",
+        "Heerenveen",
+        "Tie"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8
+      ],
+      "p_yes_mean": 0.8,
+      "p_yes_median": 0.8,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Breda": 0.7999999999999999,
+        "Heerenveen": 0.09999999999999999,
+        "Tie": 0.09999999999999999
+      },
+      "brier_mean_ensemble": 0.03999999999999998,
+      "brier_median_ensemble": 0.03999999999999998
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "outcomes": [
+        "49 or below",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56",
+        "57",
+        "58",
+        "59",
+        "60 or above"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "p_yes_mean": 0.05,
+      "p_yes_median": 0.05,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "49 or below": 0.05000000000000001,
+        "50": 0.05000000000000001,
+        "51": 0.05000000000000001,
+        "52": 0.05000000000000001,
+        "53": 0.0532125350140056,
+        "54": 0.42968212745553247,
+        "55": 0.06710533753046181,
+        "56": 0.05000000000000001,
+        "57": 0.05000000000000001,
+        "58": 0.05000000000000001,
+        "59": 0.05000000000000001,
+        "60 or above": 0.05000000000000001
+      },
+      "brier_mean_ensemble": 0.0025000000000000005,
+      "brier_median_ensemble": 0.0025000000000000005
+    },
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "outcomes": [
+        "Kaja Najzer",
+        "Anna Lena Ebster"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "p_yes_mean": 0.1,
+      "p_yes_median": 0.1,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Kaja Najzer": 0.10000000000000003,
+        "Anna Lena Ebster": 0.9
+      },
+      "brier_mean_ensemble": 0.010000000000000002,
+      "brier_median_ensemble": 0.010000000000000002
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "outcomes": [
+        "Real Madrid",
+        "Barcelona",
+        "Atletico Madrid",
+        "Villarreal",
+        "Athletic Bilbao",
+        "Betis",
+        "Real Sociedad",
+        "Girona",
+        "Celta Vigo",
+        "Valencia",
+        "Sevilla",
+        "Getafe",
+        "Espanyol",
+        "Osasuna",
+        "Alaves",
+        "Mallorca",
+        "Levante",
+        "Rayo Vallecano",
+        "Elche",
+        "Oviedo"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "p_yes_mean": 0.05,
+      "p_yes_median": 0.05,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Real Madrid": 0.026408450704225355,
+        "Barcelona": 0.49823943661971826,
+        "Atletico Madrid": 0.026408450704225355,
+        "Villarreal": 0.026408450704225355,
+        "Athletic Bilbao": 0.026408450704225355,
+        "Betis": 0.026408450704225355,
+        "Real Sociedad": 0.026408450704225355,
+        "Girona": 0.026408450704225355,
+        "Celta Vigo": 0.026408450704225355,
+        "Valencia": 0.026408450704225355,
+        "Sevilla": 0.026408450704225355,
+        "Getafe": 0.026408450704225355,
+        "Espanyol": 0.026408450704225355,
+        "Osasuna": 0.026408450704225355,
+        "Alaves": 0.026408450704225355,
+        "Mallorca": 0.026408450704225355,
+        "Levante": 0.026408450704225355,
+        "Rayo Vallecano": 0.026408450704225355,
+        "Elche": 0.026408450704225355,
+        "Oviedo": 0.026408450704225355
+      },
+      "brier_mean_ensemble": 0.0025000000000000005,
+      "brier_median_ensemble": 0.0025000000000000005
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "outcomes": [
+        "SC Braga",
+        "Sporting Lisbon",
+        "FC Porto",
+        "SL Benfica",
+        "Vitoria SC Guimaraes",
+        "Santa Clara Azores",
+        "Nacional da Madeira",
+        "Moreirense FC",
+        "Rio Ave FC",
+        "FC Arouca",
+        "Estoril Praia",
+        "Casa Pia Lisbon",
+        "CD Tondela",
+        "FC Famalicao",
+        "Estrela Amadora",
+        "AVS Futebol SAD",
+        "Gil Vicente Barcelos",
+        "FC Alverca SAD"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05555555555555555
+      ],
+      "p_yes_mean": 0.05092592592592593,
+      "p_yes_median": 0.05,
+      "p_yes_std": 0.00226804605813257,
+      "mean_probs": {
+        "SC Braga": 0.030864197530864196,
+        "Sporting Lisbon": 0.26823793490460157,
+        "FC Porto": 0.13692480359147027,
+        "SL Benfica": 0.1318742985409652,
+        "Vitoria SC Guimaraes": 0.030864197530864196,
+        "Santa Clara Azores": 0.030864197530864196,
+        "Nacional da Madeira": 0.030864197530864196,
+        "Moreirense FC": 0.030864197530864196,
+        "Rio Ave FC": 0.030864197530864196,
+        "FC Arouca": 0.030864197530864196,
+        "Estoril Praia": 0.030864197530864196,
+        "Casa Pia Lisbon": 0.030864197530864196,
+        "CD Tondela": 0.030864197530864196,
+        "FC Famalicao": 0.030864197530864196,
+        "Estrela Amadora": 0.030864197530864196,
+        "AVS Futebol SAD": 0.030864197530864196,
+        "Gil Vicente Barcelos": 0.030864197530864196,
+        "FC Alverca SAD": 0.030864197530864196
+      },
+      "brier_mean_ensemble": 0.002593449931412895,
+      "brier_median_ensemble": 0.0025000000000000005
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "outcomes": [
+        "PSG",
+        "Lille",
+        "Monaco",
+        "Lyon",
+        "Strasbourg Alsace",
+        "Stade Rennes",
+        "Marseille",
+        "Lens",
+        "Nice",
+        "Toulouse",
+        "Paris",
+        "Angers",
+        "Le Havre",
+        "Nantes",
+        "Auxerre",
+        "Lorient",
+        "Stade Brest 29",
+        "Metz"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.85,
+        0.82,
+        0.82,
+        0.82,
+        0.85,
+        0.82
+      ],
+      "p_yes_mean": 0.83,
+      "p_yes_median": 0.82,
+      "p_yes_std": 0.015491933384829681,
+      "mean_probs": {
+        "PSG": 0.48255813953488363,
+        "Lille": 0.029069767441860468,
+        "Monaco": 0.029069767441860468,
+        "Lyon": 0.029069767441860468,
+        "Strasbourg Alsace": 0.029069767441860468,
+        "Stade Rennes": 0.029069767441860468,
+        "Marseille": 0.05232558139534884,
+        "Lens": 0.029069767441860468,
+        "Nice": 0.029069767441860468,
+        "Toulouse": 0.029069767441860468,
+        "Paris": 0.029069767441860468,
+        "Angers": 0.029069767441860468,
+        "Le Havre": 0.029069767441860468,
+        "Nantes": 0.029069767441860468,
+        "Auxerre": 0.029069767441860468,
+        "Lorient": 0.029069767441860468,
+        "Stade Brest 29": 0.029069767441860468,
+        "Metz": 0.029069767441860468
+      },
+      "brier_mean_ensemble": 0.028900000000000012,
+      "brier_median_ensemble": 0.03240000000000002
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "outcomes": [
+        "Oklahoma City",
+        "Los Angeles L"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999
+      ],
+      "p_yes_mean": 0.8999999999999999,
+      "p_yes_median": 0.8999999999999999,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Oklahoma City": 0.9,
+        "Los Angeles L": 0.10000000000000003
+      },
+      "brier_mean_ensemble": 0.010000000000000018,
+      "brier_median_ensemble": 0.010000000000000018
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "outcomes": [
+        "P\u00e9ter Magyar",
+        "Viktor Orb\u00e1n"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999
+      ],
+      "p_yes_mean": 0.8999999999999999,
+      "p_yes_median": 0.8999999999999999,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "P\u00e9ter Magyar": 0.9,
+        "Viktor Orb\u00e1n": 0.10000000000000003
+      },
+      "brier_mean_ensemble": 0.010000000000000018,
+      "brier_median_ensemble": 0.010000000000000018
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "outcomes": [
+        "Ivan Demidov",
+        "Matthew Schaefer",
+        "Michael Misa",
+        "Zeev Buium",
+        "Isaac Howard",
+        "Jimmy Snuggerud",
+        "Alexander Nikishin",
+        "Zayne Parekh",
+        "Maxim Shabanov",
+        "Ryan Leonard",
+        "Yaroslav Askarov",
+        "Gabe Perreault",
+        "Matthew Savoie",
+        "Axel Sandin-Pellikka",
+        "Bradly Nadeau",
+        "Jesper Wallstedt",
+        "Rutger McGroarty",
+        "Sam Dickinson",
+        "Sam Rinzel",
+        "Ville Koivunen",
+        "Artyom Levshunov",
+        "Easton Cowan",
+        "Arseni Gritsyuk",
+        "Beckett Sennecke",
+        "Calum Ritchie",
+        "Jonathan Lekkerimaki",
+        "Berkly Catton",
+        "Danila Yurov",
+        "Leevi Merilaninen",
+        "Alex Bump"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "p_yes_mean": 0.05,
+      "p_yes_median": 0.05,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Ivan Demidov": 0.02123142250530786,
+        "Matthew Schaefer": 0.38428874734607216,
+        "Michael Misa": 0.02123142250530786,
+        "Zeev Buium": 0.02123142250530786,
+        "Isaac Howard": 0.02123142250530786,
+        "Jimmy Snuggerud": 0.02123142250530786,
+        "Alexander Nikishin": 0.02123142250530786,
+        "Zayne Parekh": 0.02123142250530786,
+        "Maxim Shabanov": 0.02123142250530786,
+        "Ryan Leonard": 0.02123142250530786,
+        "Yaroslav Askarov": 0.02123142250530786,
+        "Gabe Perreault": 0.02123142250530786,
+        "Matthew Savoie": 0.02123142250530786,
+        "Axel Sandin-Pellikka": 0.02123142250530786,
+        "Bradly Nadeau": 0.02123142250530786,
+        "Jesper Wallstedt": 0.02123142250530786,
+        "Rutger McGroarty": 0.02123142250530786,
+        "Sam Dickinson": 0.02123142250530786,
+        "Sam Rinzel": 0.02123142250530786,
+        "Ville Koivunen": 0.02123142250530786,
+        "Artyom Levshunov": 0.02123142250530786,
+        "Easton Cowan": 0.02123142250530786,
+        "Arseni Gritsyuk": 0.02123142250530786,
+        "Beckett Sennecke": 0.02123142250530786,
+        "Calum Ritchie": 0.02123142250530786,
+        "Jonathan Lekkerimaki": 0.02123142250530786,
+        "Berkly Catton": 0.02123142250530786,
+        "Danila Yurov": 0.02123142250530786,
+        "Leevi Merilaninen": 0.02123142250530786,
+        "Alex Bump": 0.02123142250530786
+      },
+      "brier_mean_ensemble": 0.0025000000000000005,
+      "brier_median_ensemble": 0.0025000000000000005
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "outcomes": [
+        "Don Leonard",
+        "Adam Miller"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999,
+        0.8999999999999999
+      ],
+      "p_yes_mean": 0.8999999999999999,
+      "p_yes_median": 0.8999999999999999,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Don Leonard": 0.9,
+        "Adam Miller": 0.10000000000000003
+      },
+      "brier_mean_ensemble": 0.010000000000000018,
+      "brier_median_ensemble": 0.010000000000000018
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "outcomes": [
+        "Kevin Hart",
+        "Elon Musk",
+        "Taylor Swift",
+        "Drake",
+        "Joe Rogan",
+        "Logan Paul",
+        "MrBeast",
+        "Theo Von",
+        "Shane Gillis",
+        "Andrew Schulz",
+        "Jake Paul"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.4999999999999998,
+        0.4999999999999999,
+        0.49999999999999983,
+        0.4999999999999999,
+        0.4999999999999999,
+        0.4999999999999999
+      ],
+      "p_yes_mean": 0.4999999999999999,
+      "p_yes_median": 0.4999999999999999,
+      "p_yes_std": 4.6443961262081255e-17,
+      "mean_probs": {
+        "Kevin Hart": 0.4999999999999999,
+        "Elon Musk": 0.05000000000000002,
+        "Taylor Swift": 0.05000000000000002,
+        "Drake": 0.05000000000000002,
+        "Joe Rogan": 0.05000000000000002,
+        "Logan Paul": 0.05000000000000002,
+        "MrBeast": 0.05000000000000002,
+        "Theo Von": 0.05000000000000002,
+        "Shane Gillis": 0.05000000000000002,
+        "Andrew Schulz": 0.05000000000000002,
+        "Jake Paul": 0.05000000000000002
+      },
+      "brier_mean_ensemble": 0.2500000000000001,
+      "brier_median_ensemble": 0.2500000000000001
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "outcomes": [
+        "Napoli",
+        "Juventus",
+        "Cremonese",
+        "Udinese",
+        "Milan",
+        "Roma",
+        "Atalanta",
+        "Cagliari",
+        "Como",
+        "Torino",
+        "Inter",
+        "Lazio",
+        "Bologna",
+        "Sassuolo",
+        "Genoa",
+        "Fiorentina",
+        "Hellas Verona",
+        "Pisa",
+        "Parma Calcio",
+        "Lecce"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.22,
+        0.22,
+        0.22,
+        0.22,
+        0.22,
+        0.22
+      ],
+      "p_yes_mean": 0.22,
+      "p_yes_median": 0.22,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Napoli": 0.12729026036644164,
+        "Juventus": 0.05014464802314368,
+        "Cremonese": 0.028929604628736744,
+        "Udinese": 0.028929604628736744,
+        "Milan": 0.12343297974927675,
+        "Roma": 0.07810993249758919,
+        "Atalanta": 0.03278688524590164,
+        "Cagliari": 0.028929604628736744,
+        "Como": 0.028929604628736744,
+        "Torino": 0.028929604628736744,
+        "Inter": 0.18322082931533265,
+        "Lazio": 0.028929604628736744,
+        "Bologna": 0.028929604628736744,
+        "Sassuolo": 0.028929604628736744,
+        "Genoa": 0.028929604628736744,
+        "Fiorentina": 0.028929604628736744,
+        "Hellas Verona": 0.028929604628736744,
+        "Pisa": 0.028929604628736744,
+        "Parma Calcio": 0.028929604628736744,
+        "Lecce": 0.028929604628736744
+      },
+      "brier_mean_ensemble": 0.0484,
+      "brier_median_ensemble": 0.0484
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "outcomes": [
+        "Rizo Velovic",
+        "Aubry Bracco",
+        "Ozzy Lusth",
+        "Chrissy Hofbeck",
+        "Christian Hubicki",
+        "Cirie Fields",
+        "Benjamin \u201cCoach\u201d Wade",
+        "Rick Devens",
+        "Dee Valladares",
+        "Emily Flippen",
+        "Tiffany Nicole Ervin",
+        "Stephenie LaGrossa Kendrick",
+        "Joe Hunter",
+        "Jonathan Young"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "p_yes_mean": 0.05,
+      "p_yes_median": 0.05,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Rizo Velovic": 0.03125000000000001,
+        "Aubry Bracco": 0.03125000000000001,
+        "Ozzy Lusth": 0.03125000000000001,
+        "Chrissy Hofbeck": 0.03125000000000001,
+        "Christian Hubicki": 0.03125000000000001,
+        "Cirie Fields": 0.03125000000000001,
+        "Benjamin \u201cCoach\u201d Wade": 0.03125000000000001,
+        "Rick Devens": 0.03125000000000001,
+        "Dee Valladares": 0.59375,
+        "Emily Flippen": 0.03125000000000001,
+        "Tiffany Nicole Ervin": 0.03125000000000001,
+        "Stephenie LaGrossa Kendrick": 0.03125000000000001,
+        "Joe Hunter": 0.03125000000000001,
+        "Jonathan Young": 0.03125000000000001
+      },
+      "brier_mean_ensemble": 0.0025000000000000005,
+      "brier_median_ensemble": 0.0025000000000000005
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "outcomes": [
+        "14 Karat Carrot",
+        "Calla Lily",
+        "Cat Witch",
+        "Crane",
+        "The Croissants",
+        "Eggplant",
+        "Galaxy Girl",
+        "Googly Eyes",
+        "Handyman",
+        "High Voltage",
+        "Le Who Who",
+        "Owl",
+        "Pangolin",
+        "Pugcasso",
+        "Queen Corgi",
+        "Scarab",
+        "Snow Cone",
+        "Stingray"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05555555555555556,
+        0.05555555555555556,
+        0.05,
+        0.05555555555555556
+      ],
+      "p_yes_mean": 0.052777777777777785,
+      "p_yes_median": 0.052777777777777785,
+      "p_yes_std": 0.0030429030972509235,
+      "mean_probs": {
+        "14 Karat Carrot": 0.04398148148148148,
+        "Calla Lily": 0.04398148148148148,
+        "Cat Witch": 0.04398148148148148,
+        "Crane": 0.04398148148148148,
+        "The Croissants": 0.04398148148148148,
+        "Eggplant": 0.04398148148148148,
+        "Galaxy Girl": 0.04794973544973544,
+        "Googly Eyes": 0.14715608465608465,
+        "Handyman": 0.04398148148148148,
+        "High Voltage": 0.04398148148148148,
+        "Le Who Who": 0.04398148148148148,
+        "Owl": 0.04398148148148148,
+        "Pangolin": 0.04398148148148148,
+        "Pugcasso": 0.14517195767195767,
+        "Queen Corgi": 0.04398148148148148,
+        "Scarab": 0.04398148148148148,
+        "Snow Cone": 0.04398148148148148,
+        "Stingray": 0.04398148148148148
+      },
+      "brier_mean_ensemble": 0.0027854938271604946,
+      "brier_median_ensemble": 0.0027854938271604946
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "outcomes": [
+        "Adam Greenberg",
+        "Adam Sobel",
+        "Britt Rescigno",
+        "Bryan Voltaggio",
+        "Carlos Anthony",
+        "Claudette Zepeda",
+        "Dale Talde",
+        "David Viana",
+        "Jet Tila",
+        "Joe Sasto",
+        "Jonathon Sawyer",
+        "Kaleena Bliss",
+        "Karen Akunowicz",
+        "Kevin Lee",
+        "Lee Anne Wong",
+        "Marcel Vigneron",
+        "Nini Nguyen",
+        "Sara Bradley",
+        "Shirley Chung",
+        "Tobias Dorzon"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ],
+      "p_yes_mean": 0.05,
+      "p_yes_median": 0.05,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Adam Greenberg": 0.049999999999999996,
+        "Adam Sobel": 0.049999999999999996,
+        "Britt Rescigno": 0.049999999999999996,
+        "Bryan Voltaggio": 0.049999999999999996,
+        "Carlos Anthony": 0.049999999999999996,
+        "Claudette Zepeda": 0.049999999999999996,
+        "Dale Talde": 0.049999999999999996,
+        "David Viana": 0.049999999999999996,
+        "Jet Tila": 0.049999999999999996,
+        "Joe Sasto": 0.049999999999999996,
+        "Jonathon Sawyer": 0.049999999999999996,
+        "Kaleena Bliss": 0.049999999999999996,
+        "Karen Akunowicz": 0.049999999999999996,
+        "Kevin Lee": 0.049999999999999996,
+        "Lee Anne Wong": 0.049999999999999996,
+        "Marcel Vigneron": 0.049999999999999996,
+        "Nini Nguyen": 0.049999999999999996,
+        "Sara Bradley": 0.049999999999999996,
+        "Shirley Chung": 0.049999999999999996,
+        "Tobias Dorzon": 0.049999999999999996
+      },
+      "brier_mean_ensemble": 0.0025000000000000005,
+      "brier_median_ensemble": 0.0025000000000000005
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "outcomes": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.05
+      ],
+      "p_yes_mean": 0.09166666666666667,
+      "p_yes_median": 0.1,
+      "p_yes_std": 0.020412414523193152,
+      "mean_probs": {
+        "0": 0.09166666666666667,
+        "1": 0.09166666666666667,
+        "2": 0.09166666666666667,
+        "3": 0.17500000000000002,
+        "4": 0.09166666666666667,
+        "5": 0.09166666666666667,
+        "6": 0.09166666666666667,
+        "7": 0.09166666666666667,
+        "8": 0.09166666666666667,
+        "9": 0.09166666666666667
+      },
+      "brier_mean_ensemble": 0.00840277777777778,
+      "brier_median_ensemble": 0.010000000000000002
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "outcomes": [
+        "Heather Watson",
+        "Kyoka Okamura"
+      ],
+      "actual": 1,
+      "per_run_p_yes": [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.55
+      ],
+      "p_yes_mean": 0.5083333333333333,
+      "p_yes_median": 0.5,
+      "p_yes_std": 0.02041241452319317,
+      "mean_probs": {
+        "Heather Watson": 0.5083333333333333,
+        "Kyoka Okamura": 0.4916666666666667
+      },
+      "brier_mean_ensemble": 0.24173611111111115,
+      "brier_median_ensemble": 0.25
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "outcomes": [
+        "Brit Aguirre",
+        "Vince George"
+      ],
+      "actual": 0,
+      "per_run_p_yes": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "p_yes_mean": 0.1,
+      "p_yes_median": 0.1,
+      "p_yes_std": 0.0,
+      "mean_probs": {
+        "Brit Aguirre": 0.10000000000000003,
+        "Vince George": 0.9
+      },
+      "brier_mean_ensemble": 0.010000000000000002,
+      "brier_median_ensemble": 0.010000000000000002
+    }
+  ]
+}

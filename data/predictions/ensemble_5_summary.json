@@ -1,0 +1,17 @@
+{
+  "n_events": 26,
+  "n_runs_ensembled": 6,
+  "per_run_mean_brier": {
+    "run_0": 0.03781923076923078,
+    "run_1": 0.038200000000000005,
+    "run_2": 0.03822255460588796,
+    "run_3": 0.03822255460588795,
+    "run_4": 0.03781923076923078,
+    "run_5": 0.03612972459639127
+  },
+  "single_run_mean": 0.03773554922443812,
+  "single_run_std": 0.0008102766125172072,
+  "ensemble_mean_Brier_arithmetic_mean": 0.03770068587105625,
+  "ensemble_mean_Brier_median": 0.03821098053181387,
+  "delta_ensemble_minus_grand_mean": -3.486335338186847e-05
+}

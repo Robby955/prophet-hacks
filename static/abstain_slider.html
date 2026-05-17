@@ -8,6 +8,7 @@
 body { font: 14px/1.45 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }
 header { max-width: 1100px; margin: 0 auto 14px; }
 header h1 { font-size: 22px; margin: 0 0 6px; }
+.read-panel { margin: 8px 0 10px; padding: 10px 12px; max-width: 950px; border: 1px solid #d8dde8; border-left: 4px solid #2856a3; border-radius: 6px; background: #f4f7fb; color: #1a1f2c; font-size: 13px; }
 header .sub { color: #475066; margin: 4px 0; font-size: 13px; max-width: 900px; }
 header .links { font-size: 13px; margin-top: 6px; }
 header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
@@ -36,6 +37,7 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 
 <header>
   <h1>Abstain-to-market policy slider</h1>
+  <div class="read-panel"><strong>What you're looking at:</strong> move the threshold to decide when the endpoint should use its own forecast; lower Brier is better, and the table below shows exactly which events switch between trade and abstain.</div>
   <p class="sub">PA scoring rule: <strong>(team Brier − market Brier) × completion rate</strong>. Jibang Wu (PA, Discord 2026-05-16): "<em>only make a prediction when you are confident enough, otherwise just use the market probability.</em>"</p>
   <p class="sub">This page visualizes that policy on our 26 resolved events. <strong>Slide the threshold</strong> to control how confident the model has to be (distance from 0.5) before we trade. Below threshold → fall back to 0.5 (proxy for market price; PA-live this would be the actual snapshotted market). The chart updates live.</p>
   <p class="links">

@@ -73,6 +73,7 @@ def main() -> int:
     body = f"""
 <header>
   <h1>Bootstrap distribution · Brier delta vs {baseline_label}</h1>
+  <div class="read-panel"><strong>What you're looking at:</strong> each bar is one paired-bootstrap resample of the Brier improvement; the result is strongest when the blue interval stays to the right of zero, and the hover labels expose the resample counts.</div>
   <p class="sub">50,000 paired bootstrap resamples of per-event Brier improvement (baseline − model). Bars = distribution shape; shaded band = 95% confidence interval; vertical line = observed mean. The CI excludes zero, so the production model significantly improves over baseline on this dataset at α=0.05. Hover for counts at each bin.</p>
   <p class="links">
     <a href="/static/scatter_resolved.html">→ per-event scatter</a> ·
@@ -142,6 +143,7 @@ Plotly.newPlot('plot', [{{
 body {{ font: 14px/1.45 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }}
 header {{ max-width: 1100px; margin: 0 auto 14px; }}
 header h1 {{ font-size: 22px; margin: 0 0 6px; }}
+.read-panel {{ margin: 8px 0 10px; padding: 10px 12px; max-width: 950px; border: 1px solid #d8dde8; border-left: 4px solid #2856a3; border-radius: 6px; background: #f4f7fb; color: #1a1f2c; font-size: 13px; }}
 header .sub {{ color: #475066; margin: 4px 0; font-size: 13px; max-width: 950px; }}
 header .links {{ font-size: 13px; margin-top: 6px; }}
 header .links a {{ color: #2856a3; text-decoration: none; margin-right: 12px; }}

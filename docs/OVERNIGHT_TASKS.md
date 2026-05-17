@@ -104,3 +104,11 @@ Estimated: 15 min, $0.
 Update this file with what you finished, what you skipped, and any
 blockers. Or just drop a line in `docs/AGENT_STATUS.md` under your
 agent's section. Rob will read both before submitting.
+
+## Codex update · 2026-05-17T07:35Z
+
+- **C1 done:** `scripts/build_d1_scatter.py` now labels only large-outcome points (`n_outcomes >= 8`), uses varied text positions, and regenerates `static/scatter_resolved.html`.
+- **C2 done:** all seven interactive research pages now have a compact "What you're looking at" orientation panel near the top. Regenerated galleries, scatter, heatmap, abstain slider, bootstrap histogram, and pipeline trace.
+- **C3 done:** `/dashboard?tour=1` and `/observatory?tour=1` now launch a small dependency-free guided tour. Normal page loads do not render the tour overlay.
+- **C4 done:** `static/pipeline_trace.html` now starts with a visible cached-example banner for the Najzer vs Ebster replay and points live walkthroughs to `/demo/start`.
+- **C5 done with boundary adjustment:** `scripts/check_bootstrap_seed_stability.py` runs the seed-stability check. Seeds `20260516`, `20260517`, `20260518` all overlap and stay within `0.001` endpoint spread: CI lows span `0.014155` to `0.014296`; CI highs span `0.037446` to `0.037674`. Wrote ignored JSON to `output/research/bootstrap_seed_stability_20260517.json`. No `docs/DECISIONS.md` edit because this file's top boundary says not to touch it.

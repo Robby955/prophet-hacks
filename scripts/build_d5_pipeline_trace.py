@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """D5: pipeline trace explorer — FutureSim-style step-by-step replay.
 
-For a canonical resolved event (Hungary 2026 PM, a clean 2-outcome
-political event we got right), renders a vertical timeline showing
+For a canonical resolved event (Najzer vs Ebster, a clean 2-outcome
+tennis event), renders a vertical timeline showing
 each pipeline stage's input → output, with the actual data from our
 cached predictions and a synthesized but accurate stage breakdown.
 
@@ -23,8 +23,8 @@ DATA = REPO / "data"
 PRED = DATA / "predictions"
 STATIC = REPO / "static"
 
-# Pick the Hungary 2026 PM event — binary, clean, model got it right.
-PICK_TICKER = "KXHUPM-26"
+# Pick the Najzer vs Ebster match: binary, clean, and used in demo copy.
+PICK_TICKER = "KXITFWMATCH-26MAY12NAJEBS"
 
 
 def main() -> int:
@@ -173,6 +173,9 @@ def main() -> int:
 body {{ font: 14px/1.5 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }}
 header {{ max-width: 1000px; margin: 0 auto 14px; }}
 header h1 {{ font-size: 22px; margin: 0 0 4px; }}
+.cache-banner {{ margin: 8px 0 10px; padding: 11px 13px; max-width: 900px; border: 1px solid #f2d18b; border-left: 4px solid #b45309; border-radius: 6px; background: #fff7e6; color: #5f370e; font-size: 13px; }}
+.cache-banner code {{ background: rgba(255,255,255,0.7); border: 1px solid #f2d18b; padding: 1px 5px; border-radius: 4px; font-size: 11px; }}
+.read-panel {{ margin: 8px 0 10px; padding: 10px 12px; max-width: 900px; border: 1px solid #d8dde8; border-left: 4px solid #2856a3; border-radius: 6px; background: #f4f7fb; color: #1a1f2c; font-size: 13px; }}
 header .sub {{ color: #475066; margin: 4px 0; font-size: 13px; max-width: 900px; }}
 header .links {{ font-size: 13px; margin-top: 6px; }}
 header .links a {{ color: #2856a3; text-decoration: none; margin-right: 12px; }}
@@ -206,6 +209,8 @@ footer code {{ background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-s
 <body>
 <header>
   <h1>Pipeline trace · {html.escape(title)}</h1>
+  <div class="cache-banner"><strong>Cached example:</strong> this is the 2026-05-12 Najzer vs Ebster match replayed from disk. For a live walkthrough of a fresh prediction, use the <code>/demo/start</code> SSE stream on the dashboard.</div>
+  <div class="read-panel"><strong>What you're looking at:</strong> a replay of one full forecast lifecycle; good behavior means each stage produces a clear artifact, and the final card links the probability distribution back to the resolved outcome.</div>
   <p class="sub">Step-by-step replay of how the production agent forecast a single resolved event. Each card shows one pipeline stage's input → output, with real data from the cached prediction. The live <code>/observatory</code> view shows the same shape for every PA call as it lands.</p>
   <p class="links">
     <a href="/static/scatter_resolved.html">→ per-event scatter</a> ·

@@ -239,6 +239,7 @@ def build_resolved() -> str:
     body = f"""
 <header>
   <h1>Side-by-side gallery · resolved events</h1>
+  <div class="read-panel"><strong>What you're looking at:</strong> each row is a resolved event and each model cell is its through-pipeline loss; green cells and low footer means are good, and clicking a row opens the probabilities, rationale, and evidence URLs.</div>
   <p class="sub">26 events from PA's <code>sample-resolved</code> set, same retrieval + prompt + longshot floor, five LLM swaps. Each cell shows model's <em>p(outcomes[0] wins)</em> and the resulting single-binary Brier (Prophet Arena CLI metric). Color: green = low loss, red = high loss. <strong>Click any row for full per-outcome probabilities, rationales, and evidence URLs.</strong></p>
   <details class="howread">
     <summary>How to read this page</summary>
@@ -387,6 +388,7 @@ def build_open() -> str:
     body = f"""
 <header>
   <h1>Side-by-side gallery · open events</h1>
+  <div class="read-panel"><strong>What you're looking at:</strong> these are unresolved sample events, so the useful signal is disagreement; red spread cells mark rows worth opening later when actuals or live PA calls arrive.</div>
   <p class="sub">42 unresolved events across PA's three open sample datasets (Economics, Entertainment, Sports). Same retrieval + prompt as production, five alternative LLMs swapped in. No actuals yet — instead the <em>cross-model spread</em> column surfaces where models disagree (red = high spread, useful as a triage signal when live events arrive).</p>
   <details class="howread">
     <summary>How to read this page</summary>
@@ -423,6 +425,7 @@ def _wrap_html(title: str, body: str, *, with_drill: bool = False) -> str:
 body { font: 14px/1.45 system-ui, -apple-system, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 24px 32px; }
 header { max-width: 1400px; margin: 0 auto 18px; }
 header h1 { font-size: 24px; margin: 0 0 4px; }
+.read-panel { margin: 8px 0 10px; padding: 10px 12px; max-width: 980px; border: 1px solid #d8dde8; border-left: 4px solid #2856a3; border-radius: 6px; background: #f4f7fb; color: #1a1f2c; font-size: 13px; }
 header .sub { color: #475066; margin: 4px 0 8px; max-width: 900px; }
 header .links { font-size: 13px; margin-top: 6px; }
 header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }

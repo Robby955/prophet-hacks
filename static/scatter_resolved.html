@@ -8,6 +8,7 @@
 body { font: 14px/1.45 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }
 header { max-width: 1200px; margin: 0 auto 14px; }
 header h1 { font-size: 22px; margin: 0 0 6px; }
+.read-panel { margin: 8px 0 10px; padding: 10px 12px; max-width: 1000px; border: 1px solid #d8dde8; border-left: 4px solid #2856a3; border-radius: 6px; background: #f4f7fb; color: #1a1f2c; font-size: 13px; }
 header .sub { color: #475066; margin: 4px 0; font-size: 13px; max-width: 1000px; }
 header .links { font-size: 13px; margin-top: 6px; }
 header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
@@ -21,6 +22,7 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 
 <header>
   <h1>Per-event scatter · production (Opus 4.7)</h1>
+  <div class="read-panel"><strong>What you're looking at:</strong> one dot per resolved event; good predictions sit near the bottom edge, and clicking or hovering a dot reveals the event, winner, rationale, and ticker.</div>
   <p class="sub">Each point = one of the 26 resolved events. <strong>X</strong> = production p_yes for <em>outcomes[0]</em>. <strong>Y</strong> = single-binary Brier loss. <strong>Green</strong> = outcomes[0] won; <strong>red</strong> = outcomes[0] lost. <strong>Size</strong> = n_outcomes (bigger circles = harder multi-outcome events). Hover for question + winner + rationale.</p>
   <p class="sub">Read the picture: green dots on the right (high p_yes for the actual winner) → low Brier (good); red dots on the right (high p_yes when outcomes[0] LOST) → high Brier (bad confident-and-wrong). Green dots on the left (low p_yes when outcomes[0] WON) → also high Brier. The shape of the curve shows where our model's confidence helped or hurt.</p>
   <p class="links">
@@ -46,15 +48,20 @@ function trace(pts, color, name) {
     mode: 'markers+text',
     type: 'scatter',
     name: name,
-    text: pts.map(p => p.n_outcomes > 5 ? String(p.n_outcomes) : ''),
-    textposition: 'top center',
-    textfont: { size: 10, color: '#475066' },
+    text: pts.map(p => p.n_outcomes >= 8 ? String(p.n_outcomes) : ''),
+    textposition: pts.map((p, i) => {
+      if (p.n_outcomes < 8) return 'middle right';
+      const positions = ['top left', 'top right', 'bottom left', 'bottom right', 'middle left', 'middle right'];
+      return positions[i % positions.length];
+    }),
+    textfont: { size: 11, color: 'rgba(71,80,102,0.72)' },
     marker: {
       size: pts.map(p => Math.min(45, 12 + p.n_outcomes * 1.2)),
       color: color,
-      opacity: 0.72,
+      opacity: 0.68,
       line: { color: '#1a1f2c', width: 1 },
     },
+    cliponaxis: false,
     customdata: pts.map(p => [p.title, p.category, p.winner, p.outcome0, p.rationale, p.n_outcomes, p.ticker]),
     hovertemplate: '<b>%{customdata[0]}</b><br>' +
                    '<span style="color:#475066">%{customdata[1]} · %{customdata[5]} outcomes</span><br><br>' +

@@ -78,6 +78,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T05:45:33Z
 - **Notes:** No forecast variant, Railway env var, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `static/` changes. `scripts/capture_demo_assets.sh` starts a local clean server with auth/provider keys unset, empty prediction store, and production variant name pinned; it captures 8 screenshots plus `forecastingpath-walkthrough.webm` under ignored `output/playwright/forecast-demo/` without calling `/predict` or `/demo/start`. `scripts/build_submission_onepager.py` reads `submission/REPORT.md` and writes ignored `output/pdf/oracles-submission-onepager.pdf`. Observatory now has a smaller header and clear zero-call empty state for screenshots.
 
+## codex/overnight-ux-research
+
+- **Current task:** Completed overnight C1-C5 queue: static research-page UX polish, dashboard/observatory guided tour, cached-trace banner, bootstrap seed stability check.
+- **Files owned this session:** `forecast_agent_server.py`, `scripts/build_d1_scatter.py`, `scripts/build_d2_heatmap.py`, `scripts/build_d3_abstain_slider.py`, `scripts/build_d4_bootstrap_hist.py`, `scripts/build_d5_pipeline_trace.py`, `scripts/build_galleries.py`, `scripts/check_bootstrap_seed_stability.py`, `static/`, `docs/OVERNIGHT_TASKS.md`, `docs/AGENT_STATUS.md`, `tests/test_bootstrap_seed_stability.py`, `tests/test_static_research_pages.py`, `tests/test_forecast_agent_server.py`.
+- **Last updated:** 2026-05-17T07:35:06Z
+- **Notes:** Non-production only. No changes to `forecast_track.py:predict_multi_outcome_retrieval`, Railway env vars, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py`. C5 stable across seeds 20260516/20260517/20260518 with CI lows `0.014155`-`0.014296` and CI highs `0.037446`-`0.037674`; recorded in `docs/OVERNIGHT_TASKS.md` rather than DECISIONS because the overnight boundary said not to touch DECISIONS.
+
 ## codex/persistent-observatory
 
 - **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.

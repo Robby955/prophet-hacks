@@ -10,6 +10,7 @@
 body { font: 14px/1.45 system-ui, -apple-system, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 24px 32px; }
 header { max-width: 1400px; margin: 0 auto 18px; }
 header h1 { font-size: 24px; margin: 0 0 4px; }
+.read-panel { margin: 8px 0 10px; padding: 10px 12px; max-width: 980px; border: 1px solid #d8dde8; border-left: 4px solid #2856a3; border-radius: 6px; background: #f4f7fb; color: #1a1f2c; font-size: 13px; }
 header .sub { color: #475066; margin: 4px 0 8px; max-width: 900px; }
 header .links { font-size: 13px; margin-top: 6px; }
 header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
@@ -83,6 +84,7 @@ tr.drill-row:hover .click-hint { color: #2856a3; }
 
 <header>
   <h1>Side-by-side gallery · open events</h1>
+  <div class="read-panel"><strong>What you're looking at:</strong> these are unresolved sample events, so the useful signal is disagreement; red spread cells mark rows worth opening later when actuals or live PA calls arrive.</div>
   <p class="sub">42 unresolved events across PA's three open sample datasets (Economics, Entertainment, Sports). Same retrieval + prompt as production, five alternative LLMs swapped in. No actuals yet — instead the <em>cross-model spread</em> column surfaces where models disagree (red = high spread, useful as a triage signal when live events arrive).</p>
   <details class="howread">
     <summary>How to read this page</summary>

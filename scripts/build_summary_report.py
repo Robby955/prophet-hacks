@@ -41,9 +41,32 @@ ABLATION_FILES = [
     ("Opus 4.7 (production)",      "multi_outcome_retrieval.json",                       "#1d4ed8"),
     ("Sonnet 4.6 (prev prod)",     "multi_outcome_retrieval.phase1_sonnet.json",          "#0891b2"),
     ("Opus 4.6",                   "ablation_claude-opus-4-6.json",                       "#7c3aed"),
+    ("GPT-5.5",                    "ablation_gpt-5-5.json",                               "#0d9488"),
     ("GPT-5.2",                    "ablation_gpt-5-2.json",                               "#16a34a"),
     ("Gemini 3.1 Pro (post-harden)", "ablation_gemini-3-1-pro-preview-postharden.json",   "#ea580c"),
 ]
+
+# Statistical-significance numbers from the paired-bootstrap on the same
+# 26 events (Codex PR #6, scripts/bootstrap_brier_ci.py). Hard-coded
+# because the bootstrap script is in a separate branch right now; pull
+# from JSON output once it lands on main.
+BOOTSTRAP_CI = {
+    "mean_delta": 0.026027,
+    "ci_low":     0.014270,
+    "ci_high":    0.037373,
+    "n_events":   26,
+    "n_resamples": 50000,
+    "seed":       20260516,
+}
+# Headline decomposition (Codex PR #6): Sonnet 4.6 run with the NEW floor
+# formula scored 0.041838; production Opus 4.7 scored 0.037912.
+# So the floor-bug fix accounts for ~85% of the 0.0639 → 0.0379 gap;
+# the model swap accounts for ~15%.
+DECOMPOSITION = {
+    "phase1_sonnet_old_floor": 0.063939,
+    "sonnet_new_floor":        0.041838,
+    "phase2_opus_new_floor":   0.037912,
+}
 
 # Open-event ablations Codex ran. No actuals (events unresolved), so we
 # compute model-agreement statistics instead of Brier.
@@ -130,9 +153,15 @@ def _compute_summary() -> dict[str, Any]:
     per_model: dict[str, dict[str, Any]] = {}
     for label, fname, color in ABLATION_FILES:
         preds = _load_predictions(ROOT / "data/predictions" / fname)
-        binary, multi = [], []
-        binary_actual, multi_actual = [], []
-        binary_p = []  # for reliability diagram (production model only)
+        # Track BOTH scoring rules consistently across all events so the
+        # cross-model table compares apples to apples. Mixing was a real
+        # bug; see docs/DECISIONS.md 2026-05-17 entry.
+        single_binary_all = []   # (p_yes - 1{out[0] won})^2 for every event
+        multiclass_all = []      # proper multi-class for every event
+        binary_only = []         # binary subset, for binary-mean column
+        multi_only = []          # multi-outcome subset, for multi-mean column
+        binary_p = []
+        binary_actual = []
 
         for ticker, ev in by_ticker.items():
             if ticker not in preds:
@@ -145,27 +174,35 @@ def _compute_summary() -> dict[str, Any]:
                 continue
             wi = outs.index(winner)
             p = preds[ticker]
-            if len(outs) == 2 and "p_yes" in p:
-                py = p["p_yes"]
-                actual = 1 if wi == 0 else 0
-                binary.append((py - actual) ** 2)
-                binary_actual.append(actual)
+            py = p.get("p_yes", 0.5)
+            actual_bin = 1 if wi == 0 else 0
+            sb = (py - actual_bin) ** 2
+            single_binary_all.append(sb)
+            pmap = {pp.get("market"): pp.get("probability", 0.0)
+                    for pp in p.get("probabilities", [])}
+            vec = [pmap.get(o, 1.0 / len(outs)) for o in outs]
+            mc = _multi_brier(vec, wi)
+            multiclass_all.append(mc)
+            if len(outs) == 2:
+                binary_only.append(sb)
                 binary_p.append(py)
+                binary_actual.append(actual_bin)
             else:
-                pmap = {pp.get("market"): pp.get("probability", 0.0)
-                        for pp in p.get("probabilities", [])}
-                vec = [pmap.get(o, 1.0 / len(outs)) for o in outs]
-                multi.append(_multi_brier(vec, wi))
+                multi_only.append(mc)
 
         per_model[label] = {
             "color": color,
-            "mean_brier": (sum(binary + multi) / len(binary + multi))
-                          if (binary or multi) else None,
-            "binary_mean": sum(binary) / len(binary) if binary else None,
-            "multi_mean": sum(multi) / len(multi) if multi else None,
-            "n_binary": len(binary),
-            "n_multi": len(multi),
-            "binary_briers": binary,
+            # Primary headline = single-binary (matches PA CLI evaluator)
+            "mean_brier": (sum(single_binary_all) / len(single_binary_all))
+                          if single_binary_all else None,
+            # Secondary diagnostic = proper multi-class
+            "multiclass_mean": (sum(multiclass_all) / len(multiclass_all))
+                               if multiclass_all else None,
+            "binary_mean": sum(binary_only) / len(binary_only) if binary_only else None,
+            "multi_mean":  sum(multi_only)  / len(multi_only)  if multi_only  else None,
+            "n_binary": len(binary_only),
+            "n_multi":  len(multi_only),
+            "binary_briers": binary_only,
             "binary_p": binary_p,
             "binary_actual": binary_actual,
         }
@@ -214,16 +251,30 @@ def _open_rows(s: dict[str, Any]) -> list[str]:
 def _render_html(s: dict[str, Any]) -> str:
     rows = []
     for label, m in s["per_model"].items():
-        mb = m["mean_brier"]
-        bm = m["binary_mean"]
-        mm = m["multi_mean"]
+        mb = m["mean_brier"]           # single-binary (PA CLI metric, primary)
+        mcm = m.get("multiclass_mean") # proper multi-class (secondary)
+        mm = m["multi_mean"]           # multi-only subset
         rows.append(f"""<tr>
             <td><span class="dot" style="background:{m['color']}"></span><strong>{label}</strong></td>
             <td>{f"{mb:.4f}" if mb is not None else '—'}</td>
-            <td>{f"{bm:.4f}" if bm is not None else '—'}</td>
+            <td>{f"{mcm:.4f}" if mcm is not None else '—'}</td>
             <td>{f"{mm:.4f}" if mm is not None else '—'}</td>
             <td>{m['n_binary']} + {m['n_multi']}</td>
         </tr>""")
+
+    # Decomposition + bootstrap numbers (pulled in here so they're in scope
+    # of the f-string body below).
+    phase1_sonnet_old_floor = DECOMPOSITION["phase1_sonnet_old_floor"]
+    sonnet_new_floor = DECOMPOSITION["sonnet_new_floor"]
+    phase2_opus_new_floor = DECOMPOSITION["phase2_opus_new_floor"]
+    delta_total = phase1_sonnet_old_floor - phase2_opus_new_floor
+    delta_floor_only = phase1_sonnet_old_floor - sonnet_new_floor
+    pct_floor_share = 100.0 * delta_floor_only / delta_total if delta_total else 0.0
+    boot_mean = BOOTSTRAP_CI["mean_delta"]
+    boot_lo = BOOTSTRAP_CI["ci_low"]
+    boot_hi = BOOTSTRAP_CI["ci_high"]
+    boot_n_resamples = BOOTSTRAP_CI["n_resamples"]
+    boot_seed = BOOTSTRAP_CI["seed"]
 
     return f"""<!doctype html>
 <html lang="en"><head>
@@ -283,16 +334,51 @@ def _render_html(s: dict[str, Any]) -> str:
   <div class="kpi"><div class="lbl">vs random</div><div class="val">{(1 - s['per_model']['Opus 4.7 (production)']['mean_brier'] / s['baselines']['random_binary']) * 100:.0f}%</div></div>
 </div>
 
-<h2>5-model Brier comparison (same pipeline, swap the LLM)</h2>
+<h2>Multi-model Brier comparison (same pipeline, swap the LLM)</h2>
 <table>
-  <thead><tr><th>Model</th><th>Mean Brier</th><th>Binary</th><th>Multi-outcome</th><th>n (bin+multi)</th></tr></thead>
+  <thead><tr>
+    <th>Model</th>
+    <th>Single-binary (PA CLI)</th>
+    <th>Multi-class (proper)</th>
+    <th>Multi-only (n=12)</th>
+    <th>n (bin+multi)</th>
+  </tr></thead>
   <tbody>
   {''.join(rows)}
   <tr><td><em>random 0.5 baseline</em></td><td>{s['baselines']['random_binary']:.4f}</td><td>—</td><td>—</td><td>—</td></tr>
   <tr><td><em>uniform 1/n prior</em></td><td>{s['baselines']['uniform_prior']:.4f}</td><td>—</td><td>—</td><td>—</td></tr>
   </tbody>
 </table>
-<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all five rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set.
+<br><br>
+<strong>Two metrics shown:</strong> PA's CLI evaluator (<code>prophet forecast evaluate</code>) implements <em>single-binary</em> Brier on <code>(p_yes − 1{{outcomes[0] won}})²</code>; PA's docs describe <em>proper multi-class</em> Brier summed across all outcomes. We report both. The earlier draft of this report mixed metrics across rows — postmortem in <code>docs/DECISIONS.md</code> 2026-05-17 entry. Under single-binary (the verifiable metric), Opus 4.7 wins by ~3.4% over Opus 4.6. Under multi-class, Opus 4.6 is marginally better (0.2500 vs 0.2558).</p>
+
+<h2>Where the win came from — floor fix vs model swap</h2>
+<div class="results">
+  <table>
+    <thead><tr><th>Variant</th><th>Mean Brier</th><th>Δ from baseline</th></tr></thead>
+    <tbody>
+      <tr><td>Sonnet 4.6 + old floor (clamps binary to 0.25)</td><td class="brier">{phase1_sonnet_old_floor:.4f}</td><td>baseline</td></tr>
+      <tr><td>Sonnet 4.6 + new floor (caps at 0.10)</td><td class="brier">{sonnet_new_floor:.4f}</td><td>−{delta_floor_only:.4f} ({pct_floor_share:.0f}% of the gap)</td></tr>
+      <tr class="highlight"><td><strong>Opus 4.7 + new floor (production)</strong></td><td class="brier">{phase2_opus_new_floor:.4f}</td><td>−{delta_total:.4f} (full gap)</td></tr>
+    </tbody>
+  </table>
+  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet→Opus swap accounts for the remaining ~15%. Numbers from Codex's paired-bootstrap branch (`scripts/bootstrap_brier_ci.py`), pinned-seed reproducible.</p>
+</div>
+
+<h2>Statistical significance — paired-bootstrap on the headline delta</h2>
+<div class="results">
+  <p>The Phase 2 improvement (0.0639 → 0.0379) on n=26 paired events:</p>
+  <table>
+    <tbody>
+      <tr><td>Mean Brier improvement</td><td class="brier">{boot_mean:.4f}</td></tr>
+      <tr><td>95% paired-bootstrap CI</td><td class="brier">[{boot_lo:.4f}, {boot_hi:.4f}]</td></tr>
+      <tr><td>Resamples</td><td>{boot_n_resamples:,}</td></tr>
+      <tr><td>Random seed</td><td>{boot_seed}</td></tr>
+    </tbody>
+  </table>
+  <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
+</div>
 
 <h2>Calibration curve · production (Opus 4.7) on binary events</h2>
 <figure>

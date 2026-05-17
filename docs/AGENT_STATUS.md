@@ -43,6 +43,20 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
   - CI/CD: preflight gate, deploy wrapper, `/healthz` commit SHA, dashboard polish (architecture image, brand fix, favicon, OG tags), commit SHA visible on `/` and `/dashboard`.
   - Dashboard try-form overhauled: example dropdown, description + rules fields, validation, latency display.
 
+## codex/live-frontend-observatory
+
+- **Current task:** Completed public/private frontend split: `/` is now a restrained public status page, `/observatory` is the PIN-gated research and operations console.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `tests/test_pin_auth.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T02:04:09Z
+- **Notes:** No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Public `/` intentionally omits exact model names, retrieval vendor, scoring formulas, GPT/Gemini comparison, and source links during active scoring. Internal `/observatory` keeps the live commit, variant, prediction count, first-call watch, GPT-5.5 answer, experiment board, and adversarial-review notes behind dashboard auth. Verified by focused auth/frontend tests, full `pytest tests/`, local content scrub check, and `./scripts/agent/verify.sh`.
+
+## codex/persistent-observatory
+
+- **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `scripts/agent/deploy.sh`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T02:43:28Z
+- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. `scripts/agent/deploy.sh` now deploys a minimal runtime bundle after preflight to avoid the repeated full-repo Railway code-snapshot/TLS upload failures. Railway production volume `oracles-agent-volume` (`1ae021a5-353d-4917-a474-8a5e0aa6dced`) is mounted on `oracles-agent` at `/data`; latest deployment `0b16e0f5` is `SUCCESS` and shows `volumeMounts: ["/data"]`. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py` changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, `./scripts/agent/verify.sh`, Railway volume list, Railway status, and live `/healthz`.
+
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
 Concrete asks for Codex. Items 1-5 from the prior list are DONE. This
@@ -111,23 +125,85 @@ opens, PA will publish resolved outcomes somewhere. When it does, run
 `scripts/analyze_results.py` to compute live Brier vs the public
 leaderboard. Document the gap in `docs/DECISIONS.md`.
 
-**6. Brave reliability monitor.** Silent retrieval degradation is the
-most plausible "we shipped retrieval-less" failure mode and is not
-covered by `scripts/full_check.sh`. Add a check that fires a probe
-query and asserts `len(results) >= 3`. Either a separate
-`scripts/brave_health.sh` or extend `full_check.sh` with step 11.
+**6. Brave reliability monitor.** ~~DONE in `baba9b0`.~~
+`scripts/brave_health.sh` ships, exits 0/1/2 for ok/degraded/unhealthy,
+parses Brave's `x-ratelimit-policy` + `x-ratelimit-remaining` headers
+correctly (the `0` slot is "no cap" on the AI Data tier, not
+exhaustion). **Open follow-up:** wire it into `scripts/full_check.sh`
+as step 11, and ideally into a launchd / cron job that fires hourly
+during the eval window.
+
+**7. Test coverage gaps (real ones, not theoretical):**
+   - `_distribute_p_yes_to_outcomes` (legacy binary adapter used by
+     `single_llm`, `opus_47`, `opus_46` variants) — has a basic happy-path
+     test but no edge cases (zero outcomes, single outcome, very-low p_yes,
+     duplicate outcome labels).
+   - Ensemble variants `predict_ensemble_logit` and
+     `predict_ensemble_leaderboard` — exist in `forecast_track.py`,
+     not in production routing, no tests beyond import.
+   - `predict_hybrid_routed` — exists, no edge tests for the binary↔multi
+     routing boundary (n=2 with weird labels, n=3 hitting both paths).
+   - `predict_multi_outcome_retrieval_sae` (Codex's offline variant) —
+     has `tests/test_forecast_track_sae.py` but tests are integration-
+     style; no unit tests for the shrinkage math itself.
+   - `chat_completions_adapter.py` — 16 tests cover the happy paths;
+     untested: streaming attempts with malformed body, very-long messages
+     past Anthropic context, attempted tool use, role='function' messages.
+   - `forecast_agent_server.py:predict()` handler — covered for happy
+     path + edge cases via `tests/test_predict_edge_cases.py`, but
+     `_PREDICTION_HISTORY` ring buffer behavior (50-record cap, eviction
+     order) is not explicitly tested.
+   - Pipeline trace fields — populated correctly per smoke, but no
+     test that asserts every field is present after a successful call.
+
+**8. Real failure modes not currently monitored beyond Brave:**
+   - Anthropic rate-limit / quota exhaustion (would fall through to
+     uniform; no monitor)
+   - In-memory `_PREDICTION_HISTORY` resets on every Railway restart
+     (observability gap; not Brier-affecting)
+   - Live commit drift from `main` (mitigated by `/healthz.commit` but
+     manual check)
+   - OpenRouter quota for ablations (only matters if we re-run them)
 
 ### Active state (refresh before claiming!)
 
-- main: `19bd1a93` (chat-completions shim) — verify with `git log --oneline -1`
-- production live commit: should match main; verify with `curl -s https://agent.forecastingpath.com/healthz | jq .commit`
+- main: `411c5f9` (`fix(deploy): upload minimal Railway runtime bundle`) — verify with `git log --oneline -1`
+- production live commit: `411c5f99`; verify with `curl -s https://agent.forecastingpath.com/healthz | jq .commit`
 - variant: `multi_outcome_retrieval` (Opus 4.7 + market-anchor + 0.10 floor)
-- tests: ~213 passing
+- tests: 221 passing
 - session spend: ~$13 of "100s" budget
 - watcher: PID 33661, ~5h uptime, no PA activity yet
-- open PRs on GitHub: 0
+- open draft PRs on GitHub: #5 SSE pipeline demo, #6 paired Brier bootstrap CI, #7 Brave health in full check, #8 hybrid routing edge tests, #9 ensemble variant tests, #11 observatory design spec. Several are likely partially superseded by main; review before merging.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
-- PA general onboarding (prophetarena.co/onboarding): NOT yet submitted — needs `/v1/chat/completions` shim to be live (deploying as of this commit), then Rob submits the form himself
+- PA general onboarding (prophetarena.co/onboarding): verify current status before claiming; `/v1/chat/completions` shim is live with auth.
+
+## codex/full-check-brave
+
+- **Current task:** Brave Search reliability monitor wired into `scripts/full_check.sh`.
+- **Files owned this session:** `scripts/full_check.sh`, `tests/test_full_check_script.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:06:29Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-full-check-brave` / `codex/full-check-brave`. Adds full-check step 5 for `scripts/brave_health.sh --quiet`; later checks renumbered to 11 total. Verified with shell syntax check, focused test, full pytest, and `./scripts/agent/verify.sh`.
+
+## codex/bootstrap-ci
+
+- **Current task:** Paired-bootstrap CI plus Phase 2 decomposition implemented and verified.
+- **Files owned this session:** `scripts/bootstrap_brier_ci.py`, `scripts/backtest_forecast.py`, `tests/test_bootstrap_brier_ci.py`, `tests/test_backtest_forecast.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:04:29Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-bootstrap-ci` / `codex/bootstrap-ci`. Result on existing snapshots: Opus Phase 2 Brier 0.037912 vs Sonnet Phase 1 0.063939, mean improvement 0.026027, 95% paired-bootstrap CI [0.014270, 0.037373] from 50,000 resamples, seed 20260516. Local Sonnet rerun with the current floor scored 0.041838: floor fix accounts for 0.022100/0.026027 (~85%) of the headline improvement; Opus vs current-floor Sonnet accounts for 0.003927 (~15%) with 95% CI [-0.004346, 0.015081]. Reports written under ignored `reports/`. Also fixed `scripts/backtest_forecast.py` to use a PATH `prophet` CLI when a worktree has no local `.venv/`.
+
+## codex/ensemble-tests
+
+- **Current task:** Add non-production tests for `predict_ensemble_logit` and `predict_ensemble_leaderboard`.
+- **Files owned this session:** `tests/test_ensemble_variants.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:46:06Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-ensemble-tests` / `codex/ensemble-tests`. Avoids production `multi_outcome_retrieval`, Railway env vars, `forecast_agent_server.py`, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, and `chat_completions_adapter.py`.
+
+## codex/hybrid-routing-tests
+
+- **Current task:** Add non-production edge tests for `predict_hybrid_routed` routing and fix its one-outcome edge case.
+- **Files owned this session:** `forecast_track.py`, `tests/test_hybrid_routing.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:17:04Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-hybrid-routing-tests` / `codex/hybrid-routing-tests`. Does not touch production `multi_outcome_retrieval`, Railway env vars, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py`.
 
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 
@@ -139,6 +215,13 @@ query and asserts `len(results) >= 3`. Either a separate
 - **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`
 - **Last updated:** 2026-05-16T23:57:38Z
 - **Notes:** Worktree branch `.claude/worktrees/codex-sse-demo` / `codex/sse-demo`. Verified by focused SSE tests, full `pytest tests/ -q` (218 passed), `./scripts/agent/verify.sh`, and local browser smoke. Respect strict bounds: no `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `static/`, `chat_completions_adapter.py`, Railway env vars, or production variant changes.
+
+## codex/observatory-design
+
+- **Current task:** Design-only branch for the next auth-gated Observatory surface: live health, prediction traces, experiment matrix, adversarial review, and public/private visibility split.
+- **Files owned this session:** `docs/superpowers/specs/2026-05-16-forecastingpath-observatory-design.md`, `.gitignore`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T01:58:00Z
+- **Notes:** No production code, `static/`, submission artifacts, research findings, decision log, Railway env vars, or production variant touched. Public `/` currently reveals exact model, variant, retrieval recipe, longshot formula, commit SHA, and failure-mode details; design recommends moving those details behind PIN during active scoring. GPT-5.5 was tried and is not a production swap: all-event single-binary Brier 0.0920 vs Opus 4.7 0.0378. `docs/WORKSHOP_PAPER_DRAFT.md` still has stale pre-correction metric claims and should be handled by the content owner.
 
 ## codex/sae-variant
 

@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-05-16T20:39:02.280953+00:00",
+  "predictions": [
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.1,
+      "rationale": "Evidence [2] explicitly states Ebster defeated Najzer."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.1,
+      "rationale": "Evidence [4] shows Johns defeated Rocha 6-3, 7-6."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.1,
+      "rationale": "Evidence [2] explicitly states Lalami Laaroussi defeated Perez."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.55,
+      "rationale": "No clear winner indicated in snippets; slight lean to Bax based on listing order/framing but essentially a toss-up."
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5,
+      "rationale": "No specific evidence on form or odds; both players roughly comparable so default to prior."
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence shows Bangladesh won by 104 runs in the 1st Test."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple sources confirm Glamorgan beat Somerset by two wickets."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence [1] explicitly states Sussex won by 222 runs."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.1,
+      "rationale": "Evidence confirms Durham won by nine wickets."
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.82,
+      "rationale": "PSG dominant favorite, leading early season and reigning champions; Marseille main challenger."
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.05,
+      "rationale": "Evidence indicates Barcelona clinched the 2025-26 La Liga title with a May 10 win over Real Madrid."
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.05,
+      "rationale": "Conflicting evidence: some sources say Sporting retained, one says FC Porto won 2025/26; Braga not mentioned as champion."
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.22,
+      "rationale": "Top contenders Inter, Napoli (defending champ), and Milan lead; Roma surprise contender; rest are long shots."
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.8,
+      "rationale": "Multiple sources confirm NAC Breda won 2-0."
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Evidence states OKC swept Lakers in Game 4 on May 11, 2026."
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.05,
+      "rationale": "Evidence states Matthew Schaefer won the 2026 Calder Trophy."
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.49999999999999983,
+      "rationale": "Evidence directly reports Netflix named Kevin Hart as the next roast subject after Tom Brady."
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "rationale": "No winner declared yet in evidence; slight boosts to Round 1 winners (Jet Tila, Claudette Zepeda, Jonathon Sawyer) and reductions to confirmed eliminations."
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.05,
+      "rationale": "Multiple sources confirm Dee Valladares was eliminated in episode 7."
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.05,
+      "rationale": "14 Karat Carrot eliminated in episode 10; finale revealed other winner\u2014Pugcasso (Phillip Phillips) is most likely based on finale recap context."
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.1,
+      "rationale": "Multiple sources including AP confirm Vince George defeated Brit Aguirre in the Democratic primary."
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.8999999999999999,
+      "rationale": "Multiple sources confirm Magyar was sworn in as PM on May 9, 2026, ending Orb\u00e1n's rule."
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.8999999999999999,
+      "rationale": "AP and multiple sources confirm Don Leonard won the Democratic primary."
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.82,
+      "rationale": "Multiple sources report the governing Historic Pact coalition won the most seats in the 2026 congressional elections."
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.05,
+      "rationale": "Evidence indicates a 6-3 decision; Louisiana was the petitioner but the ruling affirmed the district court against Louisiana's map, so 3 justices likely sided with Louisiana."
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.05,
+      "rationale": "Evidence cites Senate confirming Warsh 54-45 along party lines."
+    }
+  ]
+}

@@ -42,13 +42,44 @@ cross-model agreement analysis since outcomes are unresolved.
 
 | Variant (LLM only swap; pipeline identical) | Mean Brier ↓ | Binary (n=14) | Multi-outcome (n=12) |
 |---|---:|---:|---:|
-| **Claude Opus 4.7 (production)** | **0.0379** | 0.0425 | **0.0177** |
-| Claude Sonnet 4.6 (previous prod) | 0.0639 | 0.0879 | — |
-| Claude Opus 4.6 | 0.2264 | 0.0438 | 0.4396 |
-| OpenAI GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
-| Gemini 3.1 Pro Preview | 0.4149 | 0.0750 | 0.8115 |
+**Scoring methodology:** Prophet Arena's CLI evaluator implements
+single-binary Brier on `(p_yes - 1{outcomes[0] won})²`. PA's published
+docs describe multi-class Brier (sum across outcomes per event); the
+CLI does not implement that. Both reported below; primary headline
+is single-binary because that's what we can verify locally against
+PA's own evaluator.
+
+| Variant | Single-binary ↓ | Multi-class ↓ | Multi-only (n=12) |
+|---|---:|---:|---:|
+| **Claude Opus 4.7 (production)** | **0.0378** | 0.2558 | 0.4551 |
+| Claude Opus 4.6 | 0.0391 | **0.2500** | 0.4396 |
+| OpenAI GPT-5.2 | 0.0438 | 0.2874 | 0.4971 |
+| Claude Sonnet 4.6 (previous prod) | 0.0639 | (0.6912)* | — |
+| OpenAI GPT-5.5 | 0.0920 | 0.3429 | 0.6552 |
+| Gemini 3.1 Pro Preview | 0.0983 | 0.4773 | 0.8115 |
 | Random 0.5 baseline | 0.250 | — | — |
 | Uniform 1/n prior | 0.219 | — | — |
+
+*Sonnet's prediction file pre-dates the bug fix that adds per-outcome
+probabilities; the multi-class number reflects the 1/n uniform
+fallback, not real model behavior. Single-binary is unaffected.
+
+**Paired-bootstrap CI on the headline Opus 4.7 vs Sonnet 4.6 delta**
+(under single-binary scoring): mean improvement 0.0260, 95% CI
+[0.0143, 0.0374], 50,000 resamples, seed `20260516`, n=26 paired
+events. CI excludes zero; significant at α=0.05.
+
+**Phase 2 decomposition** (same paired-bootstrap branch):
+
+| Variant | Mean Brier |
+|---|---:|
+| Sonnet 4.6 + old longshot floor (clamps binary to 0.25) | 0.0639 |
+| Sonnet 4.6 + new floor (caps at 0.10) | 0.0418 |
+| **Opus 4.7 + new floor (production)** | **0.0379** |
+
+The floor-fix bug accounts for ~85% of the 0.0260 improvement; the
+Sonnet→Opus 4.7 swap accounts for ~15%. The dominant gain is from
+fixing post-processing, not from the model upgrade.
 
 Source: `data/predictions/{multi_outcome_retrieval,ablation_*}.json`,
 joined with `data/resolved.json` ground truth. Brier as defined in
@@ -56,19 +87,38 @@ joined with `data/resolved.json` ground truth. Brier as defined in
 
 ---
 
-## 3. The dominant driver is JSON schema compliance, not reasoning
+## 3. Schema compliance: a hypothesis that partially holds
 
-The 5-model comparison decomposes by outcome count:
+**Revised after the 2026-05-17 scoring-methodology correction.** The
+earlier draft claimed a "25× multi-outcome gap" between Opus 4.7 and
+alternatives; that was an artifact of comparing Opus 4.7's
+single-binary Brier (0.0177 multi-only) to alternatives' multi-class
+Brier (0.44–0.81). Under consistent multi-class scoring on the same
+events, Opus 4.7's multi-only Brier is 0.4551 — barely better than
+Opus 4.6 (0.4396, actually slightly better) and competitive with
+GPT-5.2 (0.4971).
 
-- **Binary events (n=14).** All 5 models within a factor of 2. Opus 4.7
-  0.0425, Gemini 3.1 Pro 0.0750. The gap is real but not large;
-  reasoning quality matters here.
-- **Multi-outcome events (n=12).** Opus 4.7 0.0177 vs Opus 4.6 0.4396 —
-  a **25× gap**. This is not a reasoning gap.
+The schema-compliance hypothesis holds most clearly for two of the
+six models:
+
+- **Gemini 3.1 Pro Preview:** multi-only 0.8115. Inspection of
+  rationale + parsed outputs shows persistent label drift ("Other"
+  instead of supplied labels) and JSON-shape contamination.
+- **GPT-5.5:** multi-only 0.6552 despite being competitive on
+  single-binary (0.0376 binary-only, the best of any model). It
+  emits well-formed JSON but assigns probability to labels not in
+  the supplied outcomes list.
+
+For the other three alternatives (Opus 4.6, GPT-5.2, and earlier
+Sonnet 4.6), the gap to Opus 4.7 is small enough that "schema
+compliance" is no longer the dominant explanation; differences are
+more plausibly accounted for by random variance on n=12 multi-outcome
+events.
 
 Inspection of the failure cases (per-call `_trace.warnings`,
 `_trace.fuzzy_matches`, and the raw ablation prediction files) shows
-the three non-production models routinely emit JSON where:
+the four non-production models (Opus 4.6, GPT-5.2, GPT-5.5, Gemini
+3.1 Pro) routinely emit JSON where:
 
 - Keys do not exactly match outcome labels supplied in the prompt
   ("Kansas City" instead of "Kansas City Chiefs"; "Yes." instead of
@@ -242,3 +292,24 @@ that produce or reproduce these:
 - End-to-end audit: `./scripts/full_check.sh`
 
 Source: <https://github.com/Robby955/prophet-hacks>
+
+---
+
+## Addendum — relevant outside work (2026-05-17)
+
+**FutureSim** (Goel et al., arXiv 2605.15188): a benchmark that
+replays real-world events chronologically (Jan-Mar 2026) to evaluate
+LLM forecasting agents on Brier and accuracy. Headline: "best agent's
+accuracy was 25%, many had worse Brier skill score than making no
+prediction at all."
+
+Relevance to this work:
+- Reinforces that LLM forecasting is genuinely hard. Our 0.0379 on
+  n=26 should not be over-claimed as a generalization; FutureSim's
+  larger eval shows even SOTA agents struggle.
+- The "worse Brier skill score than no prediction" finding maps to
+  what our parser-hardening + outcomes-safety-net work prevents
+  on our side: when models confidently emit malformed JSON, falling
+  through to uniform prior is empirically a winning move.
+- Worth citing in the post-event workshop paper as the broader
+  context for our schema-compliance finding.

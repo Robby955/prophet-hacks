@@ -17,6 +17,9 @@ dist/
 .ruff_cache/
 .coverage
 
+# Local brainstorming companion output; do not deploy or commit.
+.superpowers/
+
 # Optional local build-time SHA fallback; never committed
 .commit_sha
 

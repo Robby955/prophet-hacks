@@ -1529,7 +1529,7 @@ def predict_hybrid_routed(event: dict) -> dict:
         if n == 0:
             probs = []
         elif n == 1:
-            probs = [{"market": outs[0], "probability": p}]
+            probs = [{"market": outs[0], "probability": 1.0}]
         else:
             probs = [
                 {"market": outs[0], "probability": p},

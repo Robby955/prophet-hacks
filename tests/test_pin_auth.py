@@ -136,6 +136,13 @@ def test_compare_open_unauthed_redirects_to_login(configured_client):
     assert r.headers["location"].startswith("/login")
 
 
+def test_observatory_unauthed_redirects_to_login(configured_client):
+    r = configured_client.get("/observatory", headers={"accept": "text/html"})
+    assert r.status_code == 303
+    assert r.headers["location"].startswith("/login")
+    assert "next=%2Fobservatory" in r.headers["location"]
+
+
 def test_predictions_unauthed_returns_401_json(configured_client):
     """API endpoint should NOT redirect; should return 401."""
     r = configured_client.get("/predictions",
@@ -163,6 +170,15 @@ def test_dashboard_authed_via_query_token(configured_client):
     """Legacy ?token=… path still works (so old bookmarks don't break)."""
     r = configured_client.get("/dashboard?token=secret-token-xyz")
     assert r.status_code == 200
+
+
+def test_observatory_authed_via_cookie(configured_client):
+    r = configured_client.get(
+        "/observatory",
+        cookies={"dashboard_token": "secret-token-xyz"},
+    )
+    assert r.status_code == 200
+    assert "ForecastingPath Observatory" in r.text
 
 
 # -- No PIN configured: HTML routes 401 instead of redirect (graceful) ----

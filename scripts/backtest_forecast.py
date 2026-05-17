@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import shutil
 import subprocess
 import sys
 import time
@@ -58,17 +59,31 @@ def _now_iso() -> str:
 
 
 def _predict_one(name: str, fn, event: dict) -> dict:
-    """Predict a single event; never raises — errors become 0.5 fallbacks."""
+    """Predict a single event; never raises — errors become 0.5 fallbacks.
+
+    Returns the full canonical prediction shape including the per-outcome
+    `probabilities` array and the `evidence_urls` list, so downstream
+    analysis (proper multi-class Brier, calibration, decomposition) can
+    operate on the actual model output rather than fall back to uniform.
+
+    Bug fix 2026-05-17: prior version dropped the `probabilities` array,
+    which made multi-outcome events in the saved file unusable for
+    proper-Brier evaluation. build_summary_report.py defaulted to 1/n
+    per outcome, producing misleadingly-low multi-Brier numbers.
+    """
     ticker = event.get("market_ticker") or event.get("event_ticker")
     try:
         result = fn(event)
     except Exception as ex:
         log.warning("[%s] event %s raised: %s", name, ticker, ex)
-        result = {"p_yes": 0.5, "rationale": f"error: {ex}"}
+        result = {"p_yes": 0.5, "rationale": f"error: {ex}",
+                  "probabilities": [], "evidence_urls": []}
     return {
         "market_ticker": ticker,
         "p_yes": float(result["p_yes"]),
         "rationale": str(result.get("rationale", ""))[:300],
+        "probabilities": result.get("probabilities", []) or [],
+        "evidence_urls": (result.get("evidence_urls") or [])[:8],
     }
 
 
@@ -112,11 +127,27 @@ def write_submission(predictions: list[dict], out_path: Path) -> None:
     out_path.write_text(json.dumps(submission, indent=2))
 
 
+def _prophet_executable(repo_root: Path | None = None) -> str:
+    root = repo_root or Path(__file__).resolve().parent.parent
+    local_prophet = root / ".venv" / "bin" / "prophet"
+    if local_prophet.exists():
+        return str(local_prophet)
+    path_prophet = shutil.which("prophet")
+    if path_prophet:
+        return path_prophet
+    raise FileNotFoundError(
+        "prophet CLI not found; activate the repo venv or put prophet on PATH",
+    )
+
+
 def evaluate(submission_path: Path, actuals_path: Path) -> dict:
     """Invoke `prophet forecast evaluate` and parse its output."""
-    prophet = Path(__file__).resolve().parent.parent / ".venv" / "bin" / "prophet"
+    try:
+        prophet = _prophet_executable()
+    except FileNotFoundError as exc:
+        return {"error": str(exc), "stdout": ""}
     cmd = [
-        str(prophet), "forecast", "evaluate",
+        prophet, "forecast", "evaluate",
         "--submission", str(submission_path),
         "--actuals", str(actuals_path),
     ]

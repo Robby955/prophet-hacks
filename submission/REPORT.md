@@ -73,22 +73,74 @@ steps (event-in / JSON-out) for visual clarity — the work is in the
 `sample-resolved` — 26 resolved Prophet Arena events. Same retrieval +
 prompt; only the LLM call swaps.
 
-| Variant | Brier ↓ | Binary (n=14) | Multi-outcome (n=12) |
+**Scoring methodology note.** Prophet Arena's CLI evaluator
+(`prophet forecast evaluate`) implements single-binary Brier on
+`(p_yes - 1{outcomes[0] won})²`. PA's published formula suggests
+multi-class Brier (sum across all outcomes per event); their CLI does
+not implement that. We report both metrics. The primary headline is
+single-binary because that's what we can verify locally against PA's
+own evaluator; multi-class is a caveat in case live scoring differs.
+
+| Variant | Single-binary ↓ | Multi-class ↓ | Multi-only (n=12) |
 |---|---:|---:|---:|
-| **Claude Opus 4.7 (production)** | **0.0379** | 0.0425 | **0.0177** |
-| Claude Sonnet 4.6 (previous prod) | 0.0639 | 0.0879 | — |
-| Claude Opus 4.6 (PA leaderboard top agent) | 0.2264 | 0.0438 | 0.4396 |
-| OpenAI GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
-| Gemini 3.1 Pro Preview (PA leaderboard #1 fixed-context) | 0.4149 | 0.0750 | 0.8115 |
+| **Claude Opus 4.7 (production)** | **0.0378** | 0.2558 | 0.4551 |
+| Claude Opus 4.6 (PA leaderboard top agent) | 0.0391 | **0.2500** | 0.4396 |
+| OpenAI GPT-5.2 | 0.0438 | 0.2874 | 0.4971 |
+| Claude Sonnet 4.6 (previous prod) | 0.0639 | (0.6912)* | — |
+| OpenAI GPT-5.5 | 0.0920 | 0.3429 | 0.6552 |
+| Gemini 3.1 Pro Preview | 0.0983 | 0.4773 | 0.8115 |
 | *random 0.5 baseline* | 0.250 | — | — |
 | *uniform 1/n prior* | 0.219 | — | — |
 
-**Production wins decisively, but: n=26 is small and binary-skewed
-(16/26 are sports matchups).** The confidence interval on the Opus vs
-Sonnet delta (0.0379 vs 0.0639) is wide; the substantial gap to the
-other LLMs is robust because it's not a single delta — it's three
-independent failure modes all the alternatives hit on multi-outcome
-events.
+*Sonnet's prediction file pre-dates the bug fix that adds per-outcome
+probabilities; its multi-class number reflects the uniform 1/n
+fallback, not real model behavior. Single-binary is unaffected.
+
+**Honest comparison:** Opus 4.7 wins single-binary by **3.4%** over
+Opus 4.6 (0.0378 vs 0.0391), not the 5× claim from an earlier draft
+of this report (which had compared metrics inconsistently across
+models — postmortem in `docs/DECISIONS.md` 2026-05-17 entry). Under
+proper multi-class scoring, Opus 4.6 is marginally *better* (0.2500
+vs 0.2558). Model selection is metric-dependent on n=26; we hold
+Opus 4.7 because PA's CLI scoring (the only metric we can verify)
+favors it, and because the Sonnet→Opus 4.7 transition is the
+production-tested path.
+
+**Phase 2 vs Phase 1 (Sonnet) headline delta:** the
+Opus 4.7 vs Sonnet 4.6 improvement (0.0378 vs 0.0639) has a 95%
+paired-bootstrap CI of [0.0143, 0.0374] (n=26 paired events,
+50,000 resamples, seed `20260516`). The interval excludes zero;
+significant at α=0.05 on this dataset under single-binary scoring.
+
+**Where the win came from (decomposition, single-binary scoring):**
+
+| Variant | Mean Brier |
+|---|---:|
+| Sonnet 4.6 + old longshot floor (clamps binary to 0.25) | 0.0639 |
+| Sonnet 4.6 + new floor (caps at 0.10) | 0.0418 |
+| **Opus 4.7 + new floor (production)** | **0.0378** |
+
+Roughly **85% of the Phase 2 improvement comes from the longshot-floor
+bug fix** (a post-LLM safety-net change); the remaining ~15% is the
+Sonnet→Opus swap. The dominant gain is from fixing a silent
+post-processing bug, not from a model upgrade. We highlight this
+because the discipline finding (boundary tests for safety nets) is
+more transferable than the model choice.
+
+**On the schema-compliance hypothesis (revised):** GPT-5.5 and
+Gemini 3.1 Pro genuinely struggle (single-binary 0.092 and 0.098
+respectively; multi-class 0.34 and 0.48). For Opus 4.6 and GPT-5.2
+the gap to production is small (Opus 4.6 single-binary 0.0391,
+multi-class 0.2500 — *better* than production on multi-class). The
+strongest claim we can defend is "alternative models span a real
+spectrum, with Gemini and GPT-5.5 clearly inferior under both
+metrics." The earlier "25× multi-outcome gap" claim conflated
+single-binary and multi-class scores.
+
+n=26 is small and binary-skewed (16/26 sports matchups); the
+bootstrap CI excludes zero on this dataset under single-binary
+scoring but cannot establish convergence. Live PA performance is
+the only true test.
 
 **Open-event multi-model agreement** (Codex's 4-model ablation across
 the 3 unresolved PA datasets, 42 events, same pipeline):

@@ -1,0 +1,1080 @@
+{
+  "timestamp": "2026-05-16T20:26:53Z",
+  "variant": "v0_production",
+  "model": "claude-opus-4-7",
+  "mean_brier": 0.2301663093403324,
+  "binary_mean": 0.045885714285714294,
+  "multi_mean": 0.4451603369040535,
+  "predictions": [
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH",
+      "p_yes": 0.1,
+      "probabilities": [
+        {
+          "market": "Francisco Rocha",
+          "probability": 0.1
+        },
+        {
+          "market": "Garrett Johns",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "rationale": "Evidence [4] shows Johns defeated Rocha 6-3, 7-6."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL",
+      "p_yes": 0.1,
+      "probabilities": [
+        {
+          "market": "Brandon Perez",
+          "probability": 0.1
+        },
+        {
+          "market": "Younes Lalami Laaroussi",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "rationale": "Evidence [2] explicitly states Lalami Laaroussi defeated Perez."
+    },
+    {
+      "market_ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA",
+      "p_yes": 0.5,
+      "probabilities": [
+        {
+          "market": "Heather Watson",
+          "probability": 0.5
+        },
+        {
+          "market": "Kyoka Okamura",
+          "probability": 0.5
+        }
+      ],
+      "rationale": "No informative evidence; both players are comparable lower-tier pros, defaulting to prior."
+    },
+    {
+      "market_ticker": "KXITFWMATCH-26MAY12NAJEBS",
+      "p_yes": 0.1,
+      "probabilities": [
+        {
+          "market": "Kaja Najzer",
+          "probability": 0.1
+        },
+        {
+          "market": "Anna Lena Ebster",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "rationale": "Evidence [2] explicitly states Ebster defeated Najzer."
+    },
+    {
+      "market_ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN",
+      "p_yes": 0.8999999999999999,
+      "probabilities": [
+        {
+          "market": "Bangladesh",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Pakistan",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Evidence [2] explicitly states Bangladesh won by 104 runs, corroborated by scorecard details in [3]."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA",
+      "p_yes": 0.8999999999999999,
+      "probabilities": [
+        {
+          "market": "Glamorgan",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Somerset",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Multiple sources confirm Glamorgan beat Somerset by two wickets."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR",
+      "p_yes": 0.1,
+      "probabilities": [
+        {
+          "market": "Worcestershire",
+          "probability": 0.1
+        },
+        {
+          "market": "Durham",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "rationale": "Evidence confirms Durham won by nine wickets."
+    },
+    {
+      "market_ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC",
+      "p_yes": 0.5,
+      "probabilities": [
+        {
+          "market": "Florent Bax",
+          "probability": 0.5
+        },
+        {
+          "market": "Adrian Arcon",
+          "probability": 0.5
+        }
+      ],
+      "rationale": "No clear winner indicated in evidence; first career meeting with no odds cited."
+    },
+    {
+      "market_ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS",
+      "p_yes": 0.8999999999999999,
+      "probabilities": [
+        {
+          "market": "Sussex",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Leicestershire",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Evidence reports Sussex won by 222 runs."
+    },
+    {
+      "market_ticker": "KXLALIGA-26",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "Real Madrid",
+          "probability": 0.05
+        },
+        {
+          "market": "Barcelona",
+          "probability": 0.92
+        },
+        {
+          "market": "Atletico Madrid",
+          "probability": 0.05
+        },
+        {
+          "market": "Villarreal",
+          "probability": 0.05
+        },
+        {
+          "market": "Athletic Bilbao",
+          "probability": 0.05
+        },
+        {
+          "market": "Betis",
+          "probability": 0.05
+        },
+        {
+          "market": "Real Sociedad",
+          "probability": 0.05
+        },
+        {
+          "market": "Girona",
+          "probability": 0.05
+        },
+        {
+          "market": "Celta Vigo",
+          "probability": 0.05
+        },
+        {
+          "market": "Valencia",
+          "probability": 0.05
+        },
+        {
+          "market": "Sevilla",
+          "probability": 0.05
+        },
+        {
+          "market": "Getafe",
+          "probability": 0.05
+        },
+        {
+          "market": "Espanyol",
+          "probability": 0.05
+        },
+        {
+          "market": "Osasuna",
+          "probability": 0.05
+        },
+        {
+          "market": "Alaves",
+          "probability": 0.05
+        },
+        {
+          "market": "Mallorca",
+          "probability": 0.05
+        },
+        {
+          "market": "Levante",
+          "probability": 0.05
+        },
+        {
+          "market": "Rayo Vallecano",
+          "probability": 0.05
+        },
+        {
+          "market": "Elche",
+          "probability": 0.05
+        },
+        {
+          "market": "Oviedo",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Evidence indicates Barcelona sealed the 2025-26 La Liga title with a May 10 win over Real Madrid."
+    },
+    {
+      "market_ticker": "KXLIGUE1-26",
+      "p_yes": 0.82,
+      "probabilities": [
+        {
+          "market": "PSG",
+          "probability": 0.82
+        },
+        {
+          "market": "Lille",
+          "probability": 0.05
+        },
+        {
+          "market": "Monaco",
+          "probability": 0.05
+        },
+        {
+          "market": "Lyon",
+          "probability": 0.05
+        },
+        {
+          "market": "Strasbourg Alsace",
+          "probability": 0.05
+        },
+        {
+          "market": "Stade Rennes",
+          "probability": 0.05
+        },
+        {
+          "market": "Marseille",
+          "probability": 0.08
+        },
+        {
+          "market": "Lens",
+          "probability": 0.05
+        },
+        {
+          "market": "Nice",
+          "probability": 0.05
+        },
+        {
+          "market": "Toulouse",
+          "probability": 0.05
+        },
+        {
+          "market": "Paris",
+          "probability": 0.05
+        },
+        {
+          "market": "Angers",
+          "probability": 0.05
+        },
+        {
+          "market": "Le Havre",
+          "probability": 0.05
+        },
+        {
+          "market": "Nantes",
+          "probability": 0.05
+        },
+        {
+          "market": "Auxerre",
+          "probability": 0.05
+        },
+        {
+          "market": "Lorient",
+          "probability": 0.05
+        },
+        {
+          "market": "Stade Brest 29",
+          "probability": 0.05
+        },
+        {
+          "market": "Metz",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "PSG is top of Ligue 1 and dominant favorite as reigning champion; Marseille/Monaco are secondary contenders."
+    },
+    {
+      "market_ticker": "KXEREDIVISIEGAME-26MAY10BREHEE",
+      "p_yes": 0.8,
+      "probabilities": [
+        {
+          "market": "Breda",
+          "probability": 0.8
+        },
+        {
+          "market": "Heerenveen",
+          "probability": 0.1
+        },
+        {
+          "market": "Tie",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Multiple sources confirm NAC Breda won 2-0."
+    },
+    {
+      "market_ticker": "KXLIGAPORTUGAL-26",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "SC Braga",
+          "probability": 0.05
+        },
+        {
+          "market": "Sporting Lisbon",
+          "probability": 0.45
+        },
+        {
+          "market": "FC Porto",
+          "probability": 0.35
+        },
+        {
+          "market": "SL Benfica",
+          "probability": 0.18
+        },
+        {
+          "market": "Vitoria SC Guimaraes",
+          "probability": 0.05
+        },
+        {
+          "market": "Santa Clara Azores",
+          "probability": 0.05
+        },
+        {
+          "market": "Nacional da Madeira",
+          "probability": 0.05
+        },
+        {
+          "market": "Moreirense FC",
+          "probability": 0.05
+        },
+        {
+          "market": "Rio Ave FC",
+          "probability": 0.05
+        },
+        {
+          "market": "FC Arouca",
+          "probability": 0.05
+        },
+        {
+          "market": "Estoril Praia",
+          "probability": 0.05
+        },
+        {
+          "market": "Casa Pia Lisbon",
+          "probability": 0.05
+        },
+        {
+          "market": "CD Tondela",
+          "probability": 0.05
+        },
+        {
+          "market": "FC Famalicao",
+          "probability": 0.05
+        },
+        {
+          "market": "Estrela Amadora",
+          "probability": 0.05
+        },
+        {
+          "market": "AVS Futebol SAD",
+          "probability": 0.05
+        },
+        {
+          "market": "Gil Vicente Barcelos",
+          "probability": 0.05
+        },
+        {
+          "market": "FC Alverca SAD",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Evidence references 2024-25 title (Sporting); 2025-26 still ongoing with traditional Big Three favored, Braga an outside contender."
+    },
+    {
+      "market_ticker": "KXSERIEA-26",
+      "p_yes": 0.22,
+      "probabilities": [
+        {
+          "market": "Napoli",
+          "probability": 0.22
+        },
+        {
+          "market": "Juventus",
+          "probability": 0.08
+        },
+        {
+          "market": "Cremonese",
+          "probability": 0.05
+        },
+        {
+          "market": "Udinese",
+          "probability": 0.05
+        },
+        {
+          "market": "Milan",
+          "probability": 0.22
+        },
+        {
+          "market": "Roma",
+          "probability": 0.12
+        },
+        {
+          "market": "Atalanta",
+          "probability": 0.06
+        },
+        {
+          "market": "Cagliari",
+          "probability": 0.05
+        },
+        {
+          "market": "Como",
+          "probability": 0.05
+        },
+        {
+          "market": "Torino",
+          "probability": 0.05
+        },
+        {
+          "market": "Inter",
+          "probability": 0.32
+        },
+        {
+          "market": "Lazio",
+          "probability": 0.05
+        },
+        {
+          "market": "Bologna",
+          "probability": 0.05
+        },
+        {
+          "market": "Sassuolo",
+          "probability": 0.05
+        },
+        {
+          "market": "Genoa",
+          "probability": 0.05
+        },
+        {
+          "market": "Fiorentina",
+          "probability": 0.05
+        },
+        {
+          "market": "Hellas Verona",
+          "probability": 0.05
+        },
+        {
+          "market": "Pisa",
+          "probability": 0.05
+        },
+        {
+          "market": "Parma Calcio",
+          "probability": 0.05
+        },
+        {
+          "market": "Lecce",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Inter and Napoli are co-favorites with Milan and Roma in contention; minnows near floor."
+    },
+    {
+      "market_ticker": "KXNBASERIES-26LALOKCR2",
+      "p_yes": 0.8999999999999999,
+      "probabilities": [
+        {
+          "market": "Oklahoma City",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Los Angeles L",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "ESPN confirms Thunder swept Lakers 4-0 in second round on May 11, 2026."
+    },
+    {
+      "market_ticker": "KXROASTSUBJECT-30JAN01",
+      "p_yes": 0.4999999999999998,
+      "probabilities": [
+        {
+          "market": "Kevin Hart",
+          "probability": 0.4999999999999998
+        },
+        {
+          "market": "Elon Musk",
+          "probability": 0.05
+        },
+        {
+          "market": "Taylor Swift",
+          "probability": 0.05
+        },
+        {
+          "market": "Drake",
+          "probability": 0.05
+        },
+        {
+          "market": "Joe Rogan",
+          "probability": 0.05
+        },
+        {
+          "market": "Logan Paul",
+          "probability": 0.05
+        },
+        {
+          "market": "MrBeast",
+          "probability": 0.05
+        },
+        {
+          "market": "Theo Von",
+          "probability": 0.05
+        },
+        {
+          "market": "Shane Gillis",
+          "probability": 0.05
+        },
+        {
+          "market": "Andrew Schulz",
+          "probability": 0.05
+        },
+        {
+          "market": "Jake Paul",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Multiple sources confirm Kevin Hart is the next Netflix roast subject, hosted by Shane Gillis."
+    },
+    {
+      "market_ticker": "KXSURVIVORELIMINATION-26APR11",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "Rizo Velovic",
+          "probability": 0.05
+        },
+        {
+          "market": "Aubry Bracco",
+          "probability": 0.05
+        },
+        {
+          "market": "Ozzy Lusth",
+          "probability": 0.05
+        },
+        {
+          "market": "Chrissy Hofbeck",
+          "probability": 0.05
+        },
+        {
+          "market": "Christian Hubicki",
+          "probability": 0.05
+        },
+        {
+          "market": "Cirie Fields",
+          "probability": 0.05
+        },
+        {
+          "market": "Benjamin \u201cCoach\u201d Wade",
+          "probability": 0.05
+        },
+        {
+          "market": "Rick Devens",
+          "probability": 0.05
+        },
+        {
+          "market": "Dee Valladares",
+          "probability": 0.95
+        },
+        {
+          "market": "Emily Flippen",
+          "probability": 0.05
+        },
+        {
+          "market": "Tiffany Nicole Ervin",
+          "probability": 0.05
+        },
+        {
+          "market": "Stephenie LaGrossa Kendrick",
+          "probability": 0.05
+        },
+        {
+          "market": "Joe Hunter",
+          "probability": 0.05
+        },
+        {
+          "market": "Jonathan Young",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Multiple sources confirm Dee Valladares was eliminated in episode 7."
+    },
+    {
+      "market_ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "Adam Greenberg",
+          "probability": 0.05
+        },
+        {
+          "market": "Adam Sobel",
+          "probability": 0.05
+        },
+        {
+          "market": "Britt Rescigno",
+          "probability": 0.05
+        },
+        {
+          "market": "Bryan Voltaggio",
+          "probability": 0.05
+        },
+        {
+          "market": "Carlos Anthony",
+          "probability": 0.05
+        },
+        {
+          "market": "Claudette Zepeda",
+          "probability": 0.05
+        },
+        {
+          "market": "Dale Talde",
+          "probability": 0.05
+        },
+        {
+          "market": "David Viana",
+          "probability": 0.05
+        },
+        {
+          "market": "Jet Tila",
+          "probability": 0.05
+        },
+        {
+          "market": "Joe Sasto",
+          "probability": 0.05
+        },
+        {
+          "market": "Jonathon Sawyer",
+          "probability": 0.05
+        },
+        {
+          "market": "Kaleena Bliss",
+          "probability": 0.05
+        },
+        {
+          "market": "Karen Akunowicz",
+          "probability": 0.05
+        },
+        {
+          "market": "Kevin Lee",
+          "probability": 0.05
+        },
+        {
+          "market": "Lee Anne Wong",
+          "probability": 0.05
+        },
+        {
+          "market": "Marcel Vigneron",
+          "probability": 0.05
+        },
+        {
+          "market": "Nini Nguyen",
+          "probability": 0.05
+        },
+        {
+          "market": "Sara Bradley",
+          "probability": 0.05
+        },
+        {
+          "market": "Shirley Chung",
+          "probability": 0.05
+        },
+        {
+          "market": "Tobias Dorzon",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Evidence only covers Week 1 results; no winner declared, so distributing near-uniform with slight tilts toward strong early performers and away from eliminated chefs."
+    },
+    {
+      "market_ticker": "KXNHLCALDER-26",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "Ivan Demidov",
+          "probability": 0.05
+        },
+        {
+          "market": "Matthew Schaefer",
+          "probability": 0.92
+        },
+        {
+          "market": "Michael Misa",
+          "probability": 0.05
+        },
+        {
+          "market": "Zeev Buium",
+          "probability": 0.05
+        },
+        {
+          "market": "Isaac Howard",
+          "probability": 0.05
+        },
+        {
+          "market": "Jimmy Snuggerud",
+          "probability": 0.05
+        },
+        {
+          "market": "Alexander Nikishin",
+          "probability": 0.05
+        },
+        {
+          "market": "Zayne Parekh",
+          "probability": 0.05
+        },
+        {
+          "market": "Maxim Shabanov",
+          "probability": 0.05
+        },
+        {
+          "market": "Ryan Leonard",
+          "probability": 0.05
+        },
+        {
+          "market": "Yaroslav Askarov",
+          "probability": 0.05
+        },
+        {
+          "market": "Gabe Perreault",
+          "probability": 0.05
+        },
+        {
+          "market": "Matthew Savoie",
+          "probability": 0.05
+        },
+        {
+          "market": "Axel Sandin-Pellikka",
+          "probability": 0.05
+        },
+        {
+          "market": "Bradly Nadeau",
+          "probability": 0.05
+        },
+        {
+          "market": "Jesper Wallstedt",
+          "probability": 0.05
+        },
+        {
+          "market": "Rutger McGroarty",
+          "probability": 0.05
+        },
+        {
+          "market": "Sam Dickinson",
+          "probability": 0.05
+        },
+        {
+          "market": "Sam Rinzel",
+          "probability": 0.05
+        },
+        {
+          "market": "Ville Koivunen",
+          "probability": 0.05
+        },
+        {
+          "market": "Artyom Levshunov",
+          "probability": 0.05
+        },
+        {
+          "market": "Easton Cowan",
+          "probability": 0.05
+        },
+        {
+          "market": "Arseni Gritsyuk",
+          "probability": 0.05
+        },
+        {
+          "market": "Beckett Sennecke",
+          "probability": 0.05
+        },
+        {
+          "market": "Calum Ritchie",
+          "probability": 0.05
+        },
+        {
+          "market": "Jonathan Lekkerimaki",
+          "probability": 0.05
+        },
+        {
+          "market": "Berkly Catton",
+          "probability": 0.05
+        },
+        {
+          "market": "Danila Yurov",
+          "probability": 0.05
+        },
+        {
+          "market": "Leevi Merilaninen",
+          "probability": 0.05
+        },
+        {
+          "market": "Alex Bump",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "NHL.com states Matthew Schaefer won the 2026 Calder Trophy."
+    },
+    {
+      "market_ticker": "KXWVPRIMARY-01D26",
+      "p_yes": 0.1,
+      "probabilities": [
+        {
+          "market": "Brit Aguirre",
+          "probability": 0.1
+        },
+        {
+          "market": "Vince George",
+          "probability": 0.8999999999999999
+        }
+      ],
+      "rationale": "Multiple sources including AP confirm Vince George won the Democratic primary over Brit Aguirre."
+    },
+    {
+      "market_ticker": "KXNEXTHUNGARYPM-26MAY01",
+      "p_yes": 0.8999999999999999,
+      "probabilities": [
+        {
+          "market": "P\u00e9ter Magyar",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Viktor Orb\u00e1n",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Multiple sources confirm Magyar was sworn in as PM on May 9, 2026, ending Orb\u00e1n's rule."
+    },
+    {
+      "market_ticker": "KXTHEMASKEDSINGER-27JAN01",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "14 Karat Carrot",
+          "probability": 0.05
+        },
+        {
+          "market": "Calla Lily",
+          "probability": 0.05
+        },
+        {
+          "market": "Cat Witch",
+          "probability": 0.05
+        },
+        {
+          "market": "Crane",
+          "probability": 0.05
+        },
+        {
+          "market": "The Croissants",
+          "probability": 0.05
+        },
+        {
+          "market": "Eggplant",
+          "probability": 0.05
+        },
+        {
+          "market": "Galaxy Girl",
+          "probability": 0.05
+        },
+        {
+          "market": "Googly Eyes",
+          "probability": 0.4
+        },
+        {
+          "market": "Handyman",
+          "probability": 0.05
+        },
+        {
+          "market": "High Voltage",
+          "probability": 0.05
+        },
+        {
+          "market": "Le Who Who",
+          "probability": 0.05
+        },
+        {
+          "market": "Owl",
+          "probability": 0.05
+        },
+        {
+          "market": "Pangolin",
+          "probability": 0.05
+        },
+        {
+          "market": "Pugcasso",
+          "probability": 0.4
+        },
+        {
+          "market": "Queen Corgi",
+          "probability": 0.05
+        },
+        {
+          "market": "Scarab",
+          "probability": 0.05
+        },
+        {
+          "market": "Snow Cone",
+          "probability": 0.05
+        },
+        {
+          "market": "Stingray",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "14 Karat Carrot was eliminated in episode 10 before the finale; winner was among finalists (likely Pugcasso or Googly Eyes)."
+    },
+    {
+      "market_ticker": "KXCOLOMBIASENATE-26",
+      "p_yes": 0.82,
+      "probabilities": [
+        {
+          "market": "Government Alliance",
+          "probability": 0.82
+        },
+        {
+          "market": "Opposition",
+          "probability": 0.18
+        }
+      ],
+      "rationale": "Multiple sources report the governing Historic Pact coalition won the most seats in the 2026 Senate election."
+    },
+    {
+      "market_ticker": "KXFEDCHAIRCOUNT-27",
+      "p_yes": 0.05,
+      "probabilities": [
+        {
+          "market": "49 or below",
+          "probability": 0.05
+        },
+        {
+          "market": "50",
+          "probability": 0.05
+        },
+        {
+          "market": "51",
+          "probability": 0.05
+        },
+        {
+          "market": "52",
+          "probability": 0.05
+        },
+        {
+          "market": "53",
+          "probability": 0.05
+        },
+        {
+          "market": "54",
+          "probability": 0.4443661971830985
+        },
+        {
+          "market": "55",
+          "probability": 0.055633802816901404
+        },
+        {
+          "market": "56",
+          "probability": 0.05
+        },
+        {
+          "market": "57",
+          "probability": 0.05
+        },
+        {
+          "market": "58",
+          "probability": 0.05
+        },
+        {
+          "market": "59",
+          "probability": 0.05
+        },
+        {
+          "market": "60 or above",
+          "probability": 0.05
+        }
+      ],
+      "rationale": "Evidence cites 54-45 Senate confirmation vote for Kevin Warsh as Fed Chair."
+    },
+    {
+      "market_ticker": "KXOHPRIMARY-15D26",
+      "p_yes": 0.8999999999999999,
+      "probabilities": [
+        {
+          "market": "Don Leonard",
+          "probability": 0.8999999999999999
+        },
+        {
+          "market": "Adam Miller",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Multiple sources including AP call Leonard as winner of the Democratic primary."
+    },
+    {
+      "market_ticker": "KXVRASCOTUSVOTE-26",
+      "p_yes": 0.1,
+      "probabilities": [
+        {
+          "market": "0",
+          "probability": 0.1
+        },
+        {
+          "market": "1",
+          "probability": 0.1
+        },
+        {
+          "market": "2",
+          "probability": 0.1
+        },
+        {
+          "market": "3",
+          "probability": 0.1
+        },
+        {
+          "market": "4",
+          "probability": 0.1
+        },
+        {
+          "market": "5",
+          "probability": 0.1
+        },
+        {
+          "market": "6",
+          "probability": 0.1
+        },
+        {
+          "market": "7",
+          "probability": 0.1
+        },
+        {
+          "market": "8",
+          "probability": 0.1
+        },
+        {
+          "market": "9",
+          "probability": 0.1
+        }
+      ],
+      "rationale": "Decision was 6-3, but Louisiana was the petitioner aligned with Callais challengers' opponents\u2014need to determine which side Louisiana supported."
+    }
+  ]
+}

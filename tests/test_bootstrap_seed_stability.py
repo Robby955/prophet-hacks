@@ -23,8 +23,3 @@ def test_bootstrap_seed_stability_script_runs_with_small_resample(tmp_path) -> N
     assert payload.count('"seed"') == 3
 
 
-def test_overnight_tasks_warns_not_to_edit_decisions() -> None:
-    tasks = Path("docs/OVERNIGHT_TASKS.md").read_text()
-
-    assert "do not touch" in tasks.lower()
-    assert "docs/DECISIONS.md" in tasks

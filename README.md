@@ -319,13 +319,16 @@ Defined in `forecast_track.py`, served via `forecast_agent_server.py`'s
 
 ## Docs
 
-- **`docs/DECISIONS.md`**: append-only decision log. Read this to understand _why_ anything is the way it is. 18+ dated entries including every bug postmortem.
-- **`docs/HANDOFF.md`**: single-page state for picking up cold.
-- **`docs/AGENT_STATUS.md`**: workstream coordination + active task ownership.
-- **`docs/LIVE_OPERATIONS.md`**: production deploy / triage handoff.
+- **`docs/DECISIONS.md`**: append-only decision log. Read this to
+  understand _why_ anything is the way it is. 20+ dated entries
+  including every bug postmortem.
+- **`docs/LIVE_OPERATIONS.md`**: production deploy / triage notes.
 - **`docs/RUNBOOK.md`**: incident response patterns.
-- **`docs/STATUS.yaml`**: machine-readable status snapshot.
-- **`agent_protocol.md`**: coding-agent rules. Required reading before changes.
+- **`docs/WORKSHOP_PAPER_DRAFT.md`**: workshop-paper-style writeup.
+- **`docs/FINDINGS.md`** + **`docs/RESEARCH_NOTES.md`**: detailed
+  results and methodology.
+- **`submission/REPORT.md`**: long-form technical submission report.
+- **`submission/PROJECT_STORY.md`**: Devpost narrative.
 
 ## Verify before merging
 
@@ -356,5 +359,4 @@ for hard caps and asserts at import time.
 ## License + credit
 
 Built by Rob Sneiderman for Prophet Hacks 2026.
-Parallel implementation, evaluation, dashboard, and operations work was
-coordinated via `docs/AGENT_STATUS.md`.
+Apache 2.0 license.

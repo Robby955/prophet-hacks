@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 660" font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif">
+  <style>
+    .stage rect { fill: white; stroke: #c8cdd9; stroke-width: 1.5; rx: 6; }
+    .stage.prod rect { stroke: #1e6f3a; stroke-width: 2; fill: #f3faf5; }
+    .stage.io rect { stroke: #2856a3; stroke-width: 2; fill: #f0f5fc; }
+    .stage.safety rect { stroke: #a05818; stroke-width: 2; fill: #faf3eb; stroke-dasharray: 6 3; }
+    .stage text { font-size: 13px; fill: #1a1f2c; }
+    .stage .label { font-weight: 600; }
+    .stage .sub { font-size: 11px; fill: #475066; }
+    .arrow { stroke: #6a7388; stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+    .arrow.dim { stroke: #b0b7c4; stroke-dasharray: 4 3; }
+    .group-label { font-size: 11px; font-weight: 600; fill: #475066; text-transform: uppercase; letter-spacing: 0.5px; }
+    .group-box { fill: #fafbfc; stroke: #e6e9f0; stroke-width: 1; rx: 8; }
+    .header { font-size: 18px; font-weight: 600; fill: #1a1f2c; }
+    .subheader { font-size: 12px; fill: #475066; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6a7388"/>
+    </marker>
+  </defs>
+
+  <text x="490" y="28" text-anchor="middle" class="header">ForecastingPath · production pipeline</text>
+  <text x="490" y="46" text-anchor="middle" class="subheader">predict_multi_outcome_retrieval · Opus 4.7 + Brave Search + Kalshi-floored renormalization</text>
+
+  <!-- Input -->
+  <g class="stage io">
+    <rect x="40" y="80" width="200" height="56"/>
+    <text x="140" y="102" text-anchor="middle" class="label">Prophet Arena webhook</text>
+    <text x="140" y="120" text-anchor="middle" class="sub">POST /predict { event }</text>
+  </g>
+
+  <!-- Pipeline group box -->
+  <rect class="group-box" x="280" y="68" width="490" height="510"/>
+  <text x="290" y="86" class="group-label">5 work stages</text>
+
+  <!-- Stage 1: Query -->
+  <g class="stage">
+    <rect x="310" y="100" width="430" height="48"/>
+    <text x="525" y="120" text-anchor="middle" class="label">1. Query</text>
+    <text x="525" y="136" text-anchor="middle" class="sub">build Brave search query from event title + outcome</text>
+  </g>
+
+  <!-- Stage 2: Retrieve -->
+  <g class="stage">
+    <rect x="310" y="170" width="430" height="48"/>
+    <text x="525" y="190" text-anchor="middle" class="label">2. Retrieve</text>
+    <text x="525" y="206" text-anchor="middle" class="sub">Brave Search · count=5 · graceful degrade if key missing</text>
+  </g>
+
+  <!-- Stage 3: Dedupe + rank -->
+  <g class="stage">
+    <rect x="310" y="240" width="430" height="48"/>
+    <text x="525" y="260" text-anchor="middle" class="label">3. Dedupe + rank</text>
+    <text x="525" y="276" text-anchor="middle" class="sub">one per domain · .gov / .edu / exchanges first · cap 5</text>
+  </g>
+
+  <!-- Stage 4: Forecast (production) -->
+  <g class="stage prod">
+    <rect x="310" y="310" width="430" height="72"/>
+    <text x="525" y="332" text-anchor="middle" class="label">4. Forecast · Claude Opus 4.7</text>
+    <text x="525" y="350" text-anchor="middle" class="sub">single call · system prompt: calibration scale + market-odds anchoring</text>
+    <text x="525" y="366" text-anchor="middle" class="sub">output: strict JSON { probabilities: { label: float }, rationale }</text>
+  </g>
+
+  <!-- Stage 5: Longshot floor (safety) -->
+  <g class="stage safety">
+    <rect x="310" y="404" width="430" height="72"/>
+    <text x="525" y="426" text-anchor="middle" class="label">5. Longshot floor + renormalize</text>
+    <text x="525" y="444" text-anchor="middle" class="sub">each p_k floored at min(0.10, max(0.05, 0.5/n))</text>
+    <text x="525" y="460" text-anchor="middle" class="sub">Kalshi paper · &gt;60% buyer loss below $0.10</text>
+  </g>
+
+  <!-- Output -->
+  <g class="stage io">
+    <rect x="310" y="500" width="430" height="56"/>
+    <text x="525" y="522" text-anchor="middle" class="label">return to Prophet Arena</text>
+    <text x="525" y="540" text-anchor="middle" class="sub">{ probabilities: [ { market, probability } ] } · per-outcome</text>
+  </g>
+
+  <!-- Side rails -->
+  <g class="stage">
+    <rect x="800" y="100" width="160" height="100"/>
+    <text x="880" y="120" text-anchor="middle" class="label">Safety nets</text>
+    <text x="880" y="140" text-anchor="middle" class="sub">5-stage JSON</text>
+    <text x="880" y="156" text-anchor="middle" class="sub">parser ladder</text>
+    <text x="880" y="174" text-anchor="middle" class="sub">4-pass outcome</text>
+    <text x="880" y="190" text-anchor="middle" class="sub">label match</text>
+  </g>
+
+  <g class="stage">
+    <rect x="800" y="220" width="160" height="100"/>
+    <text x="880" y="240" text-anchor="middle" class="label">Observability</text>
+    <text x="880" y="260" text-anchor="middle" class="sub">JSONL trace per</text>
+    <text x="880" y="276" text-anchor="middle" class="sub">stage · Railway</text>
+    <text x="880" y="294" text-anchor="middle" class="sub">volume persists</text>
+    <text x="880" y="310" text-anchor="middle" class="sub">/observatory view</text>
+  </g>
+
+  <g class="stage">
+    <rect x="800" y="340" width="160" height="100"/>
+    <text x="880" y="360" text-anchor="middle" class="label">Auto guardrails</text>
+    <text x="880" y="380" text-anchor="middle" class="sub">p ∈ [0.01, 0.99]</text>
+    <text x="880" y="396" text-anchor="middle" class="sub">9-min deadline</text>
+    <text x="880" y="412" text-anchor="middle" class="sub">graceful fallback</text>
+    <text x="880" y="430" text-anchor="middle" class="sub">on each stage</text>
+  </g>
+
+  <g class="stage">
+    <rect x="800" y="460" width="160" height="80"/>
+    <text x="880" y="480" text-anchor="middle" class="label">Outcome safety</text>
+    <text x="880" y="500" text-anchor="middle" class="sub">if event lacks</text>
+    <text x="880" y="516" text-anchor="middle" class="sub">outcomes → Haiku</text>
+    <text x="880" y="532" text-anchor="middle" class="sub">4.5 infers labels</text>
+  </g>
+
+  <!-- Arrows main flow -->
+  <path class="arrow" d="M 240,108 L 305,108 L 305,124 L 310,124"/>
+  <path class="arrow" d="M 525,148 L 525,170"/>
+  <path class="arrow" d="M 525,218 L 525,240"/>
+  <path class="arrow" d="M 525,288 L 525,310"/>
+  <path class="arrow" d="M 525,382 L 525,404"/>
+  <path class="arrow" d="M 525,476 L 525,500"/>
+
+  <!-- Side-rail dim arrows -->
+  <path class="arrow dim" d="M 740,135 L 800,135"/>
+  <path class="arrow dim" d="M 740,265 L 800,265"/>
+  <path class="arrow dim" d="M 740,348 L 800,378"/>
+  <path class="arrow dim" d="M 740,440 L 800,480"/>
+
+  <!-- Footer -->
+  <text x="490" y="620" text-anchor="middle" class="subheader">backtest mean Brier on 26-event PA sample-resolved set:</text>
+  <text x="490" y="640" text-anchor="middle" class="subheader" font-weight="600">0.0378 single-binary (PA CLI metric) · 0.2558 multi-class · 40.8% improvement over Sonnet 4.6 baseline</text>
+</svg>

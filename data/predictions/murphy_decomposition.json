@@ -1,0 +1,57 @@
+[
+  {
+    "REL": 0.03742,
+    "RES": 0.24852,
+    "UNC": 0.24852,
+    "BS_decomp": 0.03742,
+    "BS_direct": 0.03782,
+    "base_rate": 0.4615,
+    "n": 26,
+    "n_bins_used": 6,
+    "variant": "Opus 4.7 (production)"
+  },
+  {
+    "REL": 0.03879,
+    "RES": 0.24852,
+    "UNC": 0.24852,
+    "BS_decomp": 0.03879,
+    "BS_direct": 0.03913,
+    "base_rate": 0.4615,
+    "n": 26,
+    "n_bins_used": 7,
+    "variant": "Opus 4.6"
+  },
+  {
+    "REL": 0.04335,
+    "RES": 0.24852,
+    "UNC": 0.24852,
+    "BS_decomp": 0.04335,
+    "BS_direct": 0.04384,
+    "base_rate": 0.4615,
+    "n": 26,
+    "n_bins_used": 6,
+    "variant": "GPT-5.2"
+  },
+  {
+    "REL": 0.02465,
+    "RES": 0.18185,
+    "UNC": 0.24852,
+    "BS_decomp": 0.09131,
+    "BS_direct": 0.09196,
+    "base_rate": 0.4615,
+    "n": 26,
+    "n_bins_used": 6,
+    "variant": "GPT-5.5"
+  },
+  {
+    "REL": 0.04965,
+    "RES": 0.21262,
+    "UNC": 0.24852,
+    "BS_decomp": 0.08555,
+    "BS_direct": 0.08732,
+    "base_rate": 0.4615,
+    "n": 26,
+    "n_bins_used": 6,
+    "variant": "Gemini 3.1 Pro"
+  }
+]

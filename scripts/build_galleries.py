@@ -109,6 +109,9 @@ def build_resolved() -> str:
     # Per-model running totals for the footer.
     totals: dict[str, list[float]] = defaultdict(list)
     rows_html: list[str] = []
+    # drill_data: ticker -> {event_meta, model_rows} so the modal can render
+    # full per-outcome breakdown + rationale + evidence URLs on click.
+    drill_data: dict[str, dict[str, Any]] = {}
 
     # Sort events by category then title for stable scrolling.
     events_sorted = sorted(events, key=lambda e: (e.get("category", ""), e.get("title", "")))
@@ -129,6 +132,7 @@ def build_resolved() -> str:
 
         cells: list[str] = []
         per_event_briers: list[tuple[str, float]] = []
+        drill_models: list[dict[str, Any]] = []
 
         for name, kind, _ in RESOLVED_MODELS:
             row = model_preds[name].get(ticker)
@@ -148,6 +152,15 @@ def build_resolved() -> str:
                 f'<span class="b">B={b:.3f}</span>'
                 f'</td>'
             )
+            drill_models.append({
+                "name": name,
+                "kind": kind,
+                "p_yes": p_yes,
+                "brier": round(b, 4),
+                "rationale": str(row.get("rationale", "")),
+                "probabilities": row.get("probabilities") or [],
+                "evidence_urls": (row.get("evidence_urls") or [])[:6],
+            })
 
         # "who won this event" — lowest Brier wins; tie if within 0.001.
         winner_name = ""
@@ -159,14 +172,27 @@ def build_resolved() -> str:
             )
 
         rows_html.append(
-            f'<tr data-category="{html.escape(cat)}" data-title="{html.escape(title.lower())}">'
+            f'<tr class="drill-row" data-ticker="{html.escape(ticker)}" '
+            f'data-category="{html.escape(cat)}" data-title="{html.escape(title.lower())}">'
             f'<td class="qcol"><div class="qtitle">{html.escape(truncate(title, 110))}</div>'
             f'<div class="qmeta">{category_pill(cat)} · n_outcomes={n_out} · winner: '
-            f'<strong>{html.escape(truncate(resolved_outcome, 60))}</strong></div></td>'
+            f'<strong>{html.escape(truncate(resolved_outcome, 60))}</strong>'
+            f' <span class="click-hint">click row →</span></div></td>'
             f'<td class="winnercol">{html.escape(winner_name)}</td>'
             + "".join(cells)
             + "</tr>"
         )
+
+        drill_data[ticker] = {
+            "title": title,
+            "category": cat,
+            "outcomes": outcomes,
+            "n_outcomes": n_out,
+            "winner": resolved_outcome,
+            "rules": ev.get("rules", ""),
+            "description": ev.get("description", ""),
+            "models": drill_models,
+        }
 
     # Footer row: mean per model.
     footer_cells: list[str] = []
@@ -189,10 +215,11 @@ def build_resolved() -> str:
         for n, k, _ in RESOLVED_MODELS
     )
 
+    drill_json = json.dumps(drill_data, ensure_ascii=False)
     body = f"""
 <header>
   <h1>Side-by-side gallery · resolved events</h1>
-  <p class="sub">26 events from PA's <code>sample-resolved</code> set, same retrieval + prompt + longshot floor, five LLM swaps. Each cell shows model's <em>p(outcomes[0] wins)</em> and the resulting single-binary Brier (Prophet Arena CLI metric). Color: green = low loss, red = high loss. Footer row is the mean Brier per model.</p>
+  <p class="sub">26 events from PA's <code>sample-resolved</code> set, same retrieval + prompt + longshot floor, five LLM swaps. Each cell shows model's <em>p(outcomes[0] wins)</em> and the resulting single-binary Brier (Prophet Arena CLI metric). Color: green = low loss, red = high loss. <strong>Click any row for full per-outcome probabilities, rationales, and evidence URLs.</strong></p>
   <p class="links">
     <a href="/static/gallery_open.html">→ open events gallery (no actuals)</a> ·
     <a href="/static/summary.html">→ summary report</a> ·
@@ -227,8 +254,16 @@ def build_resolved() -> str:
 <footer>
   <p>Built by <code>scripts/build_galleries.py</code>. Source: <code>data/resolved.json</code> + <code>data/actuals.json</code> + <code>data/predictions/multi_outcome_retrieval.json</code> + <code>data/predictions/ablation_*.json</code>. Brier is single-binary (PA CLI metric); multi-class numbers in <a href="/static/summary.html">summary report</a>.</p>
 </footer>
+
+<div id="drill-modal" class="modal-backdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" aria-label="close">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<script id="drill-data" type="application/json">{drill_json}</script>
 """
-    return _wrap_html("Side-by-side gallery · resolved", body)
+    return _wrap_html("Side-by-side gallery · resolved", body, with_drill=True)
 
 
 # ---- open gallery ------------------------------------------------------------
@@ -328,7 +363,7 @@ def build_open() -> str:
 # ---- shared layout -----------------------------------------------------------
 
 
-def _wrap_html(title: str, body: str) -> str:
+def _wrap_html(title: str, body: str, *, with_drill: bool = False) -> str:
     css = """
 :root { color-scheme: light; }
 * { box-sizing: border-box; }
@@ -369,6 +404,79 @@ section { max-width: 1400px; margin: 0 auto 28px; }
 section h2 { font-size: 17px; margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #d0d6e1; max-width: 1400px; margin-left: auto; margin-right: auto; }
 footer { max-width: 1400px; margin: 16px auto; color: #6a7388; font-size: 12px; }
 footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+tr.drill-row { cursor: pointer; }
+.click-hint { color: #b0b7c4; font-size: 11px; margin-left: 4px; font-weight: 400; }
+tr.drill-row:hover .click-hint { color: #2856a3; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(20,28,42,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 60px 24px; overflow-y: auto; z-index: 100; }
+.modal-backdrop[hidden] { display: none; }
+.modal { background: white; border-radius: 10px; max-width: 1000px; width: 100%; padding: 28px 32px 36px; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+.modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 28px; color: #6a7388; cursor: pointer; line-height: 1; }
+.modal-close:hover { color: #1a1f2c; }
+.modal h2 { margin: 0 0 6px; font-size: 19px; line-height: 1.3; }
+.modal .meta-row { color: #475066; font-size: 13px; margin-bottom: 14px; }
+.modal .meta-row strong { color: #1a1f2c; }
+.modal .winner-badge { display: inline-block; background: #d8efc7; color: #1e6f3a; padding: 2px 9px; border-radius: 10px; font-size: 12px; margin-left: 6px; }
+.modal .rules-box { background: #f4f6fa; border-left: 3px solid #c8cdd9; padding: 8px 12px; margin: 10px 0 16px; font-size: 12px; color: #475066; }
+.modal .model-card { border: 1px solid #d8dce4; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+.modal .model-card.production { border-color: #1e6f3a; background: #f3faf5; }
+.modal .model-card h3 { margin: 0 0 8px; font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
+.modal .model-card h3 .scoreline { margin-left: auto; font-weight: 400; font-size: 12px; color: #475066; font-variant-numeric: tabular-nums; }
+.modal .rationale { font-size: 13px; color: #1a1f2c; margin: 4px 0 8px; font-style: italic; }
+.modal .probs { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; row-gap: 2px; font-size: 12px; max-height: 220px; overflow-y: auto; padding: 6px 0; border-top: 1px solid #eef0f5; }
+.modal .probs .label { color: #475066; }
+.modal .probs .val { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+.modal .probs .winner-row .label { color: #1e6f3a; font-weight: 600; }
+.modal .evidence { margin-top: 8px; font-size: 11px; }
+.modal .evidence a { color: #2856a3; text-decoration: none; display: block; padding: 1px 0; }
+.modal .evidence a:hover { text-decoration: underline; }
+"""
+    drill_js = """
+const drillEl = document.getElementById('drill-data');
+const drillData = drillEl ? JSON.parse(drillEl.textContent) : {};
+const modal = document.getElementById('drill-modal');
+const modalBody = document.getElementById('modal-body');
+function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function openDrill(ticker) {
+  const d = drillData[ticker];
+  if (!d || !modal) return;
+  const winnerOutcome = d.winner;
+  let html = `<h2>${esc(d.title)}</h2>`;
+  html += `<div class="meta-row"><strong>${esc(d.category)}</strong> · ${d.n_outcomes} outcomes · winning outcome: <span class="winner-badge">${esc(winnerOutcome)}</span></div>`;
+  if (d.rules) html += `<div class="rules-box"><strong>Resolution rule:</strong> ${esc(d.rules)}</div>`;
+  for (const m of (d.models || [])) {
+    const prodCls = m.kind === 'production' ? ' production' : '';
+    const tag = m.kind === 'production' ? ' <span class="prod-tag">production</span>' : '';
+    html += `<div class="model-card${prodCls}"><h3>${esc(m.name)}${tag}<span class="scoreline">p_yes=${m.p_yes.toFixed(3)} · Brier=${m.brier.toFixed(4)}</span></h3>`;
+    if (m.rationale) html += `<div class="rationale">"${esc(m.rationale)}"</div>`;
+    html += `<div class="probs">`;
+    const sorted = (m.probabilities || []).slice().sort((a,b) => b.probability - a.probability);
+    for (const p of sorted) {
+      const isWinner = winnerOutcome && winnerOutcome.split(',').map(s=>s.trim()).includes(p.market);
+      html += `<div class="${isWinner ? 'winner-row' : ''} contents"><span class="label">${esc(p.market)}${isWinner ? ' ✓' : ''}</span><span class="val">${(p.probability*100).toFixed(1)}%</span></div>`;
+    }
+    html += `</div>`;
+    if (m.evidence_urls && m.evidence_urls.length) {
+      html += `<div class="evidence"><strong>Evidence URLs:</strong>`;
+      for (const u of m.evidence_urls) html += `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.length>90 ? u.slice(0,89)+'…' : u)}</a>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+  modalBody.innerHTML = html;
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeDrill() {
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('tr.drill-row').forEach(r => {
+  r.addEventListener('click', () => openDrill(r.dataset.ticker));
+});
+document.querySelector('.modal-close')?.addEventListener('click', closeDrill);
+modal?.addEventListener('click', e => { if (e.target === modal) closeDrill(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrill(); });
 """
     js = """
 const filter = document.getElementById('filter');
@@ -387,7 +495,7 @@ function apply() {
 }
 filter?.addEventListener('input', apply);
 cat?.addEventListener('change', apply);
-"""
+""" + (drill_js if with_drill else "")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>

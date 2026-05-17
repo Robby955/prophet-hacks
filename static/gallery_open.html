@@ -44,6 +44,31 @@ section { max-width: 1400px; margin: 0 auto 28px; }
 section h2 { font-size: 17px; margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #d0d6e1; max-width: 1400px; margin-left: auto; margin-right: auto; }
 footer { max-width: 1400px; margin: 16px auto; color: #6a7388; font-size: 12px; }
 footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+tr.drill-row { cursor: pointer; }
+.click-hint { color: #b0b7c4; font-size: 11px; margin-left: 4px; font-weight: 400; }
+tr.drill-row:hover .click-hint { color: #2856a3; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(20,28,42,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 60px 24px; overflow-y: auto; z-index: 100; }
+.modal-backdrop[hidden] { display: none; }
+.modal { background: white; border-radius: 10px; max-width: 1000px; width: 100%; padding: 28px 32px 36px; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+.modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 28px; color: #6a7388; cursor: pointer; line-height: 1; }
+.modal-close:hover { color: #1a1f2c; }
+.modal h2 { margin: 0 0 6px; font-size: 19px; line-height: 1.3; }
+.modal .meta-row { color: #475066; font-size: 13px; margin-bottom: 14px; }
+.modal .meta-row strong { color: #1a1f2c; }
+.modal .winner-badge { display: inline-block; background: #d8efc7; color: #1e6f3a; padding: 2px 9px; border-radius: 10px; font-size: 12px; margin-left: 6px; }
+.modal .rules-box { background: #f4f6fa; border-left: 3px solid #c8cdd9; padding: 8px 12px; margin: 10px 0 16px; font-size: 12px; color: #475066; }
+.modal .model-card { border: 1px solid #d8dce4; border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+.modal .model-card.production { border-color: #1e6f3a; background: #f3faf5; }
+.modal .model-card h3 { margin: 0 0 8px; font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
+.modal .model-card h3 .scoreline { margin-left: auto; font-weight: 400; font-size: 12px; color: #475066; font-variant-numeric: tabular-nums; }
+.modal .rationale { font-size: 13px; color: #1a1f2c; margin: 4px 0 8px; font-style: italic; }
+.modal .probs { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; row-gap: 2px; font-size: 12px; max-height: 220px; overflow-y: auto; padding: 6px 0; border-top: 1px solid #eef0f5; }
+.modal .probs .label { color: #475066; }
+.modal .probs .val { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
+.modal .probs .winner-row .label { color: #1e6f3a; font-weight: 600; }
+.modal .evidence { margin-top: 8px; font-size: 11px; }
+.modal .evidence a { color: #2856a3; text-decoration: none; display: block; padding: 1px 0; }
+.modal .evidence a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>

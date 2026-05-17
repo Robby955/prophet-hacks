@@ -34,8 +34,9 @@ pipeline reveals a spectrum: Opus 4.6 and GPT-5.2 are competitive,
 while GPT-5.5 and Gemini exhibit multi-outcome Brier 18–46× worse,
 driven by JSON-schema-noncompliance on outcome labels rather than
 reasoning gaps. Sample size is small (n=26) and binary-skewed
-(16/26 sports matchups); results establish directional plausibility,
-not convergence.
+(16/26 sports matchups); follow-up retrieval-count and
+source-priority ablations failed our paired-bootstrap promotion gate.
+Results establish directional plausibility, not convergence.
 
 ## 1 Introduction
 
@@ -126,6 +127,23 @@ A separate safety net `_infer_outcomes_when_missing` covers the case
 where the live webhook supplies an event without an `outcomes` field:
 a binary-question regex returns `["Yes", "No"]`; otherwise a Haiku
 4.5 call infers two-to-six plausible labels.
+
+### 2.3 Ablation protocol and promotion rule
+
+All ablations are paired at the event level: the production snapshot
+and candidate snapshot are joined on `market_ticker`, scored under the
+same evaluator, and compared by paired bootstrap with 50,000 resamples
+and a pinned seed. We treat single-binary Brier as the shipping metric
+because it is what PA's local CLI evaluator implements on the resolved
+dataset. Multi-class Brier is reported as a methodological check, not
+as authorization to change production by itself.
+
+The promotion rule is deliberately conservative. A candidate can move
+the live variant only if the single-binary delta is practically large
+on n=26 (roughly >0.01 Brier), its 95% paired-bootstrap interval
+excludes zero, and the change does not conflict with the live
+market-baseline scoring rule. Directional improvements that fail this
+gate are kept as research notes and visualizations, not shipped.
 
 ## 3 Experiments
 
@@ -254,6 +272,61 @@ We did not compute a multi-class CI because the Sonnet file
 pre-dates the per-outcome-probabilities fix; re-running Sonnet
 through the corrected pipeline is post-event work.
 
+### 3.6 Negative ablations that did not ship
+
+Two intuitive system changes failed the promotion rule after paired
+bootstrap verification.
+
+| Candidate | Single-binary delta | 95% CI | Production decision |
+|---|---:|---:|---|
+| E3: adaptive retrieval count (`k=5` vs `k=8`) | -0.0009 | [-0.0035, +0.0009] | Do not ship |
+| E4: exchanges-only source priority vs official priority | +0.0013 | [-0.0017, +0.0055] | Do not ship |
+
+E4 looked more promising under proper multi-class Brier
+(+0.0174, 95% CI [+0.0013, +0.0402]), but that is not the metric the
+PA CLI evaluator implements and it does not prove improvement against
+the live market baseline. The result is useful as research texture:
+source ordering may matter for multi-outcome calibration, but the
+effect is not reliable enough to modify the endpoint during the event.
+
+This section is included because the restraint is part of the
+method. A weekend forecasting agent can easily overfit its own
+26-event backtest; the credible artifact is not just the winning
+variant but the list of attractive variants we declined to ship.
+
+### 3.7 Backtest leakage audit
+
+The 26-event resolved set is, by construction, a set of *resolved*
+events. The Brave Search index running our retrieval was built
+after these events resolved. An audit of the evidence URLs our
+production variant retrieved finds that **10 of 26 events (38.5%)
+include at least one URL whose path contains word-boundaried
+"won", "winner", "champion", "final", or "results"**; **23.8% of
+all retrieved URLs are flagged**. Examples:
+
+- The Masked Singer Season 14 (resolved 2026-04-03) cites
+  `variety.com/.../the-masked-singer-season-14-finale-winner-ashlee-simpson-...`
+  — an article written *because* Ashlee Simpson won.
+- NHL Calder Trophy (resolved 2026-05-14) cites
+  `espn.com/.../who-won-nhl-rookie-year-winners-year-list`.
+- KXOHPRIMARY-15D26: 4 of 5 evidence URLs flagged.
+
+The implication is that **0.0378 single-binary Brier is
+best-case-with-hindsight, not expected live performance**. The
+agent has been retrieving the answer on a substantial fraction of
+events. The same leakage applies equally across every alternative-
+LLM ablation we ran on this dataset because they share retrieval;
+*cross-model rankings remain valid* (relative comparisons are
+leakage-invariant) but absolute Brier numbers are inflated similarly
+across all rows. Live Prophet Arena scoring will be a different
+distribution because events arrive unresolved.
+
+This finding validates FutureSim's chronological-replay methodology
+(Goel et al. 2026, §4.6) as the right way to evaluate a forecasting
+agent without retrieval contamination. Audit script
+`scripts/check_retrieval_leakage.py`; raw data
+`data/predictions/leakage_audit.json`.
+
 ## 4 Discussion
 
 ### 4.1 Three scoring rules, three different rankings
@@ -353,19 +426,50 @@ one. Post-processing safety nets in probabilistic-forecasting
 pipelines should have boundary tests at the lowest *n* the pipeline
 admits.
 
-### 4.4 Negative result: SAE shrinkage
+### 4.4 Negative results
 
-A separate offline variant `predict_multi_outcome_retrieval_sae`
-applies an empirical-Bayes shrinkage estimator with random effects
-over (domain × horizon × price) cells, in the spirit of small-area-
-estimation borrowed-strength methods. On the same 26-event set the
-SAE variant scored mean Brier 0.1157 (single-binary), substantially
-worse than production. The variant remains in the repository as
-research scaffolding but is not promoted. The architectural
-assumption — domain-level pooling stabilizes individual forecasts
-when sample sizes are small — runs into the practical problem that
-the calibration sample IS the evaluation sample, which either
-leaks or fails to learn.
+Three approaches we expected to help did not, in directions worth
+recording for the next iteration.
+
+**SAE shrinkage.** A separate offline variant
+`predict_multi_outcome_retrieval_sae` applies an empirical-Bayes
+shrinkage estimator with random effects over (domain × horizon ×
+price) cells, in the spirit of small-area-estimation borrowed-
+strength methods. On the same 26-event set the SAE variant scored
+mean Brier 0.1157 (single-binary), substantially worse than
+production. The variant remains in the repository as research
+scaffolding but is not promoted. The architectural assumption —
+domain-level pooling stabilizes individual forecasts when sample
+sizes are small — runs into the practical problem that the
+calibration sample IS the evaluation sample, which either leaks
+or fails to learn. A non-leaking holdout (FutureSim-style replay)
+would be the right substrate.
+
+**Adversarial-review prompts (two failure modes).** We tried two
+patterns where Opus 4.7 reviews and possibly revises its own
+prediction:
+
+1. *Two-call self-critique*: an initial production prediction,
+   followed by a second Opus 4.7 call under an adversarial-reviewer
+   system prompt. First run scored Δ = −0.00293 Brier
+   (improvement); a clean replication scored Δ = +0.00274 Brier
+   (regression). Net effect indistinguishable from run-to-run LLM
+   stochasticity on n=26.
+2. *One-call verification field*: a single Opus 4.7 call producing
+   `{probabilities_initial, verification, probabilities_final}` in
+   one structured response. Initial-pass mean Brier 0.02976; after
+   verification mean Brier 0.04848; **Δ = +0.01871 regression**, with
+   23 of 26 events modified by the verification step.
+
+Both patterns share a common failure mode: the adversarial-review
+prompt is overeager. It pulls confident-and-correct production
+predictions toward the middle, costing Brier on exactly the events
+where production was right to be confident. This is a real signal,
+not just noise — across two independent prompts and two independent
+runs the net direction is regression or near-zero. We do not promote
+either pattern. Open question for the next iteration: whether a
+confidence-aware critique (one that only revises low-confidence
+initial predictions) recovers the upside without the downside.
 
 ### 4.5 Limitations
 
@@ -383,17 +487,36 @@ performance; that result is forthcoming as the eval window opens.
 
 Goel et al. (2026, FutureSim, arXiv 2605.15188) introduce a benchmark
 that replays real-world events chronologically to evaluate LLM
-forecasting agents over a three-month period (Jan–Mar 2026). They
-report that the best agent achieves 25% accuracy and that many
-agents score worse on Brier skill than making no prediction at all.
-This contextualizes our numbers — even SOTA agents on a larger,
-non-leaking dataset struggle — and motivates the schema-compliance
-finding here as a productive failure mode to identify before the
-eval window opens.
+forecasting agents over a three-month period (Jan–Mar 2026). Agents
+forecast events beyond their knowledge cutoff while seeing news arrive
+in chronological order. The reported results are sobering: the best
+agent achieves 25% accuracy, and many agents have worse Brier skill
+score than making no prediction. FutureSim is larger and more
+principled than our weekend backtest, but it points to the same
+discipline: chronological evidence control, leakage audits, and
+baseline-relative scoring matter as much as raw model choice.
+
+The live Prophet Arena rule also connects the system to prediction
+market evaluation. A market price is an existing probabilistic
+forecast; under a Brier-skill objective, the agent should only move
+away from that reference when it has enough evidence to expect lower
+Brier. This is why the market-anchoring block remains in production
+despite some offline outcome-Brier ablations looking directionally
+better without it.
 
 The OpenForecaster work (referenced in the project's decisions log)
-reports a Brave-retrieval plateau at five chunks; we adopt that
-operating point without further ablation.
+reports a Brave-retrieval plateau at five chunks. We tested the
+closest local analogue in E3 (`k=5` vs `k=8`) and did not find a
+statistically reliable single-binary improvement. The production
+retrieval count therefore stays at five for both cost and variance
+control.
+
+Brier (1950) and later work on proper scoring rules motivate our use
+of probabilistic scores rather than accuracy alone. In this project,
+the practical lesson is not merely "use Brier"; it is to verify which
+Brier variant the evaluator actually implements and to distinguish
+proper multi-class scoring from the single-binary surrogate used by
+the CLI.
 
 The Kalshi paper (Whelan 2025) supplies the empirical >60%-buyer-
 loss finding on sub-$0.10 contracts that grounds the 0.10 longshot
@@ -432,6 +555,11 @@ python scripts/bootstrap_brier_ci.py \
 - Goel, S., Chandak, N., Arun, A., Prabhu, A., Staab, S., Hardt, M.,
   Andriushchenko, M., & Geiping, J. (2026). FutureSim: Replaying
   World Events to Evaluate Adaptive Agents. arXiv:2605.15188.
+- Brier, G. W. (1950). Verification of forecasts expressed in terms
+  of probability. *Monthly Weather Review*, 78(1), 1–3.
+- Gneiting, T., & Raftery, A. E. (2007). Strictly proper scoring
+  rules, prediction, and estimation. *Journal of the American
+  Statistical Association*, 102(477), 359–378.
 - Prophet Arena Developer Documentation, retrieved 2026-05-16.
   <https://prophetarena.co/developer>
 - Whelan, K. (2025). Empirical analysis of buyer behavior on

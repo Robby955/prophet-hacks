@@ -598,3 +598,67 @@ Artifacts:
 Decided by: Claude under Rob's "research budget worth spending on
 variance and plots" instruction. Commit: `cb4a1a0` (variance) +
 this commit (summary.html + DECISIONS entry).
+
+---
+
+## 2026-05-17 (11:30 CT) — Subset-1200 scale validation: 0.0378 was hindsight-inflated 3.2x
+
+Ran the production `predict_multi_outcome_retrieval` variant on
+Prophet Arena's public 1200-event resolved dataset
+(`huggingface.co/datasets/prophetarena/Prophet-Arena-Subset-1200`).
+Same prompt, same retrieval, same longshot floor, same Opus 4.7.
+~$120 in API spend; ~16 minutes wall-clock.
+
+**Result:**
+
+  Backtest                 n      Brier     95% CI                  Leakage
+  -----------------------  -----  --------  ----------------------  ----------------
+  sample-resolved (orig)   26     0.0378    [0.0143, 0.0374] delta  38.5% / 23.8%
+  Subset-1200 (scale)      1200   0.1224    [0.1102, 0.1351]         21.8% / 7.0%
+
+  delta: +0.0846 (n=1200 is 3.2x worse than n=26)
+
+**Honest reading:**
+
+- The 0.0378 sample-resolved headline was inflated by hindsight: the
+  26 events disproportionately mapped to well-indexed, post-resolution-
+  rich web pages (38.5% events had a post-resolution URL marker).
+- The Subset-1200 number 0.1224 is the more credible expected magnitude
+  on live PA events. The sample is 46x larger, the leakage rate is
+  roughly half, and it covers many more event types and tickers.
+- Distribution at scale: median Brier 0.010, IQR [0.010, 0.144]. The
+  pipeline produces near-perfect predictions on most events (typically
+  0.9-floored picks on a clear favorite) and catastrophic ones on a
+  long tail. The mean is dominated by the long tail.
+- Parse-error rate at scale: 0.58% (7 of 1200 events). Pipeline scales
+  cleanly; nothing breaks at 46x.
+
+**What we did with this:**
+
+- Added the Subset-1200 number to `static/summary.html` as a new top
+  section "Scale-up validation on Subset-1200 (most credible number)".
+  Both numbers are shown side-by-side; we do not replace the 0.0378
+  number because it is what the local `prophet forecast evaluate` CLI
+  computed against `data/resolved.json` + `data/actuals.json` and is
+  reproducible.
+- Updated `submission/PROJECT_STORY.md` "what we learned" #1 with the
+  scale-up result and the honest framing.
+- Did not retrofit the README or REPORT.md headline because those
+  numbers are correctly scoped to the sample-resolved set. They cite
+  the 26-event scope explicitly.
+
+**Implication for the workshop paper:** the Subset-1200 run is the
+right anchor for the absolute-Brier claim in any post-event writeup.
+The cross-model rankings (Opus 4.7 vs 4.6 vs GPT-5.2 etc.) remain
+valid on the 26-event set because they share retrieval and are
+leakage-invariant in the same way; we did not re-run the 4 alternative
+models on Subset-1200 (would cost ~$480 and the directional answer
+already exists).
+
+Artifacts:
+- `scripts/ablate_subset_1200.py` (1200-event harness with HF loader)
+- `scripts/analyze_subset_1200.py` (post-run analysis: Brier, CI,
+  leakage audit, parse-error rate)
+- `data/predictions/subset_1200.json` (raw predictions)
+- `data/predictions/subset_1200_actuals.json` (binary actuals)
+- `data/predictions/subset_1200_summary.json` (aggregate)

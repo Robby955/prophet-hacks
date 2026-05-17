@@ -1,0 +1,35 @@
+{
+  "n_events_scored": 1200,
+  "mean_brier": 0.12242,
+  "median_brier": 0.01,
+  "iqr": [
+    0.01,
+    0.1444
+  ],
+  "ci95": [
+    0.11015,
+    0.13505
+  ],
+  "parse_error_rate_pct": 0.58,
+  "leakage_audit": {
+    "events_with_any_suspect_pct": 21.8,
+    "suspect_urls_pct": 7.0,
+    "n_events": 1200,
+    "n_total_urls": 5081,
+    "top_domains": {
+      "www.espn.com": 69,
+      "www.cbssports.com": 39,
+      "www.billboard.com": 17,
+      "www.nytimes.com": 14,
+      "www.foxsports.com": 8,
+      "www.si.com": 8,
+      "www.formula1.com": 7,
+      "www.nbcsports.com": 7
+    }
+  },
+  "comparison_with_26_event": {
+    "n_26_brier": 0.03782,
+    "n_1200_brier": 0.12242,
+    "delta": 0.0846
+  }
+}

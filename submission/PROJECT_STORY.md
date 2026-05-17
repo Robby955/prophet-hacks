@@ -50,6 +50,15 @@ The full per-prediction trace lives at the PIN-protected `/dashboard`.
    the smaller part of the measured Phase 2 gain; evidence and
    post-processing discipline carry most of the result.
 
+   We also ran a 46x scale-up validation on PA's public 1200-event
+   resolved dataset (`Prophet-Arena-Subset-1200` on HuggingFace).
+   That headline came in at **Brier 0.1224** with 95% bootstrap CI
+   [0.110, 0.135]. The 0.0378 number is hindsight-rich on a small,
+   well-indexed slice; the 0.1224 is the more credible expected
+   magnitude on the live distribution. We report both because they
+   are real on different samples; the Subset-1200 number is the one
+   we expect to roughly match live PA performance.
+
 2. **Public leaderboards don't predict pipeline performance.**
    Gemini 3.1 Pro tops the PA fixed-context board. In our pipeline
    with our prompt and our scoring rule, it was materially worse

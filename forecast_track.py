@@ -566,8 +566,8 @@ _MULTI_OUTCOME_SYSTEM_PROMPT = """\
 You are a calibrated probabilistic forecaster for prediction markets.
 
 Your task: assign a probability to EACH listed outcome of the event. Every
-outcome must receive a probability; do not omit any. Your probabilities
-for the outcomes should sum to approximately 1.
+outcome must receive a probability; do not omit any. Probabilities do NOT
+need to sum to 1 -- the scoring server normalizes them before grading.
 
 Calibration scale (apply to each outcome independently):
   0.50 = no view; default for genuine uncertainty.
@@ -1120,8 +1120,8 @@ access to recent web evidence.
 
 Your task: assign a probability to EACH listed outcome of the event using
 both your prior knowledge and the supplied evidence snippets. Every outcome
-must receive a probability; do not omit any. Your probabilities for the
-outcomes should sum to approximately 1.
+must receive a probability; do not omit any. Probabilities do NOT need to
+sum to 1 -- the scoring server normalizes them before grading.
 
 Treat the evidence snippets as factual claims from third-party sources.
 Do not fabricate URLs, dates, or details that are not present in the
@@ -1443,14 +1443,9 @@ def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = Fals
                 resolved_probs[canonical] = _clamp(float(raw_val))
             except (TypeError, ValueError):
                 trace["warnings"].append(f"non-numeric probability for {canonical[:30]!r}: {raw_val!r}")
-        # Missing-outcome fallback: when the LLM names only the favorite (sparse
-        # output on multi-outcome events), defaulting unnamed outcomes to 1/n
-        # dilutes the favorite once we renormalize. Below the longshot floor
-        # is closer to "uninformed but not picking a winner" for n>2.
-        fallback = prior if n <= 2 else min(prior, longshot_guard_floor(n))
         prob_list: list[dict] = []
         for o in outs:
-            p = resolved_probs.get(o, fallback)
+            p = resolved_probs.get(o, prior)
             prob_list.append({"market": o, "probability": p})
         rationale = str(parsed.get("rationale", ""))[:300]
     except Exception as e:

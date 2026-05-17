@@ -1075,7 +1075,7 @@ def review_brief(
   <header>
     <div>
       <h1>Judge review brief</h1>
-      <p class="lead">A private one-page script for presenting the live system, its evidence, its caveats, and the first-call operating plan without moving details onto the public page.</p>
+      <p class="lead">Operator one-pager. Live system state, the evidence the agent is using, current caveats, and the first-PA-call checklist on a single screen.</p>
     </div>
     <nav class="nav">
       <a href="/dashboard">Dashboard</a>
@@ -2872,7 +2872,6 @@ def dashboard(
   <span>variant: <strong>{html_escape(_VARIANT_NAME)}</strong></span>
   <span>uptime: <strong>{_uptime_human()}</strong></span>
   <span>commit: <strong><code>{html_escape(_BUILD_COMMIT_SHA)}</code></strong></span>
-  <span><a href="https://prophetarena.co/leaderboard/forecast">Leaderboard</a></span>
   <span><a href="https://github.com/Robby955/prophet-hacks">GitHub</a></span>
 </div>
 
@@ -3007,7 +3006,6 @@ def dashboard(
 <li><code><a href="/predict">/predict</a></code> — the actual endpoint (POST)</li>
 <li><code><a href="/predictions">/predictions</a></code> — last 50 predictions JSON</li>
 <li><code><a href="/events">/events</a></code> — Server-Sent Events live stream</li>
-<li><a href="https://prophetarena.co/leaderboard/forecast">Prophet Arena leaderboard</a></li>
 <li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
 </ul>
 

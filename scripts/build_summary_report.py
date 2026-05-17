@@ -754,10 +754,28 @@ def main() -> int:
     print(f"writing {html_path}")
     html_path.write_text(_render_html(s))
 
-    # PDF
+    # PDF: delegate to the clean one-pager renderer. The previous in-file
+    # _render_pdf produced a two-page matplotlib layout with overlapping
+    # axes that read as garbage to a first-time reader (Rob review,
+    # 2026-05-17 01:50 CT). The one-pager builder reads the canonical
+    # submission/REPORT.md and renders a single-page artifact judges can
+    # actually skim.
     pdf_path = out_dir / "summary.pdf"
-    print(f"writing {pdf_path}")
-    _render_pdf(s, pdf_path)
+    print(f"writing {pdf_path} via scripts/build_submission_onepager.py")
+    try:
+        from scripts.build_submission_onepager import build_pdf  # type: ignore
+    except ImportError:
+        # When invoked as `python scripts/build_summary_report.py`, the
+        # `scripts` package import path may not exist. Fall back to a
+        # subprocess invocation so this script remains a single entry point.
+        import subprocess as _sub
+        _sub.run(
+            ["python", "scripts/build_submission_onepager.py",
+             "--output", str(pdf_path)],
+            check=True,
+        )
+    else:
+        build_pdf(pdf_path)
 
     print(f"\ndone. open {html_path} or {pdf_path}")
     return 0

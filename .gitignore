@@ -37,3 +37,4 @@ forecasting_agent_monitoring_playbook.pdf
 prophet_hacks_research_monitoring_playbook_v4.pdf
 .playwright-cli/
 output/
+data/predictions/measurement_*/

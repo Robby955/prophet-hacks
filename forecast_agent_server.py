@@ -1292,6 +1292,96 @@ def favicon() -> Response:
     return Response(status_code=204)
 
 
+@app.get("/apple-touch-icon.png", include_in_schema=False)
+@app.get("/apple-touch-icon-precomposed.png", include_in_schema=False)
+def apple_touch_icon() -> Response:
+    """iOS expects this at the root path. Serve the 192px PNG we already have."""
+    png = _STATIC_DIR / "icon-192.png"
+    if png.exists():
+        return Response(content=png.read_bytes(), media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+    return Response(status_code=404)
+
+
+@app.get("/robots.txt", include_in_schema=False)
+def robots() -> Response:
+    """Standard search-engine permissions. We're a forecasting endpoint, not
+    a content site, but having robots.txt at root is basic web hygiene and
+    keeps log noise down."""
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /predict\n"
+        "Disallow: /predictions\n"
+        "Disallow: /dashboard\n"
+        "Disallow: /observatory\n"
+        "Disallow: /demo/\n"
+        "\n"
+        "Sitemap: https://forecastingpath.com/sitemap.xml\n"
+    )
+    return Response(content=body, media_type="text/plain",
+                    headers={"Cache-Control": "public, max-age=3600"})
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap() -> Response:
+    """Minimal sitemap covering the public-facing URLs an external indexer
+    could reasonably crawl. Auth-gated pages are excluded."""
+    urls = [
+        "https://forecastingpath.com/",
+        "https://forecastingpath.com/healthz",
+        "https://forecastingpath.com/static/summary.pdf",
+        "https://forecastingpath.com/static/architecture.svg",
+        "https://forecastingpath.com/llms.txt",
+    ]
+    items = "\n".join(f"  <url><loc>{u}</loc></url>" for u in urls)
+    body = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{items}\n"
+        "</urlset>\n"
+    )
+    return Response(content=body, media_type="application/xml",
+                    headers={"Cache-Control": "public, max-age=3600"})
+
+
+@app.get("/llms.txt", include_in_schema=False)
+def llms_txt() -> Response:
+    """Emerging convention for AI agents discovering a site. Tells a
+    language-model crawler what this site is and where the structured
+    artifacts are. On-brand for a forecasting agent serving an AI
+    benchmark."""
+    body = (
+        "# ForecastingPath\n"
+        "\n"
+        "> The Oracles: a calibrated retrieval-augmented forecasting agent\n"
+        "> built for Prophet Hacks 2026. Team CanadaHacks, forecasting track.\n"
+        "\n"
+        "## What this domain serves\n"
+        "\n"
+        "- `/predict` (POST): live forecasting endpoint. Accepts a Prophet\n"
+        "  Arena event payload, returns per-outcome probabilities.\n"
+        "- `/healthz` (GET): liveness + the currently deployed commit SHA.\n"
+        "- `/v1/chat/completions` (POST): OpenAI-compatible shim for the\n"
+        "  PA onboarding form. Bearer-auth required.\n"
+        "- `/` (GET): a small public landing page.\n"
+        "\n"
+        "## Where the structured information lives\n"
+        "\n"
+        "- Source code: https://github.com/Robby955/prophet-hacks\n"
+        "- Submission report: https://forecastingpath.com/static/summary.pdf\n"
+        "- Architecture diagram: https://forecastingpath.com/static/architecture.svg\n"
+        "- Live commit SHA: https://forecastingpath.com/healthz\n"
+        "\n"
+        "## Pages not intended for crawling\n"
+        "\n"
+        "- `/dashboard`, `/observatory`, `/compare`, `/predictions`,\n"
+        "  `/demo/*`: PIN-gated operator views. Not public content.\n"
+    )
+    return Response(content=body, media_type="text/plain; charset=utf-8",
+                    headers={"Cache-Control": "public, max-age=3600"})
+
+
 def _distribute_p_yes_to_outcomes(
     p_yes: float, outcomes: list[str],
 ) -> list[dict]:

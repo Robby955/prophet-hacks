@@ -550,3 +550,51 @@ Decided by: Claude under Rob's "verify before shipping" instruction.
 The verification took ~10 minutes and zero spend. Saved a production
 change that would have been ~0 EV on PA's actual metric. Commit:
 this commit.
+
+---
+
+## 2026-05-17 (02:35 CT) — Intra-model variance: production = 0.0377 ± 0.0009
+
+Ran `predict_multi_outcome_retrieval` 5 times sequentially on the
+26-event resolved set. Same prompt, same retrieval, fresh LLM calls
+(130 + 130 Brave fetches). Cost ~$13.
+
+  run 1: 0.03820
+  run 2: 0.03822
+  run 3: 0.03822
+  run 4: 0.03782
+  run 5: 0.03613
+
+  grand mean: 0.03772
+  std:        0.00090  (CV = 2.4%)
+  range:      [0.03613, 0.03822]
+  canonical:  0.03782  (canonical file sits well inside ±1σ)
+
+**Honest production number going forward: 0.0377 ± 0.0009.**
+
+**Why this matters for ablation triage:**
+
+The Phase 2 headline improvement was 0.026 Brier with bootstrap CI
+[0.0143, 0.0374]. Intra-model noise (σ=0.001) is ~25× smaller than
+the Phase 2 signal, which is why the bootstrap CI excludes zero.
+
+For any future ablation: if the claimed Brier improvement is less
+than 0.005 (roughly 5×σ), treat it as a noise candidate that needs
+re-verification (paired bootstrap or multi-run averaging) before
+claiming a production-worthy improvement.
+
+This is the noise floor that retroactively justifies the rejections
+of E3 (adaptive retrieval count, |Δ|=0.0009) and E4 (exchanges_only
+source priority, |Δ|=0.0013) earlier today. Both fall inside the
+intra-model noise band. Bootstrap CI was the correct gate.
+
+Artifacts:
+- `scripts/ablate_variance.py` (harness)
+- `scripts/build_variance_plot.py` (3-panel interactive page)
+- `data/predictions/variance_run_*.json` (raw)
+- `data/predictions/variance_summary.json` (aggregates)
+- `static/variance.html` (Plotly view, auth-gated like other research views)
+
+Decided by: Claude under Rob's "research budget worth spending on
+variance and plots" instruction. Commit: `cb4a1a0` (variance) +
+this commit (summary.html + DECISIONS entry).

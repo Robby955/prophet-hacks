@@ -175,6 +175,9 @@
 </table>
 <p class="meta">All variants beat random; production wins by 0.005 BSS over Opus 4.6 on n=26. <strong>The hard test is BSS &gt; 0 against live Kalshi/Polymarket prices</strong> — pending PA's first call.</p>
 
+<h2>Intra-model variance: 5 fresh reruns of production</h2>
+<p class="meta">"Production scores 0.0378" hides LLM stochasticity. We re-ran the production variant 5 times on the same 26 events. Same prompt, same retrieval, fresh model calls. Result: <strong>0.0377 ± 0.0009</strong> (range [0.03613, 0.03822]; canonical file 0.03782 sits well inside ± 1 σ of the grand mean). Coefficient of variation 2.4%. The Phase 2 improvement (0.026 Brier) is ~25× larger than this noise floor, which is why the paired-bootstrap CI on the Sonnet → Opus delta excludes zero. Future small ablations with |Δ| &lt; 0.005 should be treated as noise candidates and re-verified before claiming a production-worthy improvement. Interactive: <a href="variance.html">variance.html</a>.</p>
+
 <h2>Brier decomposition (Murphy 1973): REL - RES + UNC</h2>
 <p class="meta">Same prediction files, decomposed. <strong>REL down</strong> (lower better) = miscalibration; <strong>RES up</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance. GPT-5.5 is better calibrated by REL than production in this sample, but has lower RES, so its direct Brier is worse.</p>
 <table>

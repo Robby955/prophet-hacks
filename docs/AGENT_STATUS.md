@@ -165,10 +165,10 @@ during the eval window.
 
 ## codex/bootstrap-ci
 
-- **Current task:** Paired-bootstrap CI script for the Phase 2 Brier delta implemented and verified.
-- **Files owned this session:** `scripts/bootstrap_brier_ci.py`, `tests/test_bootstrap_brier_ci.py`, `docs/AGENT_STATUS.md`
-- **Last updated:** 2026-05-17T00:01:08Z
-- **Notes:** Worktree branch `.claude/worktrees/codex-bootstrap-ci` / `codex/bootstrap-ci`. Result on existing snapshots: Opus Phase 2 Brier 0.037912 vs Sonnet Phase 1 0.063939, mean improvement 0.026027, 95% paired-bootstrap CI [0.014270, 0.037373] from 50,000 resamples, seed 20260516. Report written locally to ignored `reports/phase2_brier_bootstrap_ci.json`.
+- **Current task:** Paired-bootstrap CI plus Phase 2 decomposition implemented and verified.
+- **Files owned this session:** `scripts/bootstrap_brier_ci.py`, `scripts/backtest_forecast.py`, `tests/test_bootstrap_brier_ci.py`, `tests/test_backtest_forecast.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:04:29Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-bootstrap-ci` / `codex/bootstrap-ci`. Result on existing snapshots: Opus Phase 2 Brier 0.037912 vs Sonnet Phase 1 0.063939, mean improvement 0.026027, 95% paired-bootstrap CI [0.014270, 0.037373] from 50,000 resamples, seed 20260516. Local Sonnet rerun with the current floor scored 0.041838: floor fix accounts for 0.022100/0.026027 (~85%) of the headline improvement; Opus vs current-floor Sonnet accounts for 0.003927 (~15%) with 95% CI [-0.004346, 0.015081]. Reports written under ignored `reports/`. Also fixed `scripts/backtest_forecast.py` to use a PATH `prophet` CLI when a worktree has no local `.venv/`.
 
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 

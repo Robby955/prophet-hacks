@@ -141,6 +141,43 @@ def test_missing_category_accepted(fake_variant_client):
     assert len(body["probabilities"]) == 2
 
 
+def test_predict_then_observatory_renders_when_category_absent(fake_variant_client, monkeypatch):
+    """Sibling regression: same root cause as the dashboard 500. The
+    observatory page lists recent predictions too; if category=None
+    propagates here unsafely, this page would have 500'd identically.
+    Locks the contract: a category-less /predict round-tripped through
+    /observatory returns 200, not 500.
+    """
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "test-token")
+    fake_variant_client.post("/predict", json={
+        "event_ticker": "T-obs", "market_ticker": "T-obs",
+        "title": "Will the observatory render without category?",
+        "close_time": "2027-01-01T00:00:00Z",
+        "outcomes": ["Yes", "No"],
+    })
+    r = fake_variant_client.get("/observatory", cookies={"dashboard_token": "test-token"})
+    assert r.status_code == 200, r.text
+
+
+def test_predict_then_predictions_json_when_category_absent(fake_variant_client, monkeypatch):
+    """Same root cause check on /predictions JSON. The persistence path
+    serializes the prediction record back to JSON; if any consumer assumes
+    string-shaped category, this would surface here too.
+    """
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "test-token")
+    fake_variant_client.post("/predict", json={
+        "event_ticker": "T-preds", "market_ticker": "T-preds",
+        "title": "Will /predictions serialize without category?",
+        "close_time": "2027-01-01T00:00:00Z",
+        "outcomes": ["Yes", "No"],
+    })
+    r = fake_variant_client.get("/predictions", cookies={"dashboard_token": "test-token"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    # at least one prediction we just posted should be in the list
+    assert len(body.get("predictions", [])) >= 1
+
+
 def test_predict_then_dashboard_renders_when_category_absent(fake_variant_client, monkeypatch):
     """Regression for 2026-05-17 morning incident: making category Optional
     on EventRequest stored category=None on the prediction record. The

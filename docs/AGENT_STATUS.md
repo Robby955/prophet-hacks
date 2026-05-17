@@ -52,10 +52,10 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 
 ## codex/persistent-observatory
 
-- **Current task:** Completed disk-backed prediction history plus observatory trace table.
+- **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.
 - **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `scripts/agent/deploy.sh`, `docs/AGENT_STATUS.md`.
-- **Last updated:** 2026-05-17T02:28:26Z
-- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. `scripts/agent/deploy.sh` now deploys a minimal runtime bundle after preflight to avoid the repeated full-repo Railway code-snapshot/TLS upload failures. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `chat_completions_adapter.py`, or Railway env vars changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, and `./scripts/agent/verify.sh`.
+- **Last updated:** 2026-05-17T02:43:28Z
+- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. `scripts/agent/deploy.sh` now deploys a minimal runtime bundle after preflight to avoid the repeated full-repo Railway code-snapshot/TLS upload failures. Railway production volume `oracles-agent-volume` (`1ae021a5-353d-4917-a474-8a5e0aa6dced`) is mounted on `oracles-agent` at `/data`; latest deployment `0b16e0f5` is `SUCCESS` and shows `volumeMounts: ["/data"]`. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py` changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, `./scripts/agent/verify.sh`, Railway volume list, Railway status, and live `/healthz`.
 
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
@@ -167,15 +167,15 @@ during the eval window.
 
 ### Active state (refresh before claiming!)
 
-- main: `19bd1a93` (chat-completions shim) — verify with `git log --oneline -1`
-- production live commit: should match main; verify with `curl -s https://agent.forecastingpath.com/healthz | jq .commit`
+- main: `411c5f9` (`fix(deploy): upload minimal Railway runtime bundle`) — verify with `git log --oneline -1`
+- production live commit: `411c5f99`; verify with `curl -s https://agent.forecastingpath.com/healthz | jq .commit`
 - variant: `multi_outcome_retrieval` (Opus 4.7 + market-anchor + 0.10 floor)
-- tests: ~213 passing
+- tests: 221 passing
 - session spend: ~$13 of "100s" budget
 - watcher: PID 33661, ~5h uptime, no PA activity yet
-- open PRs on GitHub: 0
+- open draft PRs on GitHub: #5 SSE pipeline demo, #6 paired Brier bootstrap CI, #7 Brave health in full check, #8 hybrid routing edge tests, #9 ensemble variant tests, #11 observatory design spec. Several are likely partially superseded by main; review before merging.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
-- PA general onboarding (prophetarena.co/onboarding): NOT yet submitted — needs `/v1/chat/completions` shim to be live (deploying as of this commit), then Rob submits the form himself
+- PA general onboarding (prophetarena.co/onboarding): verify current status before claiming; `/v1/chat/completions` shim is live with auth.
 
 ## codex/full-check-brave
 

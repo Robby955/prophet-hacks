@@ -604,3 +604,69 @@ def test_dashboard_copy_matches_sse_refresh_behavior(monkeypatch) -> None:
     assert response.status_code == 200
     assert "The page stays live through Server-Sent Events" in response.text
     assert "Page auto-refreshes every 30s" not in response.text
+
+
+def test_dashboard_renders_first_call_triage_waiting(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    original_history = list(server._PREDICTION_HISTORY)
+    server._PREDICTION_HISTORY.clear()
+    try:
+        client = TestClient(server.app)
+
+        response = client.get("/dashboard")
+
+        assert response.status_code == 200
+        assert "First-call triage" in response.text
+        assert "Waiting for first Prophet Arena call" in response.text
+        assert "Outcome count" in response.text
+        assert "Do not change production variant" in response.text
+    finally:
+        server._PREDICTION_HISTORY.clear()
+        server._PREDICTION_HISTORY.extend(original_history)
+
+
+def test_dashboard_renders_first_call_trace_summary(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    original_history = list(server._PREDICTION_HISTORY)
+    server._PREDICTION_HISTORY.clear()
+    server._PREDICTION_HISTORY.appendleft(
+        {
+            "ts": "2026-05-17T00:01:00+00:00",
+            "market_ticker": "LIVE-1",
+            "title": "Which outcome wins?",
+            "category": "Test",
+            "p_yes": 0.4,
+            "rationale": "trace summary fixture",
+            "outcomes": ["A", "B", "C", "D"],
+            "probabilities": [
+                {"market": "A", "probability": 0.4},
+                {"market": "B", "probability": 0.3},
+                {"market": "C", "probability": 0.2},
+                {"market": "D", "probability": 0.1},
+            ],
+            "evidence_urls": ["https://example.com/a", "https://example.com/b"],
+            "trace": {
+                "parse_path": "direct",
+                "latency_ms": {"total": 3210},
+                "warnings": ["schema repaired"],
+            },
+        }
+    )
+    try:
+        client = TestClient(server.app)
+
+        response = client.get("/dashboard")
+
+        assert response.status_code == 200
+        assert "First-call triage" in response.text
+        assert "PA activity observed" in response.text
+        assert "4 outcomes" in response.text
+        assert "3210 ms" in response.text
+        assert "direct" in response.text
+        assert "schema repaired" in response.text
+        assert "2 evidence URLs" in response.text
+    finally:
+        server._PREDICTION_HISTORY.clear()
+        server._PREDICTION_HISTORY.extend(original_history)

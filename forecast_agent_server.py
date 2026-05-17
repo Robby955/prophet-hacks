@@ -2319,6 +2319,61 @@ def _prob_bars_html(probs: list[dict]) -> str:
     return "".join(rows)
 
 
+def _dashboard_first_call_triage_html(history: list[dict[str, Any]]) -> str:
+    """Operator checklist for the first live Prophet Arena request."""
+    latest = history[0] if history else None
+    if latest:
+        probs = latest.get("probabilities") if isinstance(latest.get("probabilities"), list) else []
+        outcomes = latest.get("outcomes") if isinstance(latest.get("outcomes"), list) else []
+        outcome_count = len(outcomes) or len(probs)
+        trace = latest.get("trace") if isinstance(latest.get("trace"), dict) else {}
+        latency = trace.get("latency_ms") if isinstance(trace, dict) else {}
+        total_latency = "not recorded"
+        if isinstance(latency, dict) and latency.get("total") is not None:
+            total_latency = f"{int(latency.get('total', 0))} ms"
+        parse_path = str(trace.get("parse_path") or trace.get("parser_path") or "not recorded")
+        warnings_raw = trace.get("warnings") if isinstance(trace, dict) else None
+        if isinstance(warnings_raw, list):
+            warnings = "; ".join(str(w) for w in warnings_raw[:4]) or "none"
+        elif warnings_raw:
+            warnings = str(warnings_raw)
+        else:
+            warnings = "none"
+        evidence = latest.get("evidence_urls") if isinstance(latest.get("evidence_urls"), list) else []
+        status_line = "PA activity observed"
+        rows = [
+            ("Event", str(latest.get("title") or latest.get("market_ticker") or "latest prediction")[:110]),
+            ("Outcome count", f"{outcome_count} outcomes" if outcome_count else "not recorded"),
+            ("Total latency", total_latency),
+            ("Parse path", parse_path),
+            ("Warnings", warnings),
+            ("Evidence URLs", f"{len(evidence)} evidence URLs"),
+        ]
+    else:
+        status_line = "Waiting for first Prophet Arena call"
+        rows = [
+            ("Event", "not received"),
+            ("Outcome count", "check immediately after first payload"),
+            ("Total latency", "must remain far below PA timeout"),
+            ("Parse path", "confirm direct parse or repair path"),
+            ("Warnings", "inspect before changing model or prompt"),
+            ("Evidence URLs", "confirm retrieval actually ran"),
+        ]
+    body = "".join(
+        f"<tr><td>{html_escape(label)}</td><td>{html_escape(value)}</td></tr>"
+        for label, value in rows
+    )
+    return (
+        "<div class='card triage-card'>"
+        f"<p><strong>{status_line}.</strong> First live payload review should focus on schema, latency, parser path, warnings, and evidence coverage.</p>"
+        "<table><tbody>"
+        f"{body}"
+        "</tbody></table>"
+        "<p class='meta'><strong>Do not change production variant</strong> until this table shows a real failure mode and a measured alternative beats it.</p>"
+        "</div>"
+    )
+
+
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(
     request: Request,
@@ -2333,10 +2388,11 @@ def dashboard(
         open_events_list: list = []
     else:
         open_events_list = open_events if isinstance(open_events, list) else []
+    dashboard_history = list(_PREDICTION_HISTORY)
 
     # Predictions table with inline probability bars and evidence URLs.
     pred_cards = ""
-    for p in list(_PREDICTION_HISTORY)[:20]:
+    for p in dashboard_history[:20]:
         probs_html = _prob_bars_html(p.get("probabilities") or [])
         evidence = p.get("evidence_urls") or []
         evidence_html = ""
@@ -2413,8 +2469,8 @@ def dashboard(
     variant_desc = _VARIANT_DESCRIPTIONS.get(_VARIANT_NAME, "(no description)")
     cost_per_event = _VARIANT_COSTS.get(_VARIANT_NAME, 0.0)
     avg_p_dev = 0.0
-    if _PREDICTION_HISTORY:
-        avg_p_dev = sum(abs(p["p_yes"] - 0.5) for p in _PREDICTION_HISTORY) / len(_PREDICTION_HISTORY)
+    if dashboard_history:
+        avg_p_dev = sum(abs(float(p.get("p_yes", 0.5)) - 0.5) for p in dashboard_history) / len(dashboard_history)
 
     # Sparkline + bar chart pieces
     spark_values = list(_PREDICTIONS_PER_MIN) + [_PPM_CURRENT_COUNT]
@@ -2423,7 +2479,7 @@ def dashboard(
 
     # Category distribution from recent predictions (for a tiny donut)
     cat_counts: dict[str, int] = {}
-    for p in _PREDICTION_HISTORY:
+    for p in dashboard_history:
         c = p.get("category") or "?"
         cat_counts[c] = cat_counts.get(c, 0) + 1
     cat_total = sum(cat_counts.values()) or 1
@@ -2441,6 +2497,7 @@ def dashboard(
             "real time."
             "</div>"
         )
+    first_call_triage_html = _dashboard_first_call_triage_html(dashboard_history)
 
     html = f"""<!doctype html>
 <html lang="en"><head>
@@ -2616,6 +2673,9 @@ def dashboard(
   <div class="kpi"><div class="label">Last call from Prophet Arena</div><div class="value">{html_escape(last_run[:10]) if last_run != '—' else 'never'}</div><div class="sub">{html_escape(str(last_status))}</div></div>
 </div>
 
+<h2>First-call triage</h2>
+{first_call_triage_html}
+
 <h2>What our agent does</h2>
 <div class="card">
   <figure style="margin:0 0 1.2em;">
@@ -2648,7 +2708,7 @@ def dashboard(
   <p class="meta">Why the guard: Whelan's analysis of Kalshi shows buyers of contracts priced under $0.10 lose &gt;60% on average. LLMs are especially prone to dropping unlikely outcomes to near-zero on vivid narratives, so we floor them.</p>
 </div>
 
-<h2>Recent predictions (<span id="pred-count">{len(_PREDICTION_HISTORY)}</span>)</h2>
+<h2>Recent predictions (<span id="pred-count">{len(dashboard_history)}</span>)</h2>
 <div class="pred-list" id="pred-grid">{pred_cards}</div>
 
 <h2>Open events on Prophet Arena ({len(open_events_list)})</h2>

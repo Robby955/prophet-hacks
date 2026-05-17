@@ -260,10 +260,15 @@ class _AuthGatedStaticFiles(StaticFiles):
     """Serve public assets while keeping research HTML behind dashboard auth."""
 
     _PROTECTED_PATHS = {
+        "/static/abstain_slider.html",
+        "/static/bootstrap_hist.html",
         "/static/summary.html",
         "/static/status.html",
         "/static/gallery_open.html",
         "/static/gallery_resolved.html",
+        "/static/heatmap_resolved.html",
+        "/static/pipeline_trace.html",
+        "/static/scatter_resolved.html",
     }
 
     @staticmethod
@@ -540,7 +545,6 @@ def _set_dashboard_cookie_if_needed(response: Response, request: Request) -> Non
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def root() -> str:
-    dashboard_status = "restricted" if _dashboard_auth_enabled() else "public"
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
@@ -548,9 +552,9 @@ def root() -> str:
 <title>ForecastingPath</title>
 <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
 <link rel="apple-touch-icon" sizes="192x192" href="/static/icon-192.png">
-<meta name="description" content="ForecastingPath is a live probabilistic forecasting system for Prophet Hacks 2026. Public status page; detailed research console is restricted.">
+<meta name="description" content="ForecastingPath is a live forecasting endpoint, trace viewer, and results desk for Prophet Hacks 2026.">
 <meta property="og:title" content="ForecastingPath">
-<meta property="og:description" content="Live probabilistic forecasting system. Restricted observatory for collaborators.">
+<meta property="og:description" content="Live forecasting endpoint, trace viewer, and results desk.">
 <meta property="og:image" content="https://forecastingpath.com/static/banner.webp">
 <meta property="og:url" content="https://forecastingpath.com">
 <meta property="og:type" content="website">
@@ -558,20 +562,25 @@ def root() -> str:
 <meta name="twitter:image" content="https://forecastingpath.com/static/banner.webp">
 <style>
   :root {{
-    --bg: #f5f7fb;
+    --bg: #f4f7fb;
     --panel: #ffffff;
     --line: #d9e0ea;
     --text: #0f172a;
     --muted: #64748b;
-    --accent: #2146ff;
-    --accent-soft: #eef2ff;
+    --accent: #2242ff;
+    --accent-soft: #ecf2ff;
     --ok: #047857;
+    --ink: #111827;
   }}
   * {{ box-sizing: border-box; }}
   body {{ margin: 0; background:
-         radial-gradient(circle at 12% 8%, rgba(33,70,255,0.10), transparent 28rem),
-         linear-gradient(180deg, #ffffff 0%, var(--bg) 54%, #eef2f7 100%);
+         linear-gradient(180deg, #ffffff 0%, var(--bg) 58%, #eef2f7 100%);
          color: var(--text); font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }}
+  body::before {{ content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0.42;
+         background-image:
+           linear-gradient(rgba(15,23,42,0.045) 1px, transparent 1px),
+           linear-gradient(90deg, rgba(15,23,42,0.035) 1px, transparent 1px);
+         background-size: 56px 56px; mask-image: linear-gradient(180deg, #000 0%, transparent 72%); }}
   .shell {{ min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; overflow-x: clip; }}
   header {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 22px 0;
             display: flex; align-items: center; justify-content: space-between; gap: 1rem; }}
@@ -579,22 +588,27 @@ def root() -> str:
             color: var(--text); text-decoration: none; font-weight: 760; }}
   .brand img {{ width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto; }}
   .brand span {{ overflow-wrap: anywhere; }}
+  nav {{ display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: flex-end; }}
+  nav a {{ color: var(--muted); text-decoration: none; font-size: 0.92rem; font-weight: 650;
+           padding: 0.4rem 0.6rem; border-radius: 8px; transition: color 160ms ease, background 160ms ease; }}
+  nav a:hover {{ color: var(--text); background: rgba(255,255,255,0.74); }}
   .status-pill {{ display: inline-flex; align-items: center; gap: 0.55rem; min-height: 34px;
                   padding: 0 0.72rem; border: 1px solid var(--line); border-radius: 999px;
                   background: rgba(255,255,255,0.72); color: var(--muted); font-size: 0.9rem;
                   white-space: nowrap; }}
-  .dot {{ width: 8px; height: 8px; border-radius: 99px; background: var(--ok); display: inline-block; }}
-  main {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: clamp(34px, 6vw, 72px) 0 64px; }}
-  .hero-shell {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
-                 gap: clamp(36px, 7vw, 104px); align-items: start; }}
-  .hero-copy {{ min-width: 0; max-width: 680px; }}
-  .eyebrow {{ margin: 0 0 1rem; font-size: 0.82rem; font-weight: 780; letter-spacing: 0.12em;
+  .dot {{ width: 8px; height: 8px; border-radius: 99px; background: var(--ok); display: inline-block;
+          box-shadow: 0 0 0 5px rgba(4,120,87,0.10); animation: pulse 2.4s ease-in-out infinite; }}
+  main {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: clamp(28px, 5vw, 58px) 0 64px; position: relative; }}
+  .hero-shell {{ display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(390px, 1.1fr);
+                 gap: clamp(36px, 6vw, 86px); align-items: center; }}
+  .hero-copy {{ min-width: 0; max-width: 620px; }}
+  .eyebrow {{ margin: 0 0 0.85rem; font-size: 0.82rem; font-weight: 780; letter-spacing: 0.12em;
               text-transform: uppercase; color: var(--muted); }}
-  .hero-title {{ margin: 0; max-width: 11ch; font-size: clamp(3.2rem, 7vw, 6.1rem);
-                 line-height: 0.94; letter-spacing: 0; text-wrap: balance; }}
-  .lead {{ max-width: 600px; margin: 1.35rem 0 0; color: var(--muted);
+  .hero-title {{ margin: 0; max-width: 12ch; font-size: clamp(3rem, 6vw, 5.35rem);
+                 line-height: 0.92; letter-spacing: 0; overflow-wrap: anywhere; }}
+  .lead {{ max-width: 520px; margin: 1.1rem 0 0; color: var(--muted);
            font-size: clamp(1.02rem, 1.7vw, 1.18rem); }}
-  .actions {{ display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.85rem; }}
+  .actions {{ display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.55rem; }}
   .btn {{ display: inline-flex; align-items: center; justify-content: center;
           min-height: 44px; padding: 0 1rem; border-radius: 8px;
           font-weight: 720; text-decoration: none; border: 1px solid var(--line);
@@ -602,9 +616,37 @@ def root() -> str:
   .btn:hover {{ transform: translateY(-1px); }}
   .primary {{ background: var(--accent); color: #fff; border-color: var(--accent); }}
   .secondary {{ background: rgba(255,255,255,0.82); color: var(--text); }}
-  .status-panel {{ min-width: 0; width: 100%; background: rgba(255,255,255,0.88);
-                   border: 1px solid var(--line); border-radius: 8px; padding: 1.1rem;
-                   box-shadow: 0 18px 48px rgba(15,23,42,0.08); }}
+  .run-window {{ min-width: 0; width: 100%; background: rgba(255,255,255,0.9);
+                 border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+                 box-shadow: 0 24px 70px rgba(15,23,42,0.12); }}
+  .run-top {{ display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+              padding: 0.85rem 1rem; border-bottom: 1px solid #e5ebf4; color: var(--muted);
+              font-size: 0.86rem; font-weight: 680; }}
+  .lights {{ display: flex; gap: 0.34rem; }}
+  .lights span {{ width: 8px; height: 8px; border-radius: 99px; background: #cbd5e1; }}
+  .run-body {{ padding: 1.1rem; display: grid; gap: 1rem; }}
+  .stage-list {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.72rem; }}
+  .stage {{ min-height: 132px; border: 1px solid #e5ebf4; border-radius: 8px; padding: 0.82rem;
+            background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+            display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }}
+  .stage::after {{ content: ""; position: absolute; left: -30%; right: -30%; top: 0; height: 2px;
+                   background: linear-gradient(90deg, transparent, var(--accent), transparent);
+                   transform: translateX(-80%); animation: scan 3.2s ease-in-out infinite; opacity: 0.9; }}
+  .stage:nth-child(2)::after {{ animation-delay: 0.45s; }}
+  .stage:nth-child(3)::after {{ animation-delay: 0.9s; }}
+  .stage:nth-child(4)::after {{ animation-delay: 1.35s; }}
+  .stage small {{ color: var(--muted); font-weight: 760; letter-spacing: 0.08em; }}
+  .stage strong {{ display: block; margin-top: 0.42rem; font-size: 1rem; }}
+  .stage span {{ color: var(--muted); font-size: 0.9rem; }}
+  .probability {{ display: grid; gap: 0.58rem; padding: 1rem; border: 1px solid #e5ebf4; border-radius: 8px;
+                  background: #0f172a; color: #dbeafe; }}
+  .prob-head {{ display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-weight: 720; }}
+  .prob-head span:last-child {{ color: #8dd7b7; }}
+  .bars {{ display: grid; gap: 0.46rem; }}
+  .bar {{ height: 9px; border-radius: 99px; background: rgba(219,234,254,0.14); overflow: hidden; }}
+  .bar i {{ display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8dd7b7, #9fb6ff); animation: settle 2.8s ease-in-out infinite; }}
+  .status-panel {{ min-width: 0; width: 100%; background: rgba(255,255,255,0.78);
+                   border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }}
   .status-panel h2 {{ margin: 0 0 0.85rem; font-size: 0.86rem; text-transform: uppercase;
                       letter-spacing: 0.1em; color: var(--muted); }}
   .rows {{ display: grid; gap: 0.3rem; }}
@@ -613,87 +655,124 @@ def root() -> str:
   .row:first-child {{ border-top: 0; }}
   .row span:first-child {{ color: var(--muted); }}
   .row strong {{ text-align: right; overflow-wrap: anywhere; }}
-  .signal {{ margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e7edf5;
-             display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.7rem; align-items: center;
-             color: var(--muted); font-size: 0.9rem; }}
-  .signal-line {{ height: 1px; background: linear-gradient(90deg, transparent, #94a3b8, transparent); }}
-  .signal-dot {{ width: 9px; height: 9px; border-radius: 999px; background: var(--ok);
-                 box-shadow: 0 0 0 6px rgba(4,120,87,0.10); }}
-  .lower {{ margin-top: clamp(46px, 7vw, 88px); display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }}
-  .note {{ border-top: 1px solid var(--line); padding-top: 1rem; color: var(--muted); }}
-  .note h2 {{ color: var(--text); font-size: 1rem; margin: 0 0 0.35rem; }}
-  .note p {{ margin: 0; }}
+  .lower {{ margin-top: clamp(42px, 6vw, 74px); display: grid; gap: 22px; }}
+  .demo-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }}
+  .demo-link {{ display: grid; align-content: space-between; min-height: 148px; padding: 1rem;
+                border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,0.76);
+                color: var(--text); text-decoration: none; transition: transform 160ms ease, border-color 160ms ease, background 160ms ease; }}
+  .demo-link:hover {{ transform: translateY(-2px); border-color: #aebced; background: #fff; }}
+  .demo-link span {{ color: var(--muted); font-size: 0.78rem; font-weight: 780; letter-spacing: 0.1em; text-transform: uppercase; }}
+  .demo-link strong {{ display: block; margin-top: 0.7rem; font-size: 1.05rem; }}
+  .demo-link em {{ margin-top: 0.45rem; color: var(--muted); font-style: normal; font-size: 0.92rem; }}
   footer {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 24px 0;
             color: var(--muted); font-size: 0.92rem; display: flex; justify-content: space-between; gap: 1rem; }}
   footer a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
+  @keyframes pulse {{
+    0%, 100% {{ box-shadow: 0 0 0 5px rgba(4,120,87,0.10); }}
+    50% {{ box-shadow: 0 0 0 9px rgba(4,120,87,0.04); }}
+  }}
+  @keyframes scan {{
+    0%, 22% {{ transform: translateX(-80%); opacity: 0; }}
+    42%, 80% {{ opacity: 1; }}
+    100% {{ transform: translateX(80%); opacity: 0; }}
+  }}
+  @keyframes settle {{
+    0%, 100% {{ transform: scaleX(0.96); transform-origin: left; }}
+    50% {{ transform: scaleX(1); transform-origin: left; }}
+  }}
   @media (max-width: 920px) {{
     header, footer {{ align-items: flex-start; flex-direction: column; }}
-    .hero-shell, .lower {{ grid-template-columns: 1fr; }}
-    .status-panel {{ max-width: 520px; }}
-    .hero-title {{ max-width: 10ch; }}
+    nav {{ justify-content: flex-start; }}
+    .hero-shell {{ grid-template-columns: 1fr; }}
+    .run-window {{ max-width: 680px; }}
+    .demo-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
   }}
   @media (min-width: 921px) and (max-height: 560px) {{
     header {{ padding: 14px 0; }}
     main {{ padding-top: 22px; padding-bottom: 36px; }}
-    .hero-title {{ font-size: clamp(3rem, 5vw, 4.6rem); }}
+    .hero-title {{ font-size: clamp(2.8rem, 4.7vw, 4.3rem); }}
     .lead {{ margin-top: 0.95rem; font-size: 1rem; }}
     .actions {{ margin-top: 1.2rem; }}
-    .status-panel {{ padding: 0.9rem; }}
-    .status-panel h2 {{ margin-bottom: 0.45rem; }}
-    .row {{ padding: 0.48rem 0; }}
-    .signal {{ display: none; }}
+    .stage {{ min-height: 104px; }}
+    .run-body {{ gap: 0.7rem; padding: 0.86rem; }}
+    .status-panel {{ display: none; }}
   }}
   @media (max-width: 520px) {{
     header, main, footer {{ width: min(100% - 32px, 1180px); }}
     main {{ padding-top: 24px; }}
     .status-pill {{ white-space: normal; }}
-    .hero-title {{ font-size: 2.85rem; }}
+    .hero-title {{ font-size: 2.65rem; }}
     .lead {{ margin-top: 1rem; font-size: 1rem; }}
     .actions {{ margin-top: 1.2rem; flex-direction: column; align-items: stretch; }}
+    .stage-list, .demo-grid {{ grid-template-columns: 1fr; }}
+    .stage {{ min-height: 94px; }}
     .status-panel {{ padding: 0.95rem; }}
     .row {{ padding: 0.6rem 0; }}
-    .signal {{ margin-top: 0.8rem; padding-top: 0.8rem; }}
-    .lower {{ gap: 18px; }}
+    .demo-link {{ min-height: 118px; }}
+  }}
+  @media (prefers-reduced-motion: reduce) {{
+    *, *::before, *::after {{ animation: none !important; transition: none !important; }}
   }}
 </style>
 </head><body>
 <div class="shell">
 <header>
   <a class="brand" href="/" aria-label="ForecastingPath home"><img src="/static/flaviconlogo.webp" alt=""><span>ForecastingPath</span></a>
-  <div class="status-pill"><span class="dot"></span><span>endpoint online · monitor {dashboard_status}</span></div>
+  <nav aria-label="Primary">
+    <a href="#run">Run loop</a>
+    <a href="#views">Views</a>
+    <a href="/login?next=/dashboard">Console</a>
+    <span class="status-pill"><span class="dot"></span><span>endpoint online</span></span>
+  </nav>
 </header>
 <main>
-  <section class="hero-shell" aria-label="Public system status">
+  <section class="hero-shell" aria-label="ForecastingPath overview">
     <div class="hero-copy">
-      <p class="eyebrow">ForecastingPath</p>
-      <h1 class="hero-title">Live forecast system status</h1>
-      <p class="lead">Public status for the Prophet Hacks forecasting endpoint. Detailed traces, ablations, and scoring notes stay behind the collaborator console during active scoring.</p>
+      <p class="eyebrow">Prophet Hacks 2026</p>
+      <h1 class="hero-title">ForecastingPath</h1>
+      <p class="lead">A live forecast endpoint, trace viewer, and results desk for scoring probabilistic event predictions.</p>
       <div class="actions">
-        <a class="btn primary" href="/login?next=/observatory">View observatory</a>
-        <a class="btn secondary" href="/login">Sign in</a>
+        <a class="btn primary" href="/login?next=/dashboard">Open console</a>
+        <a class="btn secondary" href="/login?next=/observatory">View observatory</a>
       </div>
     </div>
-    <aside class="status-panel" aria-label="System state">
+    <div class="run-window" id="run" aria-label="Pipeline preview">
+      <div class="run-top"><div class="lights"><span></span><span></span><span></span></div><span>live run preview</span></div>
+      <div class="run-body">
+        <div class="stage-list">
+          <div class="stage"><div><small>01</small><strong>Event</strong></div><span>payload in</span></div>
+          <div class="stage"><div><small>02</small><strong>Evidence</strong></div><span>sources ranked</span></div>
+          <div class="stage"><div><small>03</small><strong>Forecast</strong></div><span>probabilities set</span></div>
+          <div class="stage"><div><small>04</small><strong>Submit</strong></div><span>response logged</span></div>
+        </div>
+        <div class="probability" aria-label="Probability vector preview">
+          <div class="prob-head"><span>Probability vector</span><span>ready</span></div>
+          <div class="bars"><div class="bar"><i style="width:62%"></i></div><div class="bar"><i style="width:38%"></i></div><div class="bar"><i style="width:18%"></i></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="lower" id="views" aria-label="ForecastingPath views">
+    <div class="status-panel" aria-label="Public status">
       <h2>Public status</h2>
       <div class="rows">
         <div class="row"><span>Endpoint</span><strong>healthy</strong></div>
         <div class="row"><span>Submission</span><strong>active</strong></div>
-        <div class="row"><span>Monitoring</span><strong>{dashboard_status}</strong></div>
-        <div class="row"><span>Detailed traces</span><strong>PIN only</strong></div>
+        <div class="row"><span>Demo console</span><strong>ready</strong></div>
+        <div class="row"><span>Result views</span><strong>loaded</strong></div>
       </div>
-      <div class="signal" aria-hidden="true"><span class="signal-line"></span><span class="signal-dot"></span><span class="signal-line"></span></div>
-    </aside>
-  </section>
-  <section class="lower" aria-label="Project summary">
-    <div class="note"><h2>Built for scoring</h2><p>Returns structured probabilities for live events and records enough internal evidence to audit each decision.</p></div>
-    <div class="note"><h2>Reviewed as research</h2><p>Model choices, calibration, scoring caveats, and open questions are tracked behind the restricted console.</p></div>
-    <div class="note"><h2>Designed to operate</h2><p>Health, deployment status, prediction history, and failure checks are kept close to the live system.</p></div>
+    </div>
+    <div class="demo-grid">
+      <a class="demo-link" href="/login?next=/dashboard"><span>Demo</span><strong>Pipeline console</strong><em>Run the staged forecast demo and watch the live feed.</em></a>
+      <a class="demo-link" href="/login?next=/observatory"><span>Ops</span><strong>Observatory</strong><em>Current commit, run history, and first-call review.</em></a>
+      <a class="demo-link" href="/login?next=/static/abstain_slider.html"><span>Strategy</span><strong>Confidence slider</strong><em>Move the threshold and see how scoring changes.</em></a>
+      <a class="demo-link" href="/login?next=/static/scatter_resolved.html"><span>Results</span><strong>Event map</strong><em>Resolved-event losses, comparisons, and drilldowns.</em></a>
+    </div>
   </section>
 </main>
 <footer>
   <div>Team CanadaHacks · Project The Oracles</div>
-  <div><a href="/healthz">health</a> · <a href="/login?next=/dashboard">dashboard</a></div>
+  <div><a href="/healthz">health</a> &middot; <a href="/login?next=/review">brief</a> &middot; <a href="/login?next=/dashboard">dashboard</a></div>
 </footer>
 </div>
 

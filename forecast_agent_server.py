@@ -418,7 +418,12 @@ _BUILD_COMMIT_SHA: str = _build_commit_sha()
 
 
 @app.get("/healthz")
+@app.get("/health")
 def healthz() -> dict[str, Any]:
+    """Liveness + commit SHA. PA's evaluation harness issues a GET /health
+    to wake the service before posting events; we keep /healthz as the
+    original route and add /health as an alias to match the documented
+    PA contract (listar2000, Discord 2026-05-17 13:58 CT)."""
     return {
         "status": "ok",
         "team": os.environ.get("PA_TEAM_NAME", "CanadaHacks"),

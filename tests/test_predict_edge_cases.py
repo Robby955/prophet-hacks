@@ -327,6 +327,19 @@ def test_many_outcomes_handler_returns_one_per_outcome(fake_variant_client):
 # -- /healthz invariants ----------------------------------------------------
 
 
+def test_health_alias_matches_healthz(fake_variant_client):
+    """PA evaluation harness issues GET /health (not /healthz) to wake
+    the service before posting events. The alias must return 200 with
+    the same payload shape so PA's wake-up step succeeds.
+    """
+    a = fake_variant_client.get("/health")
+    b = fake_variant_client.get("/healthz")
+    assert a.status_code == 200
+    assert b.status_code == 200
+    assert a.json() == b.json()
+    assert a.json()["status"] == "ok"
+
+
 def test_healthz_always_returns_required_keys(fake_variant_client):
     r = fake_variant_client.get("/healthz")
     assert r.status_code == 200

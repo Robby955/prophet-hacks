@@ -637,7 +637,7 @@ def test_dashboard_links_private_research_views(monkeypatch) -> None:
     response = client.get("/dashboard")
 
     assert response.status_code == 200
-    assert "Private research views" in response.text
+    assert "Research views" in response.text
     assert "/review" in response.text
     assert "/observatory" in response.text
     assert "/static/summary.html" in response.text

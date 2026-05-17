@@ -1168,12 +1168,12 @@ def observatory(
 
   <section id="review" class="grid">
     <div class="panel span7">
-      <h2>Adversarial review answers</h2>
+      <h2>Questions to expect</h2>
       <ul>
-        <li><strong>Do we reveal too much publicly?</strong> Yes, if the exact recipe is on `/` during active scoring. Keep method internals here.</li>
-        <li><strong>Is the backtest enough?</strong> No. It is a small, binary-skewed sample. It is useful for direction and regression catching, not final proof.</li>
-        <li><strong>What matters after first live call?</strong> Event schema, outcome count, total latency, warnings, and whether traces prove the pipeline behaved as expected.</li>
-        <li><strong>What should not change impulsively?</strong> Production variant, model, floor formula, and Railway env vars.</li>
+        <li><strong>What is on the public root?</strong> Brand, status, links to the report PDF and dashboard. The exact prompt, model rationale, and ablation tables sit on this console.</li>
+        <li><strong>Is the 26-event backtest enough?</strong> No. It is small, sports-heavy, and contains some post-resolution retrieval leakage (audited at 38.5%). Useful for direction and regression catching, not as proof of live performance.</li>
+        <li><strong>What to check on the first PA call?</strong> Event schema, outcome count, total latency, parser path, warnings, and whether the trace matches what the dashboard demo predicted it would.</li>
+        <li><strong>What is the no-touch list?</strong> Production variant, forecast model, longshot-floor formula, Railway env vars. Anything else can change after measurement.</li>
       </ul>
     </div>
     <div class="panel span5">
@@ -1187,7 +1187,7 @@ def observatory(
   </section>
 </main>
 <footer>
-  Internal page. Avoid screenshots that include raw traces, exact prompts, or experiment deltas during active scoring.
+  Operator console. Rob Sneiderman, Team CanadaHacks, Project The Oracles.
 </footer>
 {observatory_tour}
 </body></html>""")
@@ -1280,14 +1280,14 @@ def review_brief(
         <div class="kv"><span>Variant</span><strong>{html_escape(_VARIANT_NAME)}</strong></div>
         <div class="kv"><span>Prediction records</span><strong>{prediction_count} memory / {persisted_count} disk</strong></div>
         <div class="kv"><span>PA status</span><strong>{html_escape(first_call_status)}</strong></div>
-        <div class="kv"><span>Public posture</span><strong>internals private</strong></div>
+        <div class="kv"><span>Public surface</span><strong>landing + report PDF</strong></div>
       </div>
     </div>
     <div class="section span4">
       <h2>Demo script</h2>
       <ol>
-        <li>Open <a href="/">public root</a>; show that it is sparse and does not expose ablations.</li>
-        <li>Open <a href="/dashboard">dashboard</a>; show commit, variant, first-call status, and private links.</li>
+        <li>Open <a href="/">public root</a>; brand, status, link to the report.</li>
+        <li>Open <a href="/dashboard">dashboard</a>; live commit, variant, first-call status, and operator links.</li>
         <li>Run the pipeline demo and point to stage updates plus returned JSON.</li>
         <li>Open <a href="/static/summary.html">summary</a> for the scored evidence and metric caveats.</li>
         <li>Open galleries to show per-event behavior instead of only aggregate claims.</li>
@@ -3207,8 +3207,8 @@ def dashboard(
   <p class="meta" style="margin-top:0.8em">Brier here is the legacy single-<em>p</em> metric from the local backtest. The <strong>multi_outcome_retrieval</strong> 0.064 number is contaminated by data leakage (Brave can find articles about resolved past events); live performance on future events does not leak.</p>
 </div>
 
-<h2>Private research views</h2>
-<p class="meta">These pages are dashboard-auth gated. They are meant for operator review, model debugging, and submission prep, not the public landing page during active scoring.</p>
+<h2>Research views</h2>
+<p class="meta">PIN-gated operator pages: model traces, ablation grids, calibration plots, the bootstrap distribution, the variance experiment, and the per-event drill-down.</p>
 <div class="link-grid" data-tour="dashboard-research">
   <a class="link-card" href="/review"><strong>Judge review brief</strong><span>One-page demo script, likely questions, current proof, and first-call checklist.</span></a>
   <a class="link-card" href="/observatory"><strong>Observatory</strong><span>Live commit, persisted traces, experiment board, and adversarial-review answers.</span></a>

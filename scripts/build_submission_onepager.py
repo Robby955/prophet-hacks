@@ -193,12 +193,12 @@ def build_pdf(out_path: Path) -> Path:
         else:
             cell.set_facecolor("#ffffff")
 
-    fig.text(0.53, 0.405, "What not to overclaim", fontsize=12, weight="bold", color="#111827")
+    fig.text(0.53, 0.405, "Limitations", fontsize=12, weight="bold", color="#111827")
     y = 0.378
     for bullet in [
-        "No claim about live PA performance until PA actually calls the endpoint.",
-        "No production swap for E3/E4: both failed the paired-bootstrap promotion gate.",
-        "GPT-5.5 is not dismissed generally; it underperformed in this parser/schema pipeline.",
+        "Live performance is unverified. Prophet Arena scoring starts after submission.",
+        "The 0.0378 backtest used resolved events; 38.5% of evidence URLs contain post-resolution markers. Live numbers will likely be higher.",
+        "Sample is small (n=26) and 62% sports. A balanced eval would widen the picture.",
     ]:
         fig.text(0.538, y, "-", fontsize=8.5, color="#b45309")
         y = _draw_wrapped(fig, 0.553, y, bullet, width=44, size=8.3, line_height=0.016)

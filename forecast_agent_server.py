@@ -604,7 +604,7 @@ def root() -> str:
   .hero-copy {{ min-width: 0; max-width: 620px; }}
   .eyebrow {{ margin: 0 0 0.85rem; font-size: 0.82rem; font-weight: 780; letter-spacing: 0.12em;
               text-transform: uppercase; color: var(--muted); }}
-  .hero-title {{ margin: 0; max-width: 12ch; font-size: clamp(3rem, 6vw, 5.35rem);
+  .hero-title {{ margin: 0; max-width: 12ch; font-size: clamp(2.7rem, 5vw, 4.85rem);
                  line-height: 0.92; letter-spacing: 0; overflow-wrap: anywhere; }}
   .lead {{ max-width: 520px; margin: 1.1rem 0 0; color: var(--muted);
            font-size: clamp(1.02rem, 1.7vw, 1.18rem); }}
@@ -690,7 +690,7 @@ def root() -> str:
   @media (min-width: 921px) and (max-height: 560px) {{
     header {{ padding: 14px 0; }}
     main {{ padding-top: 22px; padding-bottom: 36px; }}
-    .hero-title {{ font-size: clamp(2.8rem, 4.7vw, 4.3rem); }}
+    .hero-title {{ font-size: clamp(2.5rem, 4vw, 3.75rem); }}
     .lead {{ margin-top: 0.95rem; font-size: 1rem; }}
     .actions {{ margin-top: 1.2rem; }}
     .stage {{ min-height: 104px; }}
@@ -701,7 +701,7 @@ def root() -> str:
     header, main, footer {{ width: min(100% - 32px, 1180px); }}
     main {{ padding-top: 24px; }}
     .status-pill {{ white-space: normal; }}
-    .hero-title {{ font-size: 2.65rem; }}
+    .hero-title {{ font-size: 2.35rem; }}
     .lead {{ margin-top: 1rem; font-size: 1rem; }}
     .actions {{ margin-top: 1.2rem; flex-direction: column; align-items: stretch; }}
     .stage-list, .demo-grid {{ grid-template-columns: 1fr; }}
@@ -730,7 +730,7 @@ def root() -> str:
     <div class="hero-copy">
       <p class="eyebrow">Prophet Hacks 2026</p>
       <h1 class="hero-title">ForecastingPath</h1>
-      <p class="lead">A live forecast endpoint, trace viewer, and results desk for scoring probabilistic event predictions.</p>
+      <p class="lead">Forecasts, run history, and experiment views in one place.</p>
       <div class="actions">
         <a class="btn primary" href="/login?next=/dashboard">Open console</a>
         <a class="btn secondary" href="/login?next=/observatory">View observatory</a>

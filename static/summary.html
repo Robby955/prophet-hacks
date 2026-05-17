@@ -45,7 +45,7 @@
 
 <header>
   <h1>ForecastingPath · Summary Report</h1>
-  <div class="meta">Generated 2026-05-16T23:29:36.039698+00:00 · Git <code>c75e74ca</code> · 26 resolved events</div>
+  <div class="meta">Generated 2026-05-17T00:13:12.126227+00:00 · Git <code>e52db45c</code> · 26 resolved events</div>
 </header>
 
 <div class="kpis">
@@ -79,6 +79,12 @@
             <td>0.4396</td>
             <td>14 + 12</td>
         </tr><tr>
+            <td><span class="dot" style="background:#0d9488"></span><strong>GPT-5.5</strong></td>
+            <td>0.3226</td>
+            <td>0.0376</td>
+            <td>0.6552</td>
+            <td>14 + 12</td>
+        </tr><tr>
             <td><span class="dot" style="background:#16a34a"></span><strong>GPT-5.2</strong></td>
             <td>0.2584</td>
             <td>0.0538</td>
@@ -95,7 +101,34 @@
   <tr><td><em>uniform 1/n prior</em></td><td>0.2190</td><td>—</td><td>—</td><td>—</td></tr>
   </tbody>
 </table>
-<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all five rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+
+<h2>Where the win came from — floor fix vs model swap</h2>
+<div class="results">
+  <table>
+    <thead><tr><th>Variant</th><th>Mean Brier</th><th>Δ from baseline</th></tr></thead>
+    <tbody>
+      <tr><td>Sonnet 4.6 + old floor (clamps binary to 0.25)</td><td class="brier">0.0639</td><td>baseline</td></tr>
+      <tr><td>Sonnet 4.6 + new floor (caps at 0.10)</td><td class="brier">0.0418</td><td>−0.0221 (85% of the gap)</td></tr>
+      <tr class="highlight"><td><strong>Opus 4.7 + new floor (production)</strong></td><td class="brier">0.0379</td><td>−0.0260 (full gap)</td></tr>
+    </tbody>
+  </table>
+  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet→Opus swap accounts for the remaining ~15%. Numbers from Codex's paired-bootstrap branch (`scripts/bootstrap_brier_ci.py`), pinned-seed reproducible.</p>
+</div>
+
+<h2>Statistical significance — paired-bootstrap on the headline delta</h2>
+<div class="results">
+  <p>The Phase 2 improvement (0.0639 → 0.0379) on n=26 paired events:</p>
+  <table>
+    <tbody>
+      <tr><td>Mean Brier improvement</td><td class="brier">0.0260</td></tr>
+      <tr><td>95% paired-bootstrap CI</td><td class="brier">[0.0143, 0.0374]</td></tr>
+      <tr><td>Resamples</td><td>50,000</td></tr>
+      <tr><td>Random seed</td><td>20260516</td></tr>
+    </tbody>
+  </table>
+  <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
+</div>
 
 <h2>Calibration curve · production (Opus 4.7) on binary events</h2>
 <figure>

@@ -41,9 +41,32 @@ ABLATION_FILES = [
     ("Opus 4.7 (production)",      "multi_outcome_retrieval.json",                       "#1d4ed8"),
     ("Sonnet 4.6 (prev prod)",     "multi_outcome_retrieval.phase1_sonnet.json",          "#0891b2"),
     ("Opus 4.6",                   "ablation_claude-opus-4-6.json",                       "#7c3aed"),
+    ("GPT-5.5",                    "ablation_gpt-5-5.json",                               "#0d9488"),
     ("GPT-5.2",                    "ablation_gpt-5-2.json",                               "#16a34a"),
     ("Gemini 3.1 Pro (post-harden)", "ablation_gemini-3-1-pro-preview-postharden.json",   "#ea580c"),
 ]
+
+# Statistical-significance numbers from the paired-bootstrap on the same
+# 26 events (Codex PR #6, scripts/bootstrap_brier_ci.py). Hard-coded
+# because the bootstrap script is in a separate branch right now; pull
+# from JSON output once it lands on main.
+BOOTSTRAP_CI = {
+    "mean_delta": 0.026027,
+    "ci_low":     0.014270,
+    "ci_high":    0.037373,
+    "n_events":   26,
+    "n_resamples": 50000,
+    "seed":       20260516,
+}
+# Headline decomposition (Codex PR #6): Sonnet 4.6 run with the NEW floor
+# formula scored 0.041838; production Opus 4.7 scored 0.037912.
+# So the floor-bug fix accounts for ~85% of the 0.0639 → 0.0379 gap;
+# the model swap accounts for ~15%.
+DECOMPOSITION = {
+    "phase1_sonnet_old_floor": 0.063939,
+    "sonnet_new_floor":        0.041838,
+    "phase2_opus_new_floor":   0.037912,
+}
 
 # Open-event ablations Codex ran. No actuals (events unresolved), so we
 # compute model-agreement statistics instead of Brier.
@@ -225,6 +248,20 @@ def _render_html(s: dict[str, Any]) -> str:
             <td>{m['n_binary']} + {m['n_multi']}</td>
         </tr>""")
 
+    # Decomposition + bootstrap numbers (pulled in here so they're in scope
+    # of the f-string body below).
+    phase1_sonnet_old_floor = DECOMPOSITION["phase1_sonnet_old_floor"]
+    sonnet_new_floor = DECOMPOSITION["sonnet_new_floor"]
+    phase2_opus_new_floor = DECOMPOSITION["phase2_opus_new_floor"]
+    delta_total = phase1_sonnet_old_floor - phase2_opus_new_floor
+    delta_floor_only = phase1_sonnet_old_floor - sonnet_new_floor
+    pct_floor_share = 100.0 * delta_floor_only / delta_total if delta_total else 0.0
+    boot_mean = BOOTSTRAP_CI["mean_delta"]
+    boot_lo = BOOTSTRAP_CI["ci_low"]
+    boot_hi = BOOTSTRAP_CI["ci_high"]
+    boot_n_resamples = BOOTSTRAP_CI["n_resamples"]
+    boot_seed = BOOTSTRAP_CI["seed"]
+
     return f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
@@ -292,7 +329,34 @@ def _render_html(s: dict[str, Any]) -> str:
   <tr><td><em>uniform 1/n prior</em></td><td>{s['baselines']['uniform_prior']:.4f}</td><td>—</td><td>—</td><td>—</td></tr>
   </tbody>
 </table>
-<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all five rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+
+<h2>Where the win came from — floor fix vs model swap</h2>
+<div class="results">
+  <table>
+    <thead><tr><th>Variant</th><th>Mean Brier</th><th>Δ from baseline</th></tr></thead>
+    <tbody>
+      <tr><td>Sonnet 4.6 + old floor (clamps binary to 0.25)</td><td class="brier">{phase1_sonnet_old_floor:.4f}</td><td>baseline</td></tr>
+      <tr><td>Sonnet 4.6 + new floor (caps at 0.10)</td><td class="brier">{sonnet_new_floor:.4f}</td><td>−{delta_floor_only:.4f} ({pct_floor_share:.0f}% of the gap)</td></tr>
+      <tr class="highlight"><td><strong>Opus 4.7 + new floor (production)</strong></td><td class="brier">{phase2_opus_new_floor:.4f}</td><td>−{delta_total:.4f} (full gap)</td></tr>
+    </tbody>
+  </table>
+  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet→Opus swap accounts for the remaining ~15%. Numbers from Codex's paired-bootstrap branch (`scripts/bootstrap_brier_ci.py`), pinned-seed reproducible.</p>
+</div>
+
+<h2>Statistical significance — paired-bootstrap on the headline delta</h2>
+<div class="results">
+  <p>The Phase 2 improvement (0.0639 → 0.0379) on n=26 paired events:</p>
+  <table>
+    <tbody>
+      <tr><td>Mean Brier improvement</td><td class="brier">{boot_mean:.4f}</td></tr>
+      <tr><td>95% paired-bootstrap CI</td><td class="brier">[{boot_lo:.4f}, {boot_hi:.4f}]</td></tr>
+      <tr><td>Resamples</td><td>{boot_n_resamples:,}</td></tr>
+      <tr><td>Random seed</td><td>{boot_seed}</td></tr>
+    </tbody>
+  </table>
+  <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
+</div>
 
 <h2>Calibration curve · production (Opus 4.7) on binary events</h2>
 <figure>

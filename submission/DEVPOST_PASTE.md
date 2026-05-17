@@ -141,15 +141,23 @@ Submission report (PDF):    https://forecastingpath.com/static/summary.pdf
 Architecture diagram:       https://forecastingpath.com/static/architecture.svg
 GitHub repository:          https://github.com/Robby955/prophet-hacks
 Health endpoint:            https://forecastingpath.com/healthz
+Video walkthrough:          https://youtu.be/1ON-WAurV_0
 Auth-gated research views:  https://agent.forecastingpath.com/observatory (PIN: 176661)
 ```
 
 ## Demo video
 
-Upload `forecastingpath-walkthrough.webm` from Codex's overnight capture
-(under `output/playwright/overnight/` or wherever Codex saved it).
-If asked for a hosted URL instead of a file upload, host on YouTube or
-Loom and paste the link.
+YouTube: https://youtu.be/1ON-WAurV_0
+
+Title: "The Oracles — calibrated forecasting agent for Prophet Hacks 2026"
+Channel: Smart-Trends AI (Rob Sneiderman)
+~2:13 walkthrough: public landing, live Fed-rate-cut pipeline demo (5
+SSE stages, ~4-5s end to end), per-event Brier gallery, cross-model
+heatmap, abstain-policy slider, Super Bowl LXI + UK PM multi-outcome
+demos, resolved-event scatter, close.
+
+Audio narration: fish.audio, energetic male voice, default speed.
+Source script: `submission/TTS_SCRIPT_V2.md`.
 
 ---
 

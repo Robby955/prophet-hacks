@@ -5,6 +5,7 @@ Prophet Hacks 2026 forecasting agent. Team **CanadaHacks**, project **The Oracle
 - **Live endpoint** for Prophet Arena: <https://agent.forecastingpath.com/predict>
 - **Public landing** (no auth): <https://forecastingpath.com/>
 - **Live status** (commit SHA + variant): <https://agent.forecastingpath.com/healthz>
+- **Video walkthrough**: <https://youtu.be/1ON-WAurV_0>
 
 ## TL;DR
 

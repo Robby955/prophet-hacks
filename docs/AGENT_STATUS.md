@@ -177,6 +177,13 @@ during the eval window.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
 - PA general onboarding (prophetarena.co/onboarding): NOT yet submitted — needs `/v1/chat/completions` shim to be live (deploying as of this commit), then Rob submits the form himself
 
+## codex/full-check-brave
+
+- **Current task:** Brave Search reliability monitor wired into `scripts/full_check.sh`.
+- **Files owned this session:** `scripts/full_check.sh`, `tests/test_full_check_script.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:06:29Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-full-check-brave` / `codex/full-check-brave`. Adds full-check step 5 for `scripts/brave_health.sh --quiet`; later checks renumbered to 11 total. Verified with shell syntax check, focused test, full pytest, and `./scripts/agent/verify.sh`.
+
 ## codex/bootstrap-ci
 
 - **Current task:** Paired-bootstrap CI plus Phase 2 decomposition implemented and verified.

@@ -7,12 +7,13 @@
 #   2. Working tree clean + HEAD pushed (via preflight.sh logic)
 #   3. Local HEAD vs deployed SHA
 #   4. /healthz returns expected shape (variant, commit, status)
-#   5. /predict end-to-end with a synthetic event (live API call, ~$0.10)
-#   6. /login serves the PIN form (auth surface up)
-#   7. /dashboard redirects browser visitors to /login (auth gate works)
-#   8. /predictions returns JSON 401 to API callers (auth gate works)
-#   9. /static/summary.html and /static/summary.pdf served (artifacts deployed)
-#  10. Watcher process alive (mac notifications working)
+#   5. Brave Search reliability monitor (retrieval dependency healthy)
+#   6. /predict end-to-end with a synthetic event (live API call, ~$0.10)
+#   7. /login serves the PIN form (auth surface up)
+#   8. /dashboard redirects browser visitors to /login (auth gate works)
+#   9. /predictions returns JSON 401 to API callers (auth gate works)
+#  10. /static/summary.html and /static/summary.pdf served (artifacts deployed)
+#  11. Watcher process alive (mac notifications working)
 #
 # Pass criteria: every check prints "OK". Non-zero exit otherwise.
 #
@@ -46,7 +47,7 @@ fail()  { echo "  $(red FAIL) $1"; FAIL_COUNT=$((FAIL_COUNT+1)); }
 echo "=== full check against $HOST ==="
 
 # 1. Verify gate (silently, surface result)
-echo "[1/10] verify gate"
+echo "[1/11] verify gate"
 if PATH="$REPO_ROOT/.venv/bin:$PATH" "$REPO_ROOT/scripts/agent/verify.sh" \
     > /tmp/full_check_verify.log 2>&1; then
   ok "verify gate green"
@@ -55,7 +56,7 @@ else
 fi
 
 # 2. Working tree + push state
-echo "[2/10] git state"
+echo "[2/11] git state"
 if ! git diff --quiet HEAD 2>/dev/null; then
   fail "uncommitted changes; commit or stash"
 elif [[ -n "$(git ls-files --others --exclude-standard)" ]]; then
@@ -72,7 +73,7 @@ else
 fi
 
 # 3. Local HEAD vs deployed SHA
-echo "[3/10] local vs deployed SHA"
+echo "[3/11] local vs deployed SHA"
 LOCAL_SHA=$(git rev-parse --short=8 HEAD)
 LIVE_SHA=$(curl -s --max-time 5 "$HOST/healthz" 2>/dev/null \
   | python3 -c "import json,sys; print(json.load(sys.stdin).get('commit','?'))" 2>/dev/null || echo "?")
@@ -85,7 +86,7 @@ else
 fi
 
 # 4. /healthz shape
-echo "[4/10] /healthz response shape"
+echo "[4/11] /healthz response shape"
 HEALTHZ=$(curl -s --max-time 5 "$HOST/healthz")
 if [[ -z "$HEALTHZ" ]]; then
   fail "/healthz empty response"
@@ -106,8 +107,19 @@ else
   fi
 fi
 
-# 5. /predict end-to-end smoke (live API call, ~$0.10)
-echo "[5/10] /predict end-to-end smoke"
+# 5. Brave Search reliability monitor
+echo "[5/11] Brave Search health"
+BRAVE_OUT=$("$REPO_ROOT/scripts/brave_health.sh" --quiet 2>&1)
+BRAVE_CODE=$?
+if [[ "$BRAVE_CODE" == "0" ]]; then
+  ok "Brave Search healthy"
+else
+  BRAVE_SUMMARY=$(echo "$BRAVE_OUT" | tr '\n' ' ' | head -c 220)
+  fail "Brave Search unhealthy/degraded (exit $BRAVE_CODE): $BRAVE_SUMMARY"
+fi
+
+# 6. /predict end-to-end smoke (live API call, ~$0.10)
+echo "[6/11] /predict end-to-end smoke"
 if [[ -z "$SKIP_SMOKE_CALL" ]]; then
   SMOKE='{"event_ticker":"FULL-CHECK","market_ticker":"FULL-CHECK","title":"Will the test pass?","category":"Test","close_time":"2027-01-01T00:00:00Z","outcomes":["Yes","No"]}'
   RESP=$(curl -s -X POST "$HOST/predict" \
@@ -131,8 +143,8 @@ else
   echo "  (skipped, --skip-smoke)"
 fi
 
-# 6. /login serves the PIN form
-echo "[6/10] /login PIN form"
+# 7. /login serves the PIN form
+echo "[7/11] /login PIN form"
 LOGIN_BODY=$(curl -s --max-time 5 "$HOST/login")
 if echo "$LOGIN_BODY" | grep -q "Sign in" && echo "$LOGIN_BODY" | grep -q 'name="pin"'; then
   ok "/login serves PIN entry form"
@@ -140,8 +152,8 @@ else
   fail "/login response unexpected: $(echo "$LOGIN_BODY" | head -c 100)"
 fi
 
-# 7. /dashboard redirects browser visitors to /login
-echo "[7/10] /dashboard browser redirect to /login"
+# 8. /dashboard redirects browser visitors to /login
+echo "[8/11] /dashboard browser redirect to /login"
 CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Accept: text/html" "$HOST/dashboard")
 if [[ "$CODE" == "303" || "$CODE" == "307" || "$CODE" == "302" ]]; then
   ok "/dashboard browser redirect ($CODE)"
@@ -151,8 +163,8 @@ else
   fail "/dashboard unexpected code $CODE"
 fi
 
-# 8. /predictions returns 401 to API callers
-echo "[8/10] /predictions returns JSON 401"
+# 9. /predictions returns 401 to API callers
+echo "[9/11] /predictions returns JSON 401"
 CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Accept: application/json" "$HOST/predictions")
 if [[ "$CODE" == "401" ]]; then
   ok "/predictions returns 401 to unauthenticated API callers"
@@ -160,8 +172,8 @@ else
   fail "/predictions unexpected code $CODE"
 fi
 
-# 9. Static artifacts served
-echo "[9/10] /static/summary.html + /static/summary.pdf"
+# 10. Static artifacts served
+echo "[10/11] /static/summary.html + /static/summary.pdf"
 for path in /static/summary.html /static/summary.pdf; do
   CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HOST$path")
   if [[ "$CODE" == "200" ]]; then
@@ -171,8 +183,8 @@ for path in /static/summary.html /static/summary.pdf; do
   fi
 done
 
-# 10. Watcher alive
-echo "[10/10] watcher process alive"
+# 11. Watcher alive
+echo "[11/11] watcher process alive"
 if pgrep -f watch_predictions > /dev/null; then
   PID=$(pgrep -f watch_predictions | head -1)
   AGE=$(ps -o etime= -p "$PID" 2>/dev/null | xargs)

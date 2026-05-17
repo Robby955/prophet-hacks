@@ -78,17 +78,44 @@ prompt; only the LLM call swaps.
 | **Claude Opus 4.7 (production)** | **0.0379** | 0.0425 | **0.0177** |
 | Claude Sonnet 4.6 (previous prod) | 0.0639 | 0.0879 | — |
 | Claude Opus 4.6 (PA leaderboard top agent) | 0.2264 | 0.0438 | 0.4396 |
+| OpenAI GPT-5.5 | 0.3226 | **0.0376** | 0.6552 |
 | OpenAI GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
 | Gemini 3.1 Pro Preview (PA leaderboard #1 fixed-context) | 0.4149 | 0.0750 | 0.8115 |
 | *random 0.5 baseline* | 0.250 | — | — |
 | *uniform 1/n prior* | 0.219 | — | — |
 
-**Production wins decisively, but: n=26 is small and binary-skewed
-(16/26 are sports matchups).** The confidence interval on the Opus vs
-Sonnet delta (0.0379 vs 0.0639) is wide; the substantial gap to the
-other LLMs is robust because it's not a single delta — it's three
-independent failure modes all the alternatives hit on multi-outcome
-events.
+**Production wins decisively. The Opus 4.7 vs Sonnet 4.6 headline delta
+has a 95% paired-bootstrap CI of [0.0143, 0.0374]** (n=26 paired
+events, 50,000 resamples, seed `20260516`). The interval excludes zero;
+significant at α=0.05 on this dataset.
+
+**Where the win came from (honest decomposition):**
+
+| Variant | Mean Brier |
+|---|---:|
+| Sonnet 4.6 + old longshot floor (clamps binary to 0.25) | 0.0639 |
+| Sonnet 4.6 + new floor (caps at 0.10) | 0.0418 |
+| **Opus 4.7 + new floor (production)** | **0.0379** |
+
+Roughly **85% of the Phase 2 improvement comes from the longshot-floor
+bug fix** (a post-LLM safety-net change); the remaining ~15% is the
+Sonnet→Opus swap. The dominant gain is from fixing a silent
+post-processing bug, not from a model upgrade. We highlight this
+because the discipline finding (boundary tests for safety nets) is
+more transferable than the model choice.
+
+GPT-5.5 is worth noting separately: its binary Brier (0.0376) is
+*marginally better* than Opus 4.7 (0.0425), but its multi-outcome
+Brier (0.6552) is 37× worse. Four of four non-Opus-4.7 alternative
+models (Opus 4.6, GPT-5.2, GPT-5.5, Gemini 3.1 Pro) collapse on
+multi-outcome events in the same way — JSON schema noncompliance, not
+reasoning failure. See §4.
+
+n=26 is small and binary-skewed (16/26 sports matchups); the
+bootstrap CI excludes zero on this dataset but cannot establish
+convergence. A balanced-mix eval would likely widen the CI but not
+change the sign; multi-outcome events (where alternatives collapse)
+account for the most extreme gaps.
 
 **Open-event multi-model agreement** (Codex's 4-model ablation across
 the 3 unresolved PA datasets, 42 events, same pipeline):

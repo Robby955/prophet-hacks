@@ -193,3 +193,105 @@ the $200/10d threshold that triggers RunPod OSS-hosting consideration
 
 Spend is visible on the dashboard "API spend" tile (in-memory, resets on
 restart).
+
+---
+
+## First-PA-call reaction playbook (when /predictions count flips from 0 to 1)
+
+Watcher (`scripts/watch_predictions.sh`) will mac-notify the moment
+this happens. The next ten minutes determine whether we behave as
+designed or quietly degrade. Run the checks below sequentially; do
+not skip ahead.
+
+### Within the first minute
+
+1. **Confirm the call was real, not a probe.** Hit `/predictions`
+   with the dashboard token; count should be 1, `last_run_at` on
+   `/forecast/endpoints/CanadaHacks` should match (within a few
+   seconds).
+2. **Read the first prediction record end-to-end.** Look for:
+   - `outcomes` matches the canonical list from PA's webhook
+   - `probabilities` has one entry per outcome, all in [0.01, 0.99]
+   - `rationale` is non-empty and cites at least one fact from
+     `evidence_urls`
+3. **Inspect `trace.latency_ms`.** Expected ranges:
+   - `brave`: 200–2000 ms
+   - `llm`: 2000–8000 ms
+   - `total`: < 10,000 ms (PA's per-event budget is 600,000 ms)
+
+   If `total > 60000`: investigate, but do not change anything live
+   yet — we have plenty of budget.
+
+### Within minutes 2–5
+
+4. **Inspect `trace.warnings`.** Empty list is the expected state.
+   Common non-fatal entries:
+   - `brave search failed: …` — fell through to `predict_multi_outcome`;
+     Brier degrades to ~0.10 on backtest but is still better than
+     uniform.
+   - `llm call failed: …` — fell through to uniform prior; that's a
+     real Brier hit but better than empty probabilities.
+   - `non-numeric probability for …` — parser cleaned the LLM's
+     output; usually fine.
+5. **Inspect `trace.fuzzy_matches`.** If any entry's `matched` is
+   `None`, the LLM emitted a label not in the outcomes list. We
+   recovered via the prior, but more than 1-2 unmatched per call is
+   a signal the prompt or the model is misbehaving.
+6. **Inspect `trace.outcomes_inferred`.** Should be `false` for any
+   normal PA call (they supply the outcomes). If `true`, the live
+   webhook is sending the light shape (no `outcomes` field) and our
+   Haiku safety-net fired. Log it; not necessarily a problem.
+7. **Inspect `trace.parse_path`.** Expected: `direct` (Stage 0
+   succeeded). Stages 1–4 are the parser-hardening cascade; if you
+   see anything other than `direct`, the LLM emitted non-clean JSON.
+   Not fatal, but worth a `DECISIONS.md` note.
+
+### Within minutes 5–10
+
+8. **Run `./scripts/full_check.sh` once.** Expect zero failures.
+   Catches any regression caused by the first real call's pattern
+   differing from our synthetic smokes.
+9. **Run `./scripts/brave_health.sh` once.** Confirms the retrieval
+   layer is healthy under live load.
+10. **Re-confirm `/healthz.commit` matches the latest deployed
+    SHA.** Drift here = production is serving stale code; act fast.
+
+### Mid-event constraints — DO NOT touch
+
+Per Anri Gu and Jibang Wu's Discord clarifications, PA's eval cadence
+is **one event every 10 minutes, sequential.** That gives us a
+10-minute window before the next call. Within that window:
+
+- **Do not** change `PROPHET_AGENT_VARIANT` on Railway.
+- **Do not** deploy a new commit unless you have a measured + tested
+  Brier improvement on the same 26-event backtest. The bootstrap CI
+  is the gate, not vibes.
+- **Do not** edit `forecast_track.py:predict_multi_outcome_retrieval`
+  without running the full backtest first.
+- **Do not** change the longshot floor formula. The current
+  `min(0.10, max(0.05, 0.5/n))` is the version with 85% of the
+  measured Phase 2 improvement; changing it is a regression risk.
+
+### When to break the "don't touch" rule
+
+The only scenario where mid-event intervention is correct: the live
+predictions are returning `probabilities=[]` (catastrophic empty
+response). Then:
+
+1. Hit `/predictions` to confirm pattern (not a one-off).
+2. Check `trace.outcomes_inferred=True` — if so, the Haiku safety
+   net is firing, which means PA's webhook is sending light-shape
+   events; investigate whether outcomes were truly missing or the
+   field is named differently.
+3. Worst case: redeploy the previous good commit via
+   `git checkout <previous-sha> && ./scripts/agent/deploy.sh`.
+
+### After the first call
+
+11. **Append a dated entry to `docs/DECISIONS.md`** with: the
+    timestamp, the event ticker, the full `_trace` summary, and any
+    deviations from expected behavior. This builds the post-event
+    audit trail.
+12. **Update `static/summary.html`** to reflect the new live data
+    point by running `python scripts/build_summary_report.py` once
+    we have ≥5 resolved live events.

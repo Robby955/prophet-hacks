@@ -242,3 +242,13 @@ Ran the same `predict_multi_outcome_retrieval` pipeline (Brave 5-chunk retrieval
 Files: `data/predictions/ablation_*.json` (per-model predictions), `scripts/ablate_openrouter.py` (the standard ablation harness).
 
 Decided by: Claude after Rob authorized aggressive spending for real ablation data ("do not screw me if you end up going easy").
+
+## 2026-05-17 · GPT-5.5 ablation — confirms the schema-compliance hypothesis
+
+- Ran `openai/gpt-5.5` through the same `predict_multi_outcome_retrieval` pipeline on the 26-event sample-resolved set via `scripts/ablate_openrouter.py`. Spend ~$1.20.
+- Result: mean Brier **0.3226** (8.5× worse than Opus 4.7's 0.0379).
+- Decomposition: binary mean 0.0376 (*slightly better* than Opus 4.7's 0.0425); multi-outcome mean 0.6552 (37× worse than Opus 4.7's 0.0177).
+- Decision: do not swap. Same JSON schema failure mode we've now observed in 4 of 4 non-Anthropic-Opus-4.7 models (GPT-5.2, GPT-5.5, Opus 4.6, Gemini 3.1 Pro). The schema-compliance pattern is robust across the OpenAI/Google/older-Anthropic axis.
+- Note for the workshop paper: GPT-5.5's competitive binary number is interesting — for a binary-only pipeline, it would be a viable cheaper alternative to Opus 4.7. PA's event mix is unknown but Discord ("events won't be highly skewed") suggests both shapes will appear.
+- Decided by: Claude after Rob asked whether newer OpenAI models warranted a swap.
+- Commit: this commit.

@@ -242,3 +242,24 @@ that produce or reproduce these:
 - End-to-end audit: `./scripts/full_check.sh`
 
 Source: <https://github.com/Robby955/prophet-hacks>
+
+---
+
+## Addendum — relevant outside work (2026-05-17)
+
+**FutureSim** (Goel et al., arXiv 2605.15188): a benchmark that
+replays real-world events chronologically (Jan-Mar 2026) to evaluate
+LLM forecasting agents on Brier and accuracy. Headline: "best agent's
+accuracy was 25%, many had worse Brier skill score than making no
+prediction at all."
+
+Relevance to this work:
+- Reinforces that LLM forecasting is genuinely hard. Our 0.0379 on
+  n=26 should not be over-claimed as a generalization; FutureSim's
+  larger eval shows even SOTA agents struggle.
+- The "worse Brier skill score than no prediction" finding maps to
+  what our parser-hardening + outcomes-safety-net work prevents
+  on our side: when models confidently emit malformed JSON, falling
+  through to uniform prior is empirically a winning move.
+- Worth citing in the post-event workshop paper as the broader
+  context for our schema-compliance finding.

@@ -71,6 +71,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T05:08:00Z
 - **Notes:** No production forecast code, Railway env vars, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `static/` changes. Paper now records the event-level ablation promotion rule and the E3/E4 non-ship results. Runbook now has a no-spend first-call rehearsal command. Demo guide gives a 60-second screencast path and screenshot plan; Computer Use only needed if operating QuickTime/Chrome UI. `scripts/full_check.sh` now expects research HTML to be auth-gated instead of public.
 
+## codex/demo-artifacts
+
+- **Current task:** Reproducible demo asset capture, one-page PDF builder, and observatory empty-state polish.
+- **Files owned this session:** `forecast_agent_server.py`, `scripts/capture_demo_assets.sh`, `scripts/build_submission_onepager.py`, `docs/DEMO_CAPTURE_GUIDE.md`, `tests/test_demo_artifact_scripts.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T05:45:33Z
+- **Notes:** No forecast variant, Railway env var, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `static/` changes. `scripts/capture_demo_assets.sh` starts a local clean server with auth/provider keys unset, empty prediction store, and production variant name pinned; it captures 8 screenshots plus `forecastingpath-walkthrough.webm` under ignored `output/playwright/forecast-demo/` without calling `/predict` or `/demo/start`. `scripts/build_submission_onepager.py` reads `submission/REPORT.md` and writes ignored `output/pdf/oracles-submission-onepager.pdf`. Observatory now has a smaller header and clear zero-call empty state for screenshots.
+
 ## codex/persistent-observatory
 
 - **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.

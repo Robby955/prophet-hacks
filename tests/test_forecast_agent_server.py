@@ -81,15 +81,19 @@ def test_observatory_requires_dashboard_auth_when_configured(monkeypatch) -> Non
     assert "next=%2Fobservatory" in response.headers["location"]
 
 
-def test_observatory_renders_private_research_console(monkeypatch) -> None:
+def test_observatory_renders_private_research_console(monkeypatch, tmp_path) -> None:
     monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
     monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    monkeypatch.setenv("PROPHET_PREDICTION_STORE_PATH", str(tmp_path / "empty-predictions.jsonl"))
+    server._PREDICTION_HISTORY.clear()
     client = TestClient(server.app)
 
     response = client.get("/observatory")
 
     assert response.status_code == 200
     assert "ForecastingPath Observatory" in response.text
+    assert "Private operations" in response.text
+    assert "No Prophet Arena calls recorded yet" in response.text
     assert "GPT-5.5 was tried" in response.text
     assert "0.0920" in response.text
     assert "single-binary" in response.text

@@ -843,7 +843,8 @@ def observatory(
     if not recent_rows:
         recent_rows = (
             "<tr><td colspan='6' class='muted' style='text-align:center;padding:18px'>"
-            "No persisted predictions yet. The first Prophet Arena call will write here."
+            "No Prophet Arena calls recorded yet. The first call will add a row here with probabilities, "
+            "latency, parser path, warnings, and evidence coverage."
             "</td></tr>"
         )
 
@@ -883,7 +884,7 @@ def observatory(
   nav {{ display: flex; flex-wrap: wrap; gap: 12px; }}
   nav a {{ color: var(--muted); text-decoration: none; font-weight: 650; font-size: 0.92rem; }}
   main {{ max-width: 1240px; margin: 0 auto; padding: 28px 22px 54px; }}
-  h1 {{ margin: 0; font-size: 3.9rem; line-height: 0.98; letter-spacing: 0; }}
+  h1 {{ margin: 0; font-size: clamp(2.1rem, 5vw, 3.35rem); line-height: 0.98; letter-spacing: 0; }}
   .lead {{ margin: 14px 0 0; max-width: 760px; color: var(--muted); font-size: 1.06rem; }}
   section {{ margin-top: 28px; }}
   .grid {{ display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }}
@@ -899,6 +900,7 @@ def observatory(
   td.num {{ font-variant-numeric: tabular-nums; font-weight: 700; }}
   .small {{ font-size: 0.86rem; }} .muted {{ color: var(--muted); }} .nowrap {{ white-space: nowrap; }}
   .ok {{ color: var(--good); }} .warn {{ color: var(--warn); }}
+  .eyebrow {{ color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.82rem; font-weight: 760; margin-bottom: 10px; }}
   .callout {{ border-left: 4px solid var(--accent); background: #eef2ff; padding: 14px 16px; border-radius: 8px; }}
   .callout p {{ margin: 0; }}
   ul {{ margin: 0; padding-left: 1.1rem; }} li {{ margin: 0.35rem 0; }}
@@ -932,8 +934,9 @@ def observatory(
   </div>
 </header>
 <main>
-  <h1>Research console for the live forecasting system.</h1>
-  <p class="lead">This restricted view keeps the exact implementation, ablation state, scoring caveats, and trace context close to the operator without exposing the full playbook publicly during active scoring.</p>
+  <div class="eyebrow">Private operations</div>
+  <h1>Observatory</h1>
+  <p class="lead">Commit, prediction store, first-call state, and review links in one place. Use this view for screenshots after the first PA call lands.</p>
 
   <section id="live" class="grid">
     <div class="panel span5">
@@ -942,7 +945,7 @@ def observatory(
     </div>
     <div class="panel span7">
       <h2>First-call watch</h2>
-      <div class="callout"><p><strong>{'PA activity observed' if prediction_count else 'Waiting for first Prophet Arena call'}.</strong> When a call lands, inspect the event shape, outcome list, total latency, parser path, warnings, and returned probabilities before changing any production routing.</p></div>
+      <div class="callout"><p><strong>{'PA activity observed' if prediction_count else 'Awaiting first call'}.</strong> When a call lands, inspect event shape, outcome list, total latency, parser path, warnings, and returned probabilities before changing any production routing.</p></div>
       <table style="margin-top:14px">
         <thead><tr><th>Failure mode</th><th>Status</th><th>Operator response</th></tr></thead>
         <tbody>

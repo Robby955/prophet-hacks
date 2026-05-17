@@ -60,8 +60,21 @@ Suggested filenames under ignored `reports/demo/`:
 
 ## Repeatable screenshot commands
 
-Use the existing Playwright CLI wrapper. The output directory is ignored by
-git.
+Fast path:
+
+```bash
+scripts/capture_demo_assets.sh
+```
+
+This starts a local server with an empty prediction store, dashboard auth
+unset, provider keys unset, and the production variant name pinned. It writes
+screenshots and `forecastingpath-walkthrough.webm` under
+`output/playwright/forecast-demo/` including desktop and mobile public-root
+shots. It does not call `/predict` or
+`/demo/start`.
+
+Manual path, if you want to drive the browser yourself: use the existing
+Playwright CLI wrapper. The output directory is ignored by git.
 
 ```bash
 mkdir -p reports/demo
@@ -78,6 +91,17 @@ export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"
 
 For authenticated captures, sign in once in the browser and avoid recording
 the PIN field. Then navigate to the private views from the page links.
+
+## One-page PDF
+
+Build a compact shareable PDF from `submission/REPORT.md`:
+
+```bash
+python scripts/build_submission_onepager.py
+```
+
+Output: `output/pdf/oracles-submission-onepager.pdf`. The script reads the
+submission report but does not modify files under `submission/`.
 
 ## What not to say
 

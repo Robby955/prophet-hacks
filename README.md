@@ -123,9 +123,11 @@ are documented in `submission/REPORT.md` section 3 and `docs/FINDINGS.md` sectio
 | _random 0.5 baseline_ | 0.250 |
 | _uniform 1/n prior_ | 0.219 |
 
-Production beats the previous Sonnet baseline by **40.7% relative**.
-Paired-bootstrap CI on the delta: **[0.0143, 0.0374]**
-(50K resamples, seed `20260516`, n=26). CI excludes zero;
+Production beats the previous Sonnet baseline by **40.8% relative**
+(0.0639 -> 0.0378 = 40.81%). Paired-bootstrap CI on the delta:
+**[0.0143, 0.0374]** (50K resamples, seed `20260516`, n=26;
+reproducible to about 0.0001 across seeds 20260516/20260517/20260518
+per `scripts/check_bootstrap_seed_stability.py`). CI excludes zero;
 significant at alpha=0.05 under single-binary scoring.
 
 Production beats Opus 4.6 by 3.4% (0.0378 vs 0.0391). Under proper

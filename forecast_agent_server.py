@@ -1725,17 +1725,42 @@ def predictions(_: None = Depends(_require_dashboard_auth)) -> dict[str, Any]:
     }
 
 
-def _demo_event_payload() -> dict[str, Any]:
-    return {
-        "event_ticker": "dashboard-demo-fed-2026",
-        "market_ticker": "dashboard-demo-fed-2026",
+_DEMO_PRESETS: dict[str, dict[str, Any]] = {
+    "fed": {
+        "event_ticker": "demo-fed-2026",
+        "market_ticker": "demo-fed-2026",
         "title": "Will the US Federal Reserve cut rates at the December 2026 meeting?",
         "category": "Economics",
         "close_time": "2026-12-31T23:59:59Z",
         "outcomes": ["Yes", "No"],
-        "description": "Dashboard demo event for inspecting the production forecasting pipeline.",
+        "description": "Macro-economic policy event. FOMC decisions are well-covered in financial media and have explicit market prices on prediction markets.",
         "rules": "YES if the FOMC announces a rate cut at the December 2026 meeting; otherwise NO.",
-    }
+    },
+    "election": {
+        "event_ticker": "demo-uk-pm-2026",
+        "market_ticker": "demo-uk-pm-2026",
+        "title": "Who will be Prime Minister of the United Kingdom on January 1, 2027?",
+        "category": "Politics",
+        "close_time": "2027-01-01T00:00:00Z",
+        "outcomes": ["Keir Starmer", "Rishi Sunak", "Other"],
+        "description": "Three-outcome political event. Tests multi-outcome JSON schema compliance.",
+        "rules": "Resolves to the individual serving as UK Prime Minister at 12:00 UTC on 2027-01-01.",
+    },
+    "sport": {
+        "event_ticker": "demo-superbowl-lxi",
+        "market_ticker": "demo-superbowl-lxi",
+        "title": "Which team will win Super Bowl LXI?",
+        "category": "Sports",
+        "close_time": "2027-02-15T00:00:00Z",
+        "outcomes": ["Kansas City Chiefs", "Philadelphia Eagles", "Buffalo Bills", "Detroit Lions", "Other"],
+        "description": "Five-outcome sports event. Most predictable category for our pipeline (most events on the resolved set were sports).",
+        "rules": "YES on the team that wins Super Bowl LXI.",
+    },
+}
+
+
+def _demo_event_payload(preset: str = "fed") -> dict[str, Any]:
+    return _DEMO_PRESETS.get(preset, _DEMO_PRESETS["fed"])
 
 
 def _prune_demo_runs() -> None:
@@ -1816,8 +1841,8 @@ def _fail_demo_run(run_id: str, error: Exception) -> None:
             run["error"] = str(error)[:500]
 
 
-def _run_demo_pipeline(run_id: str) -> None:
-    event = _demo_event_payload()
+def _run_demo_pipeline(run_id: str, preset: str = "fed") -> None:
+    event = _demo_event_payload(preset)
     try:
         _record_demo_event(
             run_id,
@@ -1853,8 +1878,18 @@ def _run_demo_pipeline(run_id: str) -> None:
 
 
 @app.post("/demo/start")
-def demo_start(_: None = Depends(_require_dashboard_auth)) -> dict[str, str]:
-    """Start a PIN-protected synthetic run through the real forecast variant."""
+def demo_start(
+    request: Request,
+    _: None = Depends(_require_dashboard_auth),
+) -> dict[str, str]:
+    """Start a PIN-protected synthetic run through the real forecast variant.
+
+    Optional query param ?preset=fed|election|sport selects one of the
+    canonical demo events. Defaults to 'fed' for backwards compatibility.
+    """
+    preset = (request.query_params.get("preset") or "fed").lower()
+    if preset not in _DEMO_PRESETS:
+        preset = "fed"
     run_id = uuid.uuid4().hex[:12]
     now = datetime.now(timezone.utc).isoformat()
     with _DEMO_RUN_LOCK:
@@ -1868,20 +1903,22 @@ def demo_start(_: None = Depends(_require_dashboard_auth)) -> dict[str, str]:
             "status": "running",
             "created_at": now,
             "updated_at": now,
+            "preset": preset,
             "events": [],
             "result": None,
             "error": None,
         }
         _prune_demo_runs()
-    _record_demo_event(run_id, "queued", "running", "demo queued")
+    _record_demo_event(run_id, "queued", "running", f"demo queued ({preset})")
     threading.Thread(
         target=_run_demo_pipeline,
-        args=(run_id,),
+        args=(run_id, preset),
         daemon=True,
         name=f"forecast-demo-{run_id}",
     ).start()
     return {
         "run_id": run_id,
+        "preset": preset,
         "stream_url": f"/demo/stream/{run_id}",
         "result_url": f"/demo/result/{run_id}",
     }
@@ -3055,8 +3092,58 @@ def dashboard(
   .demo-actions {{ display: flex; flex-wrap: wrap; gap: 0.7em; align-items: center; margin-top: 0.9em; }}
   .demo-actions button {{ background: var(--accent); color: #fff; border: 0; padding: 0.65em 1.1em; border-radius: 6px; font: inherit; font-weight: 700; cursor: pointer; }}
   .demo-actions button:disabled {{ opacity: 0.55; cursor: not-allowed; }}
-  #demo-console, #demo-result {{ background: #0f172a; color: #dbeafe; border-radius: 6px; padding: 0.85em; margin-top: 0.8em; font-family: ui-monospace, "SF Mono", monospace; font-size: 0.84em; line-height: 1.45; white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }}
-  #demo-result {{ background: var(--panel-2); color: var(--text-2); border: 1px solid var(--border); }}
+  /* Live demo (moodspan-inspired): preset panel + stage timeline + result */
+  .demo-shell {{ display: grid; grid-template-columns: 320px 1fr; gap: 16px; margin-top: 0.8em; }}
+  @media (max-width: 880px) {{ .demo-shell {{ grid-template-columns: 1fr; }} }}
+  .demo-prompt-panel, .demo-result-panel {{ background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }}
+  .demo-panel-head, .demo-result-head {{ display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }}
+  .demo-panel-head .eyebrow, .demo-result-head .eyebrow {{ margin: 0; font-size: 0.72rem; font-weight: 780; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }}
+  .demo-panel-head h3, .demo-result-head h3 {{ margin: 0; font-size: 1.05rem; font-weight: 700; flex: 1 1 auto; }}
+  .demo-status-pill {{ display: inline-flex; align-items: center; gap: 0.45rem; padding: 3px 10px; border: 1px solid var(--border); border-radius: 99px; font-size: 0.78em; color: var(--muted); background: rgba(255,255,255,0.7); }}
+  .demo-status-pill .dot {{ width: 7px; height: 7px; border-radius: 50%; background: #b0b7c4; }}
+  .demo-status-pill.running .dot {{ background: #2856a3; animation: demo-pulse 1.2s ease-in-out infinite; }}
+  .demo-status-pill.completed .dot {{ background: #1e6f3a; }}
+  .demo-status-pill.failed .dot {{ background: #a02828; }}
+  @keyframes demo-pulse {{ 0%,100% {{ opacity: 1; }} 50% {{ opacity: 0.35; }} }}
+  .demo-elapsed {{ font-variant-numeric: tabular-nums; font-size: 0.85em; color: var(--muted); font-weight: 600; }}
+  .demo-presets {{ display: grid; gap: 8px; margin-bottom: 12px; }}
+  .demo-preset {{ text-align: left; background: rgba(255,255,255,0.55); border: 1px solid var(--border); border-radius: 9px; padding: 9px 11px; cursor: pointer; font: inherit; color: var(--text); transition: border-color 0.14s ease, background 0.14s ease; }}
+  .demo-preset:hover:not(:disabled) {{ border-color: #aebced; }}
+  .demo-preset.selected {{ border-color: var(--accent); background: #ecf2ff; }}
+  .demo-preset:disabled {{ opacity: 0.55; cursor: not-allowed; }}
+  .preset-row {{ display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }}
+  .preset-label {{ font-weight: 700; font-size: 0.92em; }}
+  .preset-badge {{ font-size: 0.66em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }}
+  .preset-prompt {{ display: block; margin-top: 4px; font-size: 0.81em; line-height: 1.45; color: var(--muted); }}
+  .demo-run-btn {{ width: 100%; background: var(--accent); color: #fff; border: 0; padding: 12px; border-radius: 8px; font: inherit; font-weight: 700; cursor: pointer; }}
+  .demo-run-btn:hover:not(:disabled) {{ background: #1e40af; }}
+  .demo-run-btn:disabled {{ opacity: 0.55; cursor: not-allowed; }}
+  .demo-note {{ font-size: 0.78em; color: var(--muted); margin: 10px 0 0; line-height: 1.5; }}
+  .demo-stages {{ list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }}
+  .demo-stages .stage {{ display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.55); transition: border-color 0.14s ease, background 0.14s ease; }}
+  .demo-stages .stage.active {{ border-color: var(--accent); background: #ecf2ff; }}
+  .demo-stages .stage.done {{ border-color: #cfe3d6; background: #f3faf5; }}
+  .demo-stages .stage.failed {{ border-color: #f5b7b1; background: #fdecea; }}
+  .stage-marker {{ width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); background: white; transition: all 0.14s ease; }}
+  .stage.active .stage-marker {{ border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 4px rgba(40,86,163,0.12); }}
+  .stage.done .stage-marker {{ border-color: #1e6f3a; background: #1e6f3a; }}
+  .stage.failed .stage-marker {{ border-color: #a02828; background: #a02828; }}
+  .stage-label {{ font-weight: 700; font-size: 0.92em; }}
+  .stage-detail {{ font-size: 0.78em; color: var(--muted); font-variant-numeric: tabular-nums; }}
+  .demo-output {{ margin-top: 14px; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.65); }}
+  .demo-output.empty {{ color: var(--muted); font-size: 0.88em; font-style: italic; }}
+  .demo-output .out-probs {{ display: grid; gap: 6px; margin: 6px 0 12px; }}
+  .demo-output .out-prob {{ display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; font-size: 0.92em; }}
+  .demo-output .out-prob .bar {{ position: relative; height: 22px; border-radius: 5px; background: #eef0f5; overflow: hidden; }}
+  .demo-output .out-prob .bar i {{ position: absolute; top: 0; left: 0; bottom: 0; background: linear-gradient(90deg, #2856a3, #4a6fc6); border-radius: inherit; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }}
+  .demo-output .out-prob .bar .lbl {{ position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 0.85em; text-shadow: 0 0 4px rgba(15,23,42,0.55); }}
+  .demo-output .out-prob .pct {{ font-variant-numeric: tabular-nums; font-weight: 700; min-width: 50px; text-align: right; }}
+  .demo-output .out-rationale {{ font-size: 0.9em; line-height: 1.5; color: var(--text); border-left: 3px solid var(--accent); padding: 6px 10px; background: rgba(40,86,163,0.04); border-radius: 0 6px 6px 0; margin: 10px 0; }}
+  .demo-output .out-sources {{ font-size: 0.78em; color: var(--muted); }}
+  .demo-output .out-sources strong {{ color: var(--text); }}
+  .demo-output .out-sources a {{ display: block; color: #2856a3; text-decoration: none; padding: 1px 0; word-break: break-all; }}
+  .demo-output .out-sources a:hover {{ text-decoration: underline; }}
+  .demo-output .out-meta {{ display: flex; gap: 14px; font-size: 0.78em; color: var(--muted); flex-wrap: wrap; margin-top: 8px; font-variant-numeric: tabular-nums; }}
   .link-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8em; margin-top: 0.8em; }}
   .link-card {{ display: block; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.85em 1em; color: var(--text); text-decoration: none; min-height: 104px; }}
   .link-card:hover {{ border-color: var(--accent); text-decoration: none; }}
@@ -3190,15 +3277,46 @@ def dashboard(
   <div id="try-result">Submit a question to see live per-outcome probabilities (~5–10 seconds: one Brave search + one Opus 4.7 call).</div>
 </form>
 
-<h2>Pipeline demo</h2>
-<div class="card" data-tour="dashboard-demo">
-  <p class="meta">Runs one synthetic event through the production forecast pipeline and streams stage updates to this page. This is separate from Prophet Arena calls and does not change the production variant.</p>
-  <div class="demo-actions">
-    <button type="button" id="demo-start-button" onclick="startDemo()">Run pipeline demo</button>
-    <span class="meta">Route: <code>POST /demo/start</code> -> <code>/demo/stream/&lt;run_id&gt;</code> -> <code>/demo/result/&lt;run_id&gt;</code></span>
-  </div>
-  <div id="demo-console">No demo run yet.</div>
-  <div id="demo-result">Result JSON appears here after completion.</div>
+<h2>Live pipeline demo</h2>
+<div class="demo-shell" data-tour="dashboard-demo">
+  <aside class="demo-prompt-panel">
+    <div class="demo-panel-head">
+      <p class="eyebrow">Event</p>
+      <h3>Run a live forecast</h3>
+      <span class="demo-status-pill" id="demo-status-pill"><span class="dot"></span><span id="demo-status-text">idle</span></span>
+    </div>
+    <div class="demo-presets" id="demo-presets">
+      <button type="button" class="demo-preset selected" data-preset="fed">
+        <span class="preset-row"><span class="preset-label">Fed rate cut</span><span class="preset-badge">Economics · 2 outcomes</span></span>
+        <span class="preset-prompt">Will the US Federal Reserve cut rates at the December 2026 meeting?</span>
+      </button>
+      <button type="button" class="demo-preset" data-preset="election">
+        <span class="preset-row"><span class="preset-label">UK PM</span><span class="preset-badge">Politics · 3 outcomes</span></span>
+        <span class="preset-prompt">Who will be Prime Minister of the United Kingdom on January 1, 2027?</span>
+      </button>
+      <button type="button" class="demo-preset" data-preset="sport">
+        <span class="preset-row"><span class="preset-label">Super Bowl LXI</span><span class="preset-badge">Sports · 5 outcomes</span></span>
+        <span class="preset-prompt">Which team will win Super Bowl LXI?</span>
+      </button>
+    </div>
+    <button type="button" id="demo-start-button" class="demo-run-btn" onclick="startDemo()">Run live demo</button>
+    <p class="demo-note">Runs the production variant on a synthetic event. Costs about one Brave call plus one Opus 4.7 call. Separate from Prophet Arena traffic.</p>
+  </aside>
+  <section class="demo-result-panel">
+    <header class="demo-result-head">
+      <p class="eyebrow">Pipeline</p>
+      <h3 id="demo-result-title">Pick an event and run the demo</h3>
+      <span class="demo-elapsed" id="demo-elapsed">0.0s</span>
+    </header>
+    <ol class="demo-stages" id="demo-stages">
+      <li class="stage" data-stage="queued"><span class="stage-marker"></span><span class="stage-label">Queue</span><span class="stage-detail"></span></li>
+      <li class="stage" data-stage="build_event"><span class="stage-marker"></span><span class="stage-label">Event</span><span class="stage-detail"></span></li>
+      <li class="stage" data-stage="retrieve"><span class="stage-marker"></span><span class="stage-label">Retrieve</span><span class="stage-detail">Brave Search × 5</span></li>
+      <li class="stage" data-stage="forecast"><span class="stage-marker"></span><span class="stage-label">Forecast</span><span class="stage-detail">Opus 4.7</span></li>
+      <li class="stage" data-stage="completed"><span class="stage-marker"></span><span class="stage-label">Return</span><span class="stage-detail">to Prophet Arena</span></li>
+    </ol>
+    <div id="demo-output" class="demo-output empty">Pipeline output appears here once the run completes.</div>
+  </section>
 </div>
 
 <h2>Variant comparison (26-event backtest)</h2>
@@ -3319,53 +3437,192 @@ async function doTry() {{
 }}
 
 let demoSource = null;
+let demoElapsedTimer = null;
+let demoStartedAt = 0;
+let demoSelectedPreset = "fed";
 
-function appendDemoLine(line) {{
-  const consoleEl = document.getElementById("demo-console");
-  consoleEl.textContent += (consoleEl.textContent ? "\\n" : "") + line;
+const DEMO_STAGE_ORDER = ["queued", "build_event", "retrieve", "forecast", "completed"];
+
+const DEMO_PRESET_TITLES = {{
+  fed:      "Fed rate cut · December 2026",
+  election: "UK PM · January 1, 2027",
+  sport:    "Super Bowl LXI",
+}};
+
+function setDemoStatus(state, label) {{
+  const pill = document.getElementById("demo-status-pill");
+  const txt = document.getElementById("demo-status-text");
+  if (!pill || !txt) return;
+  pill.classList.remove("running", "completed", "failed");
+  if (state) pill.classList.add(state);
+  txt.textContent = label;
 }}
+
+function markStage(stage, state, detail) {{
+  const all = document.querySelectorAll(".demo-stages .stage");
+  let hit = false;
+  all.forEach((el) => {{
+    if (el.dataset.stage === stage) {{
+      hit = true;
+      el.classList.remove("active", "done", "failed");
+      if (state) el.classList.add(state);
+      if (detail) el.querySelector(".stage-detail").textContent = detail;
+    }}
+  }});
+  return hit;
+}}
+
+function progressStages(currentStage, status) {{
+  const idx = DEMO_STAGE_ORDER.indexOf(currentStage);
+  if (idx < 0) return;
+  for (let i = 0; i < DEMO_STAGE_ORDER.length; i++) {{
+    const s = DEMO_STAGE_ORDER[i];
+    const el = document.querySelector(`.demo-stages .stage[data-stage="${{s}}"]`);
+    if (!el) continue;
+    el.classList.remove("active", "done", "failed");
+    if (i < idx) el.classList.add("done");
+    else if (i === idx) el.classList.add(status === "failed" ? "failed" : (status === "completed" ? "done" : "active"));
+  }}
+}}
+
+function resetDemoStages() {{
+  document.querySelectorAll(".demo-stages .stage").forEach((el) => {{
+    el.classList.remove("active", "done", "failed");
+  }});
+}}
+
+function renderDemoResult(result) {{
+  const out = document.getElementById("demo-output");
+  if (!out) return;
+  out.classList.remove("empty");
+  const probs = (result.probabilities || []).slice().sort((a, b) => b.probability - a.probability);
+  const trace = result.trace || {{}};
+  const latency = trace.latency_ms || {{}};
+  const evidence = (result.evidence_urls || []).slice(0, 5);
+
+  const probsHtml = probs.map((p) => {{
+    const pct = (p.probability * 100).toFixed(1);
+    return `<div class="out-prob">
+      <div class="bar"><i style="width:${{pct}}%"></i><span class="lbl">${{escapeHtml(p.market)}}</span></div>
+      <span class="pct">${{pct}}%</span>
+    </div>`;
+  }}).join("");
+
+  const sourcesHtml = evidence.length ? `<div class="out-sources"><strong>Evidence (${{evidence.length}}):</strong>${{
+    evidence.map((u) => `<a href="${{escapeHtml(u)}}" target="_blank" rel="noopener">${{escapeHtml(u.length > 90 ? u.slice(0, 89) + '…' : u)}}</a>`).join("")
+  }}</div>` : "";
+
+  const meta = [];
+  if (latency.brave) meta.push(`Brave ${{latency.brave}} ms`);
+  if (latency.llm) meta.push(`LLM ${{latency.llm}} ms`);
+  if (latency.total) meta.push(`<strong>total ${{latency.total}} ms</strong>`);
+  if (trace.parse_path) meta.push(`parse: ${{trace.parse_path}}`);
+  if (trace.warnings && trace.warnings.length) meta.push(`warnings: ${{trace.warnings.length}}`);
+
+  out.innerHTML = `
+    <div class="out-probs">${{probsHtml}}</div>
+    <div class="out-rationale">${{escapeHtml(result.rationale || "")}}</div>
+    ${{sourcesHtml}}
+    <div class="out-meta">${{meta.join(" · ")}}</div>
+  `;
+}}
+
+function escapeHtml(s) {{
+  return String(s || "").replace(/[&<>"]/g, (c) => ({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]));
+}}
+
+document.querySelectorAll(".demo-preset").forEach((btn) => {{
+  btn.addEventListener("click", () => {{
+    if (btn.disabled) return;
+    document.querySelectorAll(".demo-preset").forEach((b) => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    demoSelectedPreset = btn.dataset.preset || "fed";
+  }});
+}});
 
 async function startDemo() {{
   const button = document.getElementById("demo-start-button");
-  const consoleEl = document.getElementById("demo-console");
-  const resultEl = document.getElementById("demo-result");
+  const titleEl = document.getElementById("demo-result-title");
+  const elapsedEl = document.getElementById("demo-elapsed");
+  const outputEl = document.getElementById("demo-output");
   if (demoSource) demoSource.close();
+  if (demoElapsedTimer) {{ clearInterval(demoElapsedTimer); demoElapsedTimer = null; }}
+
   button.disabled = true;
-  consoleEl.textContent = "starting demo via /demo/start";
-  resultEl.textContent = "waiting for result";
+  document.querySelectorAll(".demo-preset").forEach((b) => {{ b.disabled = true; }});
+  resetDemoStages();
+  outputEl.classList.add("empty");
+  outputEl.textContent = "Streaming…";
+  titleEl.textContent = DEMO_PRESET_TITLES[demoSelectedPreset] || "Running";
+  setDemoStatus("running", "running");
+  demoStartedAt = Date.now();
+  elapsedEl.textContent = "0.0s";
+  demoElapsedTimer = setInterval(() => {{
+    elapsedEl.textContent = ((Date.now() - demoStartedAt) / 1000).toFixed(1) + "s";
+  }}, 100);
+
   try {{
-    const started = await fetch("/demo/start", {{method: "POST"}});
+    const started = await fetch(`/demo/start?preset=${{encodeURIComponent(demoSelectedPreset)}}`, {{method: "POST"}});
     if (!started.ok) {{
-      consoleEl.textContent = `start failed: HTTP ${{started.status}}\\n${{(await started.text()).slice(0, 500)}}`;
-      button.disabled = false;
+      const errText = (await started.text()).slice(0, 300);
+      outputEl.classList.remove("empty");
+      outputEl.textContent = `Start failed (HTTP ${{started.status}}): ${{errText}}`;
+      cleanupDemo("failed", "error");
       return;
     }}
     const meta = await started.json();
-    appendDemoLine(`run_id=${{meta.run_id}}`);
-    appendDemoLine(`stream=${{meta.stream_url}} result=${{meta.result_url}}`);
+    markStage("queued", "done", "run " + meta.run_id);
+    markStage("build_event", "active");
     demoSource = new EventSource(meta.stream_url);
     demoSource.addEventListener("demo", async (ev) => {{
       let msg; try {{ msg = JSON.parse(ev.data); }} catch (_) {{ return; }}
-      appendDemoLine(`${{msg.ts.slice(11,19)}}  ${{msg.stage}}  ${{msg.status}}  ${{msg.message}}`);
+      const stage = msg.stage;
+      const detail = msg.message || "";
+      if (stage === "forecast" && msg.status === "running") {{
+        markStage("retrieve", "done", "Brave search returned");
+        markStage("forecast", "active", "Opus 4.7 …");
+      }} else if (stage === "forecast" && msg.status === "completed") {{
+        markStage("forecast", "done", "forecast returned");
+      }} else if (stage === "build_event") {{
+        markStage("build_event", "done", detail);
+      }} else {{
+        markStage(stage, msg.status === "failed" ? "failed" : (msg.status === "completed" ? "done" : "active"), detail);
+      }}
       if (msg.status === "completed" || msg.status === "failed") {{
-        demoSource.close();
-        demoSource = null;
-        button.disabled = false;
+        if (demoSource) {{ demoSource.close(); demoSource = null; }}
         const result = await fetch(meta.result_url);
         const body = await result.json();
-        resultEl.textContent = JSON.stringify(body.result || {{error: body.error, status: body.status}}, null, 2);
+        if (msg.status === "completed") {{
+          markStage("completed", "done", "response logged");
+          progressStages("completed", "completed");
+          if (body.result) renderDemoResult(body.result);
+          else outputEl.textContent = "no result returned";
+          cleanupDemo("completed", "done");
+        }} else {{
+          markStage(stage, "failed", "error");
+          outputEl.classList.remove("empty");
+          outputEl.textContent = "Error: " + (body.error || "unknown");
+          cleanupDemo("failed", "error");
+        }}
       }}
     }});
     demoSource.onerror = () => {{
-      appendDemoLine("stream disconnected");
-      if (demoSource) demoSource.close();
-      demoSource = null;
-      button.disabled = false;
+      if (demoSource) {{ demoSource.close(); demoSource = null; }}
+      cleanupDemo("failed", "stream disconnected");
     }};
   }} catch (e) {{
-    consoleEl.textContent = "demo error: " + e.message;
-    button.disabled = false;
+    outputEl.classList.remove("empty");
+    outputEl.textContent = "Error: " + e.message;
+    cleanupDemo("failed", "error");
   }}
+}}
+
+function cleanupDemo(state, label) {{
+  const button = document.getElementById("demo-start-button");
+  button.disabled = false;
+  document.querySelectorAll(".demo-preset").forEach((b) => {{ b.disabled = false; }});
+  if (demoElapsedTimer) {{ clearInterval(demoElapsedTimer); demoElapsedTimer = null; }}
+  setDemoStatus(state, label);
 }}
 
 (function initSSE() {{

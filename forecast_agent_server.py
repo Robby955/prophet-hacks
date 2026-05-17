@@ -43,7 +43,9 @@ import json
 import logging
 import os
 import secrets
+import threading
 import time
+import uuid
 from datetime import datetime, timezone
 from html import escape as html_escape
 from pathlib import Path
@@ -85,6 +87,13 @@ _PPM_CURRENT_COUNT: int = 0
 
 # SSE subscribers: asyncio.Queues that get an event each time /predict runs.
 _SSE_SUBSCRIBERS: list = []
+
+# Short-lived dashboard demo runs. These are intentionally in-memory: the
+# demo is an operational view, not a persisted prediction record.
+_DEMO_RUNS: dict[str, dict[str, Any]] = {}
+_DEMO_RUN_LOCK = threading.Lock()
+_DEMO_MAX_RUNS = 20
+_DEMO_MAX_ACTIVE_RUNS = 2
 
 # Approximate per-event cost in USD for each variant. Used for spend tracking.
 _VARIANT_COSTS: dict[str, float] = {
@@ -1110,6 +1119,212 @@ def predictions(_: None = Depends(_require_dashboard_auth)) -> dict[str, Any]:
         "persisted_count": _prediction_store_count(),
         "predictions": history,
     }
+
+
+def _demo_event_payload() -> dict[str, Any]:
+    return {
+        "event_ticker": "dashboard-demo-fed-2026",
+        "market_ticker": "dashboard-demo-fed-2026",
+        "title": "Will the US Federal Reserve cut rates at the December 2026 meeting?",
+        "category": "Economics",
+        "close_time": "2026-12-31T23:59:59Z",
+        "outcomes": ["Yes", "No"],
+        "description": "Dashboard demo event for inspecting the production forecasting pipeline.",
+        "rules": "YES if the FOMC announces a rate cut at the December 2026 meeting; otherwise NO.",
+    }
+
+
+def _prune_demo_runs() -> None:
+    if len(_DEMO_RUNS) <= _DEMO_MAX_RUNS:
+        return
+    ordered = sorted(
+        _DEMO_RUNS.items(),
+        key=lambda item: str(item[1].get("created_at", "")),
+    )
+    for run_id, _run in ordered[: max(0, len(ordered) - _DEMO_MAX_RUNS)]:
+        _DEMO_RUNS.pop(run_id, None)
+
+
+def _record_demo_event(
+    run_id: str,
+    stage: str,
+    status_text: str,
+    message: str,
+    extra: dict[str, Any] | None = None,
+) -> None:
+    event = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "stage": stage,
+        "status": status_text,
+        "message": message,
+    }
+    if extra:
+        event["extra"] = extra
+    with _DEMO_RUN_LOCK:
+        run = _DEMO_RUNS.get(run_id)
+        if run is None:
+            return
+        run["events"].append(event)
+        run["updated_at"] = event["ts"]
+
+
+def _finish_demo_run(run_id: str, result: dict[str, Any]) -> None:
+    probs = result.get("probabilities") or []
+    if not isinstance(probs, list):
+        probs = []
+    summary = {
+        "p_yes": float(result.get("p_yes", 0.5)),
+        "rationale": str(result.get("rationale", ""))[:300],
+        "probabilities": probs,
+        "evidence_urls": (result.get("evidence_urls") or [])[:8],
+        "trace": result.get("_trace") if isinstance(result.get("_trace"), dict) else None,
+    }
+    with _DEMO_RUN_LOCK:
+        run = _DEMO_RUNS.get(run_id)
+        if run is None:
+            return
+        run["events"].append(
+            {
+                "ts": datetime.now(timezone.utc).isoformat(),
+                "stage": "completed",
+                "status": "completed",
+                "message": "result ready",
+                "extra": {"p_yes": summary["p_yes"]},
+            }
+        )
+        run["status"] = "completed"
+        run["result"] = summary
+
+
+def _fail_demo_run(run_id: str, error: Exception) -> None:
+    with _DEMO_RUN_LOCK:
+        run = _DEMO_RUNS.get(run_id)
+        if run is not None:
+            run["events"].append(
+                {
+                    "ts": datetime.now(timezone.utc).isoformat(),
+                    "stage": "failed",
+                    "status": "failed",
+                    "message": str(error)[:240],
+                }
+            )
+            run["status"] = "failed"
+            run["error"] = str(error)[:500]
+
+
+def _run_demo_pipeline(run_id: str) -> None:
+    event = _demo_event_payload()
+    try:
+        _record_demo_event(
+            run_id,
+            "build_event",
+            "running",
+            "synthetic event ready",
+            {"market_ticker": event["market_ticker"], "outcomes": event["outcomes"]},
+        )
+        _record_demo_event(
+            run_id,
+            "forecast",
+            "running",
+            f"calling {_VARIANT_NAME}",
+        )
+        started = time.monotonic()
+        result = _VARIANT_FN(event)
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        trace = result.get("_trace") if isinstance(result.get("_trace"), dict) else {}
+        _record_demo_event(
+            run_id,
+            "forecast",
+            "completed",
+            "forecast returned",
+            {
+                "latency_ms": elapsed_ms,
+                "trace_latency_ms": trace.get("latency_ms") if isinstance(trace, dict) else None,
+            },
+        )
+        _finish_demo_run(run_id, result)
+    except Exception as exc:
+        log.exception("demo run %s failed", run_id)
+        _fail_demo_run(run_id, exc)
+
+
+@app.post("/demo/start")
+def demo_start(_: None = Depends(_require_dashboard_auth)) -> dict[str, str]:
+    """Start a PIN-protected synthetic run through the real forecast variant."""
+    run_id = uuid.uuid4().hex[:12]
+    now = datetime.now(timezone.utc).isoformat()
+    with _DEMO_RUN_LOCK:
+        active_runs = sum(
+            1 for run in _DEMO_RUNS.values() if run.get("status") == "running"
+        )
+        if active_runs >= _DEMO_MAX_ACTIVE_RUNS:
+            raise HTTPException(status_code=429, detail="too many active demo runs")
+        _DEMO_RUNS[run_id] = {
+            "run_id": run_id,
+            "status": "running",
+            "created_at": now,
+            "updated_at": now,
+            "events": [],
+            "result": None,
+            "error": None,
+        }
+        _prune_demo_runs()
+    _record_demo_event(run_id, "queued", "running", "demo queued")
+    threading.Thread(
+        target=_run_demo_pipeline,
+        args=(run_id,),
+        daemon=True,
+        name=f"forecast-demo-{run_id}",
+    ).start()
+    return {
+        "run_id": run_id,
+        "stream_url": f"/demo/stream/{run_id}",
+        "result_url": f"/demo/result/{run_id}",
+    }
+
+
+@app.get("/demo/result/{run_id}")
+def demo_result(
+    run_id: str,
+    _: None = Depends(_require_dashboard_auth),
+) -> dict[str, Any]:
+    with _DEMO_RUN_LOCK:
+        run = _DEMO_RUNS.get(run_id)
+        if run is None:
+            raise HTTPException(status_code=404, detail="demo run not found")
+        return json.loads(json.dumps(run, default=str))
+
+
+@app.get("/demo/stream/{run_id}")
+async def demo_stream(
+    run_id: str,
+    _: None = Depends(_require_dashboard_auth),
+) -> StreamingResponse:
+    with _DEMO_RUN_LOCK:
+        if run_id not in _DEMO_RUNS:
+            raise HTTPException(status_code=404, detail="demo run not found")
+
+    async def gen():
+        idx = 0
+        while True:
+            with _DEMO_RUN_LOCK:
+                run = _DEMO_RUNS.get(run_id)
+                if run is None:
+                    break
+                events = list(run.get("events", []))
+                status_text = str(run.get("status") or "running")
+            for event in events[idx:]:
+                yield "event: demo\ndata: " + json.dumps(event) + "\n\n"
+            idx = len(events)
+            if status_text in {"completed", "failed"}:
+                break
+            await asyncio.sleep(0.25)
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 # -- /compare --------------------------------------------------------------
@@ -2145,6 +2360,11 @@ def dashboard(
   form.try button {{ background: var(--accent); color: white; border: 0; padding: 0.7em 1.4em; border-radius: 6px; font: inherit; font-weight: 700; margin-top: 1em; cursor: pointer; font-size: 1em; }}
   form.try button:hover {{ background: #1e40af; }}
   #try-result {{ background: var(--panel-2); padding: 0.9em; border-radius: 6px; margin-top: 1em; font-family: ui-monospace, "SF Mono", monospace; font-size: 0.85em; white-space: pre-wrap; word-break: break-all; line-height: 1.4; color: var(--text-2); border: 1px solid var(--border); }}
+  .demo-actions {{ display: flex; flex-wrap: wrap; gap: 0.7em; align-items: center; margin-top: 0.9em; }}
+  .demo-actions button {{ background: var(--accent); color: #fff; border: 0; padding: 0.65em 1.1em; border-radius: 6px; font: inherit; font-weight: 700; cursor: pointer; }}
+  .demo-actions button:disabled {{ opacity: 0.55; cursor: not-allowed; }}
+  #demo-console, #demo-result {{ background: #0f172a; color: #dbeafe; border-radius: 6px; padding: 0.85em; margin-top: 0.8em; font-family: ui-monospace, "SF Mono", monospace; font-size: 0.84em; line-height: 1.45; white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }}
+  #demo-result {{ background: var(--panel-2); color: var(--text-2); border: 1px solid var(--border); }}
 
   @keyframes flash {{ 0% {{ background: var(--ok-soft); }} 100% {{ background: var(--panel); }} }}
   .pred-card.fresh {{ animation: flash 1.8s ease-out; }}
@@ -2269,6 +2489,17 @@ def dashboard(
   <div id="try-result">Submit a question to see live per-outcome probabilities (~5–10 seconds: one Brave search + one Opus 4.7 call).</div>
 </form>
 
+<h2>Pipeline demo</h2>
+<div class="card">
+  <p class="meta">Runs one synthetic event through the production forecast pipeline and streams stage updates to this page. This is separate from Prophet Arena calls and does not change the production variant.</p>
+  <div class="demo-actions">
+    <button type="button" id="demo-start-button" onclick="startDemo()">Run pipeline demo</button>
+    <span class="meta">Route: <code>POST /demo/start</code> -> <code>/demo/stream/&lt;run_id&gt;</code> -> <code>/demo/result/&lt;run_id&gt;</code></span>
+  </div>
+  <div id="demo-console">No demo run yet.</div>
+  <div id="demo-result">Result JSON appears here after completion.</div>
+</div>
+
 <h2>Variant comparison (26-event backtest)</h2>
 <div class="card">
   {brier_svg}
@@ -2373,6 +2604,56 @@ async function doTry() {{
     const j = await r.json();
     out.textContent = `latency: ${{dt}}s\\n` + JSON.stringify(j, null, 2);
   }} catch (e) {{ out.textContent = "network error: " + e.message; }}
+}}
+
+let demoSource = null;
+
+function appendDemoLine(line) {{
+  const consoleEl = document.getElementById("demo-console");
+  consoleEl.textContent += (consoleEl.textContent ? "\\n" : "") + line;
+}}
+
+async function startDemo() {{
+  const button = document.getElementById("demo-start-button");
+  const consoleEl = document.getElementById("demo-console");
+  const resultEl = document.getElementById("demo-result");
+  if (demoSource) demoSource.close();
+  button.disabled = true;
+  consoleEl.textContent = "starting demo via /demo/start";
+  resultEl.textContent = "waiting for result";
+  try {{
+    const started = await fetch("/demo/start", {{method: "POST"}});
+    if (!started.ok) {{
+      consoleEl.textContent = `start failed: HTTP ${{started.status}}\\n${{(await started.text()).slice(0, 500)}}`;
+      button.disabled = false;
+      return;
+    }}
+    const meta = await started.json();
+    appendDemoLine(`run_id=${{meta.run_id}}`);
+    appendDemoLine(`stream=${{meta.stream_url}} result=${{meta.result_url}}`);
+    demoSource = new EventSource(meta.stream_url);
+    demoSource.addEventListener("demo", async (ev) => {{
+      let msg; try {{ msg = JSON.parse(ev.data); }} catch (_) {{ return; }}
+      appendDemoLine(`${{msg.ts.slice(11,19)}}  ${{msg.stage}}  ${{msg.status}}  ${{msg.message}}`);
+      if (msg.status === "completed" || msg.status === "failed") {{
+        demoSource.close();
+        demoSource = null;
+        button.disabled = false;
+        const result = await fetch(meta.result_url);
+        const body = await result.json();
+        resultEl.textContent = JSON.stringify(body.result || {{error: body.error, status: body.status}}, null, 2);
+      }}
+    }});
+    demoSource.onerror = () => {{
+      appendDemoLine("stream disconnected");
+      if (demoSource) demoSource.close();
+      demoSource = null;
+      button.disabled = false;
+    }};
+  }} catch (e) {{
+    consoleEl.textContent = "demo error: " + e.message;
+    button.disabled = false;
+  }}
 }}
 
 (function initSSE() {{

@@ -209,6 +209,13 @@ during the eval window.
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.
 
+## codex/sse-demo
+
+- **Current task:** PIN-protected dashboard SSE demo implemented and verified: `POST /demo/start` -> `GET /demo/stream/{run_id}` -> `GET /demo/result/{run_id}`.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-16T23:57:38Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-sse-demo` / `codex/sse-demo`. Verified by focused SSE tests, full `pytest tests/ -q` (218 passed), `./scripts/agent/verify.sh`, and local browser smoke. Respect strict bounds: no `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `static/`, `chat_completions_adapter.py`, Railway env vars, or production variant changes.
+
 ## codex/observatory-design
 
 - **Current task:** Design-only branch for the next auth-gated Observatory surface: live health, prediction traces, experiment matrix, adversarial review, and public/private visibility split.

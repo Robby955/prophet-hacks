@@ -42,19 +42,32 @@ cross-model agreement analysis since outcomes are unresolved.
 
 | Variant (LLM only swap; pipeline identical) | Mean Brier ↓ | Binary (n=14) | Multi-outcome (n=12) |
 |---|---:|---:|---:|
-| **Claude Opus 4.7 (production)** | **0.0379** | 0.0425 | **0.0177** |
-| Claude Sonnet 4.6 (previous prod) | 0.0639 | 0.0879 | — |
-| Claude Opus 4.6 | 0.2264 | 0.0438 | 0.4396 |
-| OpenAI GPT-5.5 | 0.3226 | **0.0376** | 0.6552 |
-| OpenAI GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
-| Gemini 3.1 Pro Preview | 0.4149 | 0.0750 | 0.8115 |
+**Scoring methodology:** Prophet Arena's CLI evaluator implements
+single-binary Brier on `(p_yes - 1{outcomes[0] won})²`. PA's published
+docs describe multi-class Brier (sum across outcomes per event); the
+CLI does not implement that. Both reported below; primary headline
+is single-binary because that's what we can verify locally against
+PA's own evaluator.
+
+| Variant | Single-binary ↓ | Multi-class ↓ | Multi-only (n=12) |
+|---|---:|---:|---:|
+| **Claude Opus 4.7 (production)** | **0.0378** | 0.2558 | 0.4551 |
+| Claude Opus 4.6 | 0.0391 | **0.2500** | 0.4396 |
+| OpenAI GPT-5.2 | 0.0438 | 0.2874 | 0.4971 |
+| Claude Sonnet 4.6 (previous prod) | 0.0639 | (0.6912)* | — |
+| OpenAI GPT-5.5 | 0.0920 | 0.3429 | 0.6552 |
+| Gemini 3.1 Pro Preview | 0.0983 | 0.4773 | 0.8115 |
 | Random 0.5 baseline | 0.250 | — | — |
 | Uniform 1/n prior | 0.219 | — | — |
 
-**Paired-bootstrap CI on the headline Opus 4.7 vs Sonnet 4.6 delta:**
-mean improvement 0.0260, 95% CI [0.0143, 0.0374], 50,000 resamples,
-seed `20260516`, n=26 paired events. CI excludes zero; significant at
-α=0.05 on this dataset.
+*Sonnet's prediction file pre-dates the bug fix that adds per-outcome
+probabilities; the multi-class number reflects the 1/n uniform
+fallback, not real model behavior. Single-binary is unaffected.
+
+**Paired-bootstrap CI on the headline Opus 4.7 vs Sonnet 4.6 delta**
+(under single-binary scoring): mean improvement 0.0260, 95% CI
+[0.0143, 0.0374], 50,000 resamples, seed `20260516`, n=26 paired
+events. CI excludes zero; significant at α=0.05.
 
 **Phase 2 decomposition** (same paired-bootstrap branch):
 
@@ -74,16 +87,33 @@ joined with `data/resolved.json` ground truth. Brier as defined in
 
 ---
 
-## 3. The dominant driver is JSON schema compliance, not reasoning
+## 3. Schema compliance: a hypothesis that partially holds
 
-The 5-model comparison decomposes by outcome count:
+**Revised after the 2026-05-17 scoring-methodology correction.** The
+earlier draft claimed a "25× multi-outcome gap" between Opus 4.7 and
+alternatives; that was an artifact of comparing Opus 4.7's
+single-binary Brier (0.0177 multi-only) to alternatives' multi-class
+Brier (0.44–0.81). Under consistent multi-class scoring on the same
+events, Opus 4.7's multi-only Brier is 0.4551 — barely better than
+Opus 4.6 (0.4396, actually slightly better) and competitive with
+GPT-5.2 (0.4971).
 
-- **Binary events (n=14).** All 6 models within a factor of 2. Opus 4.7
-  0.0425, GPT-5.5 *better at 0.0376*, Gemini 3.1 Pro worst at 0.0750.
-  The gap is real but not large; reasoning quality matters here.
-- **Multi-outcome events (n=12).** Opus 4.7 0.0177 vs Opus 4.6 0.4396 —
-  a **25× gap**, with GPT-5.5 at 0.6552 (37× worse) confirming the
-  pattern is robust across model families. This is not a reasoning gap.
+The schema-compliance hypothesis holds most clearly for two of the
+six models:
+
+- **Gemini 3.1 Pro Preview:** multi-only 0.8115. Inspection of
+  rationale + parsed outputs shows persistent label drift ("Other"
+  instead of supplied labels) and JSON-shape contamination.
+- **GPT-5.5:** multi-only 0.6552 despite being competitive on
+  single-binary (0.0376 binary-only, the best of any model). It
+  emits well-formed JSON but assigns probability to labels not in
+  the supplied outcomes list.
+
+For the other three alternatives (Opus 4.6, GPT-5.2, and earlier
+Sonnet 4.6), the gap to Opus 4.7 is small enough that "schema
+compliance" is no longer the dominant explanation; differences are
+more plausibly accounted for by random variance on n=12 multi-outcome
+events.
 
 Inspection of the failure cases (per-call `_trace.warnings`,
 `_trace.fuzzy_matches`, and the raw ablation prediction files) shows

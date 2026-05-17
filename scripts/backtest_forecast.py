@@ -58,17 +58,31 @@ def _now_iso() -> str:
 
 
 def _predict_one(name: str, fn, event: dict) -> dict:
-    """Predict a single event; never raises — errors become 0.5 fallbacks."""
+    """Predict a single event; never raises — errors become 0.5 fallbacks.
+
+    Returns the full canonical prediction shape including the per-outcome
+    `probabilities` array and the `evidence_urls` list, so downstream
+    analysis (proper multi-class Brier, calibration, decomposition) can
+    operate on the actual model output rather than fall back to uniform.
+
+    Bug fix 2026-05-17: prior version dropped the `probabilities` array,
+    which made multi-outcome events in the saved file unusable for
+    proper-Brier evaluation. build_summary_report.py defaulted to 1/n
+    per outcome, producing misleadingly-low multi-Brier numbers.
+    """
     ticker = event.get("market_ticker") or event.get("event_ticker")
     try:
         result = fn(event)
     except Exception as ex:
         log.warning("[%s] event %s raised: %s", name, ticker, ex)
-        result = {"p_yes": 0.5, "rationale": f"error: {ex}"}
+        result = {"p_yes": 0.5, "rationale": f"error: {ex}",
+                  "probabilities": [], "evidence_urls": []}
     return {
         "market_ticker": ticker,
         "p_yes": float(result["p_yes"]),
         "rationale": str(result.get("rationale", ""))[:300],
+        "probabilities": result.get("probabilities", []) or [],
+        "evidence_urls": (result.get("evidence_urls") or [])[:8],
     }
 
 

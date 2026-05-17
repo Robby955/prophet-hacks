@@ -252,3 +252,73 @@ Decided by: Claude after Rob authorized aggressive spending for real ablation da
 - Note for the workshop paper: GPT-5.5's competitive binary number is interesting — for a binary-only pipeline, it would be a viable cheaper alternative to Opus 4.7. PA's event mix is unknown but Discord ("events won't be highly skewed") suggests both shapes will appear.
 - Decided by: Claude after Rob asked whether newer OpenAI models warranted a swap.
 - Commit: this commit.
+
+## 2026-05-17 · CRITICAL: scoring-methodology correction (single-binary vs multi-class)
+
+A prompt-ablation pass surfaced a methodology inconsistency in the
+multi-model comparison previously published in REPORT.md, FINDINGS.md,
+README.md, and static/summary.html. The headline 0.0378 mean Brier for
+production Opus 4.7 was correct **under PA's CLI scoring**, which
+implements single-binary Brier on `(p_yes - 1{outcomes[0] won})²` —
+verified by running `prophet forecast evaluate` against the same
+predictions and confirming 0.037819. Our `backtest_forecast.py` local
+computation also uses single-binary, matching the CLI.
+
+But the cross-model ablation table compared Opus 4.7 at 0.0378
+(single-binary) against alternatives at 0.22–0.42 (proper multi-class
+Brier from `scripts/ablate_openrouter.py`, which sums squared error
+across all outcomes per event). Apples-to-oranges; the dramatic 5–25×
+"production wins" gap was inflated by the metric mismatch, not by
+actual model performance.
+
+**Consistent single-binary Brier across all six models on the same
+26 resolved events:**
+
+| Model | Single-binary | Proper multi-class | Multi-only (n=12) |
+|---|---:|---:|---:|
+| **Opus 4.7 (production)** | **0.0378** | 0.2558 | 0.4551 |
+| Opus 4.6 | 0.0391 | **0.2500** | 0.4396 |
+| GPT-5.2 | 0.0438 | 0.2874 | 0.4971 |
+| Sonnet 4.6 (prev prod) | 0.0639 | 0.6912 | (no probs stored) |
+| GPT-5.5 | 0.0920 | 0.3429 | 0.6552 |
+| Gemini 3.1 Pro Preview | 0.0983 | 0.4773 | 0.8115 |
+
+**Corrected claims:**
+
+- Production Opus 4.7 wins single-binary Brier on this dataset, but
+  by ~3.4% over Opus 4.6, not by 5×.
+- The Phase 2 improvement (0.0639 → 0.0378 vs Sonnet) is real and
+  has a paired-bootstrap CI of [0.0143, 0.0374] excluding zero.
+- The Sonnet→Opus model swap accounts for ~15% of the gap; the
+  longshot-floor bug fix accounts for ~85%. That decomposition stands.
+- Under proper multi-class scoring (what PA's docs describe, though
+  not what their CLI implements), Opus 4.6 is marginally better
+  (0.2500 vs 0.2558). Worth flagging in the workshop paper as
+  "model selection is metric-dependent on small n."
+- The schema-compliance hypothesis applies most cleanly to Gemini
+  and GPT-5.5 (worst under both metrics). For Opus 4.6 and GPT-5.2
+  the multi-class gap to production is small enough that "schema
+  compliance" is no longer the dominant explanation.
+
+**Root cause of the script error:** `scripts/backtest_forecast.py:_predict_one`
+stored only `p_yes` and `rationale`, dropping the per-outcome
+`probabilities` array. This meant summary-report multi-class
+recomputation fell back to `1/n` uniform per outcome, producing
+misleadingly-low multi-Brier numbers. Fix: prediction record now
+includes `probabilities` + `evidence_urls` fields. After fix,
+re-running the production backtest yields identical single-binary
+0.037819 plus proper multi-class 0.2558.
+
+**What we will report going forward:**
+
+- Single-binary Brier (PA CLI scoring) as the primary headline number,
+  with the caveat that PA's published formula suggests multi-class
+  and the actual live-eval scoring is ambiguous.
+- Multi-class Brier as a secondary caveat number for completeness.
+- Cross-model comparisons must use the same metric to be honest;
+  prefer single-binary for the audience-facing table.
+
+Decided by: Claude after surfacing the bug via prompt-ablation
+discrepancy. Author of the original metric mismatch: also Claude;
+postmortem is the discipline.
+- Commit: this commit + the backtest script fix.

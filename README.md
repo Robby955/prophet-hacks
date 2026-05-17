@@ -43,19 +43,32 @@ Same pipeline (Brave + anchor prompt + 0.10 floor), swap the LLM:
 
 | Model | Mean Brier | Binary (n=14) | Multi (n=12) |
 | --- | --- | --- | --- |
-| **Claude Opus 4.7** (production) | **0.0379** | 0.0425 | 0.0177 |
-| Claude Sonnet 4.6 (previous prod) | 0.0639 | 0.0879 | — |
-| Claude Opus 4.6 | 0.2264 | 0.0438 | 0.4396 |
-| OpenAI GPT-5.5 | 0.3226 | **0.0376** | 0.6552 |
-| OpenAI GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
-| Gemini 3.1 Pro Preview | 0.4149 | 0.0750 | 0.8115 |
-| _random 0.5 baseline_ | 0.250 | — | — |
-| _uniform 1/n prior_ | 0.219 | — | — |
+All numbers below are **single-binary Brier** matching PA's CLI
+evaluator (`prophet forecast evaluate`). Multi-class Brier numbers
+are documented in `submission/REPORT.md` §3 and `docs/FINDINGS.md` §2.
 
-Production beat the previous Sonnet baseline by **40.7% relative** on
-this set. Paired-bootstrap CI on the delta: **[0.0143, 0.0374]**
+| Variant | Single-binary Brier ↓ |
+|---|---:|
+| **Claude Opus 4.7** (production) | **0.0378** |
+| Claude Opus 4.6 | 0.0391 |
+| OpenAI GPT-5.2 | 0.0438 |
+| Claude Sonnet 4.6 (previous prod) | 0.0639 |
+| OpenAI GPT-5.5 | 0.0920 |
+| Gemini 3.1 Pro Preview | 0.0983 |
+| _random 0.5 baseline_ | 0.250 |
+| _uniform 1/n prior_ | 0.219 |
+
+Production beats the previous Sonnet baseline by **40.7% relative**.
+Paired-bootstrap CI on the delta: **[0.0143, 0.0374]**
 (50K resamples, seed `20260516`, n=26). CI excludes zero;
-significant at α=0.05.
+significant at α=0.05 under single-binary scoring.
+
+Production beats Opus 4.6 by 3.4% (0.0378 vs 0.0391). Under proper
+multi-class Brier (which PA's docs describe but the CLI doesn't
+implement), Opus 4.6 is marginally better. We hold Opus 4.7 because
+single-binary is the only metric we can verify locally against PA's
+own evaluator. Postmortem of the earlier inconsistent metric report
+is in `docs/DECISIONS.md` 2026-05-17 entry.
 
 ### Honest decomposition of the win
 

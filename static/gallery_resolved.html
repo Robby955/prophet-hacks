@@ -89,7 +89,7 @@ tr.drill-row:hover .click-hint { color: #2856a3; }
     <ul>
       <li><strong>Each column is the same pipeline with a different LLM.</strong> Production (Opus 4.7) outlined in green. All other models run through identical retrieval, prompt, and post-processing — only the LLM call swaps.</li>
       <li><strong>Per-cell:</strong> top number is the model's probability that <em>outcomes[0]</em> wins (PA's convention). Bottom is the resulting single-binary Brier on this event. Background color: dark green &lt; 0.02, light green &lt; 0.08, yellow &lt; 0.16, orange &lt; 0.30, red ≥ 0.30.</li>
-      <li><strong>Striped <code>err / no signal</code> cells</strong> mean that model failed JSON parsing on this event; the underlying value is a uniform-prior fallback, not a real prediction. Those cells are excluded from the model's mean Brier in the footer.</li>
+      <li><strong>Striped <code>err</code> cells</strong> mean that model failed JSON parsing on this event; the underlying value is a uniform-prior fallback. The footer mean still counts that fallback because it is the model's actual through-pipeline behavior on the resolved set.</li>
       <li><strong>"best Brier" column:</strong> which model scored lowest single-binary Brier on this event. "tie" when within 0.001 — common on binary events where everyone correctly picks 0.90/0.10.</li>
       <li><strong>Multi-class vs single-binary:</strong> PA's CLI evaluator scores single-binary; their docs describe proper multi-class. The drill-down modal shows all per-outcome probabilities so you can compute either. <a href="/static/summary.html">→ summary report</a> has the dual-metric leaderboard.</li>
     </ul>

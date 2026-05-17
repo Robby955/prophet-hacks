@@ -163,6 +163,13 @@ during the eval window.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
 - PA general onboarding (prophetarena.co/onboarding): NOT yet submitted — needs `/v1/chat/completions` shim to be live (deploying as of this commit), then Rob submits the form himself
 
+## codex/hybrid-routing-tests
+
+- **Current task:** Add non-production edge tests for `predict_hybrid_routed` routing and fix its one-outcome edge case.
+- **Files owned this session:** `forecast_track.py`, `tests/test_hybrid_routing.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:17:04Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-hybrid-routing-tests` / `codex/hybrid-routing-tests`. Does not touch production `multi_outcome_retrieval`, Railway env vars, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py`.
+
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.

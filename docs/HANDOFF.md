@@ -1,10 +1,22 @@
 # Handoff — single-page state for picking up cold
 
 Use this when another agent (or future-you) needs to take over without
-context. Last updated 2026-05-16 14:51 CT (during Prophet Hacks 2026,
-Saturday afternoon).
+context. Last updated 2026-05-17 (Prophet Hacks 2026, hackathon submission
+ready, eval window pending).
 
-If the hackathon is over: jump to `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md`.
+If the hackathon is over: run `./scripts/post_event_orchestrator.sh
+--actuals <path>` for the auto-generated retrospective draft, then
+jump to `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md`.
+
+## Quick reads in priority order
+
+1. `submission/REPORT.md` — the single-page submission summary
+2. `docs/FINDINGS.md` — the research-grade write-up of what was measured
+3. `docs/WORKSHOP_PAPER_DRAFT.md` — 4-page workshop-paper draft
+4. `docs/DECISIONS.md` — append-only decision log (every bug + every model swap)
+5. `docs/RUNBOOK.md` — operational triage including the first-PA-call playbook
+6. `docs/SUBMISSION.md` — how to fill the hackathon submission form
+7. `docs/AGENT_STATUS.md` — multi-agent coordination, current Codex handoff list
 
 ---
 

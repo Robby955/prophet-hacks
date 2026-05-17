@@ -15,6 +15,173 @@ def test_root_is_public_status_page() -> None:
     assert ("restricted" in response.text) or ("public" in response.text)
 
 
+def test_root_does_not_expose_competition_internals() -> None:
+    client = TestClient(server.app)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "ForecastingPath" in response.text
+    assert "View observatory" in response.text
+    sensitive_terms = [
+        server._VARIANT_NAME,
+        "claude-opus",
+        "Claude Opus",
+        "Brave Search",
+        "Kalshi",
+        "min(0.10",
+        "GPT-5.5",
+        "Gemini",
+        "DECISIONS.md",
+        "View source",
+    ]
+    for term in sensitive_terms:
+        assert term not in response.text
+
+
+def test_observatory_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    monkeypatch.setenv("DASHBOARD_PIN", "123456")
+    client = TestClient(server.app, follow_redirects=False)
+
+    response = client.get("/observatory", headers={"accept": "text/html"})
+
+    assert response.status_code == 303
+    assert response.headers["location"].startswith("/login")
+    assert "next=%2Fobservatory" in response.headers["location"]
+
+
+def test_observatory_renders_private_research_console(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/observatory")
+
+    assert response.status_code == 200
+    assert "ForecastingPath Observatory" in response.text
+    assert "GPT-5.5 was tried" in response.text
+    assert "0.0920" in response.text
+    assert "single-binary" in response.text
+    assert "Public surface" in response.text
+    assert server._VARIANT_NAME in response.text
+
+
+def test_prediction_store_round_trips_latest_first(tmp_path) -> None:
+    store_path = tmp_path / "predictions.jsonl"
+    older = {
+        "ts": "2026-05-17T00:00:00+00:00",
+        "market_ticker": "OLD",
+        "title": "Older event",
+        "probabilities": [{"market": "Yes", "probability": 0.4}],
+    }
+    newer = {
+        "ts": "2026-05-17T00:01:00+00:00",
+        "market_ticker": "NEW",
+        "title": "Newer event",
+        "probabilities": [{"market": "Yes", "probability": 0.6}],
+    }
+
+    server._append_prediction_record(older, path=store_path)
+    store_path.write_text(store_path.read_text() + "not json\n")
+    server._append_prediction_record(newer, path=store_path)
+
+    rows = server._load_prediction_history_from_disk(path=store_path, limit=2)
+
+    assert [r["market_ticker"] for r in rows] == ["NEW", "OLD"]
+
+
+def test_predict_persists_trace_and_predictions_reload_after_restart(monkeypatch, tmp_path) -> None:
+    store_path = tmp_path / "live-predictions.jsonl"
+    monkeypatch.setenv("PROPHET_PREDICTION_STORE_PATH", str(store_path))
+    server._PREDICTION_HISTORY.clear()
+
+    def fake_variant(event: dict) -> dict:
+        return {
+            "p_yes": 0.72,
+            "rationale": "trace persisted",
+            "probabilities": [
+                {"market": "Yes", "probability": 0.72},
+                {"market": "No", "probability": 0.28},
+            ],
+            "_trace": {
+                "parse_path": "strict-json",
+                "latency_ms": {"brave": 110, "llm": 900, "total": 1234},
+                "warnings": ["schema repaired"],
+                "brave_query": "Will this test persist?",
+            },
+        }
+
+    monkeypatch.setattr(server, "_VARIANT_FN", fake_variant)
+    client = TestClient(server.app)
+
+    response = client.post(
+        "/predict",
+        json={
+            "event_ticker": "persist-event",
+            "market_ticker": "persist-market",
+            "title": "Will the persisted trace reload?",
+            "category": "Test",
+            "close_time": "2026-12-31T23:59:59Z",
+            "outcomes": ["Yes", "No"],
+        },
+    )
+    assert response.status_code == 200
+
+    server._PREDICTION_HISTORY.clear()
+    persisted = client.get("/predictions").json()
+
+    assert persisted["count"] == 1
+    assert persisted["persisted_count"] == 1
+    assert persisted["predictions"][0]["market_ticker"] == "persist-market"
+    assert persisted["predictions"][0]["trace"]["parse_path"] == "strict-json"
+    assert persisted["predictions"][0]["trace"]["latency_ms"]["total"] == 1234
+    assert persisted["predictions"][0]["variant"] == server._VARIANT_NAME
+
+
+def test_observatory_renders_persisted_prediction_trace(monkeypatch, tmp_path) -> None:
+    store_path = tmp_path / "observatory-predictions.jsonl"
+    monkeypatch.setenv("PROPHET_PREDICTION_STORE_PATH", str(store_path))
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    server._PREDICTION_HISTORY.clear()
+    server._append_prediction_record(
+        {
+            "ts": "2026-05-17T00:01:00+00:00",
+            "event_ticker": "obs-event",
+            "market_ticker": "OBS-MKT",
+            "title": "Will observatory show trace details?",
+            "category": "Test",
+            "p_yes": 0.62,
+            "outcomes": ["Yes", "No"],
+            "probabilities": [
+                {"market": "Yes", "probability": 0.62},
+                {"market": "No", "probability": 0.38},
+            ],
+            "rationale": "visible only behind auth",
+            "evidence_urls": [],
+            "variant": server._VARIANT_NAME,
+            "commit": "abc12345",
+            "trace": {
+                "parse_path": "strict-json",
+                "latency_ms": {"total": 987},
+                "warnings": ["schema repaired"],
+            },
+        },
+        path=store_path,
+    )
+    client = TestClient(server.app)
+
+    response = client.get("/observatory")
+
+    assert response.status_code == 200
+    assert "Recent persisted predictions" in response.text
+    assert "OBS-MKT" in response.text
+    assert "strict-json" in response.text
+    assert "987 ms" in response.text
+    assert "schema repaired" in response.text
+
+
 def test_healthz_reports_served_variant() -> None:
     client = TestClient(server.app)
 

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForecastingPath · Live status</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<meta name="description" content="Live status of the ForecastingPath agent — current variant, deploy commit, predictions served, and headline backtest result. Polls /healthz every 30 seconds.">
+<style>
+  :root {
+    --bg: #fafafa;
+    --panel: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #1d4ed8;
+    --ok: #047857;
+    --ok-soft: #d1fae5;
+    --warn: #b45309;
+    --warn-soft: #fef3c7;
+    --bad: #b91c1c;
+    --bad-soft: #fee2e2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .page { max-width: 920px; margin: 0 auto; padding: 1.4em 1.2em 3em; }
+  header { text-align: center; padding: 1.5em 0 1em; }
+  h1 { margin: 0 0 0.3em; font-size: 1.9rem; letter-spacing: -0.01em; }
+  h1 .accent { color: var(--accent); }
+  .tagline { color: var(--muted); font-size: 0.96em; max-width: 540px; margin: 0 auto; }
+  /* status pill */
+  .status-strip {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 0.5em 1.2em; align-items: center;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1em 1.4em; margin-top: 1.3em;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 0.45em;
+    padding: 0.32em 0.85em; border-radius: 999px;
+    font-weight: 700; font-size: 0.92em;
+  }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .pill.muted { background: #f3f4f6; color: var(--muted); }
+  .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .meta { color: var(--muted); font-size: 0.88em; }
+  code { background: #f3f4f6; padding: 0.12em 0.45em; border-radius: 4px; font-size: 0.92em; }
+  /* sections */
+  section { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+            padding: 1.3em 1.5em; margin-top: 1em; }
+  section h2 { margin: 0 0 0.6em; font-size: 1.1rem; color: var(--accent); letter-spacing: -0.005em; }
+  section p { margin: 0.4em 0; line-height: 1.55; }
+  .big { font-size: 1.7em; font-weight: 700; }
+  .num { font-variant-numeric: tabular-nums; }
+  /* kpi grid */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+          gap: 0.9em; margin-top: 0.4em; }
+  .kpi { background: #f9fafb; border-radius: 8px; padding: 0.85em 1em; }
+  .kpi .lbl { font-size: 0.78em; color: var(--muted); text-transform: uppercase;
+              font-weight: 700; letter-spacing: 0.04em; }
+  .kpi .val { font-size: 1.45em; font-weight: 700; margin-top: 0.18em; }
+  .kpi .sub { font-size: 0.83em; color: var(--muted); margin-top: 0.18em; }
+  /* waiting banner */
+  .waiting {
+    background: linear-gradient(135deg, #fef9c3, #fef3c7);
+    border-color: #fde68a;
+  }
+  .live-active {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border-color: #6ee7b7;
+  }
+  /* actions */
+  .actions { display: flex; flex-wrap: wrap; gap: 0.6em; margin-top: 0.9em; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.4em;
+    padding: 0.55em 1em; border-radius: 7px;
+    font-weight: 650; font-size: 0.93em;
+    text-decoration: none; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-secondary { background: white; color: var(--accent); border-color: var(--border); }
+  .btn-secondary:hover { background: #eef2ff; }
+  /* mini brier ladder */
+  .ladder { display: flex; align-items: flex-end; gap: 0.4em; margin-top: 0.6em; }
+  .ladder .bar { flex: 1; min-width: 40px; }
+  .ladder .bar .l { font-size: 0.74em; color: var(--muted); text-align: center; margin-bottom: 0.2em; }
+  .ladder .bar .v { background: #c7d2fe; border-radius: 4px 4px 0 0;
+                    color: var(--accent); text-align: center; font-weight: 700;
+                    font-variant-numeric: tabular-nums; padding: 0.2em 0; }
+  .ladder .bar.us .v { background: var(--accent); color: white; }
+  footer { color: var(--muted); font-size: 0.85em; text-align: center; margin-top: 2.2em; padding-bottom: 1em; }
+  a { color: var(--accent); text-decoration: none; font-weight: 650; }
+  a:hover { text-decoration: underline; }
+  /* loading skeleton */
+  .skel { background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+          background-size: 200% 100%; animation: skel 1.6s infinite linear;
+          color: transparent !important; border-radius: 4px; }
+  @keyframes skel { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Forecasting<span class="accent">Path</span> · Live status</h1>
+  <p class="tagline">Real-time view of the production agent at <code>agent.forecastingpath.com</code>. Refreshes every 30 seconds.</p>
+</header>
+
+<div class="status-strip">
+  <span id="status-pill" class="pill muted"><span class="dot"></span><span id="status-text">loading...</span></span>
+  <span class="meta">variant <code id="variant">…</code></span>
+  <span class="meta">commit <code id="commit">…</code></span>
+  <span class="meta">team <strong>CanadaHacks · The Oracles</strong></span>
+  <span class="meta">updated <span id="last-poll">just now</span></span>
+</div>
+
+<section id="banner" class="waiting">
+  <h2 id="banner-title">Waiting for the first Prophet Arena call</h2>
+  <p id="banner-body">Endpoint is registered and active. PA's eval cadence is one event every 10 minutes; we will respond within seconds and surface the prediction here.</p>
+</section>
+
+<section>
+  <h2>System at a glance</h2>
+  <div class="kpis">
+    <div class="kpi">
+      <div class="lbl">Predictions served</div>
+      <div class="val num" id="kpi-served">—</div>
+      <div class="sub" id="kpi-served-sub">requires login to read live count</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Uptime</div>
+      <div class="val" id="kpi-uptime">healthy</div>
+      <div class="sub">since last deploy</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Per-call budget</div>
+      <div class="val">~5 s</div>
+      <div class="sub">PA limit: 10 min</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Cost per call</div>
+      <div class="val">~$0.10</div>
+      <div class="sub">Opus 4.7 + Brave free</div>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/login">Sign in to live dashboard</a>
+    <a class="btn btn-secondary" href="/static/summary.html">Research summary</a>
+    <a class="btn btn-secondary" href="/static/summary.pdf">PDF report</a>
+    <a class="btn btn-secondary" href="https://github.com/Robby955/prophet-hacks">GitHub</a>
+  </div>
+</section>
+
+<section>
+  <h2>Backtest result on 26 resolved Prophet Arena events</h2>
+  <p><span class="big num">0.0379</span> mean Brier — production pipeline (Claude Opus 4.7 + Brave retrieval + market-odds anchor + 0.10 longshot floor).</p>
+  <p class="meta">95% paired-bootstrap CI <strong>[0.0143, 0.0374]</strong> on the improvement vs the Sonnet 4.6 baseline (n=26, 50,000 resamples, seed pinned). Interval excludes zero.</p>
+
+  <div class="ladder">
+    <div class="bar us"><div class="l">Opus 4.7 (prod)</div><div class="v" style="height: 14px">0.0379</div></div>
+    <div class="bar"><div class="l">Sonnet 4.6</div><div class="v" style="height: 24px">0.0639</div></div>
+    <div class="bar"><div class="l">Opus 4.6</div><div class="v" style="height: 84px">0.226</div></div>
+    <div class="bar"><div class="l">GPT-5.2</div><div class="v" style="height: 96px">0.258</div></div>
+    <div class="bar"><div class="l">GPT-5.5</div><div class="v" style="height: 120px">0.323</div></div>
+    <div class="bar"><div class="l">Gemini 3.1 Pro</div><div class="v" style="height: 156px">0.415</div></div>
+    <div class="bar"><div class="l">uniform 1/n</div><div class="v" style="height: 82px; background:#e5e7eb; color:#374151">0.219</div></div>
+    <div class="bar"><div class="l">random 0.5</div><div class="v" style="height: 94px; background:#e5e7eb; color:#374151">0.250</div></div>
+  </div>
+  <p class="meta">Same pipeline; only the LLM call swaps. Lower is better. The gap on multi-outcome events is dominated by JSON schema compliance, not reasoning quality.</p>
+</section>
+
+<section>
+  <h2>How the win decomposes</h2>
+  <p>Of the 0.026 Brier improvement, roughly <strong>85% comes from fixing the longshot-floor bug</strong> (the old formula clamped binary predictions to a 0.25 floor); the remaining ~15% is the Sonnet → Opus 4.7 swap.</p>
+  <p class="meta">A post-LLM safety-net bug accounted for more than the model upgrade. Boundary tests for safety nets matter.</p>
+</section>
+
+<footer>
+  <p>Auto-refresh every 30s. Team CanadaHacks · Project <em>The Oracles</em> · Prophet Hacks 2026.</p>
+  <p><a href="/static/summary.html">Full research summary</a> · <a href="https://github.com/Robby955/prophet-hacks/blob/main/docs/FINDINGS.md">FINDINGS.md</a> · <a href="https://github.com/Robby955/prophet-hacks/blob/main/docs/DECISIONS.md">DECISIONS.md</a></p>
+</footer>
+
+</div>
+
+<script>
+// Poll /healthz every 30s and update the status strip + waiting banner.
+// If the user has an authed cookie, also fetch /predictions count.
+async function pollHealth() {
+  const last = document.getElementById('last-poll');
+  try {
+    const t0 = performance.now();
+    const r = await fetch('/healthz', { cache: 'no-store' });
+    const dt = Math.round(performance.now() - t0);
+    if (!r.ok) throw new Error('healthz ' + r.status);
+    const j = await r.json();
+    setStatus('ok', `Live · ${dt} ms`);
+    document.getElementById('variant').textContent = j.variant || '—';
+    document.getElementById('commit').textContent = j.commit || '—';
+    last.textContent = new Date().toLocaleTimeString();
+  } catch (err) {
+    setStatus('bad', 'Not reachable');
+    last.textContent = new Date().toLocaleTimeString();
+  }
+}
+
+function setStatus(kind, text) {
+  const pill = document.getElementById('status-pill');
+  pill.className = 'pill ' + kind;
+  document.getElementById('status-text').textContent = text;
+}
+
+// /predictions is auth-gated; quietly try it. If 401, leave the placeholder.
+async function pollPredictions() {
+  try {
+    const r = await fetch('/predictions', { cache: 'no-store', credentials: 'same-origin' });
+    if (!r.ok) {
+      // 401 means signed-out; leave placeholder. Other errors: silent.
+      return;
+    }
+    const j = await r.json();
+    const n = j.count ?? (j.predictions || []).length;
+    document.getElementById('kpi-served').textContent = String(n);
+    if (n > 0) {
+      const banner = document.getElementById('banner');
+      banner.classList.remove('waiting');
+      banner.classList.add('live-active');
+      document.getElementById('banner-title').textContent = `${n} prediction${n === 1 ? '' : 's'} served`;
+      document.getElementById('banner-body').textContent = 'Latest predictions and full traces are on the live dashboard (sign-in required).';
+      document.getElementById('kpi-served-sub').textContent = 'live count';
+    }
+  } catch (_) {
+    // network blip; ignore
+  }
+}
+
+pollHealth();
+pollPredictions();
+setInterval(pollHealth, 30000);
+setInterval(pollPredictions, 30000);
+</script>
+</body>
+</html>

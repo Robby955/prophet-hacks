@@ -43,6 +43,20 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
   - CI/CD: preflight gate, deploy wrapper, `/healthz` commit SHA, dashboard polish (architecture image, brand fix, favicon, OG tags), commit SHA visible on `/` and `/dashboard`.
   - Dashboard try-form overhauled: example dropdown, description + rules fields, validation, latency display.
 
+## codex/live-frontend-observatory
+
+- **Current task:** Completed public/private frontend split: `/` is now a restrained public status page, `/observatory` is the PIN-gated research and operations console.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `tests/test_pin_auth.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T02:04:09Z
+- **Notes:** No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Public `/` intentionally omits exact model names, retrieval vendor, scoring formulas, GPT/Gemini comparison, and source links during active scoring. Internal `/observatory` keeps the live commit, variant, prediction count, first-call watch, GPT-5.5 answer, experiment board, and adversarial-review notes behind dashboard auth. Verified by focused auth/frontend tests, full `pytest tests/`, local content scrub check, and `./scripts/agent/verify.sh`.
+
+## codex/persistent-observatory
+
+- **Current task:** Completed disk-backed prediction history plus observatory trace table.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `scripts/agent/deploy.sh`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T02:28:26Z
+- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. `scripts/agent/deploy.sh` now deploys a minimal runtime bundle after preflight to avoid the repeated full-repo Railway code-snapshot/TLS upload failures. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `chat_completions_adapter.py`, or Railway env vars changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, and `./scripts/agent/verify.sh`.
+
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
 Concrete asks for Codex. Items 1-5 from the prior list are DONE. This
@@ -169,6 +183,13 @@ during the eval window.
 - **Files owned this session:** `scripts/full_check.sh`, `tests/test_full_check_script.py`, `docs/AGENT_STATUS.md`
 - **Last updated:** 2026-05-17T00:06:29Z
 - **Notes:** Worktree branch `.claude/worktrees/codex-full-check-brave` / `codex/full-check-brave`. Adds full-check step 5 for `scripts/brave_health.sh --quiet`; later checks renumbered to 11 total. Verified with shell syntax check, focused test, full pytest, and `./scripts/agent/verify.sh`.
+
+## codex/bootstrap-ci
+
+- **Current task:** Paired-bootstrap CI plus Phase 2 decomposition implemented and verified.
+- **Files owned this session:** `scripts/bootstrap_brier_ci.py`, `scripts/backtest_forecast.py`, `tests/test_bootstrap_brier_ci.py`, `tests/test_backtest_forecast.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:04:29Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-bootstrap-ci` / `codex/bootstrap-ci`. Result on existing snapshots: Opus Phase 2 Brier 0.037912 vs Sonnet Phase 1 0.063939, mean improvement 0.026027, 95% paired-bootstrap CI [0.014270, 0.037373] from 50,000 resamples, seed 20260516. Local Sonnet rerun with the current floor scored 0.041838: floor fix accounts for 0.022100/0.026027 (~85%) of the headline improvement; Opus vs current-floor Sonnet accounts for 0.003927 (~15%) with 95% CI [-0.004346, 0.015081]. Reports written under ignored `reports/`. Also fixed `scripts/backtest_forecast.py` to use a PATH `prophet` CLI when a worktree has no local `.venv/`.
 
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 

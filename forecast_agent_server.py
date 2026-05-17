@@ -968,32 +968,27 @@ def root() -> str:
     </div>
     <div class="video-meta">
       <p class="eyebrow">2:13 walkthrough</p>
-      <h2>How a forecast actually runs</h2>
-      <p>Public landing, live pipeline demo (Fed rate cut, 5-stage SSE in
-      ~4s), per-event Brier across six models, cross-model agreement
-      heatmap, abstention-threshold slider, multi-outcome Super Bowl
-      and UK PM demos, resolved-event scatter, close.</p>
+      <h2>Watch a forecast run</h2>
+      <p>Live pipeline, per-event Brier, cross-model heatmap, abstain
+      slider, multi-outcome demos.</p>
     </div>
   </section>
 
   <section class="research-shell" aria-label="Research views">
     <header class="research-head">
-      <p class="eyebrow">Research views</p>
-      <h2>Every claim in the report has a page</h2>
-      <p>Public, no auth required. Each page below is the artifact behind
-      one section of the submission report.</p>
+      <p class="eyebrow">Research</p>
+      <h2>Open views</h2>
     </header>
     <div class="research-grid">
-      <a class="research-link" href="/static/gallery_resolved.html"><strong>Resolved-event gallery</strong><em>Per-event Brier across all six models on the 26-event sample-resolved set.</em></a>
-      <a class="research-link" href="/static/heatmap_resolved.html"><strong>Cross-model heatmap</strong><em>Pairwise agreement between models on the same retrieval and prompt.</em></a>
-      <a class="research-link" href="/static/calibration_overlay.html"><strong>Calibration diagram</strong><em>Predicted probability vs empirical frequency across ten bins.</em></a>
-      <a class="research-link" href="/static/scatter_resolved.html"><strong>Per-event scatter</strong><em>Predicted vs actual for every resolved event, colored by Brier.</em></a>
-      <a class="research-link" href="/static/bootstrap_hist.html"><strong>Bootstrap distribution</strong><em>50K paired-bootstrap resamples on the production vs Sonnet delta.</em></a>
-      <a class="research-link" href="/static/pipeline_trace.html"><strong>Pipeline trace</strong><em>One resolved event replayed stage by stage with the raw trace.</em></a>
-      <a class="research-link" href="/static/abstain_slider.html"><strong>Abstain slider</strong><em>Move the confidence cutoff, watch the scoring rule respond.</em></a>
-      <a class="research-link" href="/static/variance.html"><strong>Intra-model variance</strong><em>Five reruns of production showing the noise-floor of σ≈0.0009 on Brier.</em></a>
-      <a class="research-link" href="/static/gallery_open.html"><strong>Open-event gallery</strong><em>Cross-model forecasts on the 3 open PA datasets, 42 events.</em></a>
-      <a class="research-link" href="/compare"><strong>Comparison grid</strong><em>26 resolved events × 6 model variants in one color-coded grid.</em></a>
+      <a class="research-link" href="/static/summary.html"><strong>Summary</strong><em>Headline numbers, calibration, scale validation.</em></a>
+      <a class="research-link" href="/static/gallery_resolved.html"><strong>Resolved gallery</strong><em>Per-event Brier across six models.</em></a>
+      <a class="research-link" href="/static/heatmap_resolved.html"><strong>Cross-model heatmap</strong><em>Pairwise agreement across the lineup.</em></a>
+      <a class="research-link" href="/static/calibration_overlay.html"><strong>Calibration</strong><em>Predicted vs empirical, ten bins.</em></a>
+      <a class="research-link" href="/static/scatter_resolved.html"><strong>Per-event scatter</strong><em>Resolved-event losses, drillable.</em></a>
+      <a class="research-link" href="/static/abstain_slider.html"><strong>Abstain slider</strong><em>Move the confidence cutoff.</em></a>
+      <a class="research-link" href="/static/bootstrap_hist.html"><strong>Bootstrap CI</strong><em>50K resamples on the production delta.</em></a>
+      <a class="research-link" href="/static/pipeline_trace.html"><strong>Pipeline trace</strong><em>One event, stage by stage.</em></a>
+      <a class="research-link" href="/compare"><strong>Comparison grid</strong><em>26 events × 6 variants.</em></a>
     </div>
   </section>
 
@@ -1001,11 +996,6 @@ def root() -> str:
     <header class="research-head">
       <p class="eyebrow">Architecture</p>
       <h2>Five observable stages</h2>
-      <p>Event payload in. Search query built from the question. Evidence
-      retrieved and ranked by source. Forecast call with calibration
-      prompt. Longshot guard floor applied per outcome. Response out.
-      Every stage writes a trace recoverable from the pipeline-trace
-      explorer.</p>
     </header>
     <img src="/static/architecture.svg" alt="Pipeline architecture diagram with five stages" class="arch-svg">
   </section>

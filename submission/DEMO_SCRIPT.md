@@ -11,8 +11,9 @@ seconds; faster is fine.
    - **Tab B**: <https://agent.forecastingpath.com/dashboard> (live pipeline demo)
 2. On Tab B, scroll to the "Pipeline console" section so the "Run live
    demo" button is visible. Do NOT click it yet.
-3. Pick **one** preset card from the four (Fed / UK / Super Bowl / generic)
-   — recommended: **Fed** because the explanation cards are the cleanest.
+3. Pick **one** preset card from the three (Fed rate cut / UK PM /
+   Super Bowl LXI) — recommended: **Fed rate cut** because it's
+   the 2-outcome case and the explanation is the cleanest.
 
 ## Beats (read out loud while screen-recording)
 

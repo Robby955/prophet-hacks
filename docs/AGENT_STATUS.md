@@ -57,6 +57,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T04:35:00Z
 - **Notes:** Root page no longer uses `ForecastingPath` as a giant unbreakable H1. It now uses a bounded `hero-shell` + `status-panel` layout, with compact short-viewport and mobile media rules. Verified locally with Playwright at 2560x328, 1440x900, and 390x844; title/status panel overlap was false and mobile body width stayed at viewport width. No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Untracked `scripts/ablate_retrieval_count.py` and `data/predictions/retrieval_sweep_k3.json` were present during deploy prep and were left untouched.
 
+## codex/public-root-product-polish
+
+- **Current task:** Replaced disclosure-style public copy with a product front door and visual run-loop preview.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T04:47:00Z
+- **Notes:** Public `/` now uses compact copy, a staged run preview, and direct navigation to console, observatory, strategy, and result views. Removed "PIN only", "stay behind", "Detailed traces", and other disclosure-notice phrasing from the public page. New experiment HTML pages under `/static` are dashboard-auth gated: `abstain_slider.html`, `bootstrap_hist.html`, `heatmap_resolved.html`, and `scatter_resolved.html`. Verified with focused root/static auth tests and Playwright at 1440x900 and 390x844; no overlap, no horizontal scroll, no stale copy.
+
 ## codex/persistent-observatory
 
 - **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.

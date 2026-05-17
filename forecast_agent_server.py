@@ -604,8 +604,8 @@ def root() -> str:
   .hero-copy {{ min-width: 0; max-width: 620px; }}
   .eyebrow {{ margin: 0 0 0.85rem; font-size: 0.82rem; font-weight: 780; letter-spacing: 0.12em;
               text-transform: uppercase; color: var(--muted); }}
-  .hero-title {{ margin: 0; max-width: 12ch; font-size: clamp(2.7rem, 5vw, 4.85rem);
-                 line-height: 0.92; letter-spacing: 0; overflow-wrap: anywhere; }}
+  .hero-title {{ margin: 0; max-width: none; font-size: clamp(2.6rem, 4.4vw, 4.05rem);
+                 line-height: 0.94; letter-spacing: 0; overflow-wrap: normal; }}
   .lead {{ max-width: 520px; margin: 1.1rem 0 0; color: var(--muted);
            font-size: clamp(1.02rem, 1.7vw, 1.18rem); }}
   .actions {{ display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.55rem; }}
@@ -704,7 +704,8 @@ def root() -> str:
     .hero-title {{ font-size: 2.35rem; }}
     .lead {{ margin-top: 1rem; font-size: 1rem; }}
     .actions {{ margin-top: 1.2rem; flex-direction: column; align-items: stretch; }}
-    .stage-list, .demo-grid {{ grid-template-columns: 1fr; }}
+    .stage-list {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+    .demo-grid {{ grid-template-columns: 1fr; }}
     .stage {{ min-height: 94px; }}
     .status-panel {{ padding: 0.95rem; }}
     .row {{ padding: 0.6rem 0; }}

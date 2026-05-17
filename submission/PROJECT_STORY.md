@@ -181,12 +181,20 @@ python scripts/backtest_forecast.py \
 
 ## What's next
 
+PA's organizer (Anri) confirmed on Discord that we can keep deploying
+during the scoring window. That changes the next-steps list from
+"things to do after the event" to "things to ship as they clear the
+promotion gate":
+
+- **Mid-window experiments under the same gate.** Any new prompt or
+  retrieval variant has to clear |delta| > 0.01 single-binary Brier
+  with 95% CI excluding zero on the offline backtest before it deploys.
+  Mid-window deploys get tagged in `docs/DECISIONS.md` with SHA + UTC
+  timestamp so the post-event retrospective can attribute live Brier
+  deltas to specific changes.
 - **Run on a non-leaking benchmark.** The 26-event resolved set has
   retrieval leakage (38.5% post-resolution URLs). Re-run on FutureSim's
-  OpenForesight chronological-replay benchmark to get a clean number.
-- **Validate at scale.** Run the production pipeline on PA's
-  `Prophet-Arena-Subset-1200` (1200 resolved events, 46x our sample).
-  Verify the cross-model rankings hold and the leakage rate replicates.
+  OpenForesight chronological-replay benchmark.
 - **Wire abstain-to-market in production.** When PA's live payload
   arrives with snapshotted Polymarket/Kalshi prices, use the
   `pnl_alpha_vs_market` metric in `evaluation/brier.py` to gate when

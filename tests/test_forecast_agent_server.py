@@ -68,6 +68,35 @@ def test_observatory_renders_private_research_console(monkeypatch) -> None:
     assert server._VARIANT_NAME in response.text
 
 
+def test_review_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    monkeypatch.setenv("DASHBOARD_PIN", "123456")
+    client = TestClient(server.app, follow_redirects=False)
+
+    response = client.get("/review", headers={"accept": "text/html"})
+
+    assert response.status_code == 303
+    assert response.headers["location"].startswith("/login")
+    assert "next=%2Freview" in response.headers["location"]
+
+
+def test_review_renders_private_judge_brief(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/review")
+
+    assert response.status_code == 200
+    assert "Judge review brief" in response.text
+    assert "Demo script" in response.text
+    assert "First Prophet Arena call" in response.text
+    assert "Why not GPT-5.5?" in response.text
+    assert "/static/summary.html" in response.text
+    assert "/static/gallery_resolved.html" in response.text
+    assert server._VARIANT_NAME in response.text
+
+
 def test_prediction_store_round_trips_latest_first(tmp_path) -> None:
     store_path = tmp_path / "predictions.jsonl"
     older = {
@@ -558,6 +587,7 @@ def test_dashboard_links_private_research_views(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert "Private research views" in response.text
+    assert "/review" in response.text
     assert "/observatory" in response.text
     assert "/static/summary.html" in response.text
     assert "/static/gallery_resolved.html" in response.text

@@ -802,6 +802,7 @@ def observatory(
       <a href="#live">Live</a>
       <a href="#experiments">Experiments</a>
       <a href="#review">Review</a>
+      <a href="/review">Judge brief</a>
       <a href="/dashboard">Dashboard</a>
       <a href="/static/summary.html">Summary</a>
       <a href="/static/gallery_resolved.html">Resolved gallery</a>
@@ -879,6 +880,136 @@ def observatory(
 <footer>
   Internal page. Avoid screenshots that include raw traces, exact prompts, or experiment deltas during active scoring.
 </footer>
+</body></html>""")
+    _set_dashboard_cookie_if_needed(response, request)
+    return response
+
+
+@app.get("/review", response_class=HTMLResponse)
+def review_brief(
+    request: Request,
+    _: None = Depends(_require_dashboard_auth_redirect),
+) -> HTMLResponse:
+    """Private judge/operator briefing.
+
+    Keep this auth-gated. It intentionally compresses evidence, caveats, and
+    demo order into one page so Rob or another agent can present the system
+    without exposing the full playbook on the public root.
+    """
+    history = _prediction_history_snapshot()
+    prediction_count = len(history)
+    persisted_count = _prediction_store_count()
+    first_call_status = (
+        "PA activity observed" if prediction_count or persisted_count else "waiting for first Prophet Arena call"
+    )
+    response = HTMLResponse(f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForecastingPath · Judge review brief</title>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<style>
+  :root {{
+    --bg: #f7f8fb; --panel: #ffffff; --line: #d8dde6; --ink: #111827;
+    --muted: #667085; --accent: #1d4ed8; --ok: #047857; --warn: #b45309;
+  }}
+  * {{ box-sizing: border-box; }}
+  body {{ margin: 0; background: var(--bg); color: var(--ink);
+          font: 15px/1.54 -apple-system, "Segoe UI", system-ui, sans-serif; }}
+  main {{ max-width: 1180px; margin: 0 auto; padding: 28px 22px 56px; }}
+  header {{ display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 28px; }}
+  h1 {{ margin: 0; font-size: clamp(2.2rem, 5vw, 4.8rem); line-height: 0.96; letter-spacing: 0; }}
+  h2 {{ margin: 0 0 12px; font-size: 0.96rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }}
+  p {{ color: var(--muted); margin: 0.5rem 0; }}
+  a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
+  a:hover {{ text-decoration: underline; }}
+  .nav {{ display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; min-width: 240px; }}
+  .lead {{ max-width: 720px; font-size: 1.05rem; }}
+  .grid {{ display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-top: 16px; }}
+  .section {{ background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }}
+  .span4 {{ grid-column: span 4; }} .span5 {{ grid-column: span 5; }} .span7 {{ grid-column: span 7; }} .span12 {{ grid-column: span 12; }}
+  .proof {{ display: grid; gap: 9px; }}
+  .kv {{ display: flex; justify-content: space-between; gap: 16px; padding-top: 9px; border-top: 1px solid #edf1f7; }}
+  .kv:first-child {{ border-top: 0; padding-top: 0; }}
+  .kv span {{ color: var(--muted); }} .kv strong {{ text-align: right; overflow-wrap: anywhere; }}
+  ol, ul {{ margin: 0; padding-left: 1.1rem; }}
+  li {{ margin: 0.45rem 0; color: #374151; }}
+  table {{ width: 100%; border-collapse: collapse; }}
+  th, td {{ text-align: left; vertical-align: top; border-bottom: 1px solid #edf1f7; padding: 10px 8px; }}
+  th {{ color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; }}
+  tr:last-child td {{ border-bottom: 0; }}
+  code {{ background: #eef2f7; border: 1px solid #dbe3ef; padding: 1px 5px; border-radius: 4px; }}
+  .ok {{ color: var(--ok); }} .warn {{ color: var(--warn); }}
+  @media (max-width: 820px) {{
+    header {{ display: block; }}
+    .nav {{ justify-content: flex-start; margin-top: 16px; }}
+    .span4, .span5, .span7, .span12 {{ grid-column: 1 / -1; }}
+  }}
+</style>
+</head><body>
+<main>
+  <header>
+    <div>
+      <h1>Judge review brief</h1>
+      <p class="lead">A private one-page script for presenting the live system, its evidence, its caveats, and the first-call operating plan without moving details onto the public page.</p>
+    </div>
+    <nav class="nav">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/observatory">Observatory</a>
+      <a href="/static/summary.html">Summary</a>
+      <a href="/static/gallery_resolved.html">Resolved gallery</a>
+      <a href="/static/gallery_open.html">Open gallery</a>
+    </nav>
+  </header>
+
+  <section class="grid">
+    <div class="section span4">
+      <h2>Current proof</h2>
+      <div class="proof">
+        <div class="kv"><span>Live commit</span><strong>{html_escape(_BUILD_COMMIT_SHA)}</strong></div>
+        <div class="kv"><span>Variant</span><strong>{html_escape(_VARIANT_NAME)}</strong></div>
+        <div class="kv"><span>Prediction records</span><strong>{prediction_count} memory / {persisted_count} disk</strong></div>
+        <div class="kv"><span>PA status</span><strong>{html_escape(first_call_status)}</strong></div>
+        <div class="kv"><span>Public posture</span><strong>internals private</strong></div>
+      </div>
+    </div>
+    <div class="section span4">
+      <h2>Demo script</h2>
+      <ol>
+        <li>Open <a href="/">public root</a>; show that it is sparse and does not expose ablations.</li>
+        <li>Open <a href="/dashboard">dashboard</a>; show commit, variant, first-call status, and private links.</li>
+        <li>Run the pipeline demo and point to stage updates plus returned JSON.</li>
+        <li>Open <a href="/static/summary.html">summary</a> for the scored evidence and metric caveats.</li>
+        <li>Open galleries to show per-event behavior instead of only aggregate claims.</li>
+      </ol>
+    </div>
+    <div class="section span4">
+      <h2>First Prophet Arena call</h2>
+      <ul>
+        <li>Check <code>/predictions</code> count and disk persistence.</li>
+        <li>Inspect outcome count, parser path, warnings, and total latency.</li>
+        <li>Compare event shape with the assumptions in the dashboard demo.</li>
+        <li>Do not change the production variant without measured evidence.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="section span12">
+      <h2>Likely questions</h2>
+      <table>
+        <thead><tr><th>Question</th><th>Answer to give</th><th>Evidence link</th></tr></thead>
+        <tbody>
+          <tr><td>Why not GPT-5.5?</td><td>It was tested. The binary subset looked strong, but full endpoint behavior and schema compliance matter; the current report keeps it as an ablation rather than production.</td><td><a href="/static/summary.html">summary report</a></td></tr>
+          <tr><td>Is the backtest enough?</td><td>No. It is small and partially vulnerable to resolved-event retrieval leakage. We treat it as regression evidence, not final proof of live performance.</td><td><a href="/compare">comparison grid</a></td></tr>
+          <tr><td>What makes the system autonomous?</td><td>The endpoint accepts event JSON, retrieves evidence, produces structured probabilities, logs traces, streams operator state, and persists prediction records without manual scoring work.</td><td><a href="/dashboard">dashboard</a></td></tr>
+          <tr><td>What is the biggest current risk?</td><td>First live PA payload shape and scoring behavior are still the decisive unknowns. The first-call checklist exists to inspect that before changing model or prompt.</td><td><a href="/observatory">observatory</a></td></tr>
+          <tr><td>Do we reveal too much publicly?</td><td>The public root is sparse. Exact model names, ablations, galleries, traces, and research reports are dashboard-auth gated.</td><td><a href="/">public root</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
 </body></html>""")
     _set_dashboard_cookie_if_needed(response, request)
     return response
@@ -2584,6 +2715,7 @@ def dashboard(
 <h2>Private research views</h2>
 <p class="meta">These pages are dashboard-auth gated. They are meant for operator review, model debugging, and submission prep, not the public landing page during active scoring.</p>
 <div class="link-grid">
+  <a class="link-card" href="/review"><strong>Judge review brief</strong><span>One-page demo script, likely questions, current proof, and first-call checklist.</span></a>
   <a class="link-card" href="/observatory"><strong>Observatory</strong><span>Live commit, persisted traces, experiment board, and adversarial-review answers.</span></a>
   <a class="link-card" href="/static/summary.html"><strong>Summary report</strong><span>Brier table, bootstrap interval, phase decomposition, calibration plot, and findings.</span></a>
   <a class="link-card" href="/static/gallery_resolved.html"><strong>Resolved gallery</strong><span>Side-by-side per-event losses across production and alternative model runs.</span></a>

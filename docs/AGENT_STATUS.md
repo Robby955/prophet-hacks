@@ -170,12 +170,12 @@ during the eval window.
 - main: refresh before claiming with `git fetch && git log --oneline -1`
 - production live commit: refresh with `curl -s https://agent.forecastingpath.com/healthz | jq .commit`
 - variant: `multi_outcome_retrieval` (Opus 4.7 + market-anchor + 0.10 floor)
-- tests: 247 passing after static-report auth coverage
+- tests: 251 passing after static-report auth coverage and private review brief coverage
 - session spend: ~$13 of "100s" budget
 - watcher: PID 33661, ~5h uptime, no PA activity yet
 - open PRs on GitHub: 0 as of 2026-05-17T02:51Z. Recently merged: #5 SSE pipeline demo, #6 paired Brier bootstrap CI, #7 Brave health in full check, #8 hybrid routing edge tests, #9 ensemble variant tests, #11 observatory design spec, plus side-by-side static galleries on main.
 - public exposure note: root stays sparse. Research/report HTML under `/static` (`summary.html`, `status.html`, `gallery_open.html`, `gallery_resolved.html`) is now dashboard-auth gated; public assets remain public.
-- private UX note: `/dashboard` links the auth-gated observatory, summary report, resolved gallery, open-event gallery, `/compare`, and `/compare-open` from a single "Private research views" section.
+- private UX note: `/dashboard` links the auth-gated `/review` judge brief, observatory, summary report, resolved gallery, open-event gallery, `/compare`, and `/compare-open` from a single "Private research views" section. `/review` is the operator/judge script: current proof, demo order, likely questions, and first-call checklist.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
 - PA general onboarding (prophetarena.co/onboarding): verify current status before claiming; `/v1/chat/completions` shim is live with auth.
 

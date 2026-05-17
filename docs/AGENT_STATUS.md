@@ -191,6 +191,13 @@ during the eval window.
 - **Last updated:** 2026-05-17T00:04:29Z
 - **Notes:** Worktree branch `.claude/worktrees/codex-bootstrap-ci` / `codex/bootstrap-ci`. Result on existing snapshots: Opus Phase 2 Brier 0.037912 vs Sonnet Phase 1 0.063939, mean improvement 0.026027, 95% paired-bootstrap CI [0.014270, 0.037373] from 50,000 resamples, seed 20260516. Local Sonnet rerun with the current floor scored 0.041838: floor fix accounts for 0.022100/0.026027 (~85%) of the headline improvement; Opus vs current-floor Sonnet accounts for 0.003927 (~15%) with 95% CI [-0.004346, 0.015081]. Reports written under ignored `reports/`. Also fixed `scripts/backtest_forecast.py` to use a PATH `prophet` CLI when a worktree has no local `.venv/`.
 
+## codex/ensemble-tests
+
+- **Current task:** Add non-production tests for `predict_ensemble_logit` and `predict_ensemble_leaderboard`.
+- **Files owned this session:** `tests/test_ensemble_variants.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:46:06Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-ensemble-tests` / `codex/ensemble-tests`. Avoids production `multi_outcome_retrieval`, Railway env vars, `forecast_agent_server.py`, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, and `chat_completions_adapter.py`.
+
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.

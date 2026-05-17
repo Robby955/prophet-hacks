@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-05-16T23:40:27Z",
+  "results": [
+    {
+      "mode": "broad",
+      "elapsed_sec": 23.1,
+      "binary": 0.03936,
+      "multi": 0.254,
+      "n_bin": 26,
+      "n_multi": 26
+    },
+    {
+      "mode": "official",
+      "elapsed_sec": 26.8,
+      "binary": 0.03784,
+      "multi": 0.25256,
+      "n_bin": 26,
+      "n_multi": 26
+    },
+    {
+      "mode": "exchanges_only",
+      "elapsed_sec": 23.6,
+      "binary": 0.03657,
+      "multi": 0.23512,
+      "n_bin": 26,
+      "n_multi": 26
+    }
+  ]
+}

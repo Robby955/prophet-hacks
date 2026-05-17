@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-05-16T23:38:14Z",
+  "n_events": 26,
+  "n_market_known": 0,
+  "market_prices": {},
+  "sources": {},
+  "results": [
+    {
+      "threshold": 0.0,
+      "mean_brier": 0.03781923076923078,
+      "n_total": 26,
+      "n_traded": 26,
+      "n_abstained": 0,
+      "n_market_known": 0
+    },
+    {
+      "threshold": 0.05,
+      "mean_brier": 0.03781923076923078,
+      "n_total": 26,
+      "n_traded": 26,
+      "n_abstained": 0,
+      "n_market_known": 0
+    },
+    {
+      "threshold": 0.1,
+      "mean_brier": 0.03781923076923078,
+      "n_total": 26,
+      "n_traded": 26,
+      "n_abstained": 0,
+      "n_market_known": 0
+    },
+    {
+      "threshold": 0.15,
+      "mean_brier": 0.03781923076923078,
+      "n_total": 26,
+      "n_traded": 26,
+      "n_abstained": 0,
+      "n_market_known": 0
+    },
+    {
+      "threshold": 0.2,
+      "mean_brier": 0.03781923076923078,
+      "n_total": 26,
+      "n_traded": 26,
+      "n_abstained": 0,
+      "n_market_known": 0
+    }
+  ]
+}

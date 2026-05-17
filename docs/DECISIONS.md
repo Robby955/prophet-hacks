@@ -384,3 +384,59 @@ parallel review agent operating without the scoring-rule context;
 their measurement on V0/V1 was valid but the strategic implication
 was opposite of what they concluded once we know the actual rule.
 Commit: this commit.
+
+---
+
+## 2026-05-16 (late evening) — Backtest leakage audit: 38.5% of events retrieve post-resolution content
+
+**Audit (`scripts/check_retrieval_leakage.py`, this commit):**
+
+Of 26 events in `sample-resolved`, **10 have at least one evidence URL
+whose path contains word-boundaried "won", "wins", "winner", "champion",
+"final", "results", or similar post-resolution markers** (38.5% of
+events; 23.8% of all retrieved URLs are flagged). A first-pass
+substring match without word boundaries overcounted to 24/26; the
+honest number with `\b` boundaries is 10/26. Both numbers materially
+support the same finding. Examples:
+
+- KXTHEMASKEDSINGER-27JAN01 (resolved 2026-04-03):
+  - <https://variety.com/2026/tv/news/the-masked-singer-season-14-finale-winner-ashlee-simpson-1236704931/>
+  - URL was written AFTER Ashlee Simpson won; Brave indexed it because
+    the event had resolved.
+- KXNHLCALDER-26 (resolved 2026-05-14):
+  - <https://www.espn.com/nhl/story/_/id/45381153/who-won-nhl-rookie-year-winners-year-list>
+- KXTOURNAMENTOFCHAMPIONS-26DEC31 (resolved 2026-04-20):
+  - <https://www.foodnetwork.com/shows/tournament-of-champions/articles/tournament-of-champion-vii-episodic-updates>
+
+**What this means for our reported numbers:**
+
+- Single-binary Brier 0.0378 on the 26-event resolved set is
+  **best-case-with-hindsight**, not expected live performance. The
+  agent has been retrieving the answer.
+- The same leakage applies to every alternative-LLM ablation we ran on
+  this dataset. **Cross-model rankings remain valid** (Opus 4.7 vs
+  Opus 4.6 vs GPT-5.2 etc.) because all variants got the same
+  hindsight benefit. Absolute Brier numbers are all inflated similarly.
+- Live PA performance will be a different distribution: events arrive
+  unresolved, so Brave Search returns only forecasting articles, base
+  rates, and market quotes — not post-resolution recaps.
+- This validates the FutureSim paper's methodology (Goel et al. 2026,
+  arXiv:2605.15188): chronological replay is required to avoid this
+  exact contamination. Our submission cannot retroactively fix it
+  without a snapshotted pre-resolution news corpus.
+
+**What we will report going forward:**
+
+- Submission/REPORT.md and summary.html will gain an explicit
+  "Backtest leakage" disclosure section. The 0.0378 number stays
+  reported (it IS what `prophet forecast evaluate` says) but with
+  a "hindsight upper bound" qualifier.
+- Cross-model rankings remain the central finding because they are
+  leakage-invariant.
+- For live PA scoring, we expect higher absolute Brier than
+  backtest suggests; the headline metric is BSS vs market, which is
+  measured on the live event itself with no leakage opportunity.
+
+Decided by: Claude after running the audit Rob requested as E5.
+Commit: this commit (`scripts/check_retrieval_leakage.py` + the
+findings written into `summary.html` + this entry).

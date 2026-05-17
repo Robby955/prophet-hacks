@@ -1,0 +1,288 @@
+{
+  "n_events": 26,
+  "events_with_any_suspect": 10,
+  "events_with_any_suspect_pct": 38.5,
+  "total_urls": 105,
+  "suspect_urls": 25,
+  "suspect_urls_pct": 23.8,
+  "top_suspect_domains": [
+    {
+      "domain": "www.worldfootball.net",
+      "n": 2
+    },
+    {
+      "domain": "www.espn.com",
+      "n": 2
+    },
+    {
+      "domain": "www.foxsports.com",
+      "n": 1
+    },
+    {
+      "domain": "www.sportingnews.com",
+      "n": 1
+    },
+    {
+      "domain": "www.reuters.com",
+      "n": 1
+    },
+    {
+      "domain": "clubofmozambique.com",
+      "n": 1
+    },
+    {
+      "domain": "www.espn.co.uk",
+      "n": 1
+    },
+    {
+      "domain": "www.nhl.com",
+      "n": 1
+    },
+    {
+      "domain": "www.foodnetworkgossip.com",
+      "n": 1
+    },
+    {
+      "domain": "www.foodnetwork.com",
+      "n": 1
+    },
+    {
+      "domain": "www.primetimer.com",
+      "n": 1
+    },
+    {
+      "domain": "www.tvline.com",
+      "n": 1
+    },
+    {
+      "domain": "variety.com",
+      "n": 1
+    },
+    {
+      "domain": "lifestyle.si.com",
+      "n": 1
+    },
+    {
+      "domain": "wchstv.com",
+      "n": 1
+    }
+  ],
+  "per_event": {
+    "KXITFWMATCH-26MAY12NAJEBS": {
+      "title": "Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32",
+      "resolved_at": "2026-05-13",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXATPCHALLENGERMATCH-26MAY10ROCJOH": {
+      "title": "Who won the Rocha vs Johns ATP Challenger tennis match on May 10, 2026?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXATPCHALLENGERMATCH-26MAY05PERLAL": {
+      "title": "Who won the Perez vs Lalami Laaroussi ATP Challenger tennis match on May 5, 2026",
+      "resolved_at": "2026-05-06",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXATPCHALLENGERMATCH-26MAY05BAXARC": {
+      "title": "Who won the Bax vs Arcon ATP Challenger tennis match on May 5, 2026?",
+      "resolved_at": "2026-05-06",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXWTACHALLENGERMATCH-26MAY05WATOKA": {
+      "title": "Who won the Watson vs Okamura WTA Challenger tennis match on May 5, 2026?",
+      "resolved_at": "2026-05-06",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXCRICKETTESTMATCH-26MAY08PAKBAN": {
+      "title": "Who won the Bangladesh vs Pakistan men's Test cricket match starting May 8, 2026",
+      "resolved_at": "2026-05-12",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA": {
+      "title": "Who won the Glamorgan vs Somerset 2026 County Championship cricket match?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXCOUNTYCHAMPMATCH-26MAY08LEISUS": {
+      "title": "Who won the Sussex vs Leicestershire 2026 County Championship cricket match?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXCOUNTYCHAMPMATCH-26MAY08DURWOR": {
+      "title": "Who won the Worcestershire vs Durham 2026 County Championship cricket match?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXLIGUE1-26": {
+      "title": "Who won the 2025-26 Ligue 1 (French top-flight football)?",
+      "resolved_at": "2026-05-14",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 1,
+      "suspect_examples": [
+        "https://www.foxsports.com/soccer/strasbourg-team-standings"
+      ]
+    },
+    "KXLALIGA-26": {
+      "title": "Who won the 2025-26 La Liga (Spanish top-flight football)?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 2,
+      "suspect_examples": [
+        "https://www.worldfootball.net/competition/co97/spain-primera-division/records-winners-list/",
+        "https://www.sportingnews.com/us/soccer/news/most-la-liga-titles-won-club-barcelona-real-madrid-all-time-list/2db35fa79c97d7fc13f73a72"
+      ]
+    },
+    "KXLIGAPORTUGAL-26": {
+      "title": "Who won the 2025-26 Liga Portugal (Portuguese top-flight football)?",
+      "resolved_at": "2026-05-05",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 3,
+      "suspect_examples": [
+        "https://www.reuters.com/sports/soccer/sporting-beat-vitoria-clinch-portuguese-title-2025-05-17/",
+        "https://clubofmozambique.com/news/sporting-beat-vitoria-to-clinch-portuguese-title-282634/",
+        "https://www.espn.com/soccer/standings/_/league/por.1"
+      ]
+    },
+    "KXSERIEA-26": {
+      "title": "Who won the 2025-26 Serie A (Italian top-flight football)?",
+      "resolved_at": "2026-05-05",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 2,
+      "suspect_examples": [
+        "https://www.worldfootball.net/competition/co111/italy-serie-a/results-and-standings/",
+        "https://www.espn.co.uk/football/team/results/_/id/119/league/ITA.1"
+      ]
+    },
+    "KXEREDIVISIEGAME-26MAY10BREHEE": {
+      "title": "Who won the Breda vs Heerenveen Eredivisie football match on May 10, 2026?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXNBASERIES-26LALOKCR2": {
+      "title": "Who won the Los Angeles Lakers vs Oklahoma City NBA Round 2 playoff series in 20",
+      "resolved_at": "2026-05-12",
+      "n_evidence_urls": 2,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXNHLCALDER-26": {
+      "title": "Who won the 2025-26 NHL Calder Memorial Trophy (Rookie of the Year)?",
+      "resolved_at": "2026-05-14",
+      "n_evidence_urls": 4,
+      "n_suspect_urls": 2,
+      "suspect_examples": [
+        "https://www.nhl.com/news/nhl-calder-memorial-trophy-winners-complete-list-287749198",
+        "https://www.espn.com/nhl/story/_/id/45381153/who-won-nhl-rookie-year-winners-year-list"
+      ]
+    },
+    "KXROASTSUBJECT-30JAN01": {
+      "title": "Who was Netflix's next live roast subject after Tom Brady?",
+      "resolved_at": "2026-05-11",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXTOURNAMENTOFCHAMPIONS-26DEC31": {
+      "title": "Who won Tournament of Champions Season 7 (Food Network)?",
+      "resolved_at": "2026-04-20",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 3,
+      "suspect_examples": [
+        "https://www.foodnetworkgossip.com/2026/02/tournament-of-champions-7-toc-vii.html",
+        "https://www.foodnetwork.com/shows/tournament-of-champions/articles/tournament-of-champion-vii-episodic-updates",
+        "https://www.primetimer.com/features/tournament-of-champions-season-7-premiere-recap-jet-tila-s-big-win-and-a-shocking-elimination"
+      ]
+    },
+    "KXSURVIVORELIMINATION-26APR11": {
+      "title": "Which contestants were eliminated from Survivor Season 50 Episode 7?",
+      "resolved_at": "2026-04-10",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXTHEMASKEDSINGER-27JAN01": {
+      "title": "Who won The Masked Singer Season 14?",
+      "resolved_at": "2026-04-03",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 3,
+      "suspect_examples": [
+        "https://www.tvline.com/2138174/the-masked-singer-season-14-finale-winner-full-cast-revealed/",
+        "https://variety.com/2026/tv/news/the-masked-singer-season-14-finale-winner-ashlee-simpson-1236704931/",
+        "https://lifestyle.si.com/celebrities/masked-singer-season-14-finale-live-recap"
+      ]
+    },
+    "KXWVPRIMARY-01D26": {
+      "title": "Who won the 2026 Democratic primary for West Virginia's 1st Congressional Distri",
+      "resolved_at": "2026-05-13",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 3,
+      "suspect_examples": [
+        "https://wchstv.com/news/local/vince-george-wins-democratic-nod-in-us-house-district-1-race",
+        "https://www.cbsnews.com/pittsburgh/news/election-results-west-virginia-primary-2026/",
+        "https://therealwv.com/2026/05/13/primary-election-results-incumbent-legislators-dominate-while-incumbent-judges-are-swept/"
+      ]
+    },
+    "KXNEXTHUNGARYPM-26MAY01": {
+      "title": "Who became Prime Minister of Hungary after the 2026 election?",
+      "resolved_at": "2026-05-10",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXOHPRIMARY-15D26": {
+      "title": "Who won the 2026 Democratic primary for Ohio's 15th Congressional District?",
+      "resolved_at": "2026-05-06",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 4,
+      "suspect_examples": [
+        "https://www.dispatch.com/story/news/politics/elections/congressional/2026/05/05/democratic-primary-results-for-leonard-vs-miller-15th-congre",
+        "https://www.daytondailynews.com/local/leonard-wins-democratic-primary-for-u-s-house-seat-will-face-carey-in-the-fall/article_efa08e3e-56f0-5",
+        "https://www.caledonianrecord.com/news/national/don-leonard-wins-democratic-nomination-for-u-s-house-in-ohios-15th-congressional-district/art"
+      ]
+    },
+    "KXCOLOMBIASENATE-26": {
+      "title": "Which coalition won the 2026 Colombia Senate election?",
+      "resolved_at": "2026-04-21",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 2,
+      "suspect_examples": [
+        "https://justiceforcolombia.org/progressive-historic-pact-is-biggest-winner-in-congressional-elections/",
+        "https://www.aa.com.tr/en/americas/ruling-historical-pact-alliance-wins-colombia-s-congressional-elections/3855989"
+      ]
+    },
+    "KXVRASCOTUSVOTE-26": {
+      "title": "How many Supreme Court justices voted in favor of Louisiana in Louisiana v. Call",
+      "resolved_at": "2026-04-29",
+      "n_evidence_urls": 5,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    },
+    "KXFEDCHAIRCOUNT-27": {
+      "title": "How many US Senators voted for Trump's Federal Reserve Chair pick (2027 confirma",
+      "resolved_at": "2026-05-14",
+      "n_evidence_urls": 3,
+      "n_suspect_urls": 0,
+      "suspect_examples": []
+    }
+  }
+}

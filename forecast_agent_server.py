@@ -733,7 +733,8 @@ def root() -> str:
       <h1 class="hero-title">ForecastingPath</h1>
       <p class="lead">Forecasts, run history, and experiment views in one place.</p>
       <div class="actions">
-        <a class="btn primary" href="/login?next=/dashboard">Open console</a>
+        <a class="btn primary" href="/static/summary.pdf">Read the report</a>
+        <a class="btn secondary" href="/login?next=/dashboard">Open console</a>
         <a class="btn secondary" href="/login?next=/observatory">View observatory</a>
       </div>
     </div>
@@ -1210,7 +1211,8 @@ def _login_page_html(*, next_path: str, error: str = "") -> str:
     <b>ForecastingPath</b>
   </div>
   <h1>Sign in to view the dashboard</h1>
-  <p>This dashboard is shared by PIN. Get it from Rob.</p>
+  <p>Operator console (PIN-gated). The public submission report is
+     available without sign-in at <a href="/static/summary.pdf">/static/summary.pdf</a>.</p>
   {err_html}
   <form method="post" action="/login" autocomplete="off">
     <input name="pin" type="password" inputmode="numeric" autocomplete="off"

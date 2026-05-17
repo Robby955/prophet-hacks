@@ -256,6 +256,41 @@ def test_favicon_serves_real_icon_when_static_present() -> None:
         assert response.content == b""
 
 
+def test_static_research_html_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    monkeypatch.setenv("DASHBOARD_PIN", "123456")
+    client = TestClient(server.app, follow_redirects=False)
+
+    missing = client.get("/static/summary.html", headers={"accept": "text/html"})
+    present = client.get(
+        "/static/summary.html",
+        headers={"x-dashboard-token": "secret-token"},
+    )
+    asset = client.get("/static/favicon.ico")
+
+    assert missing.status_code == 303
+    assert missing.headers["location"].startswith("/login")
+    assert "next=%2Fstatic%2Fsummary.html" in missing.headers["location"]
+    assert present.status_code == 200
+    assert asset.status_code != 401
+    assert asset.status_code != 303
+
+
+def test_static_gallery_html_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    client = TestClient(server.app)
+
+    missing = client.get("/static/gallery_resolved.html")
+    present = client.get(
+        "/static/gallery_resolved.html",
+        headers={"authorization": "Bearer secret-token"},
+    )
+
+    assert missing.status_code == 401
+    assert present.status_code == 200
+    assert "Side-by-side gallery" in present.text
+
+
 def test_dashboard_allows_local_access_without_token(monkeypatch) -> None:
     monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
     client = TestClient(server.app)

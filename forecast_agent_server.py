@@ -48,8 +48,10 @@ import time
 import uuid
 from datetime import datetime, timezone
 from html import escape as html_escape
+from http.cookies import SimpleCookie
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, quote
 
 import httpx
 from dotenv import load_dotenv
@@ -254,12 +256,76 @@ app = FastAPI(
     openapi_url=None,
 )
 
-# Mount /static for favicon, OG image, architecture diagram. Cached aggressively
-# by browser; small WebP/ICO assets generated from images/ via the scripts/
-# image optimizer.
+class _AuthGatedStaticFiles(StaticFiles):
+    """Serve public assets while keeping research HTML behind dashboard auth."""
+
+    _PROTECTED_PATHS = {
+        "/static/summary.html",
+        "/static/status.html",
+        "/static/gallery_open.html",
+        "/static/gallery_resolved.html",
+    }
+
+    @staticmethod
+    def _scope_headers(scope: dict[str, Any]) -> dict[str, str]:
+        headers: dict[str, str] = {}
+        for raw_key, raw_value in scope.get("headers", []):
+            key = raw_key.decode("latin1").lower()
+            value = raw_value.decode("latin1")
+            headers[key] = value
+        return headers
+
+    @staticmethod
+    def _dashboard_token_from_scope(scope: dict[str, Any]) -> str:
+        headers = _AuthGatedStaticFiles._scope_headers(scope)
+        query = parse_qs((scope.get("query_string") or b"").decode("latin1"))
+        query_token = (query.get("token") or [""])[0]
+        if query_token:
+            return query_token
+        header_token = headers.get("x-dashboard-token", "")
+        if header_token:
+            return header_token
+        auth_header = headers.get("authorization", "")
+        if auth_header.lower().startswith("bearer "):
+            return auth_header[7:].strip()
+        cookie = SimpleCookie()
+        cookie.load(headers.get("cookie", ""))
+        morsel = cookie.get("dashboard_token")
+        return morsel.value if morsel else ""
+
+    @classmethod
+    def _is_static_dashboard_authorized(cls, scope: dict[str, Any]) -> bool:
+        expected = os.environ.get("DASHBOARD_AUTH_TOKEN", "").strip()
+        if not expected:
+            return True
+        supplied = cls._dashboard_token_from_scope(scope)
+        return bool(supplied) and secrets.compare_digest(supplied, expected)
+
+    async def __call__(self, scope, receive, send) -> None:  # type: ignore[no-untyped-def]
+        path = str(scope.get("path") or "")
+        if path in self._PROTECTED_PATHS and not self._is_static_dashboard_authorized(scope):
+            headers = self._scope_headers(scope)
+            if "text/html" in headers.get("accept", "").lower() and os.environ.get("DASHBOARD_PIN", "").strip():
+                response = RedirectResponse(
+                    f"/login?next={quote(path, safe='')}",
+                    status_code=status.HTTP_303_SEE_OTHER,
+                )
+            else:
+                response = Response(
+                    "dashboard authentication required",
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            await response(scope, receive, send)
+            return
+        await super().__call__(scope, receive, send)
+
+
+# Mount /static for favicon, OG image, architecture diagram. Static research
+# HTML is auth-gated by _AuthGatedStaticFiles while assets stay public.
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 if _STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+    app.mount("/static", _AuthGatedStaticFiles(directory=str(_STATIC_DIR)), name="static")
 
 # OpenAI-compatible /v1/chat/completions adapter for PA's general onboarding
 # at prophetarena.co/onboarding. Implemented as a standalone router so the

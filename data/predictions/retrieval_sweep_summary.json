@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-05-16T23:32:48Z",
+  "results": [
+    {
+      "k": 3,
+      "elapsed_sec": 24.0,
+      "binary_mean": 0.06087,
+      "multi_mean": 0.27783,
+      "multi_only_mean": 0.40821,
+      "n_bin": 26,
+      "n_multi": 26,
+      "n_multi_only": 12
+    },
+    {
+      "k": 5,
+      "elapsed_sec": 25.9,
+      "binary_mean": 0.03782,
+      "multi_mean": 0.24357,
+      "multi_only_mean": 0.42858,
+      "n_bin": 26,
+      "n_multi": 26,
+      "n_multi_only": 12
+    },
+    {
+      "k": 8,
+      "elapsed_sec": 23.2,
+      "binary_mean": 0.03868,
+      "multi_mean": 0.21627,
+      "multi_only_mean": 0.36943,
+      "n_bin": 26,
+      "n_multi": 26,
+      "n_multi_only": 12
+    },
+    {
+      "k": 10,
+      "elapsed_sec": 22.1,
+      "binary_mean": 0.05968,
+      "multi_mean": 0.26365,
+      "multi_only_mean": 0.3761,
+      "n_bin": 26,
+      "n_multi": 26,
+      "n_multi_only": 12
+    }
+  ]
+}

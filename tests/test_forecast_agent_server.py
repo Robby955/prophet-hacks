@@ -562,3 +562,15 @@ def test_dashboard_links_private_research_views(monkeypatch) -> None:
     assert "/static/summary.html" in response.text
     assert "/static/gallery_resolved.html" in response.text
     assert "/static/gallery_open.html" in response.text
+
+
+def test_dashboard_copy_matches_sse_refresh_behavior(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert "The page stays live through Server-Sent Events" in response.text
+    assert "Page auto-refreshes every 30s" not in response.text

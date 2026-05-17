@@ -2604,7 +2604,7 @@ def dashboard(
 <li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
 </ul>
 
-<p class="meta" style="margin-top:2em">Page auto-refreshes every 30s. New predictions stream in via Server-Sent Events with a brief highlight animation.</p>
+<p class="meta" style="margin-top:2em">The page stays live through Server-Sent Events. New predictions stream in with a brief highlight animation; form results are not wiped by automatic refresh.</p>
 
 </div>
 <script>

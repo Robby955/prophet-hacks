@@ -352,7 +352,7 @@ class EventRequest(BaseModel):
     title: str
     subtitle: str | None = None
     description: str | None = None
-    category: str
+    category: str | None = None
     rules: str | None = None
     close_time: str
     outcomes: list[str] | None = None

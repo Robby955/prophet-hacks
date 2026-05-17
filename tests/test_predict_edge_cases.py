@@ -122,6 +122,25 @@ def test_missing_required_field_rejected(fake_variant_client):
     assert r.status_code == 422
 
 
+def test_missing_category_accepted(fake_variant_client):
+    """`category` was tightened to optional 2026-05-17 after a live smoke
+    against /predict returned 422 for an event payload without it. The PA
+    schema documents `category` as present, but some events may omit it
+    and completion_rate is a score multiplier we cannot afford to forfeit.
+    """
+    r = fake_variant_client.post("/predict", json={
+        "event_ticker": "T-no-cat", "market_ticker": "T-no-cat",
+        "title": "Will it rain in Chicago tomorrow?",
+        # category intentionally absent
+        "close_time": "2027-01-01T00:00:00Z",
+        "outcomes": ["Yes", "No"],
+    })
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "probabilities" in body
+    assert len(body["probabilities"]) == 2
+
+
 def test_extra_unknown_fields_accepted(fake_variant_client):
     """Schema is extra='allow' so PA can add new event fields without
     breaking us. Extras should pass through transparently."""

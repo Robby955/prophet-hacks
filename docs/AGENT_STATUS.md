@@ -163,6 +163,13 @@ during the eval window.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
 - PA general onboarding (prophetarena.co/onboarding): NOT yet submitted — needs `/v1/chat/completions` shim to be live (deploying as of this commit), then Rob submits the form himself
 
+## codex/bootstrap-ci
+
+- **Current task:** Paired-bootstrap CI script for the Phase 2 Brier delta implemented and verified.
+- **Files owned this session:** `scripts/bootstrap_brier_ci.py`, `tests/test_bootstrap_brier_ci.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:01:08Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-bootstrap-ci` / `codex/bootstrap-ci`. Result on existing snapshots: Opus Phase 2 Brier 0.037912 vs Sonnet Phase 1 0.063939, mean improvement 0.026027, 95% paired-bootstrap CI [0.014270, 0.037373] from 50,000 resamples, seed 20260516. Report written locally to ignored `reports/phase2_brier_bootstrap_ci.json`.
+
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.

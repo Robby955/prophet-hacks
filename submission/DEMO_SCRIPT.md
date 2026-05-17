@@ -68,8 +68,9 @@ the gate. Repo and report linked from the landing. Thanks."
 - If Brave times out: the demo gracefully falls back to no-retrieval.
   Narrate: "and here it gracefully degrades when retrieval is missing —
   same prompt, no evidence." Continue.
-- If the page errors entirely: switch to `/static/gallery.html` (per-event
-  drill-down across five models). It's static evidence of the same story.
+- If the page errors entirely: switch to `/static/gallery_resolved.html`
+  (per-event drill-down across five models). It's static evidence of the
+  same story.
 - If `/healthz` is showing a stale SHA: skip the dashboard beat and walk
   through `/static/summary.html` instead.
 

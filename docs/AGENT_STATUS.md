@@ -167,6 +167,13 @@ during the eval window.
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.
 
+## codex/observatory-design
+
+- **Current task:** Design-only branch for the next auth-gated Observatory surface: live health, prediction traces, experiment matrix, adversarial review, and public/private visibility split.
+- **Files owned this session:** `docs/superpowers/specs/2026-05-16-forecastingpath-observatory-design.md`, `.gitignore`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T01:58:00Z
+- **Notes:** No production code, `static/`, submission artifacts, research findings, decision log, Railway env vars, or production variant touched. Public `/` currently reveals exact model, variant, retrieval recipe, longshot formula, commit SHA, and failure-mode details; design recommends moving those details behind PIN during active scoring. GPT-5.5 was tried and is not a production swap: all-event single-binary Brier 0.0920 vs Opus 4.7 0.0378. `docs/WORKSHOP_PAPER_DRAFT.md` still has stale pre-correction metric claims and should be handled by the content owner.
+
 ## codex/sae-variant
 
 - **Current task:** Offline SAE variant, reliability diagram, and open-event agreement matrix shipped to main and deployed. Cleaning stale longshot-floor docs/scripts found after deploy.

@@ -141,6 +141,36 @@ def test_missing_category_accepted(fake_variant_client):
     assert len(body["probabilities"]) == 2
 
 
+def test_predict_then_dashboard_renders_when_category_absent(fake_variant_client, monkeypatch):
+    """Regression for 2026-05-17 morning incident: making category Optional
+    on EventRequest stored category=None on the prediction record. The
+    dashboard's `html_escape(p.get('category', '?'))` returned None instead
+    of '?' because `dict.get(key, default)` only uses default when the key
+    is MISSING, not when the value is None. AttributeError propagated as
+    a 500 on every /dashboard load until /predictions was full of
+    None-category rows.
+
+    This test exercises the end-to-end path: POST a predict without
+    category, then GET /dashboard, and assert 200. A 500 here was the
+    actual production failure mode.
+    """
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "test-token")
+
+    r = fake_variant_client.post("/predict", json={
+        "event_ticker": "T-dash-regress", "market_ticker": "T-dash-regress",
+        "title": "Will a service render without category?",
+        "close_time": "2027-01-01T00:00:00Z",
+        "outcomes": ["Yes", "No"],
+    })
+    assert r.status_code == 200, r.text
+
+    dash = fake_variant_client.get("/dashboard", cookies={"dashboard_token": "test-token"})
+    assert dash.status_code == 200, (
+        f"dashboard returned {dash.status_code} after a category-less /predict; "
+        f"this was the 2026-05-17 morning production 500"
+    )
+
+
 def test_extra_unknown_fields_accepted(fake_variant_client):
     """Schema is extra='allow' so PA can add new event fields without
     breaking us. Extras should pass through transparently."""

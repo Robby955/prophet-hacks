@@ -2810,7 +2810,7 @@ def dashboard(
             f"<div class='pred-card'>"
             f"<div class='pred-head'>"
             f"<span class='pred-ts'>{html_escape(p['ts'][11:19])}</span>"
-            f"<span class='cat-pill'>{html_escape(p.get('category','?'))}</span>"
+            f"<span class='cat-pill'>{html_escape(p.get('category') or '?')}</span>"
             f"<code class='pred-ticker'>{html_escape(p['market_ticker'])}</code>"
             f"</div>"
             f"<div class='pred-title'>{html_escape(p['title'][:140])}</div>"

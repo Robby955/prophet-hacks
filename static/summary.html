@@ -161,6 +161,9 @@
   </tbody>
 </table>
 
+<h2>Self-critique ablation: Opus 4.7 reviewing its own first-pass</h2>
+<p style="margin-top:0;color:#475066;font-size:0.9rem">Two-pass setup: production first pass, then a second Opus 4.7 call under an adversarial-reviewer system prompt that surfaces overconfidence, under-confidence on favorites, missing longshots, and template-shaped outputs. The critique pass left 22 of 26 events unchanged (judged well-calibrated) and revised 4. Net improvement: <strong>-0.00293</strong> single-binary Brier on this re-run (n=26). One revision corrected a content error (Louisiana's role in a SCOTUS case), three were calibration nudges (flattening to 0.5 with no evidence; pulling overconfident favorites toward 0.75). Modest, real, replicable. Raw output in <code>data/predictions/self_critique.json</code>.</p>
+
 <h2>Calibration curve · production (Opus 4.7) on binary events</h2>
 <figure>
   <img src="summary_calibration.png" alt="Reliability diagram for the production model on 14 binary events">

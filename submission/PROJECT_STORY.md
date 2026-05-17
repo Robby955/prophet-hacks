@@ -116,6 +116,24 @@ ops work were coordinated through `docs/AGENT_STATUS.md` with explicit
 file-ownership claims. That kept parser hardening, offline research
 variants, dashboard work, and deploy tooling from colliding.
 
+## Where this fits
+
+The Oracles is the first hosted product of a larger forecasting curriculum
+and tooling stack. The companion site **TheoremPath** maintains canonical
+topic pages for the techniques this agent uses: proper scoring rules,
+calibration and uncertainty, time-series foundations, state-space models,
+the Kalman filter, particle filters, conformal prediction, e-values and
+anytime-valid inference, martingale theory, stochastic processes. Each
+TheoremPath module links into the agent as a worked example; the agent's
+Brier decomposition, longshot floor, and bootstrap-CI gate point back at
+the relevant theory pages.
+
+The hackathon submission is one artifact of that ecosystem, not a
+one-off. Post-event work brings the agent under the **ForecastPath**
+sub-brand (a curated entry-point into the forecasting modules) at
+`forecastpath.com`, with this codebase remaining the live reference
+implementation.
+
 ## Challenges
 
 - **Deploy bloat.** Three Railway deploys failed silently with TLS
@@ -169,6 +187,22 @@ python scripts/backtest_forecast.py \
 # End-to-end audit against your local instance:
 ./scripts/full_check.sh --host http://localhost:8000
 ```
+
+## What's next
+
+- **Run on a non-leaking benchmark.** The 26-event resolved set has
+  retrieval leakage (38.5% post-resolution URLs). Re-run on FutureSim's
+  OpenForesight chronological-replay benchmark to get a clean number.
+- **Validate at scale.** Run the production pipeline on PA's
+  `Prophet-Arena-Subset-1200` (1200 resolved events, 46x our sample).
+  Verify the cross-model rankings hold and the leakage rate replicates.
+- **Wire abstain-to-market in production.** When PA's live payload
+  arrives with snapshotted Polymarket/Kalshi prices, use the
+  `pnl_alpha_vs_market` metric in `evaluation/brier.py` to gate when
+  the model trades vs. defers to the market price.
+- **Ship the ForecastPath product page.** Bring this agent under the
+  TheoremPath ecosystem at `forecastpath.com` as the live worked example
+  for the calibration, conformal-prediction, and state-space modules.
 
 Live: <https://forecastingpath.com> - Repo:
 <https://github.com/Robby955/prophet-hacks>

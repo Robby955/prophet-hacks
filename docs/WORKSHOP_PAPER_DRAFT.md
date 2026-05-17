@@ -483,7 +483,28 @@ the production lead under single-binary and *narrow or invert* it
 under multi-class. We make no claim about live Prophet Arena
 performance; that result is forthcoming as the eval window opens.
 
-### 4.6 Related work
+### 4.6 Reviewer questions and current answers
+
+The strongest version of the critique is not that the system lacks
+engineering effort; it is that the evidence could be overstated. We
+therefore separate claims we consider established from claims that
+remain contingent on live Prophet Arena calls.
+
+| Reviewer question | Current answer |
+|---|---|
+| Does the resolved-set backtest leak future information? | Yes for absolute performance. The leakage audit finds post-resolution evidence URLs on 10 of 26 events. Treat 0.0378 Brier as best-case-with-hindsight, not expected live performance. |
+| Are cross-model comparisons still informative? | Mostly, because the compared model files share the same retrieval layer. Leakage inflates absolute scores but does not by itself explain the schema-compliance gap between Opus 4.7 and the alternative LLM swaps. |
+| Why not use the best binary score, GPT-5.5? | GPT-5.5 had slightly better single-binary Brier on this sample but catastrophic multi-outcome behavior under the same parser/schema pipeline. The production endpoint must handle arbitrary outcome sets, so binary-only advantage is not enough. |
+| Why not ship the retrieval-count or source-priority ablations? | Both failed the paired-bootstrap promotion rule under the PA CLI metric. Directional deltas on n=26 are research notes, not production authorization. |
+| Why keep market anchoring if some offline rows improve without it? | The live scoring rule is baseline-relative to market performance. When the agent has no measurable edge, returning the market probability is the disciplined action. |
+| What would change the production variant? | A live or chronologically replayed evaluation where the candidate beats production by a practically meaningful margin, the 95% paired interval excludes zero, and the change does not degrade multi-outcome schema compliance. |
+
+The resulting claim is intentionally narrow: the weekend system is a
+traceable, calibrated forecasting pipeline with evidence for relative
+design choices on a small resolved set. It is not yet a settled claim
+about live Prophet Arena performance.
+
+### 4.7 Related work
 
 Goel et al. (2026, FutureSim, arXiv 2605.15188) introduce a benchmark
 that replays real-world events chronologically to evaluate LLM

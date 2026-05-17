@@ -12,7 +12,7 @@
 #   7. /login serves the PIN form (auth surface up)
 #   8. /dashboard redirects browser visitors to /login (auth gate works)
 #   9. /predictions returns JSON 401 to API callers (auth gate works)
-#  10. /static/summary.html and /static/summary.pdf served (artifacts deployed)
+#  10. Static artifact auth/public behavior is correct
 #  11. Watcher process alive (mac notifications working)
 #
 # Pass criteria: every check prints "OK". Non-zero exit otherwise.
@@ -172,16 +172,31 @@ else
   fail "/predictions unexpected code $CODE"
 fi
 
-# 10. Static artifacts served
-echo "[10/11] /static/summary.html + /static/summary.pdf"
-for path in /static/summary.html /static/summary.pdf; do
-  CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HOST$path")
+# 10. Static artifacts: research HTML is auth-gated; PDF remains public
+echo "[10/11] static artifact auth/public behavior"
+CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HOST/static/summary.html")
+if [[ "$CODE" == "401" || "$CODE" == "303" || "$CODE" == "302" ]]; then
+  ok "/static/summary.html unauthenticated code=$CODE"
+else
+  fail "/static/summary.html should be auth-gated, got code $CODE"
+fi
+if [[ -n "${DASHBOARD_AUTH_TOKEN:-}" ]]; then
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+    -H "x-dashboard-token: $DASHBOARD_AUTH_TOKEN" "$HOST/static/summary.html")
   if [[ "$CODE" == "200" ]]; then
-    ok "$path serves 200"
+    ok "/static/summary.html authenticated serves 200"
   else
-    fail "$path unexpected code $CODE"
+    fail "/static/summary.html authenticated unexpected code $CODE"
   fi
-done
+else
+  echo "  $(red WARN) DASHBOARD_AUTH_TOKEN not set; skipping authenticated summary.html check"
+fi
+CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HOST/static/summary.pdf")
+if [[ "$CODE" == "200" ]]; then
+  ok "/static/summary.pdf serves 200"
+else
+  fail "/static/summary.pdf unexpected code $CODE"
+fi
 
 # 11. Watcher alive
 echo "[11/11] watcher process alive"

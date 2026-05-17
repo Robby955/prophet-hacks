@@ -64,6 +64,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T04:47:00Z
 - **Notes:** Public `/` now uses compact copy, a staged run preview, and direct navigation to console, observatory, strategy, and result views. Removed "PIN only", "stay behind", "Detailed traces", and other disclosure-notice phrasing from the public page. New experiment HTML pages under `/static` are dashboard-auth gated: `abstain_slider.html`, `bootstrap_hist.html`, `heatmap_resolved.html`, and `scatter_resolved.html`. Verified with focused root/static auth tests and Playwright at 1440x900 and 390x844; no overlap, no horizontal scroll, no stale copy.
 
+## codex/paper-runbook-demo
+
+- **Current task:** Workshop-paper methodology/related-work polish, zero-spend first-call drill, and demo capture guide.
+- **Files owned this session:** `docs/WORKSHOP_PAPER_DRAFT.md`, `docs/RUNBOOK.md`, `docs/DEMO_CAPTURE_GUIDE.md`, `scripts/first_call_drill.sh`, `scripts/full_check.sh`, `tests/test_first_call_drill_script.py`, `tests/test_full_check_script.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T05:08:00Z
+- **Notes:** No production forecast code, Railway env vars, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `static/` changes. Paper now records the event-level ablation promotion rule and the E3/E4 non-ship results. Runbook now has a no-spend first-call rehearsal command. Demo guide gives a 60-second screencast path and screenshot plan; Computer Use only needed if operating QuickTime/Chrome UI. `scripts/full_check.sh` now expects research HTML to be auth-gated instead of public.
+
 ## codex/persistent-observatory
 
 - **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.

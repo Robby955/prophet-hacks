@@ -205,6 +205,33 @@ this happens. The next ten minutes determine whether we behave as
 designed or quietly degrade. Run the checks below sequentially; do
 not skip ahead.
 
+### Dry-run drill before the first call
+
+Run this once before stepping away from the laptop:
+
+```bash
+DASHBOARD_AUTH_TOKEN="$DASHBOARD_AUTH_TOKEN" \
+  ./scripts/first_call_drill.sh --host https://agent.forecastingpath.com
+```
+
+The drill does **not** call `/predict` and does not spend API budget.
+It checks the live health payload, public-root copy, static research
+auth gates, optional `/predictions` shape when a dashboard token is
+available, and the local watcher process. It is meant to answer:
+
+| Question | Expected before first PA call |
+|---|---|
+| Is the endpoint reachable? | `/healthz` returns `status=ok` and the current commit |
+| Does the public root look safe? | No stale disclosure copy; root has the run preview |
+| Are research views protected? | New static diagrams return 401/303 without auth |
+| Can we inspect predictions immediately? | With token, `/predictions` returns JSON and count |
+| Will Rob get notified? | `watch_predictions.sh` process is alive |
+
+If the drill fails on health, deploy, or auth gates, fix that before
+waiting for PA. If the only warning is "no dashboard token supplied,"
+rerun from a shell where the token is loaded or use the browser
+dashboard manually.
+
 ### Within the first minute
 
 1. **Confirm the call was real, not a probe.** Hit `/predictions`

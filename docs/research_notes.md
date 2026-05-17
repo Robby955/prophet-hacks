@@ -6,6 +6,23 @@ binary markets.
 
 ---
 
+## 2026-05-17 replication note — self-critique is not production-ready
+
+The two-pass "Opus reviews its own first-pass forecast" ablation is unstable
+on the 26-event resolved sample. The initial run improved single-binary Brier
+from `0.04945` to `0.04652` (delta `-0.00293`, 4 changed events). A fresh
+replication at commit `a63d826c` regressed from `0.04945` to `0.05219` (delta
+`+0.00274`, 3 changed events).
+
+Conclusion: keep self-critique as an experimental reviewer surface only. Do
+not route production forecasts through it unless live PA calls expose the same
+failure mode and a measured replicated win appears on comparable event shapes.
+The more defensible next experiment is a cheaper in-prompt verification field
+(`p_initial`, `verification`, final probability) rather than a second model
+call after the first forecast.
+
+---
+
 ## 1. arxiv 2503.01307 — "Cognitive Behaviors that Enable Self-Improving Reasoners" (Gandhi et al., 2025)
 
 Source: <https://arxiv.org/abs/2503.01307>

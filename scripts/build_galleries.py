@@ -142,6 +142,20 @@ def build_resolved() -> str:
                 cells.append(f'<td class="missing">—</td>')
                 continue
             p_yes = float(row.get("p_yes", 0.5))
+            rationale = str(row.get("rationale", ""))
+            parse_failed = (
+                rationale.lower().startswith("llm error")
+                or "unparseable" in rationale.lower()
+            )
+            if parse_failed:
+                # Don't pollute model means with uniform-prior fallback values.
+                cells.append(
+                    f'<td class="brier-cell parse-err" '
+                    f'title="parse/api error — model output unparseable. p_yes={p_yes:.3f} is the uniform-prior fallback, not a real prediction.">'
+                    f'<span class="p">err</span>'
+                    f'<span class="b">no signal</span></td>'
+                )
+                continue
             b = brier_single_binary(p_yes, actual)
             totals[name].append(b)
             per_event_briers.append((name, b))
@@ -222,6 +236,16 @@ def build_resolved() -> str:
 <header>
   <h1>Side-by-side gallery · resolved events</h1>
   <p class="sub">26 events from PA's <code>sample-resolved</code> set, same retrieval + prompt + longshot floor, five LLM swaps. Each cell shows model's <em>p(outcomes[0] wins)</em> and the resulting single-binary Brier (Prophet Arena CLI metric). Color: green = low loss, red = high loss. <strong>Click any row for full per-outcome probabilities, rationales, and evidence URLs.</strong></p>
+  <details class="howread">
+    <summary>How to read this page</summary>
+    <ul>
+      <li><strong>Each column is the same pipeline with a different LLM.</strong> Production (Opus 4.7) outlined in green. All other models run through identical retrieval, prompt, and post-processing — only the LLM call swaps.</li>
+      <li><strong>Per-cell:</strong> top number is the model's probability that <em>outcomes[0]</em> wins (PA's convention). Bottom is the resulting single-binary Brier on this event. Background color: dark green &lt; 0.02, light green &lt; 0.08, yellow &lt; 0.16, orange &lt; 0.30, red ≥ 0.30.</li>
+      <li><strong>Striped <code>err / no signal</code> cells</strong> mean that model failed JSON parsing on this event; the underlying value is a uniform-prior fallback, not a real prediction. Those cells are excluded from the model's mean Brier in the footer.</li>
+      <li><strong>"best Brier" column:</strong> which model scored lowest single-binary Brier on this event. "tie" when within 0.001 — common on binary events where everyone correctly picks 0.90/0.10.</li>
+      <li><strong>Multi-class vs single-binary:</strong> PA's CLI evaluator scores single-binary; their docs describe proper multi-class. The drill-down modal shows all per-outcome probabilities so you can compute either. <a href="/static/summary.html">→ summary report</a> has the dual-metric leaderboard.</li>
+    </ul>
+  </details>
   <p class="links">
     <a href="/static/gallery_open.html">→ open events gallery (no actuals)</a> ·
     <a href="/static/summary.html">→ summary report</a> ·
@@ -294,13 +318,27 @@ def build_open() -> str:
             outcome0 = outcomes[0] if outcomes else "?"
 
             cells: list[str] = []
+            valid_ps: list[float] = []
             for display, _, _ in OPEN_MODELS:
                 row = model_preds[display].get(ticker)
                 if not row:
                     cells.append('<td class="missing">—</td>')
                     continue
                 p_yes = float(row.get("p_yes", 0.5))
-                # Color cell by confidence (distance from 0.5).
+                rationale = str(row.get("rationale", ""))
+                parse_failed = (
+                    rationale.lower().startswith("llm error")
+                    or "unparseable" in rationale.lower()
+                )
+                if parse_failed:
+                    cells.append(
+                        f'<td class="p-cell parse-err" '
+                        f'title="parse/api error — uniform-prior fallback, not a real prediction. snippet: {html.escape(rationale[:140])}">'
+                        f'<span class="p">err</span>'
+                        f'<span class="b">no signal</span></td>'
+                    )
+                    continue
+                valid_ps.append(p_yes)
                 conf = abs(p_yes - 0.5) * 2
                 shade = int(255 - conf * 100)
                 cells.append(
@@ -310,11 +348,8 @@ def build_open() -> str:
                     f'</td>'
                 )
 
-            # Cross-model spread on p(outcome[0]) — surfacing disagreement.
-            ps = [float(model_preds[d].get(ticker, {}).get("p_yes", float("nan")))
-                  for d, _, _ in OPEN_MODELS]
-            ps_valid = [p for p in ps if p == p]
-            spread = max(ps_valid) - min(ps_valid) if len(ps_valid) >= 2 else 0.0
+            # Cross-model spread on p(outcome[0]) — only across SUCCESSFUL parses.
+            spread = (max(valid_ps) - min(valid_ps)) if len(valid_ps) >= 2 else 0.0
             spread_color = "#f5b7b1" if spread > 0.3 else "#fad9b3" if spread > 0.15 else "#d8efc7"
 
             rows_html.append(
@@ -347,7 +382,17 @@ def build_open() -> str:
     body = f"""
 <header>
   <h1>Side-by-side gallery · open events</h1>
-  <p class="sub">42 unresolved events across PA's three open sample datasets (Economics, Entertainment, Sports). Same retrieval + prompt as production, three alternative LLMs swapped in. No actuals yet — instead the <em>cross-model spread</em> column surfaces where models disagree (red = high spread, useful as a triage signal when live events arrive).</p>
+  <p class="sub">42 unresolved events across PA's three open sample datasets (Economics, Entertainment, Sports). Same retrieval + prompt as production, five alternative LLMs swapped in. No actuals yet — instead the <em>cross-model spread</em> column surfaces where models disagree (red = high spread, useful as a triage signal when live events arrive).</p>
+  <details class="howread">
+    <summary>How to read this page</summary>
+    <ul>
+      <li><strong>Each column is the same pipeline with a different LLM.</strong> Five model swaps share identical retrieval + prompt + post-processing.</li>
+      <li><strong>Per-cell:</strong> model's probability for <em>outcomes[0]</em> (PA's "first outcome" convention). Darker shading = more confident (further from 0.5). Hover for the exact number and the outcome label.</li>
+      <li><strong>Striped <code>err / no signal</code> cells</strong> mean that model failed JSON parsing on this event; the uniform-prior fallback (1/n) is NOT a real prediction. Common on multi-outcome events where the LLM emits malformed JSON, fenced markdown, or labels not in the supplied outcomes list. These cells are excluded from the cross-model spread.</li>
+      <li><strong>Cross-model spread</strong> = max(p) − min(p) across successful parses for outcomes[0]. Red &gt; 0.3 marks events where models disagree most — those are where retrieval coverage or category specialization matter most.</li>
+      <li><strong>Why does <em>outcomes[0]</em> have such different probabilities across models?</strong> For multi-outcome ordinal questions (e.g. "what range will Germany Q1 GDP fall into?") the outcomes are <em>cumulative bands</em> that overlap by design. A model that puts mass on "Above 0.5%" should still rate "Above -0.4%" high. When you see one model at 92% and another at 7%, that's almost always a parse failure on the 7% side, not a real disagreement.</li>
+    </ul>
+  </details>
   <p class="links">
     <a href="/static/gallery_resolved.html">→ resolved events gallery</a> ·
     <a href="/static/summary.html">→ summary report</a> ·
@@ -396,6 +441,14 @@ table.gallery .brier-cell span.b { display: block; color: #475066; font-size: 11
 table.gallery .brier-cell.prod-cell { box-shadow: inset 0 0 0 2px rgba(30, 111, 58, 0.4); }
 table.gallery .spread-cell { text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 80px; }
 table.gallery .missing { text-align: center; color: #b0b7c4; }
+table.gallery .parse-err { background: repeating-linear-gradient(45deg, #f4f6fa, #f4f6fa 6px, #e6e9f0 6px, #e6e9f0 12px) !important; color: #6a7388; text-align: center; }
+table.gallery .parse-err .p { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+table.gallery .parse-err .b { font-size: 10px; }
+details.howread { max-width: 1400px; margin: 8px auto 0; background: #fbfaf3; border: 1px solid #e8e1c0; border-radius: 6px; padding: 6px 14px; }
+details.howread summary { cursor: pointer; font-weight: 600; font-size: 13px; color: #5f5230; padding: 4px 0; }
+details.howread ul { margin: 6px 0 10px; padding-left: 20px; font-size: 13px; line-height: 1.55; color: #1a1f2c; }
+details.howread li { margin: 4px 0; }
+details.howread code { background: #ebe6cf; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
 table.gallery tfoot td { background: #f4f6fa; border-top: 2px solid #d0d6e1; font-size: 13px; }
 .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; background: #e0e5ee; color: #475066; }
 .pill-sports { background: #d9eafa; color: #2856a3; }

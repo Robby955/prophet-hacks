@@ -146,6 +146,43 @@ def _compute_open_agreement() -> dict:
     return out
 
 
+def _load_self_critique_runs() -> list[dict[str, Any]]:
+    runs: list[dict[str, Any]] = []
+    pred_dir = ROOT / "data/predictions"
+    for path in sorted(pred_dir.glob("self_critique*.json")):
+        try:
+            data = json.loads(path.read_text())
+        except json.JSONDecodeError:
+            continue
+        before = data.get("first_pass_mean_brier_binary")
+        after = data.get("critique_mean_brier_binary")
+        delta = data.get("delta")
+        if before is None or after is None or delta is None:
+            continue
+        runs.append({
+            "file": path.name,
+            "timestamp": data.get("timestamp", "unknown"),
+            "git_sha": data.get("git_sha", "unknown"),
+            "before": float(before),
+            "after": float(after),
+            "delta": float(delta),
+            "changed": int(data.get("n_events_changed", 0)),
+            "n": len(data.get("predictions", [])),
+        })
+    return sorted(runs, key=lambda r: (r["timestamp"], r["file"]))
+
+
+def _load_murphy_rows() -> list[dict[str, Any]]:
+    path = ROOT / "data/predictions/murphy_decomposition.json"
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return []
+    return data if isinstance(data, list) else []
+
+
 def _compute_summary() -> dict[str, Any]:
     resolved = json.loads((ROOT / "data/resolved.json").read_text())
     by_ticker = {e["market_ticker"]: e for e in resolved}
@@ -209,6 +246,8 @@ def _compute_summary() -> dict[str, Any]:
 
     # Open-event multi-model agreement (Codex's offline ablations)
     open_summary = _compute_open_agreement()
+    self_critique_runs = _load_self_critique_runs()
+    murphy_rows = _load_murphy_rows()
 
     git_sha = "unknown"
     try:
@@ -226,6 +265,8 @@ def _compute_summary() -> dict[str, Any]:
         "per_model": per_model,
         "baselines": {"random_binary": 0.250, "uniform_prior": 0.219},
         "open_summary": open_summary,
+        "self_critique_runs": self_critique_runs,
+        "murphy_rows": murphy_rows,
     }
 
 
@@ -275,6 +316,42 @@ def _render_html(s: dict[str, Any]) -> str:
     boot_hi = BOOTSTRAP_CI["ci_high"]
     boot_n_resamples = BOOTSTRAP_CI["n_resamples"]
     boot_seed = BOOTSTRAP_CI["seed"]
+    self_critique_runs = s.get("self_critique_runs", [])
+    self_critique_rows = "".join(
+        "<tr>"
+        f"<td><code>{r['file']}</code></td>"
+        f"<td>{r['before']:.5f}</td>"
+        f"<td>{r['after']:.5f}</td>"
+        f"<td>{r['delta']:+.5f}</td>"
+        f"<td>{r['changed']} / {r['n']}</td>"
+        f"<td><code>{r['git_sha']}</code></td>"
+        "</tr>"
+        for r in self_critique_runs
+    )
+    if self_critique_runs:
+        n_improved = sum(1 for r in self_critique_runs if r["delta"] < 0)
+        delta_min = min(r["delta"] for r in self_critique_runs)
+        delta_max = max(r["delta"] for r in self_critique_runs)
+        self_critique_note = (
+            f"{n_improved}/{len(self_critique_runs)} runs improved single-binary Brier; "
+            f"observed delta range [{delta_min:+.5f}, {delta_max:+.5f}]. "
+            "This remains an experimental reviewer pass, not the production variant, "
+            "until live PA calls show the same failure mode and a measured win."
+        )
+    else:
+        self_critique_note = (
+            "No self-critique runs found. Treat this as an untested idea, not a result."
+        )
+    murphy_rows = "".join(
+        "<tr>"
+        f"<td>{'<strong>' + r['variant'] + '</strong>' if r.get('variant') == 'Opus 4.7 (production)' else r.get('variant', 'unknown')}</td>"
+        f"<td style='text-align:right'>{float(r.get('REL', 0.0)):.5f}</td>"
+        f"<td style='text-align:right'>{float(r.get('RES', 0.0)):.5f}</td>"
+        f"<td style='text-align:right'>{float(r.get('UNC', 0.0)):.5f}</td>"
+        f"<td style='text-align:right'>{float(r.get('BS_direct', r.get('BS_decomp', 0.0))):.5f}</td>"
+        "</tr>"
+        for r in s.get("murphy_rows", [])
+    )
 
     return f"""<!doctype html>
 <html lang="en"><head>
@@ -334,6 +411,10 @@ def _render_html(s: dict[str, Any]) -> str:
   <div class="kpi"><div class="lbl">vs random</div><div class="val">{(1 - s['per_model']['Opus 4.7 (production)']['mean_brier'] / s['baselines']['random_binary']) * 100:.0f}%</div></div>
 </div>
 
+<h2>Pipeline architecture</h2>
+<p class="meta">Five work stages, two safety nets (longshot floor + JSON parser ladder), observability via JSONL trace and Railway volume.</p>
+<img src="/static/architecture.svg" alt="Pipeline architecture: PA webhook to query to retrieve to dedupe to Opus 4.7 forecast to longshot floor and renormalize to per-outcome probabilities" style="width:100%;max-width:980px;height:auto;display:block;margin:0.5em auto;border:1px solid #e6e9f0;border-radius:8px;background:white"/>
+
 <h2>Multi-model Brier comparison (same pipeline, swap the LLM)</h2>
 <table>
   <thead><tr>
@@ -380,6 +461,13 @@ def _render_html(s: dict[str, Any]) -> str:
   <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
 </div>
 
+<h2>Brier decomposition (Murphy 1973): REL - RES + UNC</h2>
+<p class="meta">Same prediction files, decomposed. <strong>REL down</strong> (lower better) = miscalibration; <strong>RES up</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance. GPT-5.5 is better calibrated by REL than production in this sample, but has lower RES, so its direct Brier is worse.</p>
+<table>
+  <thead><tr><th>Variant</th><th style="text-align:right">REL</th><th style="text-align:right">RES</th><th style="text-align:right">UNC</th><th style="text-align:right">Brier</th></tr></thead>
+  <tbody>{murphy_rows or '<tr><td colspan="5">No decomposition file found.</td></tr>'}</tbody>
+</table>
+
 <h2>Calibration curve · production (Opus 4.7) on binary events</h2>
 <figure>
   <img src="summary_calibration.png" alt="Reliability diagram for the production model on 14 binary events">
@@ -394,6 +482,13 @@ def _render_html(s: dict[str, Any]) -> str:
   </tbody>
 </table>
 <p class="meta">Models: Opus 4.7 (prod), Opus 4.6, Sonnet 4.6, GPT-5.2. Same pipeline; only the LLM call swaps. Spread = max(p_yes) − min(p_yes) across the 4 models per event. Consensus events likely have informative evidence; contested events flag where models genuinely disagree. Full per-event matrix on the auth-protected <code>/compare-open</code> page.</p>
+
+<h2>Self-critique ablation · replication log</h2>
+<table>
+  <thead><tr><th>Run file</th><th>First pass</th><th>After critique</th><th>Delta</th><th>Changed</th><th>Git</th></tr></thead>
+  <tbody>{self_critique_rows or '<tr><td colspan="6">No self-critique runs found.</td></tr>'}</tbody>
+</table>
+<p class="meta">{self_critique_note}</p>
 
 <h2>Per-event Brier · production model</h2>
 <figure>
@@ -618,6 +713,9 @@ def _render_pdf(s: dict[str, Any], pdf_path: Path) -> None:
             "   Parser hardening (5 stages), fuzzy outcome matching, outcomes-\n"
             "   missing safety net. Verify gate now loud after silently\n"
             "   swallowing pytest failures for an entire session.\n\n"
+            "5. Self-critique is not a production change.\n"
+            "   Initial run improved by -0.00293 Brier; fresh replication\n"
+            "   regressed by +0.00274. Treat it as a research hypothesis.\n\n"
             "Honest caveats\n\n"
             "• 26 events is a small sample, skewed toward binary tennis matches.\n"
             "• Live Prophet Arena performance may differ by category mix.\n"

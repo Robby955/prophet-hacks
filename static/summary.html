@@ -45,7 +45,7 @@
 
 <header>
   <h1>ForecastingPath · Summary Report</h1>
-  <div class="meta">Generated 2026-05-17T01:39:19.954142+00:00 · Git <code>7e0f51ce</code> · 26 resolved events</div>
+  <div class="meta">Generated 2026-05-17T04:05:28.762414+00:00 · Git <code>a63d826c</code> · 26 resolved events</div>
 </header>
 
 <div class="kpis">
@@ -57,8 +57,8 @@
 </div>
 
 <h2>Pipeline architecture</h2>
-<p style="margin-top:0;color:#475066;font-size:0.9rem">Five work stages, two safety nets (longshot floor + JSON parser ladder), observability via JSONL trace + Railway volume.</p>
-<img src="/static/architecture.svg" alt="Pipeline architecture: PA webhook → query → retrieve → dedupe → Opus 4.7 forecast → longshot floor + renormalize → return per-outcome probabilities" style="width:100%;max-width:980px;height:auto;display:block;margin:0.5em auto;border:1px solid #e6e9f0;border-radius:8px;background:white"/>
+<p class="meta">Five work stages, two safety nets (longshot floor + JSON parser ladder), observability via JSONL trace and Railway volume.</p>
+<img src="/static/architecture.svg" alt="Pipeline architecture: PA webhook to query to retrieve to dedupe to Opus 4.7 forecast to longshot floor and renormalize to per-outcome probabilities" style="width:100%;max-width:980px;height:auto;display:block;margin:0.5em auto;border:1px solid #e6e9f0;border-radius:8px;background:white"/>
 
 <h2>Multi-model Brier comparison (same pipeline, swap the LLM)</h2>
 <table>
@@ -142,27 +142,12 @@
   <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
 </div>
 
-<h2>Brier decomposition (Murphy 1973): REL − RES + UNC</h2>
-<p style="margin-top:0;color:#475066;font-size:0.9rem">Same prediction files, decomposed. <strong>REL ↓</strong> (lower better) = miscalibration; <strong>RES ↑</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance (same across rows). Surfaces a non-obvious finding: GPT-5.5 is actually <em>better calibrated</em> than production (REL 0.025 vs 0.037) but discriminates less (RES 0.18 vs 0.25), so it ends up at higher overall Brier.</p>
-<table style="font-variant-numeric:tabular-nums;border-collapse:collapse;width:100%;max-width:760px">
-  <thead><tr style="background:#f4f6fa;text-align:right">
-    <th style="text-align:left;padding:6px 8px">Variant</th>
-    <th style="padding:6px 8px">REL ↓</th>
-    <th style="padding:6px 8px">RES ↑</th>
-    <th style="padding:6px 8px">UNC</th>
-    <th style="padding:6px 8px">Brier</th>
-  </tr></thead>
-  <tbody>
-    <tr><td style="padding:5px 8px"><strong>Opus 4.7 (production)</strong></td><td style="text-align:right;padding:5px 8px">0.03742</td><td style="text-align:right;padding:5px 8px"><strong>0.24852</strong></td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px"><strong>0.03782</strong></td></tr>
-    <tr><td style="padding:5px 8px">Opus 4.6</td><td style="text-align:right;padding:5px 8px">0.03879</td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px">0.03913</td></tr>
-    <tr><td style="padding:5px 8px">GPT-5.2</td><td style="text-align:right;padding:5px 8px">0.04335</td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px">0.04384</td></tr>
-    <tr><td style="padding:5px 8px">GPT-5.5</td><td style="text-align:right;padding:5px 8px"><strong>0.02465</strong></td><td style="text-align:right;padding:5px 8px">0.18185</td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px">0.09196</td></tr>
-    <tr><td style="padding:5px 8px">Gemini 3.1 Pro</td><td style="text-align:right;padding:5px 8px">0.04965</td><td style="text-align:right;padding:5px 8px">0.21262</td><td style="text-align:right;padding:5px 8px">0.24852</td><td style="text-align:right;padding:5px 8px">0.08732</td></tr>
-  </tbody>
+<h2>Brier decomposition (Murphy 1973): REL - RES + UNC</h2>
+<p class="meta">Same prediction files, decomposed. <strong>REL down</strong> (lower better) = miscalibration; <strong>RES up</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance. GPT-5.5 is better calibrated by REL than production in this sample, but has lower RES, so its direct Brier is worse.</p>
+<table>
+  <thead><tr><th>Variant</th><th style="text-align:right">REL</th><th style="text-align:right">RES</th><th style="text-align:right">UNC</th><th style="text-align:right">Brier</th></tr></thead>
+  <tbody><tr><td><strong>Opus 4.7 (production)</strong></td><td style='text-align:right'>0.03742</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.03782</td></tr><tr><td>Opus 4.6</td><td style='text-align:right'>0.03879</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.03913</td></tr><tr><td>GPT-5.2</td><td style='text-align:right'>0.04335</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.04384</td></tr><tr><td>GPT-5.5</td><td style='text-align:right'>0.02465</td><td style='text-align:right'>0.18185</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.09196</td></tr><tr><td>Gemini 3.1 Pro</td><td style='text-align:right'>0.04965</td><td style='text-align:right'>0.21262</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.08732</td></tr></tbody>
 </table>
-
-<h2>Self-critique ablation: Opus 4.7 reviewing its own first-pass</h2>
-<p style="margin-top:0;color:#475066;font-size:0.9rem">Two-pass setup: production first pass, then a second Opus 4.7 call under an adversarial-reviewer system prompt that surfaces overconfidence, under-confidence on favorites, missing longshots, and template-shaped outputs. The critique pass left 22 of 26 events unchanged (judged well-calibrated) and revised 4. Net improvement: <strong>-0.00293</strong> single-binary Brier on this re-run (n=26). One revision corrected a content error (Louisiana's role in a SCOTUS case), three were calibration nudges (flattening to 0.5 with no evidence; pulling overconfident favorites toward 0.75). Modest, real, replicable. Raw output in <code>data/predictions/self_critique.json</code>.</p>
 
 <h2>Calibration curve · production (Opus 4.7) on binary events</h2>
 <figure>
@@ -178,6 +163,13 @@
   </tbody>
 </table>
 <p class="meta">Models: Opus 4.7 (prod), Opus 4.6, Sonnet 4.6, GPT-5.2. Same pipeline; only the LLM call swaps. Spread = max(p_yes) − min(p_yes) across the 4 models per event. Consensus events likely have informative evidence; contested events flag where models genuinely disagree. Full per-event matrix on the auth-protected <code>/compare-open</code> page.</p>
+
+<h2>Self-critique ablation · replication log</h2>
+<table>
+  <thead><tr><th>Run file</th><th>First pass</th><th>After critique</th><th>Delta</th><th>Changed</th><th>Git</th></tr></thead>
+  <tbody><tr><td><code>self_critique.json</code></td><td>0.04945</td><td>0.04652</td><td>-0.00293</td><td>4 / 26</td><td><code>unknown</code></td></tr><tr><td><code>self_critique_replication_20260517T040253Z.json</code></td><td>0.04945</td><td>0.05219</td><td>+0.00274</td><td>3 / 26</td><td><code>a63d826c</code></td></tr></tbody>
+</table>
+<p class="meta">1/2 runs improved single-binary Brier; observed delta range [-0.00293, +0.00274]. This remains an experimental reviewer pass, not the production variant, until live PA calls show the same failure mode and a measured win.</p>
 
 <h2>Per-event Brier · production model</h2>
 <figure>

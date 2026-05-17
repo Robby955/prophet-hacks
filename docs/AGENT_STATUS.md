@@ -177,6 +177,8 @@ during the eval window.
 - public exposure note: root stays sparse. Research/report HTML under `/static` (`summary.html`, `status.html`, `gallery_open.html`, `gallery_resolved.html`) is now dashboard-auth gated; public assets remain public.
 - private UX note: `/dashboard` links the auth-gated `/review` judge brief, observatory, summary report, resolved gallery, open-event gallery, `/compare`, and `/compare-open` from a single "Private research views" section. `/review` is the operator/judge script: current proof, demo order, likely questions, and first-call checklist.
 - first-call triage note: `/dashboard` now has a dedicated "First-call triage" block. Before PA activity it shows the inspection checklist; after a prediction enters memory it summarizes event, outcome count, total latency, parse path, warnings, and evidence URL count.
+- self-critique ablation note: do **not** promote the two-pass reviewer to production. Initial run improved single-binary Brier by `-0.00293`; fresh replication at `a63d826c` regressed by `+0.00274`. `/static/summary.html` now reports both runs as an experimental replication log, not as a settled win.
+- gallery scoring note: parse/API failures in the resolved/open galleries now render as `err / no signal` and are excluded from display means/spread rather than being treated as uniform-prior predictions.
 - PA hackathon submission: registered, team KODWBT, forecast check passed (PA's own form returned 200 + valid 4-outcome response)
 - PA general onboarding (prophetarena.co/onboarding): verify current status before claiming; `/v1/chat/completions` shim is live with auth.
 

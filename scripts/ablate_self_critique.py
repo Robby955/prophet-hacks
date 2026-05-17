@@ -16,9 +16,11 @@ distributions per event for later analysis.
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import os
+import subprocess
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -36,6 +38,8 @@ from anthropic import Anthropic  # noqa: E402
 import forecast_track  # noqa: E402
 
 log = logging.getLogger("self_critique")
+
+_CRITIQUE_MODEL = "claude-opus-4-7"
 
 _CRITIQUE_SYSTEM = """\
 You are an adversarial reviewer of probabilistic forecasts. You will be
@@ -89,7 +93,7 @@ def _critique_one(event: dict[str, Any], first_pass: dict[str, Any]) -> dict[str
 
     try:
         resp = client.messages.create(
-            model="claude-opus-4-7",
+            model=_CRITIQUE_MODEL,
             max_tokens=1500,
             system=_CRITIQUE_SYSTEM,
             messages=[{"role": "user", "content": user_msg}],
@@ -141,14 +145,41 @@ def _critique_one(event: dict[str, Any], first_pass: dict[str, Any]) -> dict[str
     }
 
 
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run the Opus self-critique ablation on resolved events.",
+    )
+    parser.add_argument("--events", default="data/resolved.json")
+    parser.add_argument("--actuals", default="data/actuals.json")
+    parser.add_argument(
+        "--output",
+        default="data/predictions/self_critique.json",
+        help="Output JSON path. Use a new name for replication runs.",
+    )
+    parser.add_argument("--max-workers", type=int, default=4)
+    return parser.parse_args()
+
+
+def _git_sha() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short=8", "HEAD"],
+            text=True,
+            timeout=2,
+        ).strip()
+    except Exception:
+        return "unknown"
+
+
 def main() -> int:
+    args = _parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     if not os.getenv("ANTHROPIC_API_KEY"):
         print("ANTHROPIC_API_KEY missing", file=sys.stderr)
         return 2
 
-    events = json.load(open("data/resolved.json"))
-    actuals = json.load(open("data/actuals.json"))
+    events = json.load(open(args.events))
+    actuals = json.load(open(args.actuals))
 
     # Run production first-pass on all events (parallel, 4 workers).
     log.info("running first-pass forecasts on %d events", len(events))
@@ -164,7 +195,7 @@ def main() -> int:
                  "probabilities": [], "evidence_urls": []}
         return t, {"market_ticker": t, **r}
 
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    with ThreadPoolExecutor(max_workers=args.max_workers) as ex:
         futures = [ex.submit(_first, e) for e in events]
         for fut in as_completed(futures):
             t, r = fut.result()
@@ -175,7 +206,7 @@ def main() -> int:
     # Run critique pass.
     log.info("running self-critique on %d events", len(events))
     critiques: dict[str, dict[str, Any]] = {}
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    with ThreadPoolExecutor(max_workers=args.max_workers) as ex:
         futures = {ex.submit(_critique_one, e, first_passes[e["market_ticker"]]): e
                    for e in events}
         for fut in as_completed(futures):
@@ -213,14 +244,21 @@ def main() -> int:
 
     out = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "git_sha": _git_sha(),
+        "events_file": args.events,
+        "actuals_file": args.actuals,
+        "critique_model": _CRITIQUE_MODEL,
+        "max_workers": args.max_workers,
         "first_pass_mean_brier_binary": round(pre_mean, 5),
         "critique_mean_brier_binary": round(post_mean, 5),
         "delta": round(post_mean - pre_mean, 5),
         "n_events_changed": changed,
         "predictions": list(critiques.values()),
     }
-    Path("data/predictions/self_critique.json").write_text(json.dumps(out, indent=2))
-    print(f"\nwrote data/predictions/self_critique.json")
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(out, indent=2))
+    print(f"\nwrote {output}")
     return 0
 
 

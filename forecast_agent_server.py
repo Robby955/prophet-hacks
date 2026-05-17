@@ -1192,9 +1192,12 @@ def _login_page_html(*, next_path: str, error: str = "") -> str:
   .err {{ color: #b91c1c; font-weight: 600; }}
   form {{ display: grid; gap: 0.7em; margin-top: 1em; }}
   input[type="password"], input[type="text"] {{
-    width: 100%; padding: 0.7em 0.8em; font: inherit; font-size: 1.05em;
-    border: 1px solid #d8dde6; border-radius: 6px; letter-spacing: 0.2em;
-    text-align: center;
+    width: 100%; padding: 0.75em 0.9em; font: inherit; font-size: 1.05em;
+    border: 1px solid #d8dde6; border-radius: 6px; letter-spacing: 0.12em;
+    text-align: center; box-sizing: border-box;
+  }}
+  input[type="password"]:placeholder-shown, input[type="text"]:placeholder-shown {{
+    letter-spacing: 0; /* placeholder text reads naturally; only entered PIN spaces out */
   }}
   button {{ width: 100%; padding: 0.75em; font: inherit; font-size: 1em;
            font-weight: 650; background: #1d4ed8; color: white;

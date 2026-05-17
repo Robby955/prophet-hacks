@@ -14,6 +14,15 @@ Sonnet 4.6 baseline; 95% paired-bootstrap CI [0.014, 0.037], excludes zero). Pro
 runs as a FastAPI service on Railway with auth-gated research dashboard, JSONL trace per
 prediction, and a 5-model side-by-side gallery of ablation results.
 
+## Architecture
+
+![Pipeline architecture: PA webhook into query, retrieve, dedupe + rank, Opus 4.7 forecast, longshot floor + renormalize, then return per-outcome probabilities](static/architecture.svg)
+
+Five work stages plus event-in / response-out bookends. Every stage is observable
+in the per-call trace at the auth-gated `/observatory`. Safety nets (5-stage JSON
+parser, 4-pass outcome-label matcher, longshot floor) sit on the right of the
+diagram.
+
 ## Run
 
 ```bash

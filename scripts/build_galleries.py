@@ -283,6 +283,7 @@ def build_resolved() -> str:
 </table>
 <footer>
   <p>Built by <code>scripts/build_galleries.py</code>. Source: <code>data/resolved.json</code> + <code>data/actuals.json</code> + <code>data/predictions/multi_outcome_retrieval.json</code> + <code>data/predictions/ablation_*.json</code>. Brier is single-binary (PA CLI metric); multi-class numbers in <a href="/static/summary.html">summary report</a>.</p>
+  <p style="margin-top:6px;color:#6a7388">The Oracles · Team CanadaHacks · Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> · Prophet Hacks 2026</p>
 </footer>
 
 <div id="drill-modal" class="modal-backdrop" hidden>
@@ -406,6 +407,7 @@ def build_open() -> str:
 {"".join(sections)}
 <footer>
   <p>Built by <code>scripts/build_galleries.py</code>. Sources: <code>data/sample_*.json</code> + <code>data/predictions/ablation_open_*.json</code>. Probabilities shown are model output for <em>outcomes[0]</em> (PA's "outcome of interest" convention).</p>
+  <p style="margin-top:6px;color:#6a7388">The Oracles · Team CanadaHacks · Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> · Prophet Hacks 2026</p>
 </footer>
 """
     return _wrap_html("Side-by-side gallery · open", body)

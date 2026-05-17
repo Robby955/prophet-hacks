@@ -45,10 +45,28 @@ cross-model agreement analysis since outcomes are unresolved.
 | **Claude Opus 4.7 (production)** | **0.0379** | 0.0425 | **0.0177** |
 | Claude Sonnet 4.6 (previous prod) | 0.0639 | 0.0879 | — |
 | Claude Opus 4.6 | 0.2264 | 0.0438 | 0.4396 |
+| OpenAI GPT-5.5 | 0.3226 | **0.0376** | 0.6552 |
 | OpenAI GPT-5.2 | 0.2584 | 0.0538 | 0.4971 |
 | Gemini 3.1 Pro Preview | 0.4149 | 0.0750 | 0.8115 |
 | Random 0.5 baseline | 0.250 | — | — |
 | Uniform 1/n prior | 0.219 | — | — |
+
+**Paired-bootstrap CI on the headline Opus 4.7 vs Sonnet 4.6 delta:**
+mean improvement 0.0260, 95% CI [0.0143, 0.0374], 50,000 resamples,
+seed `20260516`, n=26 paired events. CI excludes zero; significant at
+α=0.05 on this dataset.
+
+**Phase 2 decomposition** (same paired-bootstrap branch):
+
+| Variant | Mean Brier |
+|---|---:|
+| Sonnet 4.6 + old longshot floor (clamps binary to 0.25) | 0.0639 |
+| Sonnet 4.6 + new floor (caps at 0.10) | 0.0418 |
+| **Opus 4.7 + new floor (production)** | **0.0379** |
+
+The floor-fix bug accounts for ~85% of the 0.0260 improvement; the
+Sonnet→Opus 4.7 swap accounts for ~15%. The dominant gain is from
+fixing post-processing, not from the model upgrade.
 
 Source: `data/predictions/{multi_outcome_retrieval,ablation_*}.json`,
 joined with `data/resolved.json` ground truth. Brier as defined in
@@ -60,15 +78,17 @@ joined with `data/resolved.json` ground truth. Brier as defined in
 
 The 5-model comparison decomposes by outcome count:
 
-- **Binary events (n=14).** All 5 models within a factor of 2. Opus 4.7
-  0.0425, Gemini 3.1 Pro 0.0750. The gap is real but not large;
-  reasoning quality matters here.
+- **Binary events (n=14).** All 6 models within a factor of 2. Opus 4.7
+  0.0425, GPT-5.5 *better at 0.0376*, Gemini 3.1 Pro worst at 0.0750.
+  The gap is real but not large; reasoning quality matters here.
 - **Multi-outcome events (n=12).** Opus 4.7 0.0177 vs Opus 4.6 0.4396 —
-  a **25× gap**. This is not a reasoning gap.
+  a **25× gap**, with GPT-5.5 at 0.6552 (37× worse) confirming the
+  pattern is robust across model families. This is not a reasoning gap.
 
 Inspection of the failure cases (per-call `_trace.warnings`,
 `_trace.fuzzy_matches`, and the raw ablation prediction files) shows
-the three non-production models routinely emit JSON where:
+the four non-production models (Opus 4.6, GPT-5.2, GPT-5.5, Gemini
+3.1 Pro) routinely emit JSON where:
 
 - Keys do not exactly match outcome labels supplied in the prompt
   ("Kansas City" instead of "Kansas City Chiefs"; "Yes." instead of

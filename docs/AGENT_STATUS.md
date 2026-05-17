@@ -53,9 +53,9 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 ## codex/persistent-observatory
 
 - **Current task:** Completed disk-backed prediction history plus observatory trace table.
-- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `scripts/agent/deploy.sh`, `docs/AGENT_STATUS.md`.
 - **Last updated:** 2026-05-17T02:28:26Z
-- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `chat_completions_adapter.py`, or Railway env vars changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, and `./scripts/agent/verify.sh`.
+- **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. `scripts/agent/deploy.sh` now deploys a minimal runtime bundle after preflight to avoid the repeated full-repo Railway code-snapshot/TLS upload failures. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, `chat_completions_adapter.py`, or Railway env vars changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, and `./scripts/agent/verify.sh`.
 
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 

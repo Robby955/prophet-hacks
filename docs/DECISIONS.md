@@ -440,3 +440,55 @@ support the same finding. Examples:
 Decided by: Claude after running the audit Rob requested as E5.
 Commit: this commit (`scripts/check_retrieval_leakage.py` + the
 findings written into `summary.html` + this entry).
+
+---
+
+## 2026-05-16 (very late) — E3 + E4 ablations: retrieval count + source priority
+
+**E3 retrieval count sweep** (k = 3, 5, 8, 10) on the 26-event resolved set:
+
+  k   binary    multi   multi-only
+  3   0.06087   0.27783   0.40821
+  5   0.03782   0.24357   0.42858
+  8   0.03868   0.21627   0.36943
+  10  0.05968   0.26365   0.37610
+
+k=5 wins single-binary (matches OpenForecaster's plateau). k=8 wins
+multi-class + multi-only Brier. k=10 regresses (noise dilution). k=3
+is clearly worst. **Suggested production change**: adaptive retrieval
+count = 5 for binary events, 8 for multi-outcome. Not auto-applying;
+would need a small dispatcher in `forecast_track.predict_multi_outcome_retrieval`.
+
+**E4 source-priority ablation** (3 modes through identical pipeline):
+
+  mode             binary    multi
+  broad           0.03936   0.25400
+  official        0.03784   0.25256   (current production)
+  exchanges_only  0.03657   0.23512
+
+exchanges_only WINS both metrics: binary +3.4%, multi-class +7% over
+production. Lead Brave results with kalshi.com/polymarket.com instead
+of the current .gov/.edu-first. **Suggested production change**:
+swap `_PRIORITY_DOMAINS` in forecast_track.py to lead with exchange
+domains. Caveat: on the resolved sample-set most events have *zero*
+exchange-domain hits in Brave results (only 2 of 5 Priority list
+entries match anything). The win may be a small-n artifact.
+**Recommendation**: try this on live PA traffic — exchange pages
+likely surface more for unresolved events than for resolved ones.
+
+**E1 abstain-to-market** (Haiku price-extraction from evidence): 0 of
+26 events had cited market prices. Confirms our retrieval is news-heavy,
+not exchange-heavy. Aligned with E4 finding: we should pull more from
+exchanges directly.
+
+**E2 verification prompt**: regressed Brier by +0.019. Combined with
+self-critique replication regression (Codex, +0.003), two-of-two
+failures for adversarial-review patterns over an already-calibrated
+production model. **Negative result for the paper.**
+
+**Spend total**: ~$25 in Anthropic + OpenRouter. Plenty of budget left.
+
+Decided by: Claude under Rob's "go run all experiments" instruction.
+None auto-applied to production. PR review pending Codex/Rob for the
+exchanges_only switch and the adaptive-retrieval-count dispatcher.
+Commit: this commit's batch.

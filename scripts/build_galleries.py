@@ -46,6 +46,8 @@ OPEN_MODELS: list[tuple[str, str, str]] = [
     ("Sonnet 4.6", "alt", "claude-sonnet-4-6"),
     ("Opus 4.6", "alt", "claude-opus-4-6"),
     ("GPT-5.2", "alt", "gpt-5-2"),
+    ("GPT-5.5", "alt", "gpt-5-5"),
+    ("Gemini 3.1 Pro", "alt", "gemini-3-1-pro-preview"),
 ]
 
 

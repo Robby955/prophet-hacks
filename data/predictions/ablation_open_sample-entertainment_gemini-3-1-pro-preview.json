@@ -1,0 +1,639 @@
+{
+  "timestamp": "2026-05-16T22:46:47Z",
+  "model": "google/gemini-3.1-pro-preview",
+  "predictions": [
+    {
+      "market_ticker": "KXNETFLIXTOPVIEWSTV-26MAY18",
+      "p_yes": 0.09090909090909091,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"At least 6 million\": 0.85,\n    \"At least 9 million\": 0",
+      "probabilities": [
+        {
+          "market": "At least 6 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 9 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 12 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 15 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 18 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 21 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 25 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 30 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 35 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 40 million",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "At least 50 million",
+          "probability": 0.09090909090909091
+        }
+      ],
+      "evidence_urls": [
+        "https://collider.com/netflix-man-on-fire-series-12-million-views-week-2-numbers/",
+        "https://flixpatrol.com/top10/netflix/",
+        "https://www.whats-on-netflix.com/news/top-10-reports/netflix-top-10s-swapped-legends-remarkably-bright-creatures/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBS-26",
+      "p_yes": 0.14285714285714285,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"The Apothecary Diaries \": 0.05,\n    \"Chainsaw Man \u2013 The",
+      "probabilities": [
+        {
+          "market": "The Apothecary Diaries ",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Chainsaw Man \u2013 The Movie: Reze Arc",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Solo Leveling Season 2 -Arise from the Shadow-",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Tie",
+          "probability": 0.14285714285714285
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/anime-awards-best-anime-score-winner",
+        "https://www.crunchyroll.com/news/latest/2026/3/9/demon-slayer-kimetsu-no-yaiba-infinity-castle-wins-saturn-award",
+        "https://www.tvguide.com/news/crunchyroll-anime-awards-nominees-full-list-2026/",
+        "https://fandomwire.com/every-crunchyroll-anime-awards-2026-nominee/"
+      ]
+    },
+    {
+      "market_ticker": "KXACMAFAOTY-68",
+      "p_yes": 0.16666666666666666,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Ella Langley\": 0.10,\n    \"Kelsea Ballerini",
+      "probabilities": [
+        {
+          "market": "Ella Langley",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Kelsea Ballerini",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Lainey Wilson",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Megan Moroney",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Miranda Lambert",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Tie",
+          "probability": 0.16666666666666666
+        }
+      ],
+      "evidence_urls": [
+        "https://www.rollingstone.com/music/music-country/2026-acm-awards-winners-list-1235554212/",
+        "https://www.acmcountry.com/news/women-lead-nominations-for-the-61st-academy-of-country-music-awards",
+        "https://www.forbes.com/sites/matthewleimkuehler/2026/05/14/acm-awards-2026-a-list-of-winners-and-nominees/",
+        "https://www.billboard.com/music/awards/2026-acm-awards-nominations-list-1236218387/",
+        "https://www.usmagazine.com/entertainment/news/what-to-know-about-2026-acm-awards-nominations-more/"
+      ]
+    },
+    {
+      "market_ticker": "KXEUROVISIONRANK-26TOP5",
+      "p_yes": 0.05,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Albania\": 0.05,\n    \"Armenia\": 0.10,\n",
+      "probabilities": [
+        {
+          "market": "Albania",
+          "probability": 0.05
+        },
+        {
+          "market": "Armenia",
+          "probability": 0.05
+        },
+        {
+          "market": "Australia",
+          "probability": 0.05
+        },
+        {
+          "market": "Austria",
+          "probability": 0.05
+        },
+        {
+          "market": "Azerbaijan",
+          "probability": 0.05
+        },
+        {
+          "market": "Belgium",
+          "probability": 0.05
+        },
+        {
+          "market": "Bulgaria",
+          "probability": 0.05
+        },
+        {
+          "market": "Cyprus",
+          "probability": 0.05
+        },
+        {
+          "market": "Croatia",
+          "probability": 0.05
+        },
+        {
+          "market": "Czechia",
+          "probability": 0.05
+        },
+        {
+          "market": "Denmark",
+          "probability": 0.05
+        },
+        {
+          "market": "Estonia",
+          "probability": 0.05
+        },
+        {
+          "market": "Finland",
+          "probability": 0.05
+        },
+        {
+          "market": "France",
+          "probability": 0.05
+        },
+        {
+          "market": "Georgia",
+          "probability": 0.05
+        },
+        {
+          "market": "Germany",
+          "probability": 0.05
+        },
+        {
+          "market": "Greece",
+          "probability": 0.05
+        },
+        {
+          "market": "Israel",
+          "probability": 0.05
+        },
+        {
+          "market": "Italy",
+          "probability": 0.05
+        },
+        {
+          "market": "Latvia",
+          "probability": 0.05
+        },
+        {
+          "market": "Lithuania",
+          "probability": 0.05
+        },
+        {
+          "market": "Luxembourg",
+          "probability": 0.05
+        },
+        {
+          "market": "Malta",
+          "probability": 0.05
+        },
+        {
+          "market": "Moldova",
+          "probability": 0.05
+        },
+        {
+          "market": "Montenegro",
+          "probability": 0.05
+        },
+        {
+          "market": "Norway",
+          "probability": 0.05
+        },
+        {
+          "market": "Poland",
+          "probability": 0.05
+        },
+        {
+          "market": "Portugal",
+          "probability": 0.05
+        },
+        {
+          "market": "Romania",
+          "probability": 0.05
+        },
+        {
+          "market": "San Marino",
+          "probability": 0.05
+        },
+        {
+          "market": "Serbia",
+          "probability": 0.05
+        },
+        {
+          "market": "Sweden",
+          "probability": 0.05
+        },
+        {
+          "market": "Switzerland",
+          "probability": 0.05
+        },
+        {
+          "market": "Ukraine",
+          "probability": 0.05
+        },
+        {
+          "market": "United Kingdom",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://eurovisionworld.com/eurovision/2026",
+        "https://www.racingpost.com/sport/special-events/eurovision/eurovision-song-contest-grand-final-2026-date-start-time-how-to-bet-betting-odds-how-to-watch-aIJac2s0Z8Ln/",
+        "https://www.manchestereveningnews.co.uk/news/tv/eurovision-2026-final-running-order-33953598",
+        "https://www.scotsman.com/arts-and-culture/film-and-tv/eurovision-2026-final-running-order-8548967",
+        "https://en.wikipedia.org/wiki/Eurovision_Song_Contest_2026"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBAC-26",
+      "p_yes": 0.14285714285714285,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"DAN DA DAN Season 2\": 0.28,\n    \"Gachiakuta",
+      "probabilities": [
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Kaiju No. 8 Season 2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "My Hero Academia FINAL SEASON",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "ONE PIECE",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Solo Leveling Season 2 -Arise from the Shadow-",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Tie",
+          "probability": 0.14285714285714285
+        }
+      ],
+      "evidence_urls": [
+        "https://www.timeout.com/usa/news/heres-the-full-list-of-the-nominees-for-the-2026-crunchyroll-anime-awards-040326",
+        "https://www.cbr.com/crunchyroll-anime-awards-solo-leveling-my-hero-academia/",
+        "https://www.reddit.com/r/sololeveling/comments/1saua03/crunchyroll_has_released_the_2026_awards_list/",
+        "https://gamerant.com/solo-leveling-mha-2026-crunchyroll-awards/",
+        "https://fandomwire.com/every-crunchyroll-anime-awards-2026-nominee/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBR-26",
+      "p_yes": 0.14285714285714285,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Blue Box\": 0.20,\n    \"DAN DA DAN Season 2\": 0.0",
+      "probabilities": [
+        {
+          "market": "Blue Box",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "The Fragrant Flower Blooms With Dignity",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Honey Lemon Soda",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "My Dress-Up Darling Season 2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Ranma1/2 Season2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Tie",
+          "probability": 0.14285714285714285
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/anime-awards-best-romance-anime-winner/will-the-fragrant-flower-blooms-with-dignity-win-best-romance-anime-at-the-2026-crunchyroll-anime-awards",
+        "https://fandomwire.com/crunchyroll-anime-awards-2026-our-predictions-for-each-major-category-this-year/",
+        "https://www.cbr.com/crunchyroll-2026-anime-awards-nominees/",
+        "https://www.aninews.in/news/entertainment/hollywood/crunchyroll-anime-awards-2026-gachiakuta-dan-da-dan-s2-nominated-in-anime-of-the-year-category-check-nominations-here20260405230250/",
+        "https://animehunch.com/crunchyroll-anime-awards-2026-reveals-full-list-of-nominees/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBNS-26",
+      "p_yes": 0.14285714285714285,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Clevatess\": 0.04,\n    \"The Fragrant Flower Blooms With Dignity\":",
+      "probabilities": [
+        {
+          "market": "Clevatess",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "The Fragrant Flower Blooms With Dignity",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "SAKAMOTO DAYS",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "The Summer Hikaru Died",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Takopi's Original Sin",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Tie",
+          "probability": 0.14285714285714285
+        }
+      ],
+      "evidence_urls": [
+        "https://fandomwire.com/crunchyroll-anime-awards-2026-our-predictions-for-each-major-category-this-year/",
+        "https://www.aninews.in/news/entertainment/hollywood/crunchyroll-anime-awards-2026-gachiakuta-dan-da-dan-s2-nominated-in-anime-of-the-year-category-check-nominations-here20260405230250/",
+        "https://deadline.com/2026/04/anime-awards-nominations-2026-crunchyroll-1236770375/",
+        "https://screenrant.com/crunchyroll-anime-year-award-nominee-list-revealed/",
+        "https://comicbook.com/anime/feature/crunchyrolls-best-new-anime-nominees-confirm-what-truly-dominated-2025/"
+      ]
+    },
+    {
+      "market_ticker": "KXANIMEBA-26",
+      "p_yes": 0.14285714285714285,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"DAN DA DAN Season 2\": 0.3,\n    \"Gachiakuta\": 0",
+      "probabilities": [
+        {
+          "market": "DAN DA DAN Season 2",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Gachiakuta",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "My Hero Academia FINAL SEASON",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "ONE PIECE",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Solo Leveling Season 2 -Arise from the Shadow-",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Takopi's Original Sin",
+          "probability": 0.14285714285714285
+        },
+        {
+          "market": "Tie",
+          "probability": 0.14285714285714285
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/anime-awards-best-animation-winner",
+        "https://www.animenewsnetwork.com/interest/2026-04-02/crunchyroll-anime-awards-reveals-2026-nominees/.236046",
+        "https://www.timeout.com/usa/news/heres-the-full-list-of-the-nominees-for-the-2026-crunchyroll-anime-awards-040326",
+        "https://comicbook.com/anime/feature/sorry-fans-crunchyrolls-2026-anime-awards-deal-a-major-blow-to-solo-leveling/",
+        "https://www.reddit.com/r/sololeveling/comments/1saua03/crunchyroll_has_released_the_2026_awards_list/"
+      ]
+    },
+    {
+      "market_ticker": "KXMEDIARELEASEICEMAN-26",
+      "p_yes": 0.2,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\"probabilities\": {\"Before Jan 1, 2026\": 0.01, \"Before Feb 1, 2026\":",
+      "probabilities": [
+        {
+          "market": "Before Jan 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before Feb 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before Mar 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before Apr 1, 2026",
+          "probability": 0.2
+        },
+        {
+          "market": "Before May 1, 2026",
+          "probability": 0.2
+        }
+      ],
+      "evidence_urls": [
+        "https://www.hotnewhiphop.com/994829-drake-iceman-episode-4-release-time",
+        "https://urbanstreetculture.co.za/drake-iceman-episode-4-release-time-global-premiere-times-revealed/",
+        "https://www.capitalxtra.com/news/drake-new-album-iceman-release-date-features/",
+        "https://artthreat.net/32687-90685-what-time-is-iceman-dropping-drake-livestreams-episode-4-from-toronto-tonight-at/"
+      ]
+    },
+    {
+      "market_ticker": "KXGTA6ONTIME",
+      "p_yes": 0.35,
+      "rationale": "```json\n{\n  \"probabilities\": {\n    \"By May 26, 2026\": 0.35\n  },\n  ",
+      "probabilities": [
+        {
+          "market": "By May 26, 2026",
+          "probability": 0.35
+        }
+      ],
+      "evidence_urls": [
+        "https://en.wikipedia.org/wiki/Grand_Theft_Auto_VI",
+        "https://www.rockstargames.com/newswire/article/258aa538o412ok/grand-theft-auto-vi-is-now-coming-may-26-2026",
+        "https://www.sideshow.com/blog/gta-6-release-date-details-grand-theft-auto",
+        "https://www.gamingbible.com/news/platform/xbox/gta-6-platforms-xbox-ps5-269721-20251126",
+        "https://www.psu.com/news/grand-theft-auto-vi-may-2026-release-date-still-could-be-delayed-says-bloomberg-journalist/"
+      ]
+    },
+    {
+      "market_ticker": "KXDAILYSHOW-26",
+      "p_yes": 0.16666666666666666,
+      "rationale": "llm error: unparseable multi-outcome model output: If Ryan Gosling is on The Late Show from 08/01/2025 at 10 AM and before Jun 1, 20",
+      "probabilities": [
+        {
+          "market": "Ryan Gosling",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Seth Meyers",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Donald Trump",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Pedro Pascal",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Travis Kelce",
+          "probability": 0.16666666666666666
+        },
+        {
+          "market": "Zendaya",
+          "probability": 0.16666666666666666
+        }
+      ],
+      "evidence_urls": [
+        "https://www.latimes.com/entertainment-arts/tv/story/2026-03-06/ryan-gosling-eva-mendes-birthday-surprise-fallon-tonight-show",
+        "https://latenighter.com/lineups-by-show/",
+        "https://www.interbridge.com/lineups.html",
+        "https://www.facebook.com/TheThingsEntertainment/posts/not-only-did-ryan-gosling-walk-off-the-late-show-set-but-he-also-ripped-stephen-/769050728729083/",
+        "https://www.nbc.com/the-tonight-show/guests/ryan-gosling-/506d9d526cc73a9c1288423280cce41a00d21d8a"
+      ]
+    },
+    {
+      "market_ticker": "KXSPOTIFYALBUMRELEASEDATEDRAKE-26",
+      "p_yes": 0.25,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Before February\": 0.01,\n    \"Before March\": 0.01,\n    ",
+      "probabilities": [
+        {
+          "market": "Before February",
+          "probability": 0.25
+        },
+        {
+          "market": "Before March",
+          "probability": 0.25
+        },
+        {
+          "market": "Before April",
+          "probability": 0.25
+        },
+        {
+          "market": "Before May",
+          "probability": 0.25
+        }
+      ],
+      "evidence_urls": [
+        "https://dknetwork.draftkings.com/2026/05/14/drakes-iceman-release-date-and-history/",
+        "https://en.wikipedia.org/wiki/Iceman_(Drake_album)",
+        "https://www.hindustantimes.com/entertainment/music/what-time-will-drakes-iceman-album-release-friday-lebron-diss-in-1-am-in-albany-leak-fuels-buzz-101778800012435.html",
+        "https://genius.com/albums/Drake/Iceman",
+        "https://www.capitalxtra.com/news/drake-new-album-iceman-release-date-features/"
+      ]
+    },
+    {
+      "market_ticker": "KXEMMYLSERIES-26SEP14",
+      "p_yes": 0.09090909090909091,
+      "rationale": "llm error: unparseable multi-outcome model output: ```json\n{\n  \"probabilities\": {\n    \"Beef\": 0.15,\n    \"The Beast in Me\": 0.12,\n",
+      "probabilities": [
+        {
+          "market": "Beef",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "The Beast in Me",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Love Story",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "All Her Fault",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Half Man",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Black Rabbit",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Death by Lightning",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Lord of the Flies",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "DTF St. Louis",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Bait",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Tie",
+          "probability": 0.09090909090909091
+        }
+      ],
+      "evidence_urls": [
+        "https://theplaylist.net/limited-or-anthology-series-emmys-2026-predictions-and-contenders-20260430/",
+        "https://www.indiewire.com/lists/2026-emmy-predictions-primetime-awards/",
+        "https://www.goldderby.com/tv/2026/2026-emmys-analysis-death-by-lightning-reggie-dinkins-industry/",
+        "https://www.hollywoodreporter.com/lists/emmys-2026-predictions-feinberg-forecast/"
+      ]
+    }
+  ]
+}

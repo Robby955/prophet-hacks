@@ -1,0 +1,729 @@
+{
+  "timestamp": "2026-05-16T22:47:32Z",
+  "model": "openai/gpt-5.5",
+  "predictions": [
+    {
+      "market_ticker": "KXECONSTATCPICORE-26MAY",
+      "p_yes": 0.0625,
+      "rationale": "No May 2026 CPI data exists yet; anchoring the -0.1% outcome to the cited ~7% market price and otherwise using core CPI base rates centered around 0.2\u20130.3% m/m, with negative or 0.5% readings relatively rare.",
+      "probabilities": [
+        {
+          "market": "Exactly -0.2%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly -0.1%",
+          "probability": 0.06891025641025642
+        },
+        {
+          "market": "Exactly 0.0%",
+          "probability": 0.10309829059829059
+        },
+        {
+          "market": "Exactly 0.1%",
+          "probability": 0.17147435897435898
+        },
+        {
+          "market": "Exactly 0.2%",
+          "probability": 0.24839743589743593
+        },
+        {
+          "market": "Exactly 0.3%",
+          "probability": 0.20566239316239318
+        },
+        {
+          "market": "Exactly 0.4%",
+          "probability": 0.07745726495726496
+        },
+        {
+          "market": "Exactly 0.5%",
+          "probability": 0.0625
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/cpi/",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+        "https://octagonai.co/markets/economics/inflation/cpi-month-over-month-in-may-2026/"
+      ]
+    },
+    {
+      "market_ticker": "KXHOUSINGSTART-26MAY21",
+      "p_yes": 0.58,
+      "rationale": "January 2026 starts were strong at 1.487M, but March evidence points to higher mortgage rates and a sharp decline in permits, so April is plausibly near but somewhat below January with declining odds across higher thresholds.",
+      "probabilities": [
+        {
+          "market": "Above 1.400M",
+          "probability": 0.58
+        },
+        {
+          "market": "Above 1.425M",
+          "probability": 0.49
+        },
+        {
+          "market": "Above 1.450M",
+          "probability": 0.4
+        },
+        {
+          "market": "Above 1.475M",
+          "probability": 0.31
+        },
+        {
+          "market": "Above 1.500M",
+          "probability": 0.23
+        },
+        {
+          "market": "Above 1.525M",
+          "probability": 0.17
+        },
+        {
+          "market": "Above 1.550M",
+          "probability": 0.12
+        },
+        {
+          "market": "Above 1.575M",
+          "probability": 0.08
+        }
+      ],
+      "evidence_urls": [
+        "https://tradingeconomics.com/united-states/housing-starts",
+        "https://economics.td.com/us-housing-starts-and-permits",
+        "https://shopprop.com/go/guides/may-2026-housing-market-update/",
+        "http://www.forecasts.org/house.htm",
+        "https://ycharts.com/indicators/housing_starts"
+      ]
+    },
+    {
+      "market_ticker": "KXDEGDPQOQF-26MAY22",
+      "p_yes": 0.06666666666666667,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Above -0.4%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above -0.3%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above -0.2%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above -0.1%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above -0.0%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.1%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.2%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.3%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.4%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.5%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.6%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.7%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.8%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 0.9%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 1.0%",
+          "probability": 0.06666666666666667
+        }
+      ],
+      "evidence_urls": [
+        "https://polymarket.com/event/germany-gdp-growth-in-q1-2026",
+        "https://octagonai.co/markets/economics/gdp/germany-gdp-growth-rate-yoy-flash-for-q1-2026/",
+        "https://tradingeconomics.com/germany/gdp-growth",
+        "https://www.focus-economics.com/countries/germany/news/gdp/germany-national-accounts-p-30-04-2026-economic-growth-accelerates-in-the-first-quarter-of-2026/",
+        "https://www.spglobal.com/ratings/en/regulatory/article/economic-research-economic-outlook-europe-q1-2026-germanys-fiscal-reawakening-s101657610"
+      ]
+    },
+    {
+      "market_ticker": "KXECONSTATCPIYOY-26MAY",
+      "p_yes": 0.0625,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Exactly 2.0%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.1%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.2%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.3%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.4%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.5%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.6%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.7%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.8%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.9%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.0%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.1%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.2%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.3%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.4%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.5%",
+          "probability": 0.0625
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/news.release/cpi.nr0.htm",
+        "https://www.investing.com/economic-calendar/cpi-733"
+      ]
+    },
+    {
+      "market_ticker": "KXCBDECISIONAUSTRALIA-26JUN16",
+      "p_yes": 0.1,
+      "rationale": "Evidence points to a recent May 2026 25bp RBA hike to 4.35%, making a June hold most likely while another 25bp hike remains plausible if inflation concerns persist; cuts and moves over 25bp are unlikely.",
+      "probabilities": [
+        {
+          "market": "Cut more than 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Cut 1-25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Maintain current rate",
+          "probability": 0.492857142857143
+        },
+        {
+          "market": "Hike 1-25bps",
+          "probability": 0.20714285714285718
+        },
+        {
+          "market": "Hike more than 25bps",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.rba.gov.au/",
+        "https://www.cnbc.com/2026/05/05/australia-central-bank-rate-hike-inflation-rba.html",
+        "https://thetimes.com.au/world/46346-why-the-reserve-bank-of-australia-has-held-rates-and-what-it-means-for-2026",
+        "https://tradingeconomics.com/australia/interest-rate"
+      ]
+    },
+    {
+      "market_ticker": "KXCBDECISIONJAPAN-26JUN15",
+      "p_yes": 0.1,
+      "rationale": "April 2026 BOJ held at 0.75% but a 6\u20133 split with three dissents for a hike to 1.0% makes a June 25bp hike the leading outcome, while cuts or a larger hike remain unlikely absent stronger evidence.",
+      "probabilities": [
+        {
+          "market": "Cut more than 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Cut 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Maintain current rate",
+          "probability": 0.29718309859154934
+        },
+        {
+          "market": "Hike 25bps",
+          "probability": 0.4028169014084507
+        },
+        {
+          "market": "Hike more than 25bps",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.reuters.com/world/asia-pacific/view-investors-react-bojs-decision-hold-rates-2026-04-28/",
+        "https://www.cnbc.com/2026/04/28/bank-of-japan-keeps-policy-rate-steady-cpi-iran-war-gdp.html",
+        "https://tradingeconomics.com/japan/interest-rate",
+        "https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2026/k260428a.pdf"
+      ]
+    },
+    {
+      "market_ticker": "KXESGDPQOQF-26JUN25",
+      "p_yes": 0.93,
+      "rationale": "Direct Q1 2026 evidence says Spain GDP expanded 0.6% QoQ, so thresholds up to above 0.5% are very likely true while strictly above 0.6% and higher are unlikely, with small residual uncertainty for source/rounding/resolution details.",
+      "probabilities": [
+        {
+          "market": "Above -0.1%",
+          "probability": 0.93
+        },
+        {
+          "market": "Above -0.0%",
+          "probability": 0.93
+        },
+        {
+          "market": "Above 0.1%",
+          "probability": 0.92
+        },
+        {
+          "market": "Above 0.2%",
+          "probability": 0.92
+        },
+        {
+          "market": "Above 0.3%",
+          "probability": 0.91
+        },
+        {
+          "market": "Above 0.4%",
+          "probability": 0.91
+        },
+        {
+          "market": "Above 0.5%",
+          "probability": 0.9
+        },
+        {
+          "market": "Above 0.6%",
+          "probability": 0.08
+        },
+        {
+          "market": "Above 0.7%",
+          "probability": 0.07
+        },
+        {
+          "market": "Above 0.8%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 0.9%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.0%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.1%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.2%",
+          "probability": 0.05
+        },
+        {
+          "market": "Above 1.3%",
+          "probability": 0.05
+        }
+      ],
+      "evidence_urls": [
+        "https://www.generationwealth.es/en/latest-economic-news/spain-economy-may-2026-gdp-inflation-energy-outlook",
+        "https://economy-finance.ec.europa.eu/economic-surveillance-eu-member-states/country-pages/spain/economic-forecast-spain_en",
+        "https://www.focus-economics.com/countries/spain/news/gdp/spain-national-accounts-p-30-04-2026-economic-growth-slows-in-the-first-quarter-of-2026/",
+        "https://www.bbvaresearch.com/en/publicaciones/spain-economic-outlook-march-2026/",
+        "https://www.caixabankresearch.com/en/economics-markets/recent-developments/spanish-economy-faces-2026-optimism"
+      ]
+    },
+    {
+      "market_ticker": "KXCBDECISIONCANADA-26JUL",
+      "p_yes": 0.1,
+      "rationale": "Recent evidence says the BoC is holding at 2.25% and markets/analysts expect rates to stay there for much of 2026, with hike risk if inflation persists and little support for renewed cuts; large moves are unlikely absent a shock.",
+      "probabilities": [
+        {
+          "market": "Cut >25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Cut 25bps",
+          "probability": 0.1
+        },
+        {
+          "market": "Maintains rate",
+          "probability": 0.5626865671641791
+        },
+        {
+          "market": "Hike 25bps",
+          "probability": 0.1373134328358209
+        },
+        {
+          "market": "Hike >25bps",
+          "probability": 0.1
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bankofcanada.ca/2026/04/fad-press-release-2026-04-29/",
+        "https://www.nesto.ca/mortgage-basics/bank-of-canada-interest-rate-schedule/",
+        "https://equalsmoney.com/economic-calendar/events/boc-interest-rate-decision"
+      ]
+    },
+    {
+      "market_ticker": "KXUSTYLD-10Y26JUN30",
+      "p_yes": 0.06666666666666667,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Above 3.60%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 3.70%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 3.80%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 3.90%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.00%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.10%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.20%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.30%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.40%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.50%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.60%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.70%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.80%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 4.90%",
+          "probability": 0.06666666666666667
+        },
+        {
+          "market": "Above 5.00%",
+          "probability": 0.06666666666666667
+        }
+      ],
+      "evidence_urls": [
+        "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value=2026",
+        "https://streetstats.finance/rates/treasuries/",
+        "https://fred.stlouisfed.org/series/DGS10",
+        "https://ycharts.com/indicators/10_year_treasury_rate"
+      ]
+    },
+    {
+      "market_ticker": "KXECONSTATCPI-26JUN",
+      "p_yes": 0.1111111111111111,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Exactly -0.2%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly -0.1%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.0%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.1%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.2%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.3%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.4%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.5%",
+          "probability": 0.1111111111111111
+        },
+        {
+          "market": "Exactly 0.6%",
+          "probability": 0.1111111111111111
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/schedule/news_release/cpi.htm",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+        "https://cpiinflationcalculator.com/2026-u-s-inflation-rate-cpi/",
+        "https://tradingeconomics.com/united-states/consumer-price-index-cpi"
+      ]
+    },
+    {
+      "market_ticker": "KXECONSTATCORECPIYOY-26JUN",
+      "p_yes": 0.0625,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Exactly 2.2%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.3%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.4%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.5%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.6%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.7%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.8%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 2.9%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.0%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.1%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.2%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.3%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.4%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.5%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.6%",
+          "probability": 0.0625
+        },
+        {
+          "market": "Exactly 3.7%",
+          "probability": 0.0625
+        }
+      ],
+      "evidence_urls": [
+        "https://www.bls.gov/cpi/",
+        "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+        "https://tradingeconomics.com/united-states/core-inflation-rate"
+      ]
+    },
+    {
+      "market_ticker": "KXFED-26SEP",
+      "p_yes": 0.09090909090909091,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Above 2.75%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.00%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.25%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.50%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.75%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.00%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.25%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.50%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.75%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 5.00%",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 5.25%",
+          "probability": 0.09090909090909091
+        }
+      ],
+      "evidence_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260318a.htm",
+        "https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast",
+        "https://equalsmoney.com/economic-calendar/events/fed-interest-rate-decision",
+        "https://www.forbes.com/sites/investor-hub/article/fed-meeting-tracker-interest-rate-strategy/",
+        "https://fred.stlouisfed.org/series/DFEDTARU"
+      ]
+    },
+    {
+      "market_ticker": "KXAAAGASED-26NOV03",
+      "p_yes": 0.09090909090909091,
+      "rationale": "llm error: 'NoneType' object has no attribute 'strip'",
+      "probabilities": [
+        {
+          "market": "Above 2.50",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 2.75",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.00",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.25",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.50",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 3.75",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.00",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.25",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.50",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 4.75",
+          "probability": 0.09090909090909091
+        },
+        {
+          "market": "Above 5.00",
+          "probability": 0.09090909090909091
+        }
+      ],
+      "evidence_urls": [
+        "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMM_EPMR_PTE_NUS_DPG&f=W",
+        "https://gasprices.aaa.com/",
+        "https://www.finder.com/economics/gas-prices"
+      ]
+    }
+  ]
+}

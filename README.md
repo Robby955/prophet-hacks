@@ -1,9 +1,67 @@
-# prophet-hacks
+# prophet-hacks · The Oracles
 
-Prophet Hacks 2026 forecasting agent for Team `CanadaHacks`, project **The Oracles**.
+Prophet Hacks 2026 forecasting agent. Team **CanadaHacks**, project **The Oracles**, forecasting track.
 
-Live at <https://forecastingpath.com/>. Predicts per-outcome probabilities for
-Prophet Arena events, scored by Brier (lower is better).
+- **Live endpoint** for Prophet Arena: <https://agent.forecastingpath.com/predict>
+- **Public landing** (no auth): <https://forecastingpath.com/>
+- **Live status** (commit SHA + variant): <https://agent.forecastingpath.com/healthz>
+
+## TL;DR
+
+Retrieval-augmented Claude Opus 4.7 forecasting agent with a Kalshi-paper longshot floor.
+Mean Brier **0.0378** single-binary on a 26-event PA backtest (40.8% reduction over a
+Sonnet 4.6 baseline; 95% paired-bootstrap CI [0.014, 0.037], excludes zero). Production
+runs as a FastAPI service on Railway with auth-gated research dashboard, JSONL trace per
+prediction, and a 5-model side-by-side gallery of ablation results.
+
+## Run
+
+```bash
+./run.sh                  # boot local forecasting server on :8000
+./run.sh smoke            # one-shot smoke against the live deploy
+./run.sh backtest         # rerun the 26-event headline backtest (~$2)
+./run.sh test             # run the test suite (259 tests)
+```
+
+See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
+`BRAVE_SEARCH_API_KEY` is recommended (pipeline degrades gracefully without it).
+
+## Three findings worth keeping
+
+1. **Bug-fix dominance.** ~85% of our headline Brier improvement came from a one-line
+   fix in the post-LLM longshot floor, not from a model upgrade. Post-processing safety
+   nets need boundary tests at the lowest *n* the pipeline admits — see
+   `docs/DECISIONS.md` postmortem.
+2. **Scoring rule matters more than the model.** PA's CLI evaluator scores single-binary
+   Brier; their published docs describe proper multi-class; their actual live scoring is a
+   Brier skill score against snapshotted Kalshi/Polymarket prices. The three rules rank
+   our model lineup differently on n=26. Pin the rule to the exact evaluator before
+   treating ablation deltas as license to ship.
+3. **Schema discipline beats raw capability** for prompt-strict contracts of this shape.
+   On the same retrieval + prompt + post-processing, GPT-5.5 and Gemini 3.1 Pro Preview
+   show multi-outcome Brier 18-46× worse than Opus 4.7 — failure mode is JSON-schema
+   noncompliance on outcome labels, not reasoning gaps. Public leaderboards don't predict
+   pipeline performance.
+
+## Two negative results worth keeping
+
+- **Adversarial-review prompts regress** on a calibrated production model.
+  Two independent variants (two-call self-critique, one-call verification-field) both
+  pull confident-and-correct predictions toward the middle, costing Brier where
+  production was right to be confident. Two prompts × two runs, same direction.
+- **Small ablations need a CI bar.** Two intuitive production-candidate changes
+  (adaptive retrieval count, exchanges-only source priority) failed paired-bootstrap
+  promotion gate at α=0.05 on n=26 (need |Δ| > 0.01 single-binary Brier to clear noise).
+  We did not ship them.
+
+## Methodological discipline this project enforces
+
+All ablation deltas are evaluated against a paired-bootstrap CI (50K resamples, pinned
+seed). The promotion rule: a candidate can move production only if (a) the single-binary
+delta is practically large on n=26, (b) the 95% CI excludes zero, and (c) the change
+doesn't conflict with the live market-baseline scoring rule. Directional improvements
+that fail this gate are kept as research notes and visualizations, not shipped.
+Workshop-paper-style writeup in `docs/WORKSHOP_PAPER_DRAFT.md`.
 
 ## What this is
 

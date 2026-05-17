@@ -545,7 +545,7 @@ def _set_dashboard_cookie_if_needed(response: Response, request: Request) -> Non
 
 def _guided_tour_assets(steps: list[dict[str, str]]) -> str:
     """Small dependency-free guided tour, inserted only for ?tour=1 views."""
-    steps_json = html_escape(json.dumps(steps, ensure_ascii=False))
+    steps_json = json.dumps(steps, ensure_ascii=False).replace("</", "<\\/")
     return f"""
 <style>
   .tour-active {{

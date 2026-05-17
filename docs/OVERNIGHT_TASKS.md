@@ -107,7 +107,7 @@ agent's section. Rob will read both before submitting.
 
 ## Codex update · 2026-05-17T07:35Z
 
-- **C1 done:** `scripts/build_d1_scatter.py` now labels only large-outcome points (`n_outcomes >= 8`), uses varied text positions, and regenerates `static/scatter_resolved.html`.
+- **C1 done:** `scripts/build_d1_scatter.py` now labels only the largest multi-outcome points (`n_outcomes >= 18`), uses varied text positions, and regenerates `static/scatter_resolved.html`. Playwright label-box check found 7 labels and 0 label overlaps.
 - **C2 done:** all seven interactive research pages now have a compact "What you're looking at" orientation panel near the top. Regenerated galleries, scatter, heatmap, abstain slider, bootstrap histogram, and pipeline trace.
 - **C3 done:** `/dashboard?tour=1` and `/observatory?tour=1` now launch a small dependency-free guided tour. Normal page loads do not render the tour overlay.
 - **C4 done:** `static/pipeline_trace.html` now starts with a visible cached-example banner for the Najzer vs Ebster replay and points live walkthroughs to `/demo/start`.

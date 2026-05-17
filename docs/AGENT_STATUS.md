@@ -83,7 +83,7 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Current task:** Completed overnight C1-C5 queue: static research-page UX polish, dashboard/observatory guided tour, cached-trace banner, bootstrap seed stability check.
 - **Files owned this session:** `forecast_agent_server.py`, `scripts/build_d1_scatter.py`, `scripts/build_d2_heatmap.py`, `scripts/build_d3_abstain_slider.py`, `scripts/build_d4_bootstrap_hist.py`, `scripts/build_d5_pipeline_trace.py`, `scripts/build_galleries.py`, `scripts/check_bootstrap_seed_stability.py`, `static/`, `docs/OVERNIGHT_TASKS.md`, `docs/AGENT_STATUS.md`, `tests/test_bootstrap_seed_stability.py`, `tests/test_static_research_pages.py`, `tests/test_forecast_agent_server.py`.
 - **Last updated:** 2026-05-17T07:35:06Z
-- **Notes:** Non-production only. No changes to `forecast_track.py:predict_multi_outcome_retrieval`, Railway env vars, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py`. C5 stable across seeds 20260516/20260517/20260518 with CI lows `0.014155`-`0.014296` and CI highs `0.037446`-`0.037674`; recorded in `docs/OVERNIGHT_TASKS.md` rather than DECISIONS because the overnight boundary said not to touch DECISIONS.
+- **Notes:** Non-production only. No changes to `forecast_track.py:predict_multi_outcome_retrieval`, Railway env vars, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py`. Scatter default-view label-box check: 7 labels, 0 overlaps. C5 stable across seeds 20260516/20260517/20260518 with CI lows `0.014155`-`0.014296` and CI highs `0.037446`-`0.037674`; recorded in `docs/OVERNIGHT_TASKS.md` rather than DECISIONS because the overnight boundary said not to touch DECISIONS.
 
 ## codex/persistent-observatory
 

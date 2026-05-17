@@ -30,5 +30,5 @@ def test_pipeline_trace_is_labeled_as_cached_example() -> None:
 def test_scatter_labels_only_large_outcome_events() -> None:
     script = Path("scripts/build_d1_scatter.py").read_text()
 
-    assert "p.n_outcomes >= 8 ? String(p.n_outcomes) : ''" in script
+    assert "p.n_outcomes >= 18 ? String(p.n_outcomes) : ''" in script
     assert "textposition: pts.map" in script

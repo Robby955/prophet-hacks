@@ -48,9 +48,9 @@ function trace(pts, color, name) {
     mode: 'markers+text',
     type: 'scatter',
     name: name,
-    text: pts.map(p => p.n_outcomes >= 8 ? String(p.n_outcomes) : ''),
+    text: pts.map(p => p.n_outcomes >= 18 ? String(p.n_outcomes) : ''),
     textposition: pts.map((p, i) => {
-      if (p.n_outcomes < 8) return 'middle right';
+      if (p.n_outcomes < 18) return 'middle right';
       const positions = ['top left', 'top right', 'bottom left', 'bottom right', 'middle left', 'middle right'];
       return positions[i % positions.length];
     }),

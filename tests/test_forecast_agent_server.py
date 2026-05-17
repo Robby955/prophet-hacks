@@ -547,3 +547,18 @@ def test_dashboard_contains_demo_console(monkeypatch) -> None:
     assert "/demo/start" in response.text
     assert "/demo/stream/" in response.text
     assert "/demo/result/" in response.text
+
+
+def test_dashboard_links_private_research_views(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert "Private research views" in response.text
+    assert "/observatory" in response.text
+    assert "/static/summary.html" in response.text
+    assert "/static/gallery_resolved.html" in response.text
+    assert "/static/gallery_open.html" in response.text

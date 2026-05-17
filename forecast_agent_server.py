@@ -803,6 +803,9 @@ def observatory(
       <a href="#experiments">Experiments</a>
       <a href="#review">Review</a>
       <a href="/dashboard">Dashboard</a>
+      <a href="/static/summary.html">Summary</a>
+      <a href="/static/gallery_resolved.html">Resolved gallery</a>
+      <a href="/static/gallery_open.html">Open gallery</a>
       <a href="/">Public page</a>
     </nav>
   </div>
@@ -2431,6 +2434,11 @@ def dashboard(
   .demo-actions button:disabled {{ opacity: 0.55; cursor: not-allowed; }}
   #demo-console, #demo-result {{ background: #0f172a; color: #dbeafe; border-radius: 6px; padding: 0.85em; margin-top: 0.8em; font-family: ui-monospace, "SF Mono", monospace; font-size: 0.84em; line-height: 1.45; white-space: pre-wrap; word-break: break-word; min-height: 3.2em; }}
   #demo-result {{ background: var(--panel-2); color: var(--text-2); border: 1px solid var(--border); }}
+  .link-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8em; margin-top: 0.8em; }}
+  .link-card {{ display: block; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 0.85em 1em; color: var(--text); text-decoration: none; min-height: 104px; }}
+  .link-card:hover {{ border-color: var(--accent); text-decoration: none; }}
+  .link-card strong {{ display: block; color: var(--text); margin-bottom: 0.25em; }}
+  .link-card span {{ color: var(--muted); font-size: 0.9em; line-height: 1.4; }}
 
   @keyframes flash {{ 0% {{ background: var(--ok-soft); }} 100% {{ background: var(--panel); }} }}
   .pred-card.fresh {{ animation: flash 1.8s ease-out; }}
@@ -2448,6 +2456,7 @@ def dashboard(
     th, td {{ padding: 0.55em 0.65em; overflow-wrap: anywhere; }}
     table {{ display: block; overflow-x: auto; }}
     .prob-row {{ grid-template-columns: minmax(0, 1.2fr) minmax(80px, 2fr) 44px; gap: 0.45em; }}
+    .link-grid {{ grid-template-columns: 1fr; }}
   }}
 </style>
 </head><body>
@@ -2570,6 +2579,17 @@ def dashboard(
 <div class="card">
   {brier_svg}
   <p class="meta" style="margin-top:0.8em">Brier here is the legacy single-<em>p</em> metric from the local backtest. The <strong>multi_outcome_retrieval</strong> 0.064 number is contaminated by data leakage (Brave can find articles about resolved past events); live performance on future events does not leak.</p>
+</div>
+
+<h2>Private research views</h2>
+<p class="meta">These pages are dashboard-auth gated. They are meant for operator review, model debugging, and submission prep, not the public landing page during active scoring.</p>
+<div class="link-grid">
+  <a class="link-card" href="/observatory"><strong>Observatory</strong><span>Live commit, persisted traces, experiment board, and adversarial-review answers.</span></a>
+  <a class="link-card" href="/static/summary.html"><strong>Summary report</strong><span>Brier table, bootstrap interval, phase decomposition, calibration plot, and findings.</span></a>
+  <a class="link-card" href="/static/gallery_resolved.html"><strong>Resolved gallery</strong><span>Side-by-side per-event losses across production and alternative model runs.</span></a>
+  <a class="link-card" href="/static/gallery_open.html"><strong>Open-event gallery</strong><span>Model spread on unresolved events for disagreement triage before PA scoring.</span></a>
+  <a class="link-card" href="/compare"><strong>Comparison grid</strong><span>Auth-gated model comparison with reliability diagram and event-level rationales.</span></a>
+  <a class="link-card" href="/compare-open"><strong>Open comparison</strong><span>Current open-event matrix for checking model agreement and likely failure modes.</span></a>
 </div>
 
 <h2>Quick links</h2>

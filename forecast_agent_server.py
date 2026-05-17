@@ -421,6 +421,7 @@ def healthz() -> dict[str, Any]:
         "variant": _VARIANT_NAME,
         "version": app.version,
         "commit": _BUILD_COMMIT_SHA,
+        "brave_configured": bool(os.environ.get("BRAVE_SEARCH_API_KEY")),
     }
 
 
@@ -1212,33 +1213,49 @@ def predict(event: EventRequest) -> PredictionResponse:
         "predict %s | variant=%s | outcomes=%d | title=%s",
         event.market_ticker, _VARIANT_NAME, len(outcomes), event.title[:80],
     )
-    result = _VARIANT_FN(event_dict)
-    p_yes = float(result["p_yes"])
-    # Defensive: clamp p_yes to [0.01, 0.99] before distribution.
-    p_yes = max(0.01, min(0.99, p_yes))
-    rationale = str(result.get("rationale", ""))[:300]
+    try:
+        result = _VARIANT_FN(event_dict)
+        p_yes = float(result["p_yes"])
+        # Defensive: clamp p_yes to [0.01, 0.99] before distribution.
+        p_yes = max(0.01, min(0.99, p_yes))
+        rationale = str(result.get("rationale", ""))[:300]
 
-    # Prefer per-outcome probabilities when the variant emits them
-    # (multi-outcome variants per the 2026-05-16 server schema). Fall back
-    # to distributing the single p_yes for legacy binary variants.
-    raw_probs = result.get("probabilities")
-    if (
-        isinstance(raw_probs, list)
-        and raw_probs
-        and all(
-            isinstance(p, dict) and "market" in p and "probability" in p
-            for p in raw_probs
-        )
-    ):
-        probs = [
-            {
-                "market": str(p["market"]),
-                "probability": max(0.01, min(0.99, float(p["probability"]))),
-            }
-            for p in raw_probs
-        ]
-    else:
-        probs = _distribute_p_yes_to_outcomes(p_yes, outcomes)
+        # Prefer per-outcome probabilities when the variant emits them
+        # (multi-outcome variants per the 2026-05-16 server schema). Fall back
+        # to distributing the single p_yes for legacy binary variants.
+        raw_probs = result.get("probabilities")
+        if (
+            isinstance(raw_probs, list)
+            and raw_probs
+            and all(
+                isinstance(p, dict) and "market" in p and "probability" in p
+                for p in raw_probs
+            )
+        ):
+            probs = [
+                {
+                    "market": str(p["market"]),
+                    "probability": max(0.01, min(0.99, float(p["probability"]))),
+                }
+                for p in raw_probs
+            ]
+        else:
+            probs = _distribute_p_yes_to_outcomes(p_yes, outcomes)
+    except Exception as exc:
+        print(json.dumps({
+            "event": "predict_exception",
+            "market_ticker": event.market_ticker,
+            "variant": _VARIANT_NAME,
+            "reason": f"{type(exc).__name__}: {str(exc)[:200]}",
+        }), flush=True)
+        log.exception("predict handler exception for %s; falling back to uniform", event.market_ticker)
+        result = forecast_track.predict_uniform_prior(event_dict)
+        p_yes = max(0.01, min(0.99, float(result["p_yes"])))
+        rationale = f"handler fallback (uniform): {type(exc).__name__}"[:300]
+        if outcomes:
+            probs = _distribute_p_yes_to_outcomes(p_yes, outcomes)
+        else:
+            probs = []
 
     log.info(
         "predict %s -> p_yes=%.3f over %d outcomes",

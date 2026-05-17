@@ -1,85 +1,95 @@
-# fish.audio TTS script for the 60-second demo
+# fish.audio TTS script — 75 seconds, 5 beats
 
-Voice: **energetic male**. Speed: **default (1.0x)**. Slight pause at every blank line.
+**Voice**: energetic male. **Speed**: default 1.0×. **Pause** at every
+blank line (fish.audio honors them).
 
-Paste the **plain-prose block at the bottom** straight into fish.audio. The labeled
-chunks above are just to help you align the audio to your CapCut beats.
+**Total target**: ~185 words → ~74 seconds at ~150 wpm.
 
-Total target: **~145 words = ~58 seconds** at ~150 wpm. Adjust speed in CapCut by
-+/-5% if it drifts.
-
----
-
-## Chunk 1 — Landing (0:00 to 0:08, ~20 words)
-
-> This is The Oracles. A live forecasting endpoint for Prophet Arena. Built
-> for Prophet Hacks 2026, Chicago.
-
-## Chunk 2 — Numbers (0:08 to 0:18, ~26 words)
-
-> Brier zero point oh-three-seven-eight on the twenty-six-event backtest.
-> Zero point one-two-two-four on the twelve-hundred-event scale set, with
-> ninety-five percent confidence interval one-ten to one-thirty-five.
-
-## Chunk 3 — Pipeline (0:18 to 0:35, ~42 words)
-
-> Five stages. Build a Brave Search query. Retrieve five web snippets,
-> deduped by domain. Rank them. One forecast call to Claude Opus four-point-seven
-> with a market-anchored prompt. Then a Kalshi-paper longshot floor caps
-> every outcome at ten percent.
-
-## Chunk 4 — Result (0:35 to 0:48, ~32 words)
-
-> Here is the live demo. The pipeline runs in about three seconds. Every
-> stage logs. The rationale, the probabilities, every search hit, every
-> model decision, all recoverable on the trace explorer.
-
-## Chunk 5 — Wrap (0:48 to 0:60, ~25 words)
-
-> Calibration overlay. Per-event scatter. Bootstrap confidence intervals.
-> Every ablation has a CI, nothing ships unless it clears the gate.
-> Repo and report linked. Thanks.
+Paste the **single plain-prose block** at the bottom into fish.audio.
+The labeled chunks are for CapCut alignment to `submission/DEMO_SCRIPT.md`.
 
 ---
 
-## Final plain prose block (paste this verbatim into fish.audio)
+## Chunk 1 — Public root (0:00–0:05, ~13 words)
+
+> The Oracles. A live forecasting endpoint for Prophet Arena, built for
+> Prophet Hacks twenty twenty-six.
+
+## Chunk 2 — Live pipeline demo (0:05–0:40, ~80 words)
+
+> The centerpiece is a live retrieval-augmented pipeline. Each event
+> Prophet Arena posts goes through five stages.
+>
+> A Brave Search query is built from the title. Five web snippets are
+> retrieved, deduped by domain, ranked. One forecast call to Claude Opus
+> four point seven, with a market-anchored prompt. A Kalshi-paper
+> longshot floor caps every outcome at ten percent.
+>
+> Three seconds end to end. Probabilities, rationale, evidence URLs,
+> every search hit, every latency — all logged on disk per call.
+
+## Chunk 3 — Cross-model heatmap (0:40–0:50, ~25 words)
+
+> Cross-model agreement on the resolved backtest. Same prompt, same
+> retrieval, six models scored. Opus four point seven dominates the
+> multi-outcome events.
+
+## Chunk 4 — Resolved gallery (0:50–1:05, ~32 words)
+
+> Per-event drill-down. Twenty-six resolved events, every model's
+> probability, every Brier score. Brier zero point oh three seven eight
+> on this set, zero point one two two four on the twelve hundred event
+> scale set.
+
+## Chunk 5 — Abstain slider (1:05–1:15, ~28 words)
+
+> Strategic insight. Predict only when you have edge, otherwise defer
+> to the market price. Every ablation has a bootstrap confidence interval.
+> Nothing ships unless it clears the gate. Thanks.
+
+---
+
+## Single plain-prose block (paste this verbatim into fish.audio)
 
 ```
-This is The Oracles. A live forecasting endpoint for Prophet Arena. Built for Prophet Hacks twenty twenty-six, Chicago.
+The Oracles. A live forecasting endpoint for Prophet Arena, built for Prophet Hacks twenty twenty-six.
 
-Brier zero point oh three seven eight on the twenty-six event backtest. Zero point one two two four on the twelve hundred event scale set, with ninety-five percent confidence interval one-ten to one-thirty-five.
+The centerpiece is a live retrieval-augmented pipeline. Each event Prophet Arena posts goes through five stages.
 
-Five stages. Build a Brave Search query. Retrieve five web snippets, deduped by domain. Rank them. One forecast call to Claude Opus four point seven, with a market-anchored prompt. Then a Kalshi-paper longshot floor caps every outcome at ten percent.
+A Brave Search query is built from the title. Five web snippets are retrieved, deduped by domain, ranked. One forecast call to Claude Opus four point seven, with a market-anchored prompt. A Kalshi-paper longshot floor caps every outcome at ten percent.
 
-Here is the live demo. The pipeline runs in about three seconds. Every stage logs. The rationale, the probabilities, every search hit, every model decision, all recoverable on the trace explorer.
+Three seconds end to end. Probabilities, rationale, evidence URLs, every search hit, every latency, all logged on disk per call.
 
-Calibration overlay. Per-event scatter. Bootstrap confidence intervals. Every ablation has a confidence interval, nothing ships unless it clears the gate. Repo and report linked. Thanks.
+Cross-model agreement on the resolved backtest. Same prompt, same retrieval, six models scored. Opus four point seven dominates the multi-outcome events.
+
+Per-event drill-down. Twenty-six resolved events, every model's probability, every Brier score. Brier zero point oh three seven eight on this set. Zero point one two two four on the twelve hundred event scale set.
+
+Strategic insight. Predict only when you have edge, otherwise defer to the market price. Every ablation has a bootstrap confidence interval. Nothing ships unless it clears the gate. Thanks.
 ```
 
 ---
 
-## CapCut alignment notes
+## CapCut alignment cheat-sheet
 
-Drag the generated audio into CapCut. Cut it at the natural sentence pauses
-between the chunks above and slide each chunk under the matching video beat
-in `submission/DEMO_SCRIPT.md`:
+| Chunk | Audio time | Maps to DEMO_SCRIPT.md beat | Action in CapCut |
+|---|---|---|---|
+| 1 | 0:00–0:05 | Beat 1 (Public root, Tab 1) | Land audio start at video frame 1 |
+| 2 | 0:05–0:40 | Beat 2 (Dashboard?record=1, Run live demo) | The narration covers the ~3-6s server wait; pad timeline if your local demo finishes faster |
+| 3 | 0:40–0:50 | Beat 3 (heatmap_resolved.html) | Tab switch ⌘3 lands at 0:40 |
+| 4 | 0:50–1:05 | Beat 4 (gallery_resolved.html) | Tab switch ⌘4 lands at 0:50 |
+| 5 | 1:05–1:15 | Beat 5 (abstain_slider.html) | Tab switch ⌘5 lands at 1:05 |
 
-| Audio chunk | Maps to DEMO_SCRIPT.md beat |
-|---|---|
-| Chunk 1 | [0:00 - 0:08] Tab A (landing) |
-| Chunk 2 | (scroll on the landing showing the numbers card) |
-| Chunk 3 | [0:08 - 0:20] Click into Tab B (dashboard) |
-| Chunk 4 | [0:20 - 0:45] Click "Run live demo" + watch stages |
-| Chunk 5 | [0:45 - 1:00] Show one research page + close |
+## CapCut audio mix
 
-If a chunk runs long, the next-beat cursor move is forgiving (you can
-hold on the previous shot for 1-2 frames more).
+- Voice: -12 dB to -6 dB peak (CapCut auto-normalize is fine)
+- No background music. If you must, -24 dB ducked under voice.
+- No reverb, no "studio voice" effect. fish.audio's raw output reads
+  best when it sounds like a person, not a polished narrator.
+- Voice clarity filter: ON (CapCut default). Anything more sounds AI.
 
-## What to avoid in the voice mix
+## What to drop if you run long
 
-- No background music louder than -18 dB. Speech should be foreground.
-- No reverb or "studio" effects. Fish.audio's raw output is fine; CapCut's
-  "Voice clarity" preset is fine too. Anything more sounds like a fake AI
-  narrator.
-- Do not let the volume normalize too aggressively. fish.audio's default
-  is already loud enough.
+If the cut runs to 80+ seconds, the safest cut is the second half of
+Chunk 4 (the scale-set sentence). Chunks 1, 2, and 5 are load-bearing.
+Chunk 3 can also be shortened to one sentence ("Cross-model agreement
+on the resolved backtest, same prompt, six models.").

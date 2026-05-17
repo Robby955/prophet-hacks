@@ -662,3 +662,38 @@ Artifacts:
 - `data/predictions/subset_1200.json` (raw predictions)
 - `data/predictions/subset_1200_actuals.json` (binary actuals)
 - `data/predictions/subset_1200_summary.json` (aggregate)
+
+## 2026-05-17 — Prophet Arena confirmed endpoint mutability during scoring
+
+Anri Gu from the Prophet Arena org (GitLab affiliation in handle) clarified
+on Discord this afternoon, in response to Siddharth asking:
+
+> Q: "For the forecasting track, can we still continue refining if we don't
+>    change the endpoint during the evaluation phase?"
+> A: "Since you're hosting it, you can update it as you'd like. We won't be
+>    verifying that the code stays the same or anything."
+
+**What this means for our submission:**
+
+1. We can keep deploying improvements during the live evaluation window.
+   The endpoint URL is stable; the implementation behind it is not pinned.
+2. Combined with our paired-bootstrap CI promotion bar, this means we can
+   measure new prompt/retrieval variants on the early PA calls and ship
+   them mid-window if they clear the gate. The bar stays: |delta| > 0.01
+   single-binary Brier with 95% CI excluding zero.
+3. Risk: any change deployed mid-window mixes pre- and post-change
+   scoring. We will tag commits with the deploy SHA and time so the
+   post-event retrospective can split the live BSS series by deploy.
+
+**How to apply:**
+
+- Don't disable the promotion-gate discipline. The temptation is "PA is
+  scoring, just push the change" — that's the same mistake as training-test
+  contamination. Run the offline backtest first, get a CI, then deploy.
+- Tag mid-window deploys explicitly in `docs/DECISIONS.md` so we can
+  attribute live PA Brier deltas to specific commits.
+- Document this in `submission/PROJECT_STORY.md` as "what's next" so
+  judges see we know the latitude exists.
+
+Source: Discord screenshot from 2026-05-17, conversation between Anri Gu
+([GTLB]) and Siddharth at 1:26–1:28 PM local.

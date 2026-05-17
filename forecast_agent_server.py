@@ -2972,6 +2972,11 @@ def dashboard(
         else ""
     )
 
+    # ?record=1 hides everything on /dashboard except the live pipeline demo.
+    # Used for clean screen-record takes (no auto-refresh meta, no KPIs, no
+    # try-form, no cost notes). The auth gate above still applies.
+    record_body_class = ' class="record-mode"' if request.query_params.get("record") == "1" else ""
+
     html = f"""<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
@@ -3169,8 +3174,32 @@ def dashboard(
     .prob-row {{ grid-template-columns: minmax(0, 1.2fr) minmax(80px, 2fr) 44px; gap: 0.45em; }}
     .link-grid {{ grid-template-columns: 1fr; }}
   }}
+
+  /* Recording mode (?record=1): hide everything except the live pipeline
+     demo so a screen capture lands on the centerpiece. */
+  body.record-mode > .page > h1,
+  body.record-mode > .page > .topline,
+  body.record-mode > .page > p.meta,
+  body.record-mode > .page > .kpis,
+  body.record-mode > .page > .card,
+  body.record-mode > .page > .pred-list,
+  body.record-mode > .page > .try,
+  body.record-mode > .page > .footer,
+  body.record-mode > .page > h2,
+  body.record-mode > .page > h3,
+  body.record-mode > .page > form,
+  body.record-mode > .page > .link-grid,
+  body.record-mode .demo-note {{
+    display: none !important;
+  }}
+  body.record-mode {{ background: #f7f8fb; }}
+  body.record-mode > .page {{ padding: 1.4em 1.1em 2em; max-width: 1180px; }}
+  body.record-mode .demo-shell {{ box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08); border-radius: 14px; padding: 18px; }}
+  body.record-mode .demo-result-panel {{ min-height: 420px; }}
+  body.record-mode .demo-output,
+  body.record-mode pre.demo-output {{ font-size: 0.98rem; }}
 </style>
-</head><body>
+</head><body{record_body_class}>
 <div class="page">
 
 <h1>The Oracles</h1>

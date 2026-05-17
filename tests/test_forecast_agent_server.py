@@ -623,6 +623,25 @@ def test_dashboard_contains_demo_console(monkeypatch) -> None:
     assert "EventSource(meta.stream_url)" in response.text
 
 
+def test_dashboard_record_mode_adds_body_class(monkeypatch) -> None:
+    """?record=1 toggles a body class that the CSS uses to hide everything
+    except the live pipeline demo. The demo HTML is still in the markup
+    (so SSE wiring is unchanged); CSS does the hiding."""
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    plain = client.get("/dashboard")
+    record = client.get("/dashboard?record=1")
+
+    assert plain.status_code == 200
+    assert record.status_code == 200
+    assert 'class="record-mode"' not in plain.text
+    assert 'class="record-mode"' in record.text
+    assert "body.record-mode" in record.text  # CSS rule present
+    assert "Run live demo" in record.text  # demo HTML still in markup
+
+
 def test_dashboard_links_private_research_views(monkeypatch) -> None:
     monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
     monkeypatch.delenv("DASHBOARD_PIN", raising=False)

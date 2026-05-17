@@ -1,82 +1,95 @@
-# 60-second demo screen-record script — The Oracles
+# 60-90 second demo screen-record script — The Oracles
 
-Use this to record a single take. Browser at 1280x720 or larger. Voice
-overlay in plain conversational tone. No effects. Target length 55-65
-seconds; faster is fine.
+**Use this order** (per Codex's recommendation). Five beats, target 75
+seconds total. The TTS script at `submission/TTS_SCRIPT.md` is timed to
+match exactly these beats.
+
+Browser at **1440×900**. macOS Screen Recording or QuickTime → File →
+New Screen Recording → "Selected Portion" → drag a 1440×900 selection
+over the browser. Do not stitch screenshots.
 
 ## Pre-flight (off-camera, do once)
 
-1. Two browser tabs already loaded:
-   - **Tab A**: <https://forecastingpath.com/> (public landing)
-   - **Tab B**: <https://agent.forecastingpath.com/dashboard> (live pipeline demo)
-2. On Tab B, scroll to the "Pipeline console" section so the "Run live
-   demo" button is visible. Do NOT click it yet.
-3. Pick **one** preset card from the three (Fed rate cut / UK PM /
-   Super Bowl LXI) — recommended: **Fed rate cut** because it's
-   the 2-outcome case and the explanation is the cleanest.
+1. Sign in once at `https://forecastingpath.com/login?next=/dashboard?record=1`
+   with PIN `176661`. Cookie persists. Do NOT record this step.
+2. Open these five tabs in this order, all already loaded:
+   - **Tab 1**: `https://forecastingpath.com/` (public landing)
+   - **Tab 2**: `https://forecastingpath.com/dashboard?record=1` (live demo, recording layout)
+   - **Tab 3**: `https://agent.forecastingpath.com/static/heatmap_resolved.html`
+   - **Tab 4**: `https://agent.forecastingpath.com/static/gallery_resolved.html`
+   - **Tab 5**: `https://agent.forecastingpath.com/static/abstain_slider.html`
+3. On Tab 2, pre-select the **Super Bowl LXI** preset card (the 5-outcome
+   one). It produces better multi-outcome visuals than Fed.
+4. Hit ⌘L to clear the URL bar focus before you start recording.
 
-## Beats (read out loud while screen-recording)
+## Beats (with exact click cues)
 
-**[0:00 - 0:08] Tab A — the landing.**
-"This is The Oracles, our forecasting-track submission for Prophet Hacks.
-A retrieval-augmented Claude Opus 4.7 endpoint that Prophet Arena hits live."
+### Beat 1 — Public root [0:00 – 0:05]
 
-(Scroll once to surface the result card showing Brier 0.0378 single-binary,
-0.1224 on Subset-1200.)
+Tab 1 already visible. Hold for 4 seconds. Brand, status pill, the two
+result numbers (0.0378 / 0.1224) should be in the viewport.
 
-"Two numbers matter: 0.0378 on our 26-event backtest, 0.1224 on the
-1200-event scale-up. The smaller one is hindsight-rich. The larger one
-is what we expect to roughly match live PA."
+> No clicks. Pan eyes from top headline to numbers card.
 
-**[0:08 - 0:20] Click into Tab B (dashboard).**
-"This is the live operator console. The pipeline runs in five stages —
-query, retrieve, rank, forecast, floor. Each stage logs."
+### Beat 2 — Live pipeline demo [0:05 – 0:40]
 
-(Hover the preset cards.) "Pick a synthetic event — I'll run the Fed one."
+Switch to Tab 2 (⌘2). Recording-mode layout shows ONLY the demo panel.
 
-**[0:20 - 0:45] Click "Run live demo".**
-"This is a real call to the production endpoint. Brave Search hits five
-sources, Opus 4.7 reads them with the anchored calibration prompt, and
-the Kalshi-paper longshot floor caps every outcome at 10%."
+| Sub-beat | Time | Action |
+|---|---|---|
+| 2a | 0:05–0:10 | Hold on the demo panel. Super Bowl LXI card is highlighted. |
+| 2b | 0:10–0:12 | Click **Run live demo**. |
+| 2c | 0:12–0:35 | Hold. Stage timeline ticks: Queue → Event → Retrieve → Forecast → Return. Output panel fills with probabilities + rationale. |
+| 2d | 0:35–0:40 | Pan eyes over the JSON output. |
 
-(Watch the stage timeline tick through.)
+The demo takes about 3–6 seconds wall-clock on the server. The chat
+script keeps narrating during the wait so dead air doesn't hurt.
 
-"There's the rationale. There's the per-outcome probabilities. And the
-full trace — every search hit, every model decision — is recoverable on
-the prediction-trace explorer."
+### Beat 3 — Cross-model heatmap [0:40 – 0:50]
 
-**[0:45 - 1:00] Briefly open one research page (Tab B → top nav → "Event
-map" or jump to `/static/scatter_resolved.html`).**
+Switch to Tab 3 (⌘3). Hold.
 
-"The research views are public for judging — calibration diagram,
-per-event scatter, bootstrap CI, ablations across six models. Every
-ablation delta has a paired-bootstrap CI; nothing ships unless it clears
-the gate. Repo and report linked from the landing. Thanks."
+> No clicks. Hover one cell briefly if you want a tooltip moment.
 
-## What NOT to do
+### Beat 4 — Resolved gallery [0:50 – 1:05]
 
-- Don't show /predictions or /observatory — those have prediction
-  payloads in them that may include any first PA call.
-- Don't show /static/status.html — it's still PIN-gated and the 401 page
-  is ugly.
-- Don't open the Devpost form on-camera.
-- Don't claim numbers that aren't on screen. The 40.8% relative number is
-  in the landing card; the rest is for the report.
+Switch to Tab 4 (⌘4). Scroll down once slowly (1 trackpad swipe).
+Click on any row to expand a per-event drill-down. Hold 2 seconds. Click
+to collapse.
 
-## Quick alternates if the live demo fails on-camera
+### Beat 5 — Abstain slider [1:05 – 1:15]
 
-- If Brave times out: the demo gracefully falls back to no-retrieval.
-  Narrate: "and here it gracefully degrades when retrieval is missing —
-  same prompt, no evidence." Continue.
-- If the page errors entirely: switch to `/static/gallery_resolved.html`
-  (per-event drill-down across five models). It's static evidence of the
-  same story.
-- If `/healthz` is showing a stale SHA: skip the dashboard beat and walk
-  through `/static/summary.html` instead.
+Switch to Tab 5 (⌘5). Drag the threshold slider from the left to the
+right once, slowly. The "predictions kept" count and score drop visibly.
+
+## End [1:15]
+
+Stop recording. CapCut trim head+tail.
+
+## Quick alternates if something fails on camera
+
+- If the live demo hangs >10s: cut to a still of the result page; the TTS
+  script's beat 2 narration covers ~30s so you have airtime.
+- If Brave times out: the system falls back to no-retrieval. The probabilities
+  are still returned; just narrate "and here it gracefully degrades without
+  evidence." Continue.
+- If the cookie expired: you'll get redirected to /login. Stop the take,
+  re-auth in another tab, do not re-record the auth screen.
+
+## What NOT to do on camera
+
+- Don't show `/observatory`, `/predictions`, `/static/status.html`,
+  `/review` — operator-only or PIN-gated.
+- Don't show the PIN entry screen.
+- Don't show `~/Desktop/variables.txt` or any terminal with API keys.
+- Don't reference the parallel-agent coordination (it's in the writeup,
+  not the demo).
+- Don't open the Devpost form on camera.
 
 ## After recording
 
-- Trim head and tail to remove the cursor settling.
-- Export as 1080p mp4 or webm, under 50 MB.
-- Upload to Devpost form video field at
-  <https://devpost.com/submit-to/29074-ai-forecasting-hackathon/manage/submissions/1020007-the-oracles/project_details/edit>.
+- CapCut: trim head+tail to clean cursor settles.
+- Drop the fish.audio mp3 from `submission/TTS_SCRIPT.md` onto the audio
+  track. Align the chunk boundaries to the beats above.
+- Export 1080p mp4, under 50MB.
+- Upload to Devpost form video field.

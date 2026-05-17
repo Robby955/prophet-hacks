@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import shutil
 import subprocess
 import sys
 import time
@@ -126,11 +127,27 @@ def write_submission(predictions: list[dict], out_path: Path) -> None:
     out_path.write_text(json.dumps(submission, indent=2))
 
 
+def _prophet_executable(repo_root: Path | None = None) -> str:
+    root = repo_root or Path(__file__).resolve().parent.parent
+    local_prophet = root / ".venv" / "bin" / "prophet"
+    if local_prophet.exists():
+        return str(local_prophet)
+    path_prophet = shutil.which("prophet")
+    if path_prophet:
+        return path_prophet
+    raise FileNotFoundError(
+        "prophet CLI not found; activate the repo venv or put prophet on PATH",
+    )
+
+
 def evaluate(submission_path: Path, actuals_path: Path) -> dict:
     """Invoke `prophet forecast evaluate` and parse its output."""
-    prophet = Path(__file__).resolve().parent.parent / ".venv" / "bin" / "prophet"
+    try:
+        prophet = _prophet_executable()
+    except FileNotFoundError as exc:
+        return {"error": str(exc), "stdout": ""}
     cmd = [
-        str(prophet), "forecast", "evaluate",
+        prophet, "forecast", "evaluate",
         "--submission", str(submission_path),
         "--actuals", str(actuals_path),
     ]

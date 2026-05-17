@@ -1,44 +1,55 @@
 # Post-event retrospective
 
-Fill in within 7 days of the eval window closing. Be specific. Real
-numbers over adjectives. Three things per "worked / did not work /
-would change" section, no padding.
+Fill this in within 7 days of the evaluation window closing. Use real
+numbers, commit SHAs, and trace references. Do not turn weak evidence
+into strong claims.
 
 ---
 
-## Final Brier score
+## Final outcome
 
-- **Agent Brier:** `<fill in>`
-- **Random 0.25 baseline:** 0.2500 (constant; `(0.5 - 0.5)^2`)
-- **Market-implied baseline:** `<fill in>` (computed by replaying ticks with `p_yes = market mid`)
-- **Delta vs random:** `<fill in>`
-- **Delta vs market:** `<fill in>` (negative = beat the market)
-- **Bucket-level calibration:** see `reports/<slug>/calibration_plot.png`
+- **Team Brier:** `<fill in>`
+- **Market Brier:** `<fill in>`
+- **Delta versus market:** `<fill in>` (negative means we beat market)
+- **Random 0.5 baseline:** `0.2500`
+- **Uniform prior baseline:** `<fill in>`
+- **Brier Skill Score versus market:** `<fill in>`
+- **Events scored:** `<fill in>`
+- **Endpoint completion rate:** `<fill in>` successful calls / attempted calls
+- **Live commit or commits:** `<fill in>`
+- **Production variant:** `<fill in>`
 
-## Trade-level performance
+## Live call audit
 
-- **Total notional traded:** `$<fill in>`
-- **Total trades submitted:** `<fill in>`
-- **Trade win rate:** `<fill in>` (resolved markets where the trade direction was correct)
-- **Average edge captured vs forecasted:** `<fill in>` (capture rate)
-- **Maximum drawdown:** `$<fill in>` (from peak bankroll)
-- **Final bankroll:** `$<fill in>` (starting: $10,000)
-- **Sharpe-equivalent on per-tick PnL:** `<fill in>` (mean / stddev of per-tick PnL)
+Use `/predictions`, Railway logs, and any Prophet Arena result export.
 
-## Per-variant comparison
+- **Payload shape received:** `<fill in>`
+- **Outcome count distribution:** `<fill in>`
+- **Prediction schema returned:** `<fill in>`
+- **Probability range:** `<fill in min/max>`
+- **Fallback count:** `<fill in>`
+- **Parse path breakdown:** `<fill in>`
+- **Warning count and common warnings:** `<fill in>`
+- **Latency p50 / p95 / max:** `<fill in>`
+- **Brave retrieval coverage:** `<fill in>` events with non-empty evidence / total
+- **Largest single-event Brier loss:** `<fill in>`
+- **Best single-event win versus market:** `<fill in>`
 
-Filled in only if multiple variants ran. Otherwise drop this section.
+## Offline versus live gap
 
-| Variant | Brier | Final bankroll | Trades | Notes |
-| --- | --- | --- | --- | --- |
-| baseline-market-price | | | | |
-| model-forecast-no-retrieval | | | | |
-| model-forecast-retrieval | | | | |
-| calibrated-ensemble | | | | |
+- **Sample-resolved backtest Brier:** `<fill in>`
+- **Bootstrap CI used before event:** `<fill in>`
+- **Live Brier:** `<fill in>`
+- **Did the offline ranking predict live ranking?** `<yes/no/unclear>`
+- **Evidence timestamp leakage risk:** `<fill in>`
+- **Event mix difference:** `<fill in binary vs multi-outcome counts>`
+- **Which offline claims survived live scoring?** `<fill in>`
+- **Which offline claims should be downgraded?** `<fill in>`
 
 ## What worked
 
-Three specific decisions or modules that paid off. Cite commit SHAs.
+Three specific decisions or modules that paid off. Cite commit SHAs and
+the metric or trace that supports each one.
 
 1. `<fill in>`
 2. `<fill in>`
@@ -46,57 +57,86 @@ Three specific decisions or modules that paid off. Cite commit SHAs.
 
 ## What did not work
 
-Three specific decisions or modules that hurt. Cite commit SHAs.
+Three specific decisions or modules that hurt or failed to matter. Cite
+commit SHAs and the evidence.
 
 1. `<fill in>`
 2. `<fill in>`
 3. `<fill in>`
 
-## What I would do differently
+## If the score was poor
 
-Three concrete improvements for the next sprint. Each one specific
-enough to be a PR description.
+State the failure mode plainly. Pick the smallest defensible explanation
+that matches the data.
+
+- `<fill in: payload/schema mismatch, retrieval weakness, market baseline
+  dominance, leakage in offline eval, event-mix mismatch, calibration
+  failure, deploy/auth/routing issue, sparse sample, or another measured
+  cause>`
+- **Trace or script proving it:** `<fill in>`
+- **What would have caught it earlier:** `<fill in>`
+- **One next experiment:** `<fill in>`
+
+## What I would change next
+
+Three concrete follow-up PRs, each narrow enough to implement.
 
 1. `<fill in>`
 2. `<fill in>`
 3. `<fill in>`
 
-## Methodology highlights
+## Methodology notes worth preserving
 
-Bullet list of the methodology choices worth showcasing in the portfolio
-writeup. Examples:
+Keep only points that remain true after live scoring.
 
-- Calibration discipline: bucketed probabilities snap to `[0.10, 0.20, ..., 0.90]`.
-- Skip-by-default: any uncertainty falls through to a SKIP record.
-- Edge threshold 0.08 as a constant in `risk.py`, not a yaml-only knob.
-- Idempotency keys on every `TradeIntentRequest` derived from `sha256(tick_id|market_id|side|size)`.
-- Multi-model agreement gate (if shipped): triage and forecast must agree on direction.
-- Append-only JSONL traces, one record per decision, written before the next decision starts.
+- Forecasts were scored with Brier, not accuracy.
+- The endpoint returned the Prophet Arena `probabilities` schema.
+- Candidate changes were promoted only after paired comparisons cleared
+  the uncertainty bar.
+- Negative ablations were documented rather than quietly discarded.
+- Per-call traces captured retrieval, model output, parsing, latency, and
+  fallback behavior.
+- The live dashboard and review pages were auth-gated while the public
+  landing page remained safe to share.
 
-## Code organization summary
+## Portfolio artifacts to keep
 
-Single paragraph describing how the four-module split (`agent.py`,
-`forecaster.py`, `market_filter.py`, `risk.py`) actually held up under
-real conditions. Did the seams hold? Were there modules that grew bigger
-than they should have? Was there a missing module that should exist?
+- `submission/REPORT.md`
+- `submission/PROJECT_STORY.md`
+- `docs/FINDINGS.md`
+- `docs/WORKSHOP_PAPER_DRAFT.md`
+- `docs/ADVERSARIAL_REVIEW.md`
+- `docs/DECISIONS.md`
+- `docs/RUNBOOK.md`
+- `docs/HANDOFF.md`
+- `docs/QUANT_PORTFOLIO_ARTIFACTS.md`
+- `output/playwright/` captures that are safe to publish
+- `data/predictions/` backtest outputs
+- sanitized `/predictions` live traces, if available
 
 ## Cost report
 
-- **Anthropic API spend:** $`<fill in>`
-- **OpenAI API spend:** $`<fill in>`
-- **RunPod spend (if any):** $`<fill in>`
-- **Other infra:** $`<fill in>`
-- **Total:** $`<fill in>`
+- **Anthropic API spend:** `$<fill in>`
+- **OpenAI API spend:** `$<fill in>`
+- **Brave Search spend:** `$<fill in>`
+- **Railway spend:** `$<fill in>`
+- **Other infra:** `$<fill in>`
+- **Total:** `$<fill in>`
 
 ## Reproducibility receipt
 
-One-command run that recreates the headline result on a fresh clone.
+Commands that should recreate the headline analysis on a fresh clone
+after actuals are available.
 
 ```bash
 git clone <repo>
 cd prophet-hacks
 python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python agent.py --slug <slug-used> --variant <variant-used>
-python scripts/build_results_report.py --slug <slug-used>
+./scripts/agent/verify.sh
+./scripts/post_event_orchestrator.sh --actuals <path-to-actuals>
+./scripts/full_check.sh
 ```
+
+If any command requires a private token, state that clearly and include a
+safe public substitute where possible.

@@ -92,6 +92,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T02:43:28Z
 - **Notes:** `/predict` now appends each served prediction to ignored JSONL storage (`PROPHET_PREDICTION_STORE_PATH`, Railway volume path, then `logs/live_predictions.jsonl`). `/predictions` lazily reloads that store if the in-memory ring is empty, so a process restart no longer erases the visible recent trace history when the file remains available. `/observatory` now shows recent persisted predictions with probabilities, total latency, parse path, and warnings. `scripts/agent/deploy.sh` now deploys a minimal runtime bundle after preflight to avoid the repeated full-repo Railway code-snapshot/TLS upload failures. Railway production volume `oracles-agent-volume` (`1ae021a5-353d-4917-a474-8a5e0aa6dced`) is mounted on `oracles-agent` at `/data`; latest deployment `0b16e0f5` is `SUCCESS` and shows `volumeMounts: ["/data"]`. No production variant, public landing copy, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py` changed. Verified by new failing-first tests, full `pytest tests/`, local persisted-row render check, `./scripts/agent/verify.sh`, Railway volume list, Railway status, and live `/healthz`.
 
+## codex/post-event-artifact-preservation
+
+- **Current task:** Completed portfolio and retrospective documentation refresh so the project keeps value even if live PA scoring disappoints.
+- **Files owned this session:** `docs/QUANT_PORTFOLIO_ARTIFACTS.md`, `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md`, `docs/HANDOFF.md`, `docs/STATUS.yaml`, `tests/test_portfolio_artifacts_docs.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T08:30:41Z
+- **Notes:** No production forecast code, Railway env vars, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changed. `docs/QUANT_PORTFOLIO_ARTIFACTS.md` now explicitly captures what survives a weak leaderboard result, which public claims to avoid, and what artifacts to preserve before making the repo public. `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md` now matches the forecasting endpoint instead of stale trading-track bankroll fields. `docs/HANDOFF.md` points new agents at adversarial review, demo capture, and portfolio docs. `docs/STATUS.yaml` reflects live `/healthz` commit `7c3f04e9`, auth-gated research surfaces, open PR #12, and the post-event runbook. Verified by `python -m pytest tests/test_portfolio_artifacts_docs.py -q` and `./scripts/agent/verify.sh` (274 passed).
+
 ## codex/handoff-todo-list (rev. 2026-05-17T00:10Z)
 
 Concrete asks for Codex. Items 1-5 from the prior list are DONE. This

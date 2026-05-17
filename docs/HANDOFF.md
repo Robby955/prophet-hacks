@@ -1,8 +1,8 @@
-# Handoff — single-page state for picking up cold
+# Handoff: single-page state for picking up cold
 
 Use this when another agent (or future-you) needs to take over without
 context. Last updated 2026-05-17 (Prophet Hacks 2026, hackathon submission
-ready, eval window pending).
+ready, eval window pending; live health verified at commit `7c3f04e9`).
 
 If the hackathon is over: run `./scripts/post_event_orchestrator.sh
 --actuals <path>` for the auto-generated retrospective draft, then
@@ -10,13 +10,16 @@ jump to `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md`.
 
 ## Quick reads in priority order
 
-1. `submission/REPORT.md` — the single-page submission summary
-2. `docs/FINDINGS.md` — the research-grade write-up of what was measured
-3. `docs/WORKSHOP_PAPER_DRAFT.md` — 4-page workshop-paper draft
-4. `docs/DECISIONS.md` — append-only decision log (every bug + every model swap)
-5. `docs/RUNBOOK.md` — operational triage including the first-PA-call playbook
-6. `docs/SUBMISSION.md` — how to fill the hackathon submission form
-7. `docs/AGENT_STATUS.md` — multi-agent coordination, current Codex handoff list
+1. `submission/REPORT.md`: the single-page submission summary
+2. `docs/FINDINGS.md`: the research-grade write-up of what was measured
+3. `docs/WORKSHOP_PAPER_DRAFT.md`: 4-page workshop-paper draft
+4. `docs/ADVERSARIAL_REVIEW.md`: strongest self-critique and claim limits
+5. `docs/QUANT_PORTFOLIO_ARTIFACTS.md`: what survives even if live score disappoints
+6. `docs/DEMO_CAPTURE_GUIDE.md`: screenshots and short demo capture flow
+7. `docs/DECISIONS.md`: append-only decision log (every bug + every model swap)
+8. `docs/RUNBOOK.md`: operational triage including the first-PA-call playbook
+9. `docs/SUBMISSION.md`: how to fill the hackathon submission form
+10. `docs/AGENT_STATUS.md`: multi-agent coordination, current Codex handoff list
 
 ---
 
@@ -27,7 +30,7 @@ A live forecasting agent submitted to **Prophet Hacks 2026** by team
 **forecasting track**, scored by Brier (lower is better). Prophet Arena
 calls our endpoint with each event; we return per-outcome probabilities.
 
-The repo doubles as a career portfolio piece — `docs/DECISIONS.md`, the
+The repo doubles as a career portfolio piece: `docs/DECISIONS.md`, the
 JSONL traces, this handoff, and the post-event retrospective are
 intentional artifacts, not afterthoughts.
 
@@ -36,20 +39,22 @@ intentional artifacts, not afterthoughts.
 | Thing | URL / value | Notes |
 |---|---|---|
 | Endpoint hostname (primary) | `https://agent.forecastingpath.com` | Railway-hosted |
-| Apex (same backend) | `https://forecastingpath.com` | redirects to /dashboard |
+| Apex (same backend) | `https://forecastingpath.com` | public landing page |
 | Health | `/healthz` | public, 200 |
 | Predict | `POST /predict` | public (Prophet Arena hits this) |
-| Dashboard | `/dashboard?token=$DASHBOARD_AUTH_TOKEN` | auth-protected |
+| Dashboard | `/dashboard` | auth-protected; redirects to `/login` |
 | Predictions history | `GET /predictions` (same auth) | in-memory list |
 | Active variant | `multi_outcome_retrieval` | Brave search → Opus 4.7 → longshot floor |
 | Forecast model | `claude-opus-4-7` | Phase 2 swap from Sonnet 4.6 |
 | Triage model | `gpt-5.4-mini` (not currently used live) | reserved |
 | Search | Brave Search (BRAVE_SEARCH_API_KEY) | 5 chunks, deduped |
 | Hosted on | Railway service `oracles-agent` in `mindful-unity` project | manual `railway up` deploys |
-| Endpoint registration | Prophet Arena team `CanadaHacks`, active | `last_run_at: None` (no PA call yet at handoff time) |
+| Endpoint registration | Prophet Arena team `CanadaHacks`, active | endpoint API now requires auth from this shell |
+| Live commit | `7c3f04e9` | verified via both `/healthz` hosts on 2026-05-17 |
 
-Dashboard auth token lives at `/tmp/forecastpath-dashboard-url` on
-Rob's machine. **Never paste it into chat or commit it.**
+Dashboard auth uses a PIN-backed login cookie in production. Tokens and
+PIN files live outside the repo. **Never paste them into chat or commit
+them.**
 
 ## Strategy in one paragraph
 
@@ -58,7 +63,7 @@ For every event Prophet Arena sends:
 1. Build a Brave search query from event title + most informative outcome.
 2. Hit Brave for 5 results, dedupe by source priority (.gov/.edu first).
 3. Inject evidence titles+snippets into Opus 4.7 with a strict system
-   prompt that includes a **market-odds anchoring** block — if the
+   prompt that includes a **market-odds anchoring** block. If the
    evidence cites implied probabilities, anchor to them.
 4. Apply the Kalshi longshot floor: per-outcome probability ≥
    `min(0.10, max(0.05, 0.5/n_outcomes))`. The 0.10 ceiling on the
@@ -70,45 +75,40 @@ For every event Prophet Arena sends:
 ## What's been deployed (commit history)
 
 ```
-62f08a3  fix(dashboard): reflect Phase 2 (Opus 4.7, anchoring, 0.10 floor cap)
-9652016  feat(forecast): Opus 4.7 + market-odds-anchor prompt + fix binary floor bug   <- Phase 2
-a254665  fix(eval): harden review-found edge cases                                     <- Codex
-b5ed6de  feat(eval): cherry-pick observability + Kalshi market_blend from v3-v6        <- Phase 1
-cafd6f6  chore(ops): track agent guide and predictions watcher                         <- Phase 1
-2e38088  fix(dashboard): protect live monitor                                          <- Codex earlier
+7c3f04e  fix(overnight): resolve tour json and scatter labels
+0799caa  docs(review): adversarial self-review + fix README 40.7/40.8 inconsistency
+8b65079  feat(server): shepherd tour + observatory polish + dashboard tour wiring
+a2a6880  feat(overnight): regenerated pages from C1-C5 + variance ablation
+0e7cf4b  docs(variance): surface 0.0377 +- 0.0009 in summary + DECISIONS
+cb4a1a0  feat(variance): 5-run intra-model variance ablation + interactive plot
+f59022b  fix(submission-polish): README diagram + gallery credit footer + login spacing
+12959ea  feat(landing+login): surface public report; clarify operator-only gating
+9652016  feat(forecast): Opus 4.7 + market-odds-anchor prompt + fix binary floor bug
 ```
 
 `main` is what Railway serves (after a manual `railway up`).
-GitHub auto-deploy is NOT wired — pushing to main does NOT trigger a
+GitHub auto-deploy is NOT wired. Pushing to main does NOT trigger a
 Railway build. Production updates require `railway up` from a logged-in
 shell or the Railway MCP tool.
 
 ## Open work / Phase 3 candidates (priority order)
 
-1. **PR #1 cherry-pick** — `calibrator.py` + `ensemble.py` for a
-   median-of-logits + disagreement-penalty ensemble. Build
-   `predict_multi_outcome_retrieval_ensemble` (Opus 4.7 + GPT-5.2 + same
-   Brave evidence). Estimated +0.005–0.020 BSS at 2x cost. PR is
-   conflicting; cherry-pick the two modules and skip the rest.
+1. **First live PA call review:** inspect `/predictions`, Railway logs,
+   payload shape, outcome matching, parse path, warnings, and latency.
 
-2. **PR #4 SAE shrinkage** — `forecasting/borrowed_strength.py` is the
-   real upside (estimated +0.025–0.040 BSS from the agent review).
-   Hierarchical Bayesian shrinkage in logit space. Wire into
-   `predict_multi_outcome_retrieval` after the first live PA call so
-   we have real event shapes to test against.
+2. **Post-event actuals flow:** when actuals are available, run
+   `./scripts/post_event_orchestrator.sh --actuals <path>` and fill
+   `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md`.
 
-3. **Triage gate** — port the idea from `proposed_retrieval/base.py`
-   (skip Brave when triage is confident, e.g. max prob > 0.7).
-   Cost optimization, not a Brier improvement. Worth doing if event
-   volume turns out high.
+3. **Open PR #12 review:** the only open PR from `gh pr list` on
+   2026-05-17. It touches forecast quality and server behavior, so do
+   not merge without measured improvement on the right metric and Rob's
+   explicit approval.
 
-4. **Reliability diagram on the dashboard** — `evaluation/ece.py`
-   already returns the bin data. Add a simple SVG calibration curve to
-   `forecast_agent_server.py` once we have ≥30 resolved predictions.
-
-5. **OPEN PRs to deal with** — #1 (v2 calibrated ensemble),
-   #4 (v3-v6 SAE stack). #3 already closed. Both will sit forever
-   conflicting; either selectively cherry-pick or close.
+4. **Public release cleanup:** use
+   `docs/QUANT_PORTFOLIO_ARTIFACTS.md` before making the repo public:
+   redact secrets, preserve demo captures, preserve negative ablations,
+   and avoid unsupported market-beating claims.
 
 ## Files you should know
 
@@ -130,8 +130,8 @@ shell or the Railway MCP tool.
 
 ## Commits + git rules
 
-- **No AI co-author trailers ever** (no `Co-Authored-By: Claude`, no
-  `🤖 Generated`). This repo flips public after the event; commit history
+- **No agent co-author trailers ever** (no `Co-Authored-By: Claude`, no
+  generated-with-agent trailers). This repo flips public after the event; commit history
   should read as Rob's work.
 - Convention: `<scope>(<area>): <one-line>`.
 - Never `git commit --amend` a pushed commit; new commits only.
@@ -148,7 +148,7 @@ When the notification fires:
 3. Verify the prediction shape: outcomes match event.outcomes, each
    probability in [0.01, 0.99], no NaN, longshot floor applied.
 4. If Brave retrieval failed, the rationale will say so and
-   `evidence_urls` will be empty — fall-through path, still safe.
+   `evidence_urls` will be empty: fall-through path, still safe.
 
 ## Costs and budget
 

@@ -2,8 +2,8 @@
 # Feedable to Codex, Claude, or a scheduled briefing job.
 # Keep terse and factual. The richer human view is the live dashboard.
 
-version: 4
-as_of: "2026-05-16T18:46:08Z"
+version: 5
+as_of: "2026-05-17T08:30:41Z"
 last_actor: codex
 project_name: The Oracles
 team_name: CanadaHacks
@@ -16,11 +16,12 @@ event:
 
 production:
   root_url: "https://forecastingpath.com/"
-  root_url_status: "Railway custom domain exists; Cloudflare authoritative apex A visible, resolver propagation pending from this shell"
+  root_url_status: "healthy; /healthz returns 200 and commit 7c3f04e9"
   endpoint_url: "https://agent.forecastingpath.com/predict"
   health_url: "https://agent.forecastingpath.com/healthz"
   dashboard_url: "https://agent.forecastingpath.com/dashboard"
-  dashboard_auth: "DASHBOARD_AUTH_TOKEN protects /dashboard, /predictions, and /events in production"
+  dashboard_auth: "PIN-backed login cookie protects /dashboard, /observatory, /review, /predictions, /events, and static research pages"
+  public_surface: "root landing page, /healthz, /robots.txt, /sitemap.xml, and /predict for Prophet Arena"
   docs_url: null
   hosting: "Railway"
   railway_project_name: "mindful-unity"
@@ -28,32 +29,29 @@ production:
   railway_service_name: "oracles-agent"
   railway_service_id: "ff3b8fd2-19c9-4905-8040-94d3f612a8eb"
   railway_environment: "production"
-  latest_deployment_id: "23aa7725-3fa6-4e55-88b7-b50a82ce6b19"
-  latest_deployment_status: "SUCCESS"
+  latest_deployment_id: "not refreshed in this pass"
+  latest_deployment_status: "SUCCESS inferred from live /healthz; Railway deployment id not queried"
   registered_with_prophet_arena: true
+  endpoint_api_status_from_this_shell: "401 without auth; do not infer last_run_at from unauthenticated curl"
   is_active: true
   last_run_at: null
-  last_run_status: null
+  last_run_status: "unknown from unauthenticated shell"
   last_run_n_predictions: null
   variant_served: "multi_outcome_retrieval"
-  current_public_state: "healthy, waiting for first Prophet Arena call"
-  root_route_behavior: "public status page; live monitor is token-protected at /dashboard"
+  live_commit: "7c3f04e9"
+  current_public_state: "healthy; waiting for first PA call or score publication"
+  root_route_behavior: "public landing page; operator and research pages are auth-gated"
 
 repo:
   remote: "git@github.com:Robby955/prophet-hacks.git"
   branch: "main"
-  current_head: "64ac36c"
-  privacy: "private during sprint; flip public after Rob review post-event"
+  current_head_note: "status refresh started from 7c3f04e9; run git rev-parse --short=8 HEAD for exact local head after docs-only commits"
+  privacy: "private during sprint; flip public only after Rob review post-event"
   open_prs:
-    - number: 1
-      title: "feat(architecture): v2 calibrated ensemble forecaster"
-      note: "large architecture branch; not current production"
-    - number: 3
-      title: "feat(monitor): auto-refreshing HTML dashboard for live + post-event review"
-      note: "trace monitor branch; separate from FastAPI live dashboard"
-    - number: 4
-      title: "feat(v3-v6): full SAE-borrowed-strength forecasting stack"
-      note: "large offline harness branch; review carefully before merging"
+    - number: 12
+      title: "fix(forecast): five-fix ship list - anchor removal + sum-to-1 + fallback + retrieval log + /predict guard"
+      head: "fix/2026-05-16-forecast-quality-ship-list"
+      note: "review carefully; touches forecast quality and server behavior. Do not merge without measured improvement and Rob approval."
   open_issues_count: 0
 
 forecasting_track:
@@ -77,87 +75,62 @@ forecasting_track:
     graceful_degradation:
       - "If BRAVE_SEARCH_API_KEY is missing or Brave fails, fall back to multi_outcome"
       - "If the LLM call fails, fall back to uniform prior"
+    live_trace_fields:
+      - "Brave query"
+      - "evidence titles and URLs"
+      - "raw model output"
+      - "parse path"
+      - "latency_ms"
+      - "warnings"
+      - "fallback path"
 
-  variants_in_forecast_track_py:
-    - name: uniform_prior
-      description: "deterministic 1/len(outcomes)"
-      cost_per_event_usd: 0.0
-    - name: single_llm
-      description: "one Sonnet 4.6 call; emits legacy binary p_yes"
-      cost_per_event_usd: 0.005
-    - name: opus_47
-      description: "one Opus 4.7 call"
-      cost_per_event_usd: 0.015
-    - name: opus_46
-      description: "one Opus 4.6 call"
-      cost_per_event_usd: 0.015
-    - name: gpt55
-      description: "one GPT-5.5 call"
-      cost_per_event_usd: 0.010
-    - name: gpt52
-      description: "one GPT-5.2 call"
-      cost_per_event_usd: 0.010
-    - name: ensemble_logit
-      description: "Sonnet 4.6 + GPT-5.5, logit-mean blend"
-      cost_per_event_usd: 0.015
-    - name: ensemble_leaderboard
-      description: "Sonnet 4.6 + Opus 4.6 + GPT-5.2, logit-mean blend"
-      cost_per_event_usd: 0.025
-    - name: sonnet_cot
-      description: "Sonnet 4.6 structured prompt experiment"
-      cost_per_event_usd: 0.007
-    - name: sonnet_cot_shrink
-      description: "sonnet_cot plus post-hoc shrinkage to prior"
-      cost_per_event_usd: 0.007
-    - name: multi_outcome
-      description: "one Sonnet 4.6 call returns per-outcome probabilities"
-      cost_per_event_usd: 0.010
-    - name: multi_outcome_sc3
-      description: "k=3 parallel multi_outcome calls, averaged per outcome"
-      cost_per_event_usd: 0.030
-    - name: multi_outcome_retrieval
-      description: "Brave Search evidence plus multi_outcome prompt plus Kalshi guard"
-      cost_per_event_usd: 0.012
-      currently_in_production: true
-    - name: hybrid_routed
-      description: "binary routes to gpt55; multi-outcome routes to multi_outcome"
-      cost_per_event_usd: 0.008
-
-  brier_baseline_sample_resolved:
+  current_backtest_context:
     n_events: 26
     caution: "retrieval on resolved historical events can leak through web search"
-    legacy_p_yes_brier:
-      random_0_5: 0.250
-      uniform_prior: 0.219
-      single_llm: 0.193
-      opus_47: 0.230
-      opus_46: 0.237
-      gpt55: 0.198
-      gpt52: 0.203
-      ensemble_logit: 0.193
-      ensemble_leaderboard: 0.208
-      sonnet_cot: 0.207
-      sonnet_cot_shrink: 0.194
-      multi_outcome: 0.211
-      multi_outcome_retrieval: 0.064
+    current_headline: "multi_outcome_retrieval remains production; live PA calls are the next trigger"
+    rejected_changes:
+      - "self-critique prompt: first run improved, replication regressed; treated as noise"
+      - "retrieval-count sweep: k=5 versus k=8 did not clear paired-bootstrap CI"
+      - "source-priority sweep: not significant under PA single-binary metric"
+
+portfolio:
+  durable_docs:
+    - "docs/QUANT_PORTFOLIO_ARTIFACTS.md"
+    - "docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md"
+    - "docs/ADVERSARIAL_REVIEW.md"
+    - "docs/FINDINGS.md"
+    - "docs/WORKSHOP_PAPER_DRAFT.md"
+    - "docs/DECISIONS.md"
+    - "docs/HANDOFF.md"
+    - "docs/RUNBOOK.md"
+  demo_assets:
+    - "docs/DEMO_CAPTURE_GUIDE.md"
+    - "scripts/capture_demo_assets.sh"
+    - "output/playwright/forecast-demo/"
+    - "output/playwright/overnight/"
+  public_claim_rule: "Do not claim market-beating performance until Team Brier versus Market Brier is known."
 
 infra:
   active:
     - "Railway production service"
     - "custom domain agent.forecastingpath.com"
+    - "custom domain forecastingpath.com"
+    - "PIN-gated dashboard and research pages"
   not_active:
     - "Cloudflare quick tunnel, replaced by Railway custom domain"
     - "local FastAPI process, Railway hosts production"
-    - "scripts/watchdog.sh and scripts/watch_predictions.sh, superseded by managed container for production"
+    - "RunPod, intentionally off for this workload"
 
 next_steps:
   immediate:
-    - "Watch for Prophet Arena first call or open events"
-    - "If first call arrives, verify /predictions and dashboard history fill"
-    - "Keep README, STATUS.yaml, and LIVE_OPERATIONS.md current after deploys"
+    - "Watch for Prophet Arena first call or open scores"
+    - "If first call arrives, verify /predictions, Railway logs, payload shape, probabilities, warnings, and latency"
+    - "When actuals are available, run ./scripts/post_event_orchestrator.sh --actuals <path>"
+    - "Fill docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md within 7 days of close"
   review_before_merge:
-    - "Open GitHub PRs #1, #3, #4 are large and not equivalent to production main"
+    - "Open GitHub PR #12 changes forecast/server behavior; do not merge without measured improvement and Rob approval"
     - "Review data leakage risk before promoting any retrieval backtest result"
+    - "Use docs/QUANT_PORTFOLIO_ARTIFACTS.md before flipping repo public"
 
 traps_already_hit_dont_repeat:
   - "Do not confuse forecasting and trading tracks"
@@ -166,7 +139,8 @@ traps_already_hit_dont_repeat:
   - "Railway Nixpacks venv is /opt/venv and not on PATH; startCommand uses the absolute uvicorn path"
   - "OpenAI GPT-5.x reject max_tokens and temperature overrides"
   - "Anthropic Opus 4.7 rejects temperature"
-  - "fastapi and uvicorn must stay in requirements.txt"
+  - "fastapi, uvicorn, and python-multipart must stay in requirements.txt"
+  - "Do not turn single-seed prompt ablations into findings"
 
 links:
   developer_portal: "https://prophetarena.co/developer"

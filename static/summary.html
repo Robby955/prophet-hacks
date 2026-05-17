@@ -142,6 +142,25 @@
   <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
 </div>
 
+<h2>How Prophet Arena actually scores us</h2>
+<p class="meta">Per PA organizers (Discord, 2026-05-16): <strong>Total score = (team avg Brier − market avg Brier) × completion rate</strong>. Higher is better; a lower Brier than the market produces a positive score. Markets are snapshotted Kalshi/Polymarket prices at prediction time on events closing 2 days to 2 weeks out. <em>You only win by beating the market.</em></p>
+<p class="meta"><strong>Implications baked into our agent</strong>: (1) the market-odds-anchoring block in the system prompt is strategically protective — anchoring to cited market prices gives approximately market Brier when our model lacks edge; (2) post-LLM longshot floor caps overconfidence on contracts &lt;$0.10 (Kalshi paper: &gt;60% buyer loss); (3) exception boundary on <code>/predict</code> is the priority guard for <em>completion rate</em>, which multiplies the final score.</p>
+
+<h2>Brier Skill Score (BSS) — production vs alternatives</h2>
+<p class="meta"><strong>BSS = 1 − Brier_model / Brier_baseline</strong>. Here baseline is random (Brier = 0.25). BSS = 1 is perfect; BSS &gt; 0 beats the baseline. Live PA scoring substitutes market-implied Brier as the baseline — those numbers come once PA calls land. Code: <code>evaluation/brier.py:brier_skill_score</code>.</p>
+<table>
+  <thead><tr><th>Variant</th><th style="text-align:right">Brier</th><th style="text-align:right">BSS vs random</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Opus 4.7 (production)</strong></td><td style="text-align:right"><strong>0.0378</strong></td><td style="text-align:right"><strong>0.849</strong></td></tr>
+    <tr><td>Opus 4.6</td><td style="text-align:right">0.0391</td><td style="text-align:right">0.844</td></tr>
+    <tr><td>GPT-5.2</td><td style="text-align:right">0.0438</td><td style="text-align:right">0.825</td></tr>
+    <tr><td>Sonnet 4.6 (prev prod)</td><td style="text-align:right">0.0639</td><td style="text-align:right">0.744</td></tr>
+    <tr><td>Gemini 3.1 Pro</td><td style="text-align:right">0.0873</td><td style="text-align:right">0.651</td></tr>
+    <tr><td>GPT-5.5</td><td style="text-align:right">0.0920</td><td style="text-align:right">0.632</td></tr>
+  </tbody>
+</table>
+<p class="meta">All variants beat random; production wins by 0.005 BSS over Opus 4.6 on n=26. <strong>The hard test is BSS &gt; 0 against live Kalshi/Polymarket prices</strong> — pending PA's first call.</p>
+
 <h2>Brier decomposition (Murphy 1973): REL - RES + UNC</h2>
 <p class="meta">Same prediction files, decomposed. <strong>REL down</strong> (lower better) = miscalibration; <strong>RES up</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance. GPT-5.5 is better calibrated by REL than production in this sample, but has lower RES, so its direct Brier is worse.</p>
 <table>

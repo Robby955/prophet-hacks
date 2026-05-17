@@ -322,3 +322,65 @@ Decided by: Claude after surfacing the bug via prompt-ablation
 discrepancy. Author of the original metric mismatch: also Claude;
 postmortem is the discipline.
 - Commit: this commit + the backtest script fix.
+
+---
+
+## 2026-05-16 (late evening) — PA scoring formula confirmed; KEEP market-odds-anchoring
+
+**Discovery via PA organizer Discord (Anri Gu + Jibang Wu, 2026-05-16 23:11 CT):**
+
+> Total score = (team avg Brier − market avg Brier) × completion rate.
+> Market Brier = calculated against snapshotted Kalshi/Polymarket
+> prices at the time of prediction. Events close 2 days to 2 weeks out.
+
+This is a **relative metric vs market**, not absolute Brier. The hard
+test is `BSS > 0 vs market`, which markets are calibrated to defeat
+by aggregating informed money.
+
+**What this means for the SHIP-list from the parallel review agent:**
+
+- **Item #1 (delete `_MULTI_OUTCOME_RETRIEVAL_SYSTEM_PROMPT` market-odds-anchoring block at forecast_track.py:1139-1147):**
+  **DO NOT APPLY** without first measuring on a market-anchored
+  baseline. The +0.0192 multi-only Brier improvement V1 vs V0 was
+  measured against actual outcomes, not against market-Brier. Under
+  PA's actual scoring rule, the anchoring block is protective:
+  - When market is right and we anchor → we tie market Brier → score ≈ 0
+  - When market is wrong and our model has signal → we beat market
+  - Without anchoring, when market is right → we drift off-truth → lose
+  Removing the anchor only helps if our model has signal the market
+  systematically lacks across many event categories. n=26 unmeasured.
+- **Item #2 (sum-to-1 dilution fix):** APPLY — multi-class scoring
+  benefits, single-binary unaffected. Confirmed 7 of 26 events have
+  prob sums &gt; 1.0 (max 2.35 on KXNHLCALDER-26).
+- **Item #3 (silent retrieval degradation log):** APPLY — protects
+  completion_rate by surfacing Brave fallback to operator.
+- **Item #4 (exception boundary on /predict):** APPLY — directly
+  protects completion_rate, the score multiplier. Highest priority.
+- **Item #5 (missing-outcome fallback):** APPLY — uniform prior on
+  small n is too aggressive; `min(prior, longshot_guard_floor(n))`
+  shrinks unknowns toward 0 conservatively.
+
+**Already-built infrastructure that becomes load-bearing:**
+
+- `evaluation/brier.py:brier_skill_score(brier_model, brier_baseline)`
+  — exact PA metric. Surfaced in summary.html this commit.
+- `evaluation/brier.py:pnl_alpha_vs_market(p_final, p_market, outcome)`
+  — per-event alpha vs market. Used once PA calls land with market
+  prices in the request payload (or we infer from cited prices).
+- `forecasting/market_blend.py` — Kalshi-paper-informed market-aware
+  blending, offline-only. Not promoting now; might revisit if PA
+  starts emitting explicit market prices in the request.
+
+**FutureSim (Goel et al. 2026, OpenForecaster/futuresim):** Their
+benchmark replays months chronologically on the OpenForesight
+dataset; their best agent scores 23.6% accuracy / 0.054 Brier skill
+score. Architecture not portable (multi-agent simulator vs our
+webhook agent). Post-event: clone + run our agent through
+OpenForesight as a workshop-paper extension.
+
+Decided by: Claude after Rob surfaced the Discord scoring-formula
+screenshot. Author of the original "delete anchoring" recommendation:
+parallel review agent operating without the scoring-rule context;
+their measurement on V0/V1 was valid but the strategic implication
+was opposite of what they concluded once we know the actual rule.
+Commit: this commit.

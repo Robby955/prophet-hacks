@@ -39,16 +39,27 @@ not convergence.
 
 ## 1 Introduction
 
-Prophet Arena's published scoring formula is the proper
-multi-class Brier
-$\text{Brier}(\mathbf p, \mathbf y) = \sum_{k=1}^{K} (p_k - y_k)^2$,
-averaged across events. Their CLI evaluator
-(`prophet forecast evaluate`), however, implements *single-binary*
-Brier on `(p_yes − 1{outcomes[0] won})²` — the squared error against
-the indicator for the first listed outcome winning. We discovered
-this gap mid-bench and report both metrics throughout; the headline
-is single-binary because that's the metric we can verify against
-PA's own evaluator on a resolved dataset.
+Prophet Arena's actual scoring rule, confirmed by PA organizers in
+Discord on 2026-05-16 ("Total score = (team avg Brier − market avg
+Brier) × completion rate"), is a *Brier skill score against a
+live-market baseline*. The market baseline is the Brier of
+snapshotted Kalshi or Polymarket prices at prediction time, on
+events that close 2 days to 2 weeks out. Beating the market by a
+small margin in Brier produces a small positive total score;
+producing higher Brier than the market produces a negative score.
+Completion rate (fraction of webhook events the agent successfully
+returned a forecast on) is a multiplicative term — a 500 error on
+10% of events scales the headline by 0.9.
+
+This rule differs from both of the offline metrics one would compute
+from PA's published submission docs. The published formula
+$\text{Brier}(\mathbf p, \mathbf y) = \sum_{k=1}^{K} (p_k - y_k)^2$
+suggests proper multi-class Brier; PA's CLI evaluator
+(`prophet forecast evaluate`) implements *single-binary* Brier on
+`(p_yes − 1{outcomes[0] won})²`. We report both throughout because
+they ranked our model lineup differently on our 26-event resolved
+backtest, and the actual live metric was not known to us until after
+all ablations were run.
 
 Each event arrives as
 `{title, description, rules, category, close_time, outcomes[]}`;
@@ -245,28 +256,49 @@ through the corrected pipeline is post-event work.
 
 ## 4 Discussion
 
-### 4.1 Scoring rule matters more than expected
+### 4.1 Three scoring rules, three different rankings
 
 The single-largest finding from this weekend is that *the scoring
-rule itself* changes which model looks best. PA's published formula
-suggests proper multi-class Brier; PA's CLI evaluator implements
-single-binary. On n=26 resolved events the two metrics rank the
-top three models differently:
+rule itself* changes which model looks best. We encountered three
+distinct rules during the bench:
+
+- **PA CLI** (`prophet forecast evaluate`): single-binary on
+  `(p_yes − 1{outcomes[0] won})²`.
+- **PA published docs**: proper multi-class Brier summed across all
+  per-outcome labels.
+- **PA actual live scoring** (confirmed by organizers in Discord
+  partway through the bench): `(team avg Brier − market avg Brier)
+  × completion rate`. A Brier skill score with a market baseline.
+
+On the 26-event resolved set we can verify the first two but not
+the third (no snapshotted market prices in the dataset). The first
+two metrics rank the top-three models differently:
 
 - Single-binary: Opus 4.7 > Opus 4.6 > GPT-5.2 (by 3.4% and 12% margins)
 - Multi-class: Opus 4.6 > Opus 4.7 > GPT-5.2 (by 2.3% and 13% margins)
 
 GPT-5.5 and Gemini are bottom-ranked under both metrics, so the
-schema-compliance finding (§4.2) holds. But the production-model
-choice between Opus 4.7 and Opus 4.6 is metric-dependent and on
+schema-compliance finding (§4.2) holds. But the choice between
+Opus 4.7 and Opus 4.6 in production is metric-dependent and on
 n=26 cannot be settled. We chose Opus 4.7 because PA's CLI metric
 is the only one we can verify against resolved data, and because
 we tested the Sonnet → Opus 4.7 transition end-to-end.
 
-Practitioners should pin the scoring rule to the evaluator they
-will actually be scored against, and report both if in doubt.
-Selecting a model on a metric the grader does not implement is
-the same mistake as training-test split contamination, in spirit.
+Once we learned the actual live rule, the strategic implications
+flipped on one of our ablation findings. A prompt-variant ablation
+removing the market-odds-anchoring block from the system prompt
+showed a +0.0192 multi-only Brier improvement against actual
+outcomes (n=12 multi-outcome events). Under the live rule this is
+not a clear win: anchoring to cited market prices is *protective*
+against negative score when the market has signal we lack, and the
++0.0192 only translates to positive total score if it survives
+re-measurement against market Brier rather than outcome Brier. We
+did not delete the anchoring block. A clean re-run with snapshotted
+market prices is post-event work.
+
+Practitioners should pin the scoring rule to the *exact* evaluator
+they will be graded by, and verify before treating ablation deltas
+on offline metrics as license to ship.
 
 ### 4.2 Schema-compliance hypothesis (revised)
 

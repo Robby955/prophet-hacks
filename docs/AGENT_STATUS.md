@@ -50,6 +50,13 @@ Format: one `## <agent name / worktree>` heading per agent, body has:
 - **Last updated:** 2026-05-17T02:04:09Z
 - **Notes:** No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Public `/` intentionally omits exact model names, retrieval vendor, scoring formulas, GPT/Gemini comparison, and source links during active scoring. Internal `/observatory` keeps the live commit, variant, prediction count, first-call watch, GPT-5.5 answer, experiment board, and adversarial-review notes behind dashboard auth. Verified by focused auth/frontend tests, full `pytest tests/`, local content scrub check, and `./scripts/agent/verify.sh`.
 
+## codex/public-root-overlap-fix
+
+- **Current task:** Completed public root layout fix for the oversized wordmark/status-panel overlap.
+- **Files owned this session:** `forecast_agent_server.py`, `tests/test_forecast_agent_server.py`, `docs/AGENT_STATUS.md`.
+- **Last updated:** 2026-05-17T04:35:00Z
+- **Notes:** Root page no longer uses `ForecastingPath` as a giant unbreakable H1. It now uses a bounded `hero-shell` + `status-panel` layout, with compact short-viewport and mobile media rules. Verified locally with Playwright at 2560x328, 1440x900, and 390x844; title/status panel overlap was false and mobile body width stayed at viewport width. No production variant, Railway env var, `static/`, `submission/`, `docs/DECISIONS.md`, or `docs/FINDINGS.md` changes. Untracked `scripts/ablate_retrieval_count.py` and `data/predictions/retrieval_sweep_k3.json` were present during deploy prep and were left untouched.
+
 ## codex/persistent-observatory
 
 - **Current task:** Completed disk-backed prediction history plus observatory trace table; Railway production volume is mounted.

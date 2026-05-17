@@ -568,74 +568,113 @@ def root() -> str:
     --ok: #047857;
   }}
   * {{ box-sizing: border-box; }}
-  body {{ margin: 0; background: linear-gradient(180deg, #fff 0%, var(--bg) 48%, #eef2f7 100%);
+  body {{ margin: 0; background:
+         radial-gradient(circle at 12% 8%, rgba(33,70,255,0.10), transparent 28rem),
+         linear-gradient(180deg, #ffffff 0%, var(--bg) 54%, #eef2f7 100%);
          color: var(--text); font: 16px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }}
-  .shell {{ min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; }}
-  header {{ max-width: 1160px; width: 100%; margin: 0 auto; padding: 24px;
+  .shell {{ min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; overflow-x: clip; }}
+  header {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 22px 0;
             display: flex; align-items: center; justify-content: space-between; gap: 1rem; }}
-  .brand {{ display: inline-flex; align-items: center; gap: 0.7rem; font-weight: 760; }}
-  .brand img {{ width: 38px; height: 38px; border-radius: 8px; }}
-  .status {{ display: inline-flex; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 0.93rem; }}
+  .brand {{ display: inline-flex; align-items: center; gap: 0.72rem; min-width: 0;
+            color: var(--text); text-decoration: none; font-weight: 760; }}
+  .brand img {{ width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto; }}
+  .brand span {{ overflow-wrap: anywhere; }}
+  .status-pill {{ display: inline-flex; align-items: center; gap: 0.55rem; min-height: 34px;
+                  padding: 0 0.72rem; border: 1px solid var(--line); border-radius: 999px;
+                  background: rgba(255,255,255,0.72); color: var(--muted); font-size: 0.9rem;
+                  white-space: nowrap; }}
   .dot {{ width: 8px; height: 8px; border-radius: 99px; background: var(--ok); display: inline-block; }}
-  main {{ max-width: 1160px; width: 100%; margin: 0 auto; padding: 54px 24px 76px; }}
-  .hero {{ display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(310px, 0.85fr);
-           gap: clamp(28px, 5vw, 72px); align-items: center; }}
-  h1 {{ margin: 0; max-width: 720px; font-size: 5.8rem;
-        line-height: 0.94; letter-spacing: 0; }}
-  .lead {{ max-width: 590px; margin: 1.6rem 0 0; color: var(--muted);
-           font-size: 1.15rem; }}
-  .actions {{ display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }}
+  main {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: clamp(34px, 6vw, 72px) 0 64px; }}
+  .hero-shell {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+                 gap: clamp(36px, 7vw, 104px); align-items: start; }}
+  .hero-copy {{ min-width: 0; max-width: 680px; }}
+  .eyebrow {{ margin: 0 0 1rem; font-size: 0.82rem; font-weight: 780; letter-spacing: 0.12em;
+              text-transform: uppercase; color: var(--muted); }}
+  .hero-title {{ margin: 0; max-width: 11ch; font-size: clamp(3.2rem, 7vw, 6.1rem);
+                 line-height: 0.94; letter-spacing: 0; text-wrap: balance; }}
+  .lead {{ max-width: 600px; margin: 1.35rem 0 0; color: var(--muted);
+           font-size: clamp(1.02rem, 1.7vw, 1.18rem); }}
+  .actions {{ display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.85rem; }}
   .btn {{ display: inline-flex; align-items: center; justify-content: center;
           min-height: 44px; padding: 0 1rem; border-radius: 8px;
-          font-weight: 720; text-decoration: none; border: 1px solid var(--line); }}
+          font-weight: 720; text-decoration: none; border: 1px solid var(--line);
+          transition: transform 160ms ease, border-color 160ms ease, background 160ms ease; }}
+  .btn:hover {{ transform: translateY(-1px); }}
   .primary {{ background: var(--accent); color: #fff; border-color: var(--accent); }}
-  .secondary {{ background: rgba(255,255,255,0.76); color: var(--text); }}
-  .panel {{ background: rgba(255,255,255,0.84); border: 1px solid var(--line);
-            border-radius: 8px; padding: 1.1rem; box-shadow: 0 18px 48px rgba(15,23,42,0.08); }}
-  .panel h2 {{ margin: 0 0 0.8rem; font-size: 0.9rem; text-transform: uppercase;
-                letter-spacing: 0.08em; color: var(--muted); }}
-  .rows {{ display: grid; gap: 0.65rem; }}
+  .secondary {{ background: rgba(255,255,255,0.82); color: var(--text); }}
+  .status-panel {{ min-width: 0; width: 100%; background: rgba(255,255,255,0.88);
+                   border: 1px solid var(--line); border-radius: 8px; padding: 1.1rem;
+                   box-shadow: 0 18px 48px rgba(15,23,42,0.08); }}
+  .status-panel h2 {{ margin: 0 0 0.85rem; font-size: 0.86rem; text-transform: uppercase;
+                      letter-spacing: 0.1em; color: var(--muted); }}
+  .rows {{ display: grid; gap: 0.3rem; }}
   .row {{ display: flex; align-items: center; justify-content: space-between;
-          gap: 1rem; padding: 0.72rem 0; border-top: 1px solid #e7edf5; }}
+          gap: 1rem; padding: 0.8rem 0; border-top: 1px solid #e7edf5; }}
   .row:first-child {{ border-top: 0; }}
   .row span:first-child {{ color: var(--muted); }}
-  .row strong {{ text-align: right; }}
-  .lower {{ margin-top: clamp(42px, 7vw, 86px); display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }}
+  .row strong {{ text-align: right; overflow-wrap: anywhere; }}
+  .signal {{ margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e7edf5;
+             display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.7rem; align-items: center;
+             color: var(--muted); font-size: 0.9rem; }}
+  .signal-line {{ height: 1px; background: linear-gradient(90deg, transparent, #94a3b8, transparent); }}
+  .signal-dot {{ width: 9px; height: 9px; border-radius: 999px; background: var(--ok);
+                 box-shadow: 0 0 0 6px rgba(4,120,87,0.10); }}
+  .lower {{ margin-top: clamp(46px, 7vw, 88px); display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }}
   .note {{ border-top: 1px solid var(--line); padding-top: 1rem; color: var(--muted); }}
   .note h2 {{ color: var(--text); font-size: 1rem; margin: 0 0 0.35rem; }}
   .note p {{ margin: 0; }}
-  footer {{ max-width: 1160px; width: 100%; margin: 0 auto; padding: 24px;
+  footer {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 24px 0;
             color: var(--muted); font-size: 0.92rem; display: flex; justify-content: space-between; gap: 1rem; }}
   footer a {{ color: var(--accent); text-decoration: none; font-weight: 650; }}
-  @media (max-width: 800px) {{
+  @media (max-width: 920px) {{
     header, footer {{ align-items: flex-start; flex-direction: column; }}
-    .hero, .lower {{ grid-template-columns: 1fr; }}
-    main {{ padding-top: 28px; }}
-    h1 {{ font-size: 3.2rem; }}
-    .lead {{ font-size: 1rem; }}
+    .hero-shell, .lower {{ grid-template-columns: 1fr; }}
+    .status-panel {{ max-width: 520px; }}
+    .hero-title {{ max-width: 10ch; }}
   }}
-  @media (max-width: 420px) {{
-    h1 {{ font-size: 2.55rem; }}
+  @media (min-width: 921px) and (max-height: 560px) {{
+    header {{ padding: 14px 0; }}
+    main {{ padding-top: 22px; padding-bottom: 36px; }}
+    .hero-title {{ font-size: clamp(3rem, 5vw, 4.6rem); }}
+    .lead {{ margin-top: 0.95rem; font-size: 1rem; }}
+    .actions {{ margin-top: 1.2rem; }}
+    .status-panel {{ padding: 0.9rem; }}
+    .status-panel h2 {{ margin-bottom: 0.45rem; }}
+    .row {{ padding: 0.48rem 0; }}
+    .signal {{ display: none; }}
+  }}
+  @media (max-width: 520px) {{
+    header, main, footer {{ width: min(100% - 32px, 1180px); }}
+    main {{ padding-top: 24px; }}
+    .status-pill {{ white-space: normal; }}
+    .hero-title {{ font-size: 2.85rem; }}
+    .lead {{ margin-top: 1rem; font-size: 1rem; }}
+    .actions {{ margin-top: 1.2rem; flex-direction: column; align-items: stretch; }}
+    .status-panel {{ padding: 0.95rem; }}
+    .row {{ padding: 0.6rem 0; }}
+    .signal {{ margin-top: 0.8rem; padding-top: 0.8rem; }}
+    .lower {{ gap: 18px; }}
   }}
 </style>
 </head><body>
 <div class="shell">
 <header>
-  <div class="brand"><img src="/static/flaviconlogo.webp" alt="ForecastingPath"><span>ForecastingPath</span></div>
-  <div class="status"><span class="dot"></span><span>online · monitor {dashboard_status}</span></div>
+  <a class="brand" href="/" aria-label="ForecastingPath home"><img src="/static/flaviconlogo.webp" alt=""><span>ForecastingPath</span></a>
+  <div class="status-pill"><span class="dot"></span><span>endpoint online · monitor {dashboard_status}</span></div>
 </header>
 <main>
-  <section class="hero">
-    <div>
-      <h1>ForecastingPath</h1>
-      <p class="lead">A live probabilistic forecasting system for Prophet Hacks 2026. The public page stays concise during active scoring; the research console is restricted to collaborators.</p>
+  <section class="hero-shell" aria-label="Public system status">
+    <div class="hero-copy">
+      <p class="eyebrow">ForecastingPath</p>
+      <h1 class="hero-title">Live forecast system status</h1>
+      <p class="lead">Public status for the Prophet Hacks forecasting endpoint. Detailed traces, ablations, and scoring notes stay behind the collaborator console during active scoring.</p>
       <div class="actions">
         <a class="btn primary" href="/login?next=/observatory">View observatory</a>
         <a class="btn secondary" href="/login">Sign in</a>
       </div>
     </div>
-    <aside class="panel" aria-label="System state">
+    <aside class="status-panel" aria-label="System state">
       <h2>Public status</h2>
       <div class="rows">
         <div class="row"><span>Endpoint</span><strong>healthy</strong></div>
@@ -643,6 +682,7 @@ def root() -> str:
         <div class="row"><span>Monitoring</span><strong>{dashboard_status}</strong></div>
         <div class="row"><span>Detailed traces</span><strong>PIN only</strong></div>
       </div>
+      <div class="signal" aria-hidden="true"><span class="signal-line"></span><span class="signal-dot"></span><span class="signal-line"></span></div>
     </aside>
   </section>
   <section class="lower" aria-label="Project summary">

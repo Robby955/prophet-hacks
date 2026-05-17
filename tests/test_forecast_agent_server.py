@@ -40,6 +40,18 @@ def test_root_does_not_expose_competition_internals() -> None:
         assert term not in response.text
 
 
+def test_root_uses_bounded_public_layout() -> None:
+    client = TestClient(server.app)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert 'class="hero-shell"' in response.text
+    assert 'class="hero-title"' in response.text
+    assert 'class="status-panel"' in response.text
+    assert "<h1>ForecastingPath</h1>" not in response.text
+
+
 def test_observatory_requires_dashboard_auth_when_configured(monkeypatch) -> None:
     monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
     monkeypatch.setenv("DASHBOARD_PIN", "123456")

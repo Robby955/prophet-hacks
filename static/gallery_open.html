@@ -37,6 +37,11 @@ table.gallery .missing { text-align: center; color: #b0b7c4; }
 table.gallery .parse-err { background: repeating-linear-gradient(45deg, #f4f6fa, #f4f6fa 6px, #e6e9f0 6px, #e6e9f0 12px) !important; color: #6a7388; text-align: center; }
 table.gallery .parse-err .p { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
 table.gallery .parse-err .b { font-size: 10px; }
+details.howread { max-width: 1400px; margin: 8px auto 0; background: #fbfaf3; border: 1px solid #e8e1c0; border-radius: 6px; padding: 6px 14px; }
+details.howread summary { cursor: pointer; font-weight: 600; font-size: 13px; color: #5f5230; padding: 4px 0; }
+details.howread ul { margin: 6px 0 10px; padding-left: 20px; font-size: 13px; line-height: 1.55; color: #1a1f2c; }
+details.howread li { margin: 4px 0; }
+details.howread code { background: #ebe6cf; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
 table.gallery tfoot td { background: #f4f6fa; border-top: 2px solid #d0d6e1; font-size: 13px; }
 .pill { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; background: #e0e5ee; color: #475066; }
 .pill-sports { background: #d9eafa; color: #2856a3; }
@@ -78,7 +83,17 @@ tr.drill-row:hover .click-hint { color: #2856a3; }
 
 <header>
   <h1>Side-by-side gallery · open events</h1>
-  <p class="sub">42 unresolved events across PA's three open sample datasets (Economics, Entertainment, Sports). Same retrieval + prompt as production, three alternative LLMs swapped in. No actuals yet — instead the <em>cross-model spread</em> column surfaces where models disagree (red = high spread, useful as a triage signal when live events arrive).</p>
+  <p class="sub">42 unresolved events across PA's three open sample datasets (Economics, Entertainment, Sports). Same retrieval + prompt as production, five alternative LLMs swapped in. No actuals yet — instead the <em>cross-model spread</em> column surfaces where models disagree (red = high spread, useful as a triage signal when live events arrive).</p>
+  <details class="howread">
+    <summary>How to read this page</summary>
+    <ul>
+      <li><strong>Each column is the same pipeline with a different LLM.</strong> Five model swaps share identical retrieval + prompt + post-processing.</li>
+      <li><strong>Per-cell:</strong> model's probability for <em>outcomes[0]</em> (PA's "first outcome" convention). Darker shading = more confident (further from 0.5). Hover for the exact number and the outcome label.</li>
+      <li><strong>Striped <code>err / no signal</code> cells</strong> mean that model failed JSON parsing on this event; the uniform-prior fallback (1/n) is NOT a real prediction. Common on multi-outcome events where the LLM emits malformed JSON, fenced markdown, or labels not in the supplied outcomes list. These cells are excluded from the cross-model spread.</li>
+      <li><strong>Cross-model spread</strong> = max(p) − min(p) across successful parses for outcomes[0]. Red &gt; 0.3 marks events where models disagree most — those are where retrieval coverage or category specialization matter most.</li>
+      <li><strong>Why does <em>outcomes[0]</em> have such different probabilities across models?</strong> For multi-outcome ordinal questions (e.g. "what range will Germany Q1 GDP fall into?") the outcomes are <em>cumulative bands</em> that overlap by design. A model that puts mass on "Above 0.5%" should still rate "Above -0.4%" high. When you see one model at 92% and another at 7%, that's almost always a parse failure on the 7% side, not a real disagreement.</li>
+    </ul>
+  </details>
   <p class="links">
     <a href="/static/gallery_resolved.html">→ resolved events gallery</a> ·
     <a href="/static/summary.html">→ summary report</a> ·

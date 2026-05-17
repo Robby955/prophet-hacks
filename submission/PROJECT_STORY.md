@@ -125,24 +125,6 @@ ops work were coordinated through `docs/AGENT_STATUS.md` with explicit
 file-ownership claims. That kept parser hardening, offline research
 variants, dashboard work, and deploy tooling from colliding.
 
-## Where this fits
-
-The Oracles is the first hosted product of a larger forecasting curriculum
-and tooling stack. The companion site **TheoremPath** maintains canonical
-topic pages for the techniques this agent uses: proper scoring rules,
-calibration and uncertainty, time-series foundations, state-space models,
-the Kalman filter, particle filters, conformal prediction, e-values and
-anytime-valid inference, martingale theory, stochastic processes. Each
-TheoremPath module links into the agent as a worked example; the agent's
-Brier decomposition, longshot floor, and bootstrap-CI gate point back at
-the relevant theory pages.
-
-The hackathon submission is one artifact of that ecosystem, not a
-one-off. Post-event work brings the agent under the **ForecastPath**
-sub-brand (a curated entry-point into the forecasting modules) at
-`forecastpath.com`, with this codebase remaining the live reference
-implementation.
-
 ## Challenges
 
 - **Deploy bloat.** Three Railway deploys failed silently with TLS
@@ -209,9 +191,10 @@ python scripts/backtest_forecast.py \
   arrives with snapshotted Polymarket/Kalshi prices, use the
   `pnl_alpha_vs_market` metric in `evaluation/brier.py` to gate when
   the model trades vs. defers to the market price.
-- **Ship the ForecastPath product page.** Bring this agent under the
-  TheoremPath ecosystem at `forecastpath.com` as the live worked example
-  for the calibration, conformal-prediction, and state-space modules.
+- **Confidence-aware critique.** The two adversarial-review patterns
+  we tried regressed; an open hypothesis is to only revise low-
+  confidence initial predictions, leaving confident-and-correct ones
+  alone.
 
 Live: <https://forecastingpath.com> - Repo:
 <https://github.com/Robby955/prophet-hacks>

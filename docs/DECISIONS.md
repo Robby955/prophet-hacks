@@ -492,3 +492,61 @@ Decided by: Claude under Rob's "go run all experiments" instruction.
 None auto-applied to production. PR review pending Codex/Rob for the
 exchanges_only switch and the adaptive-retrieval-count dispatcher.
 Commit: this commit's batch.
+
+---
+
+## 2026-05-17 — Verification: E3 + E4 findings fail paired-bootstrap CI
+
+Both production-candidate changes from the late-night ablation batch
+failed the paired-bootstrap CI test on n=26 events. **Neither
+applied to production.** Discipline win: the verification saved
+us from chasing small-n noise.
+
+**E4 (exchanges_only source priority) — paired bootstrap:**
+
+  Scoring         | Mean Δ    | 95% CI                | Significant?
+  ----------------|-----------|------------------------|--------------
+  Single-binary   | +0.00128  | [-0.00167, +0.00550]  | NO (PA CLI)
+  Multi-class     | +0.01744  | [+0.00133, +0.04016]  | YES (proper)
+
+Per-event inspection: 22 of 26 events show **zero** change between
+official and exchanges_only — the prioritization only affects events
+where Brave returned an exchange URL. Of the 4 events with non-zero
+delta, results split (WTA tennis match helps +0.05, ATP tennis match
+hurts -0.01). On the metric PA actually scores (single-binary CLI),
+the change is indistinguishable from noise.
+
+**E3 (adaptive retrieval k=5 binary / k=8 multi) — paired bootstrap:**
+
+  Comparison      | Mean Δ    | 95% CI                | Significant?
+  ----------------|-----------|------------------------|--------------
+  k=5 vs k=8 bin  | -0.00087  | [-0.00346, +0.00087]  | NO
+  k=5 vs k=8 mc   | +0.02730  | [-0.02921, +0.10907]  | NO
+  adaptive vs k=5 | -0.00087  | [-0.00346, +0.00087]  | NO
+
+The k=5 vs k=8 binary delta is so small that even the bootstrap CI
+on n=26 can't separate them. Multi-class shows a directional
+preference for k=8 but the CI is wide enough that one or two events
+swinging would flip the sign.
+
+**What stays valid:**
+
+- The headline Phase 2 delta (Sonnet 4.6 + old floor → Opus 4.7 +
+  new floor) DID pass the bootstrap CI on the same dataset
+  (CI [0.0143, 0.0374], excludes zero). That improvement was big
+  enough (0.026 single-binary Brier) to clear small-n noise.
+- For the workshop paper, E3 and E4 stay as "directional but
+  inconclusive on n=26" not "production-improving wins."
+- Production stays on current `_PRIORITY_DOMAINS` and `count=5` for
+  retrieval — both unchanged.
+
+**General methodology lesson:** On n=26, paired-bootstrap CIs at
+α=0.05 need roughly |Δ| > 0.01 single-binary Brier to clear zero.
+Anything smaller is indistinguishable from run-to-run LLM
+stochasticity. Apply this bar to any future small-ablation
+finding before shipping to production.
+
+Decided by: Claude under Rob's "verify before shipping" instruction.
+The verification took ~10 minutes and zero spend. Saved a production
+change that would have been ~0 EV on PA's actual metric. Commit:
+this commit.

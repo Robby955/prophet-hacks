@@ -148,11 +148,13 @@ def _compute_open_agreement() -> dict:
 
 def _compute_summary() -> dict[str, Any]:
     resolved = json.loads((ROOT / "data/resolved.json").read_text())
+    actuals = json.loads((ROOT / "data/actuals.json").read_text())
     by_ticker = {e["market_ticker"]: e for e in resolved}
 
     per_model: dict[str, dict[str, Any]] = {}
     for label, fname, color in ABLATION_FILES:
         preds = _load_predictions(ROOT / "data/predictions" / fname)
+        endpoint = []
         binary, multi = [], []
         binary_actual, multi_actual = [], []
         binary_p = []  # for reliability diagram (production model only)
@@ -168,13 +170,15 @@ def _compute_summary() -> dict[str, Any]:
                 continue
             wi = outs.index(winner)
             p = preds[ticker]
+            if "p_yes" in p and ticker in actuals:
+                endpoint.append((float(p["p_yes"]) - float(actuals[ticker])) ** 2)
             if len(outs) == 2 and "p_yes" in p:
                 py = p["p_yes"]
                 actual = 1 if wi == 0 else 0
                 binary.append((py - actual) ** 2)
                 binary_actual.append(actual)
                 binary_p.append(py)
-            else:
+            elif p.get("probabilities"):
                 pmap = {pp.get("market"): pp.get("probability", 0.0)
                         for pp in p.get("probabilities", [])}
                 vec = [pmap.get(o, 1.0 / len(outs)) for o in outs]
@@ -182,12 +186,17 @@ def _compute_summary() -> dict[str, Any]:
 
         per_model[label] = {
             "color": color,
-            "mean_brier": (sum(binary + multi) / len(binary + multi))
-                          if (binary or multi) else None,
+            "mean_brier": (sum(endpoint) / len(endpoint))
+                          if endpoint else (
+                              (sum(binary + multi) / len(binary + multi))
+                              if (binary or multi) else None
+                          ),
             "binary_mean": sum(binary) / len(binary) if binary else None,
             "multi_mean": sum(multi) / len(multi) if multi else None,
+            "n_endpoint": len(endpoint),
             "n_binary": len(binary),
             "n_multi": len(multi),
+            "endpoint_briers": endpoint,
             "binary_briers": binary,
             "binary_p": binary_p,
             "binary_actual": binary_actual,
@@ -245,7 +254,7 @@ def _render_html(s: dict[str, Any]) -> str:
             <td>{f"{mb:.4f}" if mb is not None else '—'}</td>
             <td>{f"{bm:.4f}" if bm is not None else '—'}</td>
             <td>{f"{mm:.4f}" if mm is not None else '—'}</td>
-            <td>{m['n_binary']} + {m['n_multi']}</td>
+            <td>{m['n_endpoint']}</td>
         </tr>""")
 
     # Decomposition + bootstrap numbers (pulled in here so they're in scope
@@ -320,16 +329,16 @@ def _render_html(s: dict[str, Any]) -> str:
   <div class="kpi"><div class="lbl">vs random</div><div class="val">{(1 - s['per_model']['Opus 4.7 (production)']['mean_brier'] / s['baselines']['random_binary']) * 100:.0f}%</div></div>
 </div>
 
-<h2>5-model Brier comparison (same pipeline, swap the LLM)</h2>
+<h2>5-model endpoint Brier comparison (same pipeline, swap the LLM)</h2>
 <table>
-  <thead><tr><th>Model</th><th>Mean Brier</th><th>Binary</th><th>Multi-outcome</th><th>n (bin+multi)</th></tr></thead>
+  <thead><tr><th>Model</th><th>Endpoint Brier</th><th>Binary p_yes</th><th>Full multi Brier</th><th>n endpoint</th></tr></thead>
   <tbody>
   {''.join(rows)}
   <tr><td><em>random 0.5 baseline</em></td><td>{s['baselines']['random_binary']:.4f}</td><td>—</td><td>—</td><td>—</td></tr>
   <tr><td><em>uniform 1/n prior</em></td><td>{s['baselines']['uniform_prior']:.4f}</td><td>—</td><td>—</td><td>—</td></tr>
   </tbody>
 </table>
-<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set.</p>
+<p class="meta">Lower is better. Endpoint Brier uses <code>p_yes</code> against Prophet Arena's binary actuals for the 26-event sample-resolved set. Full multi Brier is shown only when the artifact contains per-outcome probabilities; blank means that run stored endpoint-style <code>p_yes</code> only.</p>
 
 <h2>Where the win came from — floor fix vs model swap</h2>
 <div class="results">
@@ -523,8 +532,8 @@ def _render_pdf(s: dict[str, Any], pdf_path: Path) -> None:
         ax1.axvline(0.219, color="#9ca3af", linestyle=":", linewidth=1,
                     label="uniform 1/n prior")
         ax1.set_xlim(0, max(means) * 1.15)
-        ax1.set_xlabel("Mean Brier (lower better)")
-        ax1.set_title("5-model comparison: same pipeline, swap the LLM", fontsize=11)
+        ax1.set_xlabel("Endpoint Brier (lower better)")
+        ax1.set_title("5-model endpoint comparison: same pipeline, swap the LLM", fontsize=11)
         ax1.legend(loc="lower right", fontsize=8)
         ax1.grid(axis="x", alpha=0.25)
 

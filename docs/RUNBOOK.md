@@ -187,9 +187,11 @@ Per-call cost in production (multi_outcome_retrieval):
 - Anthropic Opus 4.7: ~$0.10/call (5500 in + 500 out tokens)
 - Total per event: ~$0.10
 
-Session budget for the 2026-05-16 hackathon: ~$50 expected, well under
-the $200/10d threshold that triggers RunPod OSS-hosting consideration
-(see `docs/RUNPOD_POSTURE.md`).
+Session budget for the 2026-05-16/17 hackathon: ~$75 spent as of
+2026-05-17 03:30 UTC (5-model ablation runs + retrieval/source/
+verification/abstain ablations + self-critique replication). Well
+under the $200/10d threshold that triggers RunPod OSS-hosting
+consideration (see `docs/RUNPOD_POSTURE.md`).
 
 Spend is visible on the dashboard "API spend" tile (in-memory, resets on
 restart).
@@ -242,18 +244,41 @@ not skip ahead.
    webhook is sending the light shape (no `outcomes` field) and our
    Haiku safety-net fired. Log it; not necessarily a problem.
 7. **Inspect `trace.parse_path`.** Expected: `direct` (Stage 0
-   succeeded). Stages 1–4 are the parser-hardening cascade; if you
-   see anything other than `direct`, the LLM emitted non-clean JSON.
-   Not fatal, but worth a `DECISIONS.md` note.
+   succeeded) OR `clean` (Stage 1 — `_clean_loose_json` rescued
+   smart quotes or trailing commas). Both are normal. Stages 2–4
+   are the regex-based fallbacks; if you see Stage 2+ on the first
+   call, the LLM is emitting markdown-fenced or prose-wrapped JSON
+   — add a `DECISIONS.md` note and watch for a pattern, but don't
+   touch production. Stage 4 was where the Gemini ablation kept
+   landing; for Opus 4.7 production it should be rare.
+
+8. **Sanity-check probability calibration against any cited market
+   prices.** PA's actual scoring is
+   `(team_brier − market_brier) × completion_rate`. If `rationale`
+   cites an explicit market price (Polymarket/Kalshi quote) and our
+   `p_yes` deviates by &gt;0.10 without specific contrary evidence
+   in the snippets, we may be chasing the LLM's own reasoning rather
+   than market-anchored truth. Note for the next-call pattern; do
+   not edit live. We have no edge unless we beat market by a real
+   margin on most events.
+
+9. **Calibration expectations vs backtest.** Our 0.0378 single-binary
+   Brier on the 26-event resolved set is *best-case-with-hindsight*
+   (38.5% of events had post-resolution URLs in evidence — see E5
+   audit in `docs/DECISIONS.md`). For unresolved live events Brave
+   returns forecasting articles + base rates + market quotes, NOT
+   post-resolution recaps. **Expect live Brier &gt; 0.04 on early
+   calls.** Anything below 0.03 on early live events would be
+   suspicious (re-check that the actuals weren't already known).
 
 ### Within minutes 5–10
 
-8. **Run `./scripts/full_check.sh` once.** Expect zero failures.
-   Catches any regression caused by the first real call's pattern
-   differing from our synthetic smokes.
-9. **Run `./scripts/brave_health.sh` once.** Confirms the retrieval
-   layer is healthy under live load.
-10. **Re-confirm `/healthz.commit` matches the latest deployed
+10. **Run `./scripts/full_check.sh` once.** Expect zero failures.
+    Catches any regression caused by the first real call's pattern
+    differing from our synthetic smokes.
+11. **Run `./scripts/brave_health.sh` once.** Confirms the retrieval
+    layer is healthy under live load.
+12. **Re-confirm `/healthz.commit` matches the latest deployed
     SHA.** Drift here = production is serving stale code; act fast.
 
 ### Mid-event constraints — DO NOT touch
@@ -264,13 +289,23 @@ is **one event every 10 minutes, sequential.** That gives us a
 
 - **Do not** change `PROPHET_AGENT_VARIANT` on Railway.
 - **Do not** deploy a new commit unless you have a measured + tested
-  Brier improvement on the same 26-event backtest. The bootstrap CI
-  is the gate, not vibes.
+  Brier improvement on the same 26-event backtest with a paired-
+  bootstrap CI excluding zero. The CI bar is the gate, not vibes —
+  see 2026-05-17 DECISIONS entry: **on n=26, |Δ| > 0.01 single-binary
+  Brier is the minimum to clear significance at α=0.05.** Anything
+  smaller is run-to-run LLM stochasticity. We rejected E3 and E4
+  shipping for exactly this reason.
 - **Do not** edit `forecast_track.py:predict_multi_outcome_retrieval`
-  without running the full backtest first.
+  without running the full backtest + bootstrap CI first.
 - **Do not** change the longshot floor formula. The current
   `min(0.10, max(0.05, 0.5/n))` is the version with 85% of the
   measured Phase 2 improvement; changing it is a regression risk.
+- **Do not** delete the market-odds-anchoring block from the
+  system prompt at `forecast_track.py:1139-1147`. The parallel
+  review agent's ablation showed a +0.0192 multi-only Brier
+  improvement when removed, but that's against actual outcomes, not
+  against market Brier; under PA's actual scoring (BSS vs market)
+  the anchor is *protective* when our model lacks edge.
 
 ### When to break the "don't touch" rule
 
@@ -288,10 +323,13 @@ response). Then:
 
 ### After the first call
 
-11. **Append a dated entry to `docs/DECISIONS.md`** with: the
+13. **Append a dated entry to `docs/DECISIONS.md`** with: the
     timestamp, the event ticker, the full `_trace` summary, and any
     deviations from expected behavior. This builds the post-event
     audit trail.
-12. **Update `static/summary.html`** to reflect the new live data
+14. **Update `static/summary.html`** to reflect the new live data
     point by running `python scripts/build_summary_report.py` once
     we have ≥5 resolved live events.
+15. **Rebuild the galleries** (`python scripts/build_galleries.py`)
+    once live events accumulate enough to be worth showing alongside
+    the resolved backtest set.

@@ -645,6 +645,39 @@ def test_dashboard_links_private_research_views(monkeypatch) -> None:
     assert "/static/gallery_open.html" in response.text
 
 
+def test_dashboard_guided_tour_only_renders_on_query_flag(monkeypatch) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    client = TestClient(server.app)
+
+    plain = client.get("/dashboard")
+    toured = client.get("/dashboard?tour=1")
+
+    assert plain.status_code == 200
+    assert toured.status_code == 200
+    assert 'id="guided-tour"' not in plain.text
+    assert 'id="guided-tour"' in toured.text
+    assert "Live commit + uptime" in toured.text
+    assert "Pipeline demo" in toured.text
+    assert 'data-tour="dashboard-research"' in toured.text
+
+
+def test_observatory_guided_tour_targets_core_sections(monkeypatch, tmp_path) -> None:
+    monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
+    monkeypatch.delenv("DASHBOARD_PIN", raising=False)
+    monkeypatch.setenv("PROPHET_PREDICTION_STORE_PATH", str(tmp_path / "empty.jsonl"))
+    server._PREDICTION_HISTORY.clear()
+    client = TestClient(server.app)
+
+    response = client.get("/observatory?tour=1")
+
+    assert response.status_code == 200
+    assert 'id="guided-tour"' in response.text
+    assert "Experiment board" in response.text
+    assert "Per-event drill-down" in response.text
+    assert 'data-tour="recent-predictions"' in response.text
+
+
 def test_dashboard_copy_matches_sse_refresh_behavior(monkeypatch) -> None:
     monkeypatch.delenv("DASHBOARD_AUTH_TOKEN", raising=False)
     monkeypatch.delenv("DASHBOARD_PIN", raising=False)

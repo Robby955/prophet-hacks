@@ -543,6 +543,152 @@ def _set_dashboard_cookie_if_needed(response: Response, request: Request) -> Non
     )
 
 
+def _guided_tour_assets(steps: list[dict[str, str]]) -> str:
+    """Small dependency-free guided tour, inserted only for ?tour=1 views."""
+    steps_json = html_escape(json.dumps(steps, ensure_ascii=False))
+    return f"""
+<style>
+  .tour-active {{
+    position: relative;
+    z-index: 1001;
+    outline: 3px solid #2146ff;
+    outline-offset: 4px;
+    border-radius: 8px;
+  }}
+  .tour-scrim {{
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.44);
+  }}
+  .tour-card {{
+    position: fixed;
+    z-index: 1002;
+    right: 24px;
+    bottom: 24px;
+    width: min(390px, calc(100vw - 32px));
+    background: #fff;
+    color: #101828;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
+    padding: 16px 18px;
+  }}
+  .tour-card h3 {{
+    margin: 0 0 6px;
+    font-size: 1rem;
+    letter-spacing: 0;
+  }}
+  .tour-card p {{
+    margin: 0;
+    color: #475467;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }}
+  .tour-actions {{
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    margin-top: 14px;
+  }}
+  .tour-count {{
+    color: #667085;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+  }}
+  .tour-buttons {{
+    display: flex;
+    gap: 8px;
+  }}
+  .tour-buttons button {{
+    border: 1px solid #d0d6e1;
+    background: #fff;
+    color: #101828;
+    border-radius: 7px;
+    padding: 7px 10px;
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+  }}
+  .tour-buttons button.primary {{
+    background: #2146ff;
+    border-color: #2146ff;
+    color: #fff;
+  }}
+  @media (max-width: 640px) {{
+    .tour-card {{
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      width: auto;
+    }}
+  }}
+</style>
+<div id="guided-tour" hidden>
+  <div class="tour-scrim" data-tour-close></div>
+  <section class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+    <h3 id="tour-title"></h3>
+    <p id="tour-body"></p>
+    <div class="tour-actions">
+      <span id="tour-count" class="tour-count"></span>
+      <div class="tour-buttons">
+        <button type="button" data-tour-close>Close</button>
+        <button type="button" data-tour-next class="primary">Next</button>
+      </div>
+    </div>
+  </section>
+</div>
+<script id="guided-tour-steps" type="application/json">{steps_json}</script>
+<script>
+(function () {{
+  const root = document.getElementById("guided-tour");
+  const stepEl = document.getElementById("guided-tour-steps");
+  if (!root || !stepEl) return;
+  const steps = JSON.parse(stepEl.textContent || "[]");
+  const title = document.getElementById("tour-title");
+  const body = document.getElementById("tour-body");
+  const count = document.getElementById("tour-count");
+  const next = root.querySelector("[data-tour-next]");
+  let index = 0;
+  let active = null;
+
+  function closeTour() {{
+    if (active) active.classList.remove("tour-active");
+    root.hidden = true;
+  }}
+
+  function showStep(i) {{
+    if (!steps.length) return closeTour();
+    if (active) active.classList.remove("tour-active");
+    index = Math.max(0, Math.min(i, steps.length - 1));
+    const step = steps[index];
+    active = document.querySelector(step.selector);
+    if (active) {{
+      active.classList.add("tour-active");
+      active.scrollIntoView({{ block: "center", behavior: "smooth" }});
+    }}
+    title.textContent = step.title;
+    body.textContent = step.body;
+    count.textContent = `${{index + 1}} / ${{steps.length}}`;
+    next.textContent = index === steps.length - 1 ? "Done" : "Next";
+    root.hidden = false;
+  }}
+
+  next.addEventListener("click", function () {{
+    if (index >= steps.length - 1) closeTour();
+    else showStep(index + 1);
+  }});
+  root.querySelectorAll("[data-tour-close]").forEach((el) => el.addEventListener("click", closeTour));
+  document.addEventListener("keydown", function (event) {{
+    if (event.key === "Escape" && !root.hidden) closeTour();
+  }});
+  showStep(0);
+}})();
+</script>
+"""
+
+
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 def root() -> str:
     return f"""<!doctype html>
@@ -858,9 +1004,47 @@ def observatory(
         ("Last total latency", last_latency),
         ("Server uptime", _uptime_human()),
     ]
-    state_rows = "\n".join(
-        f"<div class='kv'><span>{html_escape(k)}</span><strong>{html_escape(v)}</strong></div>"
-        for k, v in rows
+    state_row_html: list[str] = []
+    for k, v in rows:
+        attr = ""
+        if k == "Live commit":
+            attr = " data-tour='commit'"
+        elif k == "Production variant":
+            attr = " data-tour='variant'"
+        state_row_html.append(
+            f"<div class='kv'{attr}><span>{html_escape(k)}</span><strong>{html_escape(v)}</strong></div>"
+        )
+    state_rows = "\n".join(state_row_html)
+    observatory_tour = (
+        _guided_tour_assets([
+            {
+                "selector": "[data-tour='live-state']",
+                "title": "Live commit + uptime",
+                "body": "This panel is the first truth source: commit, uptime, persisted records, and whether any PA call has landed.",
+            },
+            {
+                "selector": "[data-tour='variant']",
+                "title": "Production variant",
+                "body": "This row names the exact forecast path currently serving. Do not change it without a measured win and Rob's OK.",
+            },
+            {
+                "selector": "[data-tour='recent-predictions']",
+                "title": "Recent predictions",
+                "body": "Live PA calls appear here with probabilities, latency, parser path, warnings, and trace coverage.",
+            },
+            {
+                "selector": "[data-tour='experiment-board']",
+                "title": "Experiment board",
+                "body": "This section separates measured findings from ideas that were tested and not shipped.",
+            },
+            {
+                "selector": "[data-tour='per-event-drill']",
+                "title": "Per-event drill-down",
+                "body": "Open the resolved gallery when you need the row-level probabilities, rationales, evidence URLs, and Brier cells.",
+            },
+        ])
+        if request.query_params.get("tour") == "1"
+        else ""
     )
     response = HTMLResponse(f"""<!doctype html>
 <html lang="en"><head>
@@ -928,8 +1112,9 @@ def observatory(
       <a href="/review">Judge brief</a>
       <a href="/dashboard">Dashboard</a>
       <a href="/static/summary.html">Summary</a>
-      <a href="/static/gallery_resolved.html">Resolved gallery</a>
+      <a data-tour="per-event-drill" href="/static/gallery_resolved.html">Resolved gallery</a>
       <a href="/static/gallery_open.html">Open gallery</a>
+      <a href="/observatory?tour=1">Tour</a>
       <a href="/">Public page</a>
     </nav>
   </div>
@@ -940,7 +1125,7 @@ def observatory(
   <p class="lead">Commit, prediction store, first-call state, and review links in one place. Use this view for screenshots after the first PA call lands.</p>
 
   <section id="live" class="grid">
-    <div class="panel span5">
+    <div class="panel span5" data-tour="live-state">
       <h2>Live state</h2>
       {state_rows}
     </div>
@@ -959,14 +1144,14 @@ def observatory(
   </section>
 
   <section id="experiments" class="grid">
-    <div class="panel span12">
+    <div class="panel span12" data-tour="recent-predictions">
       <h2>Recent persisted predictions</h2>
       <table>
         <thead><tr><th>Market</th><th>Event</th><th>Probabilities</th><th>Latency</th><th>Parse path</th><th>Warnings</th></tr></thead>
         <tbody>{recent_rows}</tbody>
       </table>
     </div>
-    <div class="panel span12">
+    <div class="panel span12" data-tour="experiment-board">
       <h2>Experiment board</h2>
       <table>
         <thead><tr><th>Question</th><th>Status</th><th>Current answer</th><th>Next action</th></tr></thead>
@@ -1004,6 +1189,7 @@ def observatory(
 <footer>
   Internal page. Avoid screenshots that include raw traces, exact prompts, or experiment deltas during active scoring.
 </footer>
+{observatory_tour}
 </body></html>""")
     _set_dashboard_cookie_if_needed(response, request)
     return response
@@ -2716,6 +2902,37 @@ def dashboard(
             "</div>"
         )
     first_call_triage_html = _dashboard_first_call_triage_html(dashboard_history)
+    dashboard_tour = (
+        _guided_tour_assets([
+            {
+                "selector": "[data-tour='dashboard-live']",
+                "title": "Live commit + uptime",
+                "body": "Start here when verifying the running service: status, variant, uptime, commit, and source links are in one row.",
+            },
+            {
+                "selector": "[data-tour='dashboard-variant']",
+                "title": "Production variant",
+                "body": "This is the active forecast path. It should stay stable unless an ablation clears the promotion bar.",
+            },
+            {
+                "selector": "[data-tour='dashboard-recent']",
+                "title": "Recent predictions",
+                "body": "When PA calls the endpoint, new predictions stream here with probability bars and evidence links.",
+            },
+            {
+                "selector": "[data-tour='dashboard-demo']",
+                "title": "Pipeline demo",
+                "body": "Run this synthetic walkthrough to see the same stage sequence without waiting for a live PA event.",
+            },
+            {
+                "selector": "[data-tour='dashboard-research']",
+                "title": "Per-event drill-down",
+                "body": "Use these private views for row-level Brier cells, cross-model galleries, and experiment review.",
+            },
+        ])
+        if request.query_params.get("tour") == "1"
+        else ""
+    )
 
     html = f"""<!doctype html>
 <html lang="en"><head>
@@ -2869,13 +3086,14 @@ def dashboard(
 <div class="page">
 
 <h1>The Oracles</h1>
-<div class="topline">
+<div class="topline" data-tour="dashboard-live">
   <span><span class="live-dot" id="live-dot"></span><strong id="live-status">Live</strong></span>
   <span>team: <strong>CanadaHacks</strong></span>
-  <span>variant: <strong>{html_escape(_VARIANT_NAME)}</strong></span>
+  <span data-tour="dashboard-variant">variant: <strong>{html_escape(_VARIANT_NAME)}</strong></span>
   <span>uptime: <strong>{_uptime_human()}</strong></span>
   <span>commit: <strong><code>{html_escape(_BUILD_COMMIT_SHA)}</code></strong></span>
   <span><a href="https://github.com/Robby955/prophet-hacks">GitHub</a></span>
+  <span><a href="/dashboard?tour=1">Tour</a></span>
 </div>
 
 <p class="meta">A calibrated forecasting agent for Prophet Hacks 2026. Each event we receive is enriched with web evidence, scored by Claude Opus 4.7 with explicit market-odds anchoring, and protected by a Kalshi longshot floor before the probabilities are returned.</p>
@@ -2926,7 +3144,7 @@ def dashboard(
 </div>
 
 <h2>Recent predictions (<span id="pred-count">{len(dashboard_history)}</span>)</h2>
-<div class="pred-list" id="pred-grid">{pred_cards}</div>
+<div class="pred-list" id="pred-grid" data-tour="dashboard-recent">{pred_cards}</div>
 
 <h2>Open events on Prophet Arena ({len(open_events_list)})</h2>
 <table>
@@ -2973,7 +3191,7 @@ def dashboard(
 </form>
 
 <h2>Pipeline demo</h2>
-<div class="card">
+<div class="card" data-tour="dashboard-demo">
   <p class="meta">Runs one synthetic event through the production forecast pipeline and streams stage updates to this page. This is separate from Prophet Arena calls and does not change the production variant.</p>
   <div class="demo-actions">
     <button type="button" id="demo-start-button" onclick="startDemo()">Run pipeline demo</button>
@@ -2991,7 +3209,7 @@ def dashboard(
 
 <h2>Private research views</h2>
 <p class="meta">These pages are dashboard-auth gated. They are meant for operator review, model debugging, and submission prep, not the public landing page during active scoring.</p>
-<div class="link-grid">
+<div class="link-grid" data-tour="dashboard-research">
   <a class="link-card" href="/review"><strong>Judge review brief</strong><span>One-page demo script, likely questions, current proof, and first-call checklist.</span></a>
   <a class="link-card" href="/observatory"><strong>Observatory</strong><span>Live commit, persisted traces, experiment board, and adversarial-review answers.</span></a>
   <a class="link-card" href="/static/summary.html"><strong>Summary report</strong><span>Brier table, bootstrap interval, phase decomposition, calibration plot, and findings.</span></a>
@@ -3184,6 +3402,7 @@ async function startDemo() {{
   es.onerror = () => {{ status.textContent = "Reconnecting"; dot.classList.add("warn"); }};
 }})();
 </script>
+{dashboard_tour}
 </body></html>"""
     response = HTMLResponse(html)
     _set_dashboard_cookie_if_needed(response, request)

@@ -25,7 +25,7 @@ A calibrated retrieval-augmented forecasting agent for Prophet Arena. Opus 4.7 +
 ## Elevator pitch (≤256 chars)
 
 ```
-Live forecasting endpoint for Prophet Arena. Mean Brier 0.0378 single-binary on the 26-event resolved backtest (0.0377 +- 0.0009 across 5 reruns), 40.8% reduction over the Sonnet baseline, 95% paired-bootstrap CI [0.0143, 0.0374].
+Live forecasting endpoint for Prophet Arena. Brier 0.0378 on the 26-event sample-resolved set (0.0377 +- 0.0009 across 5 reruns) and 0.1224 on PA's 1200-event scale validation (95% CI [0.110, 0.135]). Schema discipline + bootstrap-CI promotion gate.
 ```
 
 ## What it does (long description)
@@ -55,6 +55,8 @@ Negative results worth recording:
 - Small ablations need a confidence-interval bar. Two intuitive candidate changes (adaptive retrieval count, exchanges-only source priority) failed the paired-bootstrap promotion gate at alpha=0.05 on n=26. They did not ship.
 
 Every published claim is backed by an on-disk artifact: prediction JSON, bootstrap-CI script, leakage-audit script, variance ablation. The audit script flags 38.5 percent of resolved events as having at least one post-resolution URL in the evidence list, so the 0.0378 number is best-case-with-hindsight and we say so prominently in the report.
+
+Scale validation. We re-ran the same production variant on Prophet Arena's public 1200-event resolved dataset (Prophet-Arena-Subset-1200 on HuggingFace), 46 times the sample-resolved size. Mean Brier 0.1224 with 95% bootstrap CI [0.110, 0.135]. The leakage rate at scale drops to 21.8 percent of events / 7.0 percent of URLs, vs 38.5 percent / 23.8 percent on the small set, confirming the small-set headline was hindsight-inflated. The 0.1224 number is the more credible expected magnitude on live PA events. We do not replace the 0.0378 (it is what the local prophet forecast evaluate CLI computes on its own dataset); we publish both alongside.
 
 The auth-gated research console at agent.forecastingpath.com/observatory shows live prediction traces, a 5-model side-by-side gallery with per-event drill-down, a cross-model heatmap, an interactive abstain-policy slider that visualizes Prophet Arena's actual scoring rule, a bootstrap distribution histogram, an intra-model variance plot, and a step-by-step pipeline trace explorer for educational replay. The public root shows a sparse product page.
 
@@ -100,6 +102,7 @@ Testing: 270+ pytest cases. The verify gate (scripts/agent/verify.sh) was tighte
 - A methodology bar (paired-bootstrap CI, magnitude > 0.01 single-binary Brier on n=26) that I rejected two of my own candidate production changes against, in writing, in docs/DECISIONS.md.
 - A backtest leakage audit that I ran on myself and reported prominently. Most submissions would hide a 38.5 percent post-resolution-URL rate; we surface it in the top section of static/summary.html and explain why cross-model rankings are still leakage-invariant.
 - An intra-model variance estimate (5 reruns, sigma = 0.0009) that turns "production scores 0.0378" into "production scores 0.0377 +- 0.0009 across 5 reruns" and justifies the noise-floor cutoff retroactively.
+- A 46x scale validation on Prophet Arena's 1200-event public dataset. Caught that the small-sample Brier (0.0378) was hindsight-inflated and reported the credible scale number (0.1224, 95% CI [0.110, 0.135]) alongside it. Most teams would hide this; we put it at the top of the report.
 - A clean separation of public and private surfaces. The public root and /healthz and /static/summary.pdf are open. Operator details, raw traces, and ablation pages live behind a PIN during active scoring.
 ```
 
@@ -110,6 +113,7 @@ Testing: 270+ pytest cases. The verify gate (scripts/agent/verify.sh) was tighte
 - Pin the scoring rule to the exact evaluator. Selecting a model on a metric the grader does not implement is the same mistake as training-test split contamination.
 - Retrieval over resolved events leaks. Word-boundaried search markers (won, winner, champion, final) flag a third of our events. Chronological-replay benchmarks (FutureSim, Goel et al. 2026) are the right substrate for the next iteration.
 - A 0.01 single-binary Brier delta is the minimum signal to clear noise on n=26. Anything smaller is run-to-run LLM stochasticity. Two of our own candidate changes failed this bar and did not ship.
+- Small-sample headlines lie. The 0.0378 on n=26 inflated to 0.1224 on n=1200 because the small set over-sampled well-indexed events with high retrieval leakage. Cross-model rankings stayed leakage-invariant, but the absolute Brier needs scale validation to be defensible.
 - Two AI coding agents can cooperate on one repo if file-ownership claims are explicit and the decision log is append-only. We had zero merge conflicts across roughly 80 commits.
 ```
 

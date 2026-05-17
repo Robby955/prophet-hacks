@@ -697,3 +697,56 @@ on Discord this afternoon, in response to Siddharth asking:
 
 Source: Discord screenshot from 2026-05-17, conversation between Anri Gu
 ([GTLB]) and Siddharth at 1:26–1:28 PM local.
+
+## 2026-05-17 17:30 CT — PR #12 partial 4+5 backtest regression; reverted before serving
+
+Cherry-picked 2 of 3 prompt changes from closed PR #12 onto main as commit
+`7662c9b5`:
+- Both multi-outcome prompts: "Probabilities do NOT need to sum to 1" replaced
+  with "Your probabilities for the outcomes should sum to approximately 1."
+- `_predict_multi_outcome_retrieval_impl` missing-outcome fallback:
+  `prior` (=1/n) replaced with `min(prior, longshot_guard_floor(n))` when n>2.
+
+Held back the third change (anchor-block removal) as too risky without first
+seeing PA's live distribution.
+
+**What the measurement showed (paired-bootstrap, n=26, n_resamples=20000):**
+
+| Metric | Pre-4+5 | With-4+5 | Delta | Notes |
+| --- | --- | --- | --- | --- |
+| Single-binary Brier (mean) | 0.0378 | 0.0445 | **+0.0066 (17.6% worse, relative)** | Point estimate |
+| 95% paired-bootstrap CI on improvement | — | — | **[-0.0201, +0.0006]** | Crosses zero (barely) |
+| Pr(improvement ≤ 0) | — | — | **0.87** | 87% probability of regression |
+
+**Decision:** the change FAILS our published promotion gate
+(|delta| > 0.01 AND 95% CI excludes zero). It clears neither condition:
+|delta|=0.0066 < 0.01 threshold, and CI includes zero (upper bound +0.0006).
+
+**Action taken:**
+1. Reverted via `git revert 7662c9b5` → commit `13dc61f`.
+2. Pushed and queued a redeploy of the safety-net-only state (`81b05ab6`,
+   functionally identical to `1ed9bd63`).
+3. Railway aborted the in-flight bad-prompts builds before any of them
+   promoted to serving traffic. The bad code never served a /predict
+   call.
+
+**What we learned:**
+- The PR #12 body claimed +0.0003 single-binary Brier (noise) when measuring
+  4+5+anchor-removal *together*. That bundle may have a different interaction
+  than 4+5 alone; the anchor removal might have been load-bearing for the
+  +0.0003 number. Partial cherry-picks of bundled changes need their own CI.
+- Run-to-run drift on Opus 4.7 is real (σ≈0.0009 per the variance run), but a
+  +0.0066 delta is too large for run-noise alone. Some of this is a real
+  effect from the sum-to-1 wording change.
+- Confirms the discipline: every change runs through bootstrap CI before it
+  ships, even when an earlier PR description claimed "low risk."
+
+**Re-evaluation plan:**
+After first PA call lands, look at outcome-count distribution. If multi-outcome
+heavy, revisit 4+5+anchor-removal *together* (PR #12's full bundle) with a
+fresh measurement against the live PA payload format.
+
+Artifacts:
+- `data/predictions/measurement_4_5/multi_outcome_retrieval.json` (gitignored;
+  reproducible via `python scripts/backtest_forecast.py --variants multi_outcome_retrieval --out-dir data/predictions/measurement_4_5`)
+- `data/predictions/measurement_4_5/backtest_summary.json` (same, gitignored)

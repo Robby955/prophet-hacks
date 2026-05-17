@@ -103,12 +103,16 @@ python scripts/build_submission_onepager.py
 Output: `output/pdf/oracles-submission-onepager.pdf`. The script reads the
 submission report but does not modify files under `submission/`.
 
-## What not to say
+## Things to be careful about when talking through the demo
 
-- Do not claim live Prophet Arena performance before first call.
-- Do not call E3/E4 production improvements; both failed paired-bootstrap
-  verification under the shipping metric.
-- Do not describe GPT-5.5 or Gemini as generally bad models. The measured
-  result is narrower: they underperformed in this exact parser/schema pipeline.
-- Do not imply the public page contains the research details. It is a front
-  door; the review evidence is in authenticated views.
+- The 0.0378 and 0.1224 numbers are backtest scores. There is no live PA
+  score yet; the endpoint just went live. Say so.
+- The retrieval-count sweep and source-priority swap are research, not
+  shipping changes. The CIs crossed zero on n=26, so they're recorded in
+  `docs/DECISIONS.md` and not in production.
+- GPT-5.5 and Gemini 3.1 Pro Preview lost on this exact pipeline (this
+  prompt, this parser, this floor). They aren't bad models, they just
+  don't fit this contract well. That's the actual finding.
+- The public landing is intentionally sparse. The research views
+  (galleries, scatter, calibration, bootstrap, pipeline trace) are linked
+  from the dashboard nav. /observatory and /review stay PIN-gated.

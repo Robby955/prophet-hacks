@@ -25,7 +25,7 @@ A calibrated retrieval-augmented forecasting agent for Prophet Arena. Opus 4.7 +
 ## Elevator pitch (≤256 chars)
 
 ```
-Live forecasting endpoint for Prophet Arena. Brier 0.0378 on the 26-event sample-resolved set (0.0377 +- 0.0009 across 5 reruns) and 0.1224 on PA's 1200-event scale validation (95% CI [0.110, 0.135]). Schema discipline + bootstrap-CI promotion gate.
+Live forecasting endpoint for Prophet Arena. Opus 4.7 + Brave Search + a Kalshi-paper longshot floor. Brier 0.0378 on the 26-event sample (0.0377 +- 0.0009 over 5 reruns); 0.1224 on PA's 1200-event scale set (95% CI [0.110, 0.135]).
 ```
 
 ## What it does (long description)
@@ -48,11 +48,11 @@ The submission is grounded in three findings and two negative results.
 Findings:
 - Bug-fix dominance. About 85% of the headline Brier improvement over the Sonnet baseline came from a one-line fix to the post-LLM longshot floor formula, not from a model upgrade. The old max(0.05, 0.5/n) evaluated to 0.25 for binary events, silently clamping every binary prediction into [0.25, 0.75] regardless of model output.
 - Scoring rule matters more than the model. Prophet Arena's CLI evaluator scores single-binary Brier; their published docs describe proper multi-class Brier; their actual live scoring is a Brier skill score against snapshotted Kalshi/Polymarket prices. The three rules rank our model lineup differently on n=26.
-- Schema discipline beats raw capability for prompt-strict contracts of this shape. On the same retrieval and prompt and post-processing, GPT-5.5 and Gemini 3.1 Pro Preview score 18 to 46 times worse than Opus 4.7 on multi-outcome events. The failure mode is JSON-schema noncompliance on outcome labels, not a reasoning gap.
+- Same retrieval, same prompt, same post-processing: GPT-5.5 and Gemini 3.1 Pro Preview scored 18 to 46 times worse than Opus 4.7 on the multi-outcome events. The failure was JSON output - probability mass on outcome labels that weren't in the supplied list, not a reasoning gap. Both are strong models that didn't fit this exact contract.
 
 Negative results worth recording:
 - Adversarial-review prompts regress on a calibrated production model. Two independent variants (two-call self-critique, one-call verification field) both pull confident-and-correct predictions toward the middle, costing Brier where production was right to be confident.
-- Small ablations need a confidence-interval bar. Two intuitive candidate changes (adaptive retrieval count, exchanges-only source priority) failed the paired-bootstrap promotion gate at alpha=0.05 on n=26. They did not ship.
+- Two changes that looked like obvious wins didn't survive a paired-bootstrap CI on n=26: an adaptive retrieval count, and prioritizing exchange sources only. The CIs crossed zero, so neither shipped. Recorded in `docs/DECISIONS.md` as research notes.
 
 Every published claim is backed by an on-disk artifact: prediction JSON, bootstrap-CI script, leakage-audit script, variance ablation. The audit script flags 38.5 percent of resolved events as having at least one post-resolution URL in the evidence list, so the 0.0378 number is best-case-with-hindsight and we say so prominently in the report.
 
@@ -98,12 +98,12 @@ Testing: 270+ pytest cases. The verify gate (scripts/agent/verify.sh) was tighte
 ## Accomplishments I am proud of
 
 ```
-- Three load-bearing findings and two honest negative results, each backed by an on-disk artifact a reviewer can rerun.
-- A methodology bar (paired-bootstrap CI, magnitude > 0.01 single-binary Brier on n=26) that I rejected two of my own candidate production changes against, in writing, in docs/DECISIONS.md.
-- A backtest leakage audit that I ran on myself and reported prominently. Most submissions would hide a 38.5 percent post-resolution-URL rate; we surface it in the top section of static/summary.html and explain why cross-model rankings are still leakage-invariant.
-- An intra-model variance estimate (5 reruns, sigma = 0.0009) that turns "production scores 0.0378" into "production scores 0.0377 +- 0.0009 across 5 reruns" and justifies the noise-floor cutoff retroactively.
-- A 46x scale validation on Prophet Arena's 1200-event public dataset. Caught that the small-sample Brier (0.0378) was hindsight-inflated and reported the credible scale number (0.1224, 95% CI [0.110, 0.135]) alongside it. Most teams would hide this; we put it at the top of the report.
-- A clean separation of public and private surfaces. The public root and /healthz and /static/summary.pdf are open. Operator details, raw traces, and ablation pages live behind a PIN during active scoring.
+- Three findings and two negative results, each with a script in the repo a reviewer can rerun.
+- A bootstrap-CI promotion bar that I held my own candidate changes to. Two intuitive ablations failed it and didn't ship; the rejection is logged.
+- A backtest-leakage audit I ran on the same set I'm reporting from. 38.5% of the 26 resolved events have at least one post-resolution URL in evidence. The honest number is at the top of the summary report, not the appendix.
+- A 5-rerun variance estimate (sigma = 0.0009) that turns "scores 0.0378" into "scores 0.0377 +- 0.0009 across 5 reruns" and explains where the noise floor sits.
+- A scale validation on Prophet Arena's 1200-event Subset. The small-sample 0.0378 inflated to 0.1224 at 46x the size; 0.1224 with 95% CI [0.110, 0.135] is the credible expected magnitude on live PA.
+- Two AI agents (myself and Codex) coordinated through one repo over the weekend via append-only docs/DECISIONS.md and docs/AGENT_STATUS.md. Zero merge conflicts across roughly 80 commits.
 ```
 
 ## What I learned
@@ -158,8 +158,40 @@ Loom and paste the link.
 - [ ] Repo flipped to public (GitHub Settings -> Change visibility -> Public)
 - [ ] README renders the architecture.svg inline (visible at top of GitHub view)
 - [ ] LICENSE shows Apache 2.0
-- [ ] All public links in this file return 200 in incognito
+- [ ] All public links in this file return 200 in incognito (use the apex
+      `https://forecastingpath.com/`, **not** `https://www.forecastingpath.com/`
+      — see "www subdomain hygiene" below)
 - [ ] Demo video uploaded
 - [ ] All form fields filled with the blocks above
 
 Hit submit.
+
+## www subdomain hygiene (do before submitting)
+
+`https://www.forecastingpath.com/` currently serves the wrong project
+(TheoremPath, via Vercel). The apex `https://forecastingpath.com/`
+serves the agent landing on Railway, which is correct.
+
+Two ways to fix, pick one:
+
+**Option A — quickest** (remove the wrong alias, accept www doesn't work):
+1. Vercel dashboard -> TheoremPath project -> Settings -> Domains
+2. Remove `www.forecastingpath.com`
+3. www.forecastingpath.com will then NXDOMAIN until DNS propagates, but
+   nothing wrong is being served.
+
+**Option B — make www work** (alias to apex):
+1. Vercel dashboard -> remove `www.forecastingpath.com` from TheoremPath as above.
+2. In Railway, oracles-agent service -> Settings -> Domains -> Add
+   custom domain `www.forecastingpath.com`. Railway will give you a CNAME.
+3. In Rob's DNS provider (Namecheap or wherever forecastingpath.com is
+   registered), update the `www` CNAME to point at the Railway CNAME
+   Railway gives you. Wait 5-10 min for propagation.
+4. Verify: `curl -sI https://www.forecastingpath.com/healthz` returns
+   the same commit SHA as `curl -sI https://forecastingpath.com/healthz`.
+
+Recommended: **Option B**. It costs 5 minutes and avoids judges seeing
+the wrong page if they type www out of habit.
+
+Either way, **all Devpost form fields above use the apex
+`https://forecastingpath.com/`**.

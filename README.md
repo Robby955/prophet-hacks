@@ -46,11 +46,12 @@ See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
    Brier skill score against snapshotted Kalshi/Polymarket prices. The three rules rank
    our model lineup differently on n=26. Pin the rule to the exact evaluator before
    treating ablation deltas as license to ship.
-3. **Schema discipline beats raw capability** for prompt-strict contracts of this shape.
-   On the same retrieval + prompt + post-processing, GPT-5.5 and Gemini 3.1 Pro Preview
-   were materially worse than Opus 4.7 under both reported metrics. The failure mode was
-   JSON-schema noncompliance on outcome labels, not a general reasoning claim. Public
-   leaderboards don't predict pipeline performance.
+3. **Schema compliance was the differentiator on multi-outcome events.**
+   Same retrieval, same prompt, same post-processing: GPT-5.5 and Gemini 3.1 Pro Preview
+   scored materially worse than Opus 4.7 under both reported metrics. The failure mode was
+   probability mass on outcome labels that weren't in the supplied list, not weaker
+   reasoning. Both are strong models that didn't fit this particular contract.
+   Public leaderboards rank-order something different from what this pipeline measures.
 
 ## Two negative results worth keeping
 
@@ -58,10 +59,10 @@ See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
   Two independent variants (two-call self-critique, one-call verification-field) both
   pull confident-and-correct predictions toward the middle, costing Brier where
   production was right to be confident. Two prompts across two runs, same direction.
-- **Small ablations need a CI bar.** Two intuitive production-candidate changes
-  (adaptive retrieval count, exchanges-only source priority) failed paired-bootstrap
-  promotion gate at alpha=0.05 on n=26 (need |delta| > 0.01 single-binary Brier to clear noise).
-  We did not ship them.
+- **Two intuitive production-candidate changes** (adaptive retrieval count, exchanges-only
+  source priority) didn't survive a paired-bootstrap CI on n=26. The CIs crossed zero, so
+  the deltas couldn't be distinguished from noise (need |delta| > 0.01 single-binary Brier
+  to clear it). Neither shipped.
 
 ## Methodological discipline this project enforces
 

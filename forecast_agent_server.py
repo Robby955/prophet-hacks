@@ -2180,11 +2180,13 @@ def _compare_reliability_svg(data: dict[str, Any]) -> str:
 
 
 @app.get("/compare", response_class=HTMLResponse)
-def compare(
-    request: Request,
-    _: None = Depends(_require_dashboard_auth_redirect),
-) -> HTMLResponse:
-    """Multi-model multi-event comparison grid for the resolved backtest set."""
+def compare(request: Request) -> HTMLResponse:
+    """Multi-model multi-event comparison grid for the resolved backtest set.
+
+    Public: same shape of data as the /static/* research pages — resolved
+    events with model predictions and tooltips. Opened for Devpost judging
+    2026-05-17.
+    """
     data = _load_compare_data()
     models = data["models"]
     events = data["events"]
@@ -2381,10 +2383,7 @@ def _load_open_predictions_by_model(
 
 
 @app.get("/compare-open", response_class=HTMLResponse)
-def compare_open(
-    request: Request,
-    _: None = Depends(_require_dashboard_auth_redirect),
-) -> HTMLResponse:
+def compare_open(request: Request) -> HTMLResponse:
     """Browse our production predictions on the 3 open PA datasets
     (sample-economics, sample-entertainment, sample-sports). 42 events,
     no actuals yet -- this is a research/showcase view, not a Brier table.

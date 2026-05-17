@@ -124,16 +124,18 @@ def test_dashboard_unauthed_redirects_to_login(configured_client):
     assert "next=" in r.headers["location"]
 
 
-def test_compare_unauthed_redirects_to_login(configured_client):
+def test_compare_public_for_judging(configured_client):
+    """/compare and /compare-open were opened to public for Devpost judging
+    (2026-05-17). Same data shape as the public /static/* research pages."""
     r = configured_client.get("/compare", headers={"accept": "text/html"})
-    assert r.status_code == 303
-    assert r.headers["location"].startswith("/login")
+    assert r.status_code == 200
+    assert "html" in r.headers["content-type"].lower()
 
 
-def test_compare_open_unauthed_redirects_to_login(configured_client):
+def test_compare_open_public_for_judging(configured_client):
     r = configured_client.get("/compare-open", headers={"accept": "text/html"})
-    assert r.status_code == 303
-    assert r.headers["location"].startswith("/login")
+    assert r.status_code == 200
+    assert "html" in r.headers["content-type"].lower()
 
 
 def test_observatory_unauthed_redirects_to_login(configured_client):

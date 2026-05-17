@@ -318,57 +318,50 @@ def test_favicon_serves_real_icon_when_static_present() -> None:
         assert response.content == b""
 
 
-def test_static_research_html_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+def test_static_research_html_is_public_for_judging(monkeypatch) -> None:
+    """The research HTML pages (summary, galleries, scatter, heatmap,
+    abstain slider, bootstrap, pipeline trace) were PIN-gated during
+    build to avoid revealing methodology to competitors mid-bench. For
+    Devpost judging on 2026-05-17 we opened them to anonymous GET so
+    judges can see the work. Only /static/status.html (operator
+    dashboard mirror) stays PIN-gated.
+    """
     monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
     monkeypatch.setenv("DASHBOARD_PIN", "123456")
     client = TestClient(server.app, follow_redirects=False)
 
-    missing = client.get("/static/summary.html", headers={"accept": "text/html"})
-    present = client.get(
+    for path in [
         "/static/summary.html",
-        headers={"x-dashboard-token": "secret-token"},
-    )
-    asset = client.get("/static/favicon.ico")
+        "/static/gallery_resolved.html",
+        "/static/gallery_open.html",
+        "/static/scatter_resolved.html",
+        "/static/heatmap_resolved.html",
+        "/static/abstain_slider.html",
+        "/static/bootstrap_hist.html",
+        "/static/pipeline_trace.html",
+    ]:
+        r = client.get(path, headers={"accept": "text/html"})
+        assert r.status_code == 200, f"{path} should be public for judging, got {r.status_code}"
 
-    assert missing.status_code == 303
-    assert missing.headers["location"].startswith("/login")
-    assert "next=%2Fstatic%2Fsummary.html" in missing.headers["location"]
-    assert present.status_code == 200
+    asset = client.get("/static/favicon.ico")
     assert asset.status_code != 401
     assert asset.status_code != 303
 
 
-def test_static_gallery_html_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+def test_static_status_html_still_gated(monkeypatch) -> None:
+    """The operator status page mirror is still PIN-gated since it
+    exposes the dashboard's exact UI without the surrounding console
+    chrome. Judges have the rest; this stays operator-only."""
     monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
     client = TestClient(server.app)
 
-    missing = client.get("/static/gallery_resolved.html")
+    missing = client.get("/static/status.html")
     present = client.get(
-        "/static/gallery_resolved.html",
+        "/static/status.html",
         headers={"authorization": "Bearer secret-token"},
     )
-
     assert missing.status_code == 401
     assert present.status_code == 200
-    assert "Side-by-side gallery" in present.text
-
-
-def test_static_experiment_html_requires_dashboard_auth_when_configured(monkeypatch) -> None:
-    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
-    client = TestClient(server.app)
-
-    protected_paths = [
-        "/static/abstain_slider.html",
-        "/static/bootstrap_hist.html",
-        "/static/heatmap_resolved.html",
-        "/static/scatter_resolved.html",
-    ]
-    for path in protected_paths:
-        missing = client.get(path)
-        present = client.get(path, headers={"authorization": "Bearer secret-token"})
-
-        assert missing.status_code == 401
-        assert present.status_code == 200
 
 
 def test_dashboard_allows_local_access_without_token(monkeypatch) -> None:
@@ -536,7 +529,7 @@ def test_demo_start_caps_active_runs(monkeypatch) -> None:
 def test_demo_start_runs_pipeline_and_exposes_result(monkeypatch) -> None:
     monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
 
-    def fake_run(run_id: str) -> None:
+    def fake_run(run_id: str, preset: str = "fed") -> None:
         server._record_demo_event(run_id, "build_event", "running", "synthetic event ready")
         server._record_demo_event(run_id, "forecast", "running", "calling forecast variant")
         server._finish_demo_run(
@@ -588,7 +581,7 @@ def test_demo_start_runs_pipeline_and_exposes_result(monkeypatch) -> None:
 def test_demo_stream_returns_sse_events(monkeypatch) -> None:
     monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
 
-    def fake_run(run_id: str) -> None:
+    def fake_run(run_id: str, preset: str = "fed") -> None:
         server._record_demo_event(run_id, "forecast", "running", "calling forecast variant")
         server._finish_demo_run(
             run_id,
@@ -623,10 +616,11 @@ def test_dashboard_contains_demo_console(monkeypatch) -> None:
     response = client.get("/dashboard")
 
     assert response.status_code == 200
-    assert "Run pipeline demo" in response.text
+    assert "Run live demo" in response.text
     assert "/demo/start" in response.text
-    assert "/demo/stream/" in response.text
-    assert "/demo/result/" in response.text
+    # stream/result URLs are pulled from the /demo/start response (meta.stream_url),
+    # not hard-coded in dashboard HTML, so we don't assert their literal presence here.
+    assert "EventSource(meta.stream_url)" in response.text
 
 
 def test_dashboard_links_private_research_views(monkeypatch) -> None:

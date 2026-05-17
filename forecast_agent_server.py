@@ -260,15 +260,12 @@ class _AuthGatedStaticFiles(StaticFiles):
     """Serve public assets while keeping research HTML behind dashboard auth."""
 
     _PROTECTED_PATHS = {
-        "/static/abstain_slider.html",
-        "/static/bootstrap_hist.html",
-        "/static/summary.html",
+        # Operator-only page. The judge-facing research views below were
+        # PIN-gated during build; opened to public for Devpost judging
+        # (2026-05-17 14:45 CT) so judges can see the gallery, calibration
+        # overlay, variance experiment, and other research artifacts
+        # without needing the operator PIN.
         "/static/status.html",
-        "/static/gallery_open.html",
-        "/static/gallery_resolved.html",
-        "/static/heatmap_resolved.html",
-        "/static/pipeline_trace.html",
-        "/static/scatter_resolved.html",
     }
 
     @staticmethod

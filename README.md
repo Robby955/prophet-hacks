@@ -130,6 +130,19 @@ reproducible to about 0.0001 across seeds 20260516/20260517/20260518
 per `scripts/check_bootstrap_seed_stability.py`). CI excludes zero;
 significant at alpha=0.05 under single-binary scoring.
 
+![Per-event single-binary Brier across five models on the 26-event sample-resolved backtest](static/summary_per_event.png)
+
+![Reliability diagram: predicted probability versus empirical frequency, ten 0.10-wide bins, production vs baselines](static/summary_calibration.png)
+
+### Scale-up: Subset-1200 (HuggingFace `prophetarena/Prophet-Arena-Subset-1200`)
+
+We replayed the production pipeline against PA's 1200-event resolved set
+(46x our headline sample). Headline came in at **Brier 0.1224**, 95%
+bootstrap CI **[0.110, 0.135]**. The 0.0378 number is hindsight-rich on a
+small, well-indexed slice; 0.1224 is the more credible expected magnitude
+on the live distribution. Both numbers are real on different samples;
+**Subset-1200 is the one we expect to roughly match live PA performance.**
+
 Production beats Opus 4.6 by 3.4% (0.0378 vs 0.0391). Under proper
 multi-class Brier (which PA's docs describe but the CLI doesn't
 implement), Opus 4.6 is marginally better. We hold Opus 4.7 because

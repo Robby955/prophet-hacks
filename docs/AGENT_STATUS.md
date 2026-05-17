@@ -198,6 +198,13 @@ during the eval window.
 - **Last updated:** 2026-05-17T00:46:06Z
 - **Notes:** Worktree branch `.claude/worktrees/codex-ensemble-tests` / `codex/ensemble-tests`. Avoids production `multi_outcome_retrieval`, Railway env vars, `forecast_agent_server.py`, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, and `chat_completions_adapter.py`.
 
+## codex/hybrid-routing-tests
+
+- **Current task:** Add non-production edge tests for `predict_hybrid_routed` routing and fix its one-outcome edge case.
+- **Files owned this session:** `forecast_track.py`, `tests/test_hybrid_routing.py`, `docs/AGENT_STATUS.md`
+- **Last updated:** 2026-05-17T00:17:04Z
+- **Notes:** Worktree branch `.claude/worktrees/codex-hybrid-routing-tests` / `codex/hybrid-routing-tests`. Does not touch production `multi_outcome_retrieval`, Railway env vars, `static/`, `submission/`, `docs/DECISIONS.md`, `docs/FINDINGS.md`, or `chat_completions_adapter.py`.
+
 ## codex/sae-variant-wire (HANDOFF — TODO, see codex/handoff-todo-list above)
 
 - See item 2 in the handoff list. This entry kept for backwards reference; the consolidated list is authoritative.

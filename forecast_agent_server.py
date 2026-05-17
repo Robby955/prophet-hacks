@@ -863,6 +863,41 @@ def root() -> str:
   @media (prefers-reduced-motion: reduce) {{
     *, *::before, *::after {{ animation: none !important; transition: none !important; }}
   }}
+
+  /* Video walkthrough section */
+  .video-shell {{ margin-top: clamp(40px, 6vw, 80px); display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 60px); align-items: center; }}
+  .video-frame {{ position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 24px 70px rgba(15,23,42,0.16); background: #000; }}
+  .video-frame iframe {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }}
+  .video-meta h2 {{ margin: 0.55rem 0 0.75rem; font-size: clamp(1.5rem, 2.6vw, 2.05rem); letter-spacing: -0.01em; }}
+  .video-meta p {{ margin: 0; color: var(--muted); }}
+  @media (max-width: 820px) {{
+    .video-shell {{ grid-template-columns: 1fr; }}
+  }}
+
+  /* Research views section */
+  .research-shell {{ margin-top: clamp(48px, 7vw, 88px); }}
+  .research-head {{ max-width: 720px; margin: 0 auto 28px; text-align: center; }}
+  .research-head h2 {{ margin: 0.45rem 0 0.7rem; font-size: clamp(1.6rem, 2.8vw, 2.2rem); letter-spacing: -0.01em; }}
+  .research-head p {{ margin: 0; color: var(--muted); }}
+  .research-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }}
+  .research-link {{ background: rgba(255,255,255,0.92); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.05rem; text-decoration: none; color: var(--text); transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease; }}
+  .research-link:hover {{ transform: translateY(-2px); border-color: #aebced; box-shadow: 0 16px 38px rgba(15,23,42,0.08); }}
+  .research-link strong {{ display: block; font-size: 1rem; font-weight: 720; }}
+  .research-link em {{ display: block; margin-top: 0.42rem; color: var(--muted); font-style: normal; font-size: 0.9rem; line-height: 1.45; }}
+
+  /* Architecture diagram section */
+  .architecture-shell {{ margin-top: clamp(48px, 7vw, 88px); }}
+  .arch-svg {{ display: block; width: 100%; max-width: 900px; height: auto; margin: 32px auto 0; }}
+
+  /* Footer expansion */
+  footer {{ width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: clamp(40px, 5vw, 72px) 0 32px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); }}
+  .footer-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; }}
+  .footer-grid strong {{ display: block; color: var(--text); font-weight: 720; margin-bottom: 8px; }}
+  .footer-grid p {{ margin: 0; }}
+  .footer-grid ul {{ margin: 0; padding: 0; list-style: none; }}
+  .footer-grid li {{ margin-top: 4px; }}
+  .footer-grid a {{ color: var(--muted); text-decoration: none; border-bottom: 1px dotted transparent; transition: color 140ms ease, border-color 140ms ease; }}
+  .footer-grid a:hover {{ color: var(--accent); border-bottom-color: var(--accent); }}
 </style>
 </head><body>
 <div class="shell">
@@ -915,15 +950,91 @@ def root() -> str:
     </div>
     <div class="demo-grid">
       <a class="demo-link" href="/login?next=/dashboard"><span>Demo</span><strong>Pipeline console</strong><em>Run the staged forecast demo and watch the live feed.</em></a>
-      <a class="demo-link" href="/login?next=/observatory"><span>Ops</span><strong>Observatory</strong><em>Current commit, run history, and first-call review.</em></a>
-      <a class="demo-link" href="/login?next=/static/abstain_slider.html"><span>Strategy</span><strong>Confidence slider</strong><em>Move the threshold and see how scoring changes.</em></a>
-      <a class="demo-link" href="/login?next=/static/scatter_resolved.html"><span>Results</span><strong>Event map</strong><em>Resolved-event losses, comparisons, and drilldowns.</em></a>
+      <a class="demo-link" href="/static/summary.html"><span>Report</span><strong>Summary</strong><em>Backtest numbers, calibration, Subset-1200 scale validation.</em></a>
+      <a class="demo-link" href="/static/abstain_slider.html"><span>Strategy</span><strong>Confidence slider</strong><em>Move the threshold and see how scoring changes.</em></a>
+      <a class="demo-link" href="/static/scatter_resolved.html"><span>Results</span><strong>Event map</strong><em>Resolved-event losses, comparisons, and drilldowns.</em></a>
     </div>
+  </section>
+
+  <section class="video-shell" aria-label="2-minute walkthrough">
+    <div class="video-frame">
+      <iframe
+        src="https://www.youtube.com/embed/1ON-WAurV_0"
+        title="The Oracles — Prophet Hacks 2026 walkthrough"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen></iframe>
+    </div>
+    <div class="video-meta">
+      <p class="eyebrow">2:13 walkthrough</p>
+      <h2>How a forecast actually runs</h2>
+      <p>Public landing, live pipeline demo (Fed rate cut, 5-stage SSE in
+      ~4s), per-event Brier across six models, cross-model agreement
+      heatmap, abstention-threshold slider, multi-outcome Super Bowl
+      and UK PM demos, resolved-event scatter, close.</p>
+    </div>
+  </section>
+
+  <section class="research-shell" aria-label="Research views">
+    <header class="research-head">
+      <p class="eyebrow">Research views</p>
+      <h2>Every claim in the report has a page</h2>
+      <p>Public, no auth required. Each page below is the artifact behind
+      one section of the submission report.</p>
+    </header>
+    <div class="research-grid">
+      <a class="research-link" href="/static/gallery_resolved.html"><strong>Resolved-event gallery</strong><em>Per-event Brier across all six models on the 26-event sample-resolved set.</em></a>
+      <a class="research-link" href="/static/heatmap_resolved.html"><strong>Cross-model heatmap</strong><em>Pairwise agreement between models on the same retrieval and prompt.</em></a>
+      <a class="research-link" href="/static/calibration_overlay.html"><strong>Calibration diagram</strong><em>Predicted probability vs empirical frequency across ten bins.</em></a>
+      <a class="research-link" href="/static/scatter_resolved.html"><strong>Per-event scatter</strong><em>Predicted vs actual for every resolved event, colored by Brier.</em></a>
+      <a class="research-link" href="/static/bootstrap_hist.html"><strong>Bootstrap distribution</strong><em>50K paired-bootstrap resamples on the production vs Sonnet delta.</em></a>
+      <a class="research-link" href="/static/pipeline_trace.html"><strong>Pipeline trace</strong><em>One resolved event replayed stage by stage with the raw trace.</em></a>
+      <a class="research-link" href="/static/abstain_slider.html"><strong>Abstain slider</strong><em>Move the confidence cutoff, watch the scoring rule respond.</em></a>
+      <a class="research-link" href="/static/variance.html"><strong>Intra-model variance</strong><em>Five reruns of production showing the noise-floor of σ≈0.0009 on Brier.</em></a>
+      <a class="research-link" href="/static/gallery_open.html"><strong>Open-event gallery</strong><em>Cross-model forecasts on the 3 open PA datasets, 42 events.</em></a>
+      <a class="research-link" href="/compare"><strong>Comparison grid</strong><em>26 resolved events × 6 model variants in one color-coded grid.</em></a>
+    </div>
+  </section>
+
+  <section class="architecture-shell" aria-label="Pipeline architecture diagram">
+    <header class="research-head">
+      <p class="eyebrow">Architecture</p>
+      <h2>Five observable stages</h2>
+      <p>Event payload in. Search query built from the question. Evidence
+      retrieved and ranked by source. Forecast call with calibration
+      prompt. Longshot guard floor applied per outcome. Response out.
+      Every stage writes a trace recoverable from the pipeline-trace
+      explorer.</p>
+    </header>
+    <img src="/static/architecture.svg" alt="Pipeline architecture diagram with five stages" class="arch-svg">
   </section>
 </main>
 <footer>
-  <div>Team CanadaHacks · Project The Oracles</div>
-  <div><a href="/healthz">health</a> &middot; <a href="/login?next=/review">brief</a> &middot; <a href="/login?next=/dashboard">dashboard</a></div>
+  <div class="footer-grid">
+    <div>
+      <strong>Team CanadaHacks · Project The Oracles</strong>
+      <p>Prophet Hacks 2026, forecasting track. Built solo. Submission
+      live at <a href="https://devpost.com/software/canadahacks">devpost.com/software/canadahacks</a>.</p>
+    </div>
+    <div>
+      <strong>Public links</strong>
+      <ul>
+        <li><a href="/healthz">/healthz (commit + variant)</a></li>
+        <li><a href="https://github.com/Robby955/prophet-hacks">GitHub repo</a></li>
+        <li><a href="https://youtu.be/1ON-WAurV_0">YouTube walkthrough</a></li>
+        <li><a href="/static/summary.pdf">Report PDF</a></li>
+      </ul>
+    </div>
+    <div>
+      <strong>Operator-only (PIN)</strong>
+      <ul>
+        <li><a href="/login?next=/dashboard">Live dashboard</a></li>
+        <li><a href="/login?next=/observatory">Observatory</a></li>
+        <li><a href="/login?next=/review">Judge brief</a></li>
+      </ul>
+    </div>
+  </div>
 </footer>
 </div>
 

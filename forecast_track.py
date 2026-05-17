@@ -566,8 +566,8 @@ _MULTI_OUTCOME_SYSTEM_PROMPT = """\
 You are a calibrated probabilistic forecaster for prediction markets.
 
 Your task: assign a probability to EACH listed outcome of the event. Every
-outcome must receive a probability; do not omit any. Probabilities do NOT
-need to sum to 1 -- the scoring server normalizes them before grading.
+outcome must receive a probability; do not omit any. Your probabilities
+for the outcomes should sum to approximately 1.
 
 Calibration scale (apply to each outcome independently):
   0.50 = no view; default for genuine uncertainty.
@@ -1120,8 +1120,8 @@ access to recent web evidence.
 
 Your task: assign a probability to EACH listed outcome of the event using
 both your prior knowledge and the supplied evidence snippets. Every outcome
-must receive a probability; do not omit any. Probabilities do NOT need to
-sum to 1 -- the scoring server normalizes them before grading.
+must receive a probability; do not omit any. Your probabilities for the
+outcomes should sum to approximately 1.
 
 Treat the evidence snippets as factual claims from third-party sources.
 Do not fabricate URLs, dates, or details that are not present in the
@@ -1135,15 +1135,6 @@ Calibration scale (apply to each outcome independently):
   0.70 = real view; concrete reasoning, multiple consistent signals.
   0.80 = strong view; hard evidence, clear mechanism.
   0.90 = near-certain; mechanically determined or authoritative source.
-
-Market-odds anchoring (IMPORTANT):
-If the evidence cites explicit market odds, implied probabilities, or
-betting prices for any outcome (e.g. "+1500" implies ~6%, "-200" implies
-~67%, "trading at 0.25" implies 25%), anchor your forecast for that
-outcome strongly to that number. Markets aggregate informed money;
-move more than 0.05 away from a cited market price only when you have
-specific contrary evidence in the snippets (not vibes, not narratives).
-LLMs systematically overweight vivid low-probability stories; resist that.
 
 Rules:
 - Output ONLY valid JSON of the shape:
@@ -1367,6 +1358,12 @@ def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = Fals
             "BRAVE_SEARCH_API_KEY missing; %s falling back to predict_multi_outcome",
             event.get("market_ticker", "?"),
         )
+        print(json.dumps({
+            "event": "retrieval_degraded",
+            "reason": "brave_key_missing",
+            "market_ticker": event.get("market_ticker"),
+            "task_id": task_id if "task_id" in locals() else None,
+        }), flush=True)
         trace["warnings"].append("BRAVE_SEARCH_API_KEY missing; fell through to predict_multi_outcome")
         base = predict_multi_outcome(event)
         guarded = apply_longshot_guard(base.get("probabilities", []), n)
@@ -1393,6 +1390,12 @@ def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = Fals
             "Brave search failed for %s: %s -- continuing without evidence",
             event.get("market_ticker", "?"), e,
         )
+        print(json.dumps({
+            "event": "retrieval_degraded",
+            "reason": f"brave_search_failed: {str(e)[:160]}",
+            "market_ticker": event.get("market_ticker"),
+            "task_id": task_id if "task_id" in locals() else None,
+        }), flush=True)
         trace["warnings"].append(f"brave search failed: {str(e)[:120]}")
         chunks = []
     trace["latency_ms"]["brave"] = int((_time.time() - t_brave) * 1000)
@@ -1443,9 +1446,10 @@ def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = Fals
                 resolved_probs[canonical] = _clamp(float(raw_val))
             except (TypeError, ValueError):
                 trace["warnings"].append(f"non-numeric probability for {canonical[:30]!r}: {raw_val!r}")
+        fallback = prior if n <= 2 else min(prior, longshot_guard_floor(n))
         prob_list: list[dict] = []
         for o in outs:
-            p = resolved_probs.get(o, prior)
+            p = resolved_probs.get(o, fallback)
             prob_list.append({"market": o, "probability": p})
         rationale = str(parsed.get("rationale", ""))[:300]
     except Exception as e:

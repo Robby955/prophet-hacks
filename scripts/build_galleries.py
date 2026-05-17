@@ -148,12 +148,16 @@ def build_resolved() -> str:
                 or "unparseable" in rationale.lower()
             )
             if parse_failed:
-                # Don't pollute model means with uniform-prior fallback values.
+                # Mark visually but DO include in the mean — uniform-prior
+                # fallback is the model's actual through-pipeline behavior on
+                # this event; excluding would game the comparison.
+                b = brier_single_binary(p_yes, actual)
+                totals[name].append(b)
                 cells.append(
                     f'<td class="brier-cell parse-err" '
-                    f'title="parse/api error — model output unparseable. p_yes={p_yes:.3f} is the uniform-prior fallback, not a real prediction.">'
+                    f'title="parse/api error — uniform-prior fallback (p={p_yes:.3f}); counted in mean as Brier={b:.4f}">'
                     f'<span class="p">err</span>'
-                    f'<span class="b">no signal</span></td>'
+                    f'<span class="b">B={b:.3f}</span></td>'
                 )
                 continue
             b = brier_single_binary(p_yes, actual)

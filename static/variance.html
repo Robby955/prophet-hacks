@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intra-model variance · ForecastingPath</title>
+<style>
+body { font: 14px/1.5 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }
+header { max-width: 1200px; margin: 0 auto 14px; }
+header h1 { font-size: 22px; margin: 0 0 8px; }
+header .sub { color: #475066; margin: 4px 0; font-size: 13px; max-width: 1000px; }
+header .links { font-size: 13px; margin-top: 6px; }
+header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
+header .links a:hover { text-decoration: underline; }
+.kpis { max-width: 1200px; margin: 12px auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.kpi { background: white; border: 1px solid #d0d6e1; border-radius: 8px; padding: 10px 14px; }
+.kpi .lbl { color: #6a7388; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
+.kpi .val { font-size: 1.35em; font-weight: 700; margin-top: 0.2em; font-variant-numeric: tabular-nums; }
+section { max-width: 1200px; margin: 0 auto 28px; }
+section h2 { font-size: 16px; margin: 8px 0; }
+section .meta { color: #6a7388; font-size: 12px; margin-top: 4px; }
+section > div[id^="plot-"] { background: white; border: 1px solid #e6e9f0; border-radius: 8px; }
+footer { max-width: 1200px; margin: 16px auto; color: #6a7388; font-size: 12px; }
+footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Intra-model variance · production Opus 4.7 across 5 reruns</h1>
+  <p class="sub">The headline "production scores 0.0378 single-binary Brier" hides
+     run-to-run LLM stochasticity. We re-ran <code>predict_multi_outcome_retrieval</code>
+     five times on the same 26 events. Same prompt, same retrieval, fresh LLM calls.
+     The grand mean is <strong>0.03772</strong> with a standard deviation of
+     <strong>0.00090</strong>. The canonical production file (the one PA's CLI
+     scored) reported 0.03782, well within one standard deviation of the grand mean.
+     Read this as: <strong>production Brier = 0.0377 ± 0.0009</strong>.</p>
+  <p class="links">
+    <a href="/static/summary.html">→ summary report</a> ·
+    <a href="/static/gallery_resolved.html">→ side-by-side gallery</a> ·
+    <a href="/static/bootstrap_hist.html">→ bootstrap CI</a> ·
+    <a href="/">→ home</a>
+  </p>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="lbl">Grand mean (5 runs)</div><div class="val">0.03772</div></div>
+  <div class="kpi"><div class="lbl">Standard deviation</div><div class="val">0.00090</div></div>
+  <div class="kpi"><div class="lbl">Range</div><div class="val">[0.0361, 0.0382]</div></div>
+  <div class="kpi"><div class="lbl">Canonical file</div><div class="val">0.03782</div></div>
+</div>
+
+<section>
+  <h2>1. Per-run mean Brier · 5 fresh reruns + canonical</h2>
+  <div id="plot-runs" style="height: 380px;"></div>
+  <p class="meta">Dashed line = grand mean of the 5 variance runs. Shaded band = ± 1 σ.
+     If the canonical bar sits inside the band, the published number is consistent with
+     intra-model noise (not an outlier).</p>
+</section>
+
+<section>
+  <h2>2. Per-event p_yes spread · which events are stable vs noisy</h2>
+  <div id="plot-spread" style="height: 520px;"></div>
+  <p class="meta">For each event, the dots show <em>p_yes</em> across the 5 reruns;
+     the bar shows max − min. Sorted by spread (most volatile at top). Events with
+     near-zero spread are the ones where the model converges to the same probability
+     regardless of stochastic effects; events with high spread are where small
+     wording differences in the LLM output flip our score.</p>
+</section>
+
+<section>
+  <h2>3. Per-event Brier · all 5 runs overlaid</h2>
+  <div id="plot-jitter" style="height: 420px;"></div>
+  <p class="meta">Same x-axis: events sorted by mean Brier. Each event has 5 dots
+     (one per rerun) jittered vertically for visibility. Most events cluster tight;
+     a handful have wider spread.</p>
+</section>
+
+<footer>
+  <p>Built by <code>scripts/build_variance_plot.py</code> from
+     <code>data/predictions/variance_run_*.json</code>. Variance ablation harness:
+     <code>scripts/ablate_variance.py</code>.</p>
+  <p style="margin-top:6px;color:#6a7388">The Oracles · Team CanadaHacks · Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> · Prophet Hacks 2026</p>
+</footer>
+
+<script id="data-runs" type="application/json">[{"label": "canonical", "mean_brier": 0.03781923076923078, "n": 26}, {"label": "run 1", "mean_brier": 0.038200000000000005, "n": 26}, {"label": "run 2", "mean_brier": 0.03822255460588796, "n": 26}, {"label": "run 3", "mean_brier": 0.03822255460588795, "n": 26}, {"label": "run 4", "mean_brier": 0.03781923076923078, "n": 26}, {"label": "run 5", "mean_brier": 0.03612972459639127, "n": 26}]</script>
+<script id="data-spread" type="application/json">[{"ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA", "title": "Who won the Watson vs Okamura WTA Challenger tennis match on May 5, 2026?", "p_mean": 0.51, "p_std": 0.022360679774997918, "p_range": 0.050000000000000044, "all_p": [0.5, 0.5, 0.5, 0.5, 0.55]}, {"ticker": "KXVRASCOTUSVOTE-26", "title": "How many Supreme Court justices voted in favor of Louisiana in Louisiana v. Call", "p_mean": 0.09, "p_std": 0.022360679774997897, "p_range": 0.05, "all_p": [0.1, 0.1, 0.1, 0.1, 0.05]}, {"ticker": "KXLIGUE1-26", "title": "Who won the 2025-26 Ligue 1 (French top-flight football)?", "p_mean": 0.826, "p_std": 0.01341640786499875, "p_range": 0.030000000000000027, "all_p": [0.82, 0.82, 0.82, 0.85, 0.82]}, {"ticker": "KXTHEMASKEDSINGER-27JAN01", "title": "Who won The Masked Singer Season 14?", "p_mean": 0.05333333333333333, "p_std": 0.0030429030972509235, "p_range": 0.005555555555555557, "all_p": [0.05, 0.05555555555555556, 0.05555555555555556, 0.05, 0.05555555555555556]}, {"ticker": "KXLIGAPORTUGAL-26", "title": "Who won the 2025-26 Liga Portugal (Portuguese top-flight football)?", "p_mean": 0.05111111111111111, "p_std": 0.002484519974999764, "p_range": 0.00555555555555555, "all_p": [0.05, 0.05, 0.05, 0.05, 0.05555555555555555]}, {"ticker": "KXROASTSUBJECT-30JAN01", "title": "Who was Netflix's next live roast subject after Tom Brady?", "p_mean": 0.4999999999999999, "p_std": 2.482534153247273e-17, "p_range": 5.551115123125783e-17, "all_p": [0.4999999999999999, 0.49999999999999983, 0.4999999999999999, 0.4999999999999999, 0.4999999999999999]}, {"ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL", "title": "Who won the Perez vs Lalami Laaroussi ATP Challenger tennis match on May 5, 2026", "p_mean": 0.1, "p_std": 0.0, "p_range": 0.0, "all_p": [0.1, 0.1, 0.1, 0.1, 0.1]}, {"ticker": "KXITFWMATCH-26MAY12NAJEBS", "title": "Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32", "p_mean": 0.1, "p_std": 0.0, "p_range": 0.0, "all_p": [0.1, 0.1, 0.1, 0.1, 0.1]}, {"ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH", "title": "Who won the Rocha vs Johns ATP Challenger tennis match on May 10, 2026?", "p_mean": 0.1, "p_std": 0.0, "p_range": 0.0, "all_p": [0.1, 0.1, 0.1, 0.1, 0.1]}, {"ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC", "title": "Who won the Bax vs Arcon ATP Challenger tennis match on May 5, 2026?", "p_mean": 0.55, "p_std": 0.0, "p_range": 0.0, "all_p": [0.55, 0.55, 0.55, 0.55, 0.55]}, {"ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN", "title": "Who won the Bangladesh vs Pakistan men's Test cricket match starting May 8, 2026", "p_mean": 0.9, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999]}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA", "title": "Who won the Glamorgan vs Somerset 2026 County Championship cricket match?", "p_mean": 0.9, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999]}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS", "title": "Who won the Sussex vs Leicestershire 2026 County Championship cricket match?", "p_mean": 0.9, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999]}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR", "title": "Who won the Worcestershire vs Durham 2026 County Championship cricket match?", "p_mean": 0.1, "p_std": 0.0, "p_range": 0.0, "all_p": [0.1, 0.1, 0.1, 0.1, 0.1]}, {"ticker": "KXLALIGA-26", "title": "Who won the 2025-26 La Liga (Spanish top-flight football)?", "p_mean": 0.05, "p_std": 0.0, "p_range": 0.0, "all_p": [0.05, 0.05, 0.05, 0.05, 0.05]}, {"ticker": "KXEREDIVISIEGAME-26MAY10BREHEE", "title": "Who won the Breda vs Heerenveen Eredivisie football match on May 10, 2026?", "p_mean": 0.8, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8, 0.8, 0.8, 0.8, 0.8]}, {"ticker": "KXNBASERIES-26LALOKCR2", "title": "Who won the Los Angeles Lakers vs Oklahoma City NBA Round 2 playoff series in 20", "p_mean": 0.9, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999]}, {"ticker": "KXSERIEA-26", "title": "Who won the 2025-26 Serie A (Italian top-flight football)?", "p_mean": 0.22000000000000003, "p_std": 0.0, "p_range": 0.0, "all_p": [0.22, 0.22, 0.22, 0.22, 0.22]}, {"ticker": "KXNHLCALDER-26", "title": "Who won the 2025-26 NHL Calder Memorial Trophy (Rookie of the Year)?", "p_mean": 0.05, "p_std": 0.0, "p_range": 0.0, "all_p": [0.05, 0.05, 0.05, 0.05, 0.05]}, {"ticker": "KXSURVIVORELIMINATION-26APR11", "title": "Which contestants were eliminated from Survivor Season 50 Episode 7?", "p_mean": 0.05, "p_std": 0.0, "p_range": 0.0, "all_p": [0.05, 0.05, 0.05, 0.05, 0.05]}, {"ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31", "title": "Who won Tournament of Champions Season 7 (Food Network)?", "p_mean": 0.05, "p_std": 0.0, "p_range": 0.0, "all_p": [0.05, 0.05, 0.05, 0.05, 0.05]}, {"ticker": "KXWVPRIMARY-01D26", "title": "Who won the 2026 Democratic primary for West Virginia's 1st Congressional Distri", "p_mean": 0.1, "p_std": 0.0, "p_range": 0.0, "all_p": [0.1, 0.1, 0.1, 0.1, 0.1]}, {"ticker": "KXOHPRIMARY-15D26", "title": "Who won the 2026 Democratic primary for Ohio's 15th Congressional District?", "p_mean": 0.9, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999]}, {"ticker": "KXNEXTHUNGARYPM-26MAY01", "title": "Who became Prime Minister of Hungary after the 2026 election?", "p_mean": 0.9, "p_std": 0.0, "p_range": 0.0, "all_p": [0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999, 0.8999999999999999]}, {"ticker": "KXCOLOMBIASENATE-26", "title": "Which coalition won the 2026 Colombia Senate election?", "p_mean": 0.82, "p_std": 0.0, "p_range": 0.0, "all_p": [0.82, 0.82, 0.82, 0.82, 0.82]}, {"ticker": "KXFEDCHAIRCOUNT-27", "title": "How many US Senators voted for Trump's Federal Reserve Chair pick (2027 confirma", "p_mean": 0.05, "p_std": 0.0, "p_range": 0.0, "all_p": [0.05, 0.05, 0.05, 0.05, 0.05]}]</script>
+<script id="data-events" type="application/json">[{"ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA", "title": "Who won the Watson vs Okamura WTA Challenger tennis match on May 5, 2026?", "mean": 0.2405, "std": 0.021242645786248023, "min": 0.20249999999999996, "max": 0.25, "all": [0.25, 0.25, 0.25, 0.25, 0.20249999999999996]}, {"ticker": "KXLIGUE1-26", "title": "Who won the 2025-26 Ligue 1 (French top-flight football)?", "mean": 0.030420000000000013, "std": 0.004427414595449589, "min": 0.022500000000000006, "max": 0.03240000000000002, "all": [0.03240000000000002, 0.03240000000000002, 0.03240000000000002, 0.022500000000000006, 0.03240000000000002]}, {"ticker": "KXVRASCOTUSVOTE-26", "title": "How many Supreme Court justices voted in favor of Louisiana in Louisiana v. Call", "mean": 0.008500000000000002, "std": 0.0033541019662496853, "min": 0.0025000000000000005, "max": 0.010000000000000002, "all": [0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.0025000000000000005]}, {"ticker": "KXTHEMASKEDSINGER-27JAN01", "title": "Who won The Masked Singer Season 14?", "mean": 0.0028518518518518524, "std": 0.00032119532693204175, "min": 0.0025000000000000005, "max": 0.00308641975308642, "all": [0.0025000000000000005, 0.00308641975308642, 0.00308641975308642, 0.0025000000000000005, 0.00308641975308642]}, {"ticker": "KXLIGAPORTUGAL-26", "title": "Who won the 2025-26 Liga Portugal (Portuguese top-flight football)?", "mean": 0.0026172839506172843, "std": 0.00026225488624997506, "min": 0.0025000000000000005, "max": 0.0030864197530864196, "all": [0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0030864197530864196]}, {"ticker": "KXROASTSUBJECT-30JAN01", "title": "Who was Netflix's next live roast subject after Tom Brady?", "mean": 0.2500000000000001, "std": 4.965068306494546e-17, "min": 0.2500000000000001, "max": 0.2500000000000002, "all": [0.2500000000000001, 0.2500000000000002, 0.2500000000000001, 0.2500000000000001, 0.2500000000000001]}, {"ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL", "title": "Who won the Perez vs Lalami Laaroussi ATP Challenger tennis match on May 5, 2026", "mean": 0.010000000000000002, "std": 0.0, "min": 0.010000000000000002, "max": 0.010000000000000002, "all": [0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002]}, {"ticker": "KXITFWMATCH-26MAY12NAJEBS", "title": "Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32", "mean": 0.010000000000000002, "std": 0.0, "min": 0.010000000000000002, "max": 0.010000000000000002, "all": [0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002]}, {"ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH", "title": "Who won the Rocha vs Johns ATP Challenger tennis match on May 10, 2026?", "mean": 0.010000000000000002, "std": 0.0, "min": 0.010000000000000002, "max": 0.010000000000000002, "all": [0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002]}, {"ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC", "title": "Who won the Bax vs Arcon ATP Challenger tennis match on May 5, 2026?", "mean": 0.20249999999999996, "std": 0.0, "min": 0.20249999999999996, "max": 0.20249999999999996, "all": [0.20249999999999996, 0.20249999999999996, 0.20249999999999996, 0.20249999999999996, 0.20249999999999996]}, {"ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN", "title": "Who won the Bangladesh vs Pakistan men's Test cricket match starting May 8, 2026", "mean": 0.010000000000000018, "std": 0.0, "min": 0.010000000000000018, "max": 0.010000000000000018, "all": [0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018]}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA", "title": "Who won the Glamorgan vs Somerset 2026 County Championship cricket match?", "mean": 0.010000000000000018, "std": 0.0, "min": 0.010000000000000018, "max": 0.010000000000000018, "all": [0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018]}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS", "title": "Who won the Sussex vs Leicestershire 2026 County Championship cricket match?", "mean": 0.010000000000000018, "std": 0.0, "min": 0.010000000000000018, "max": 0.010000000000000018, "all": [0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018]}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR", "title": "Who won the Worcestershire vs Durham 2026 County Championship cricket match?", "mean": 0.010000000000000002, "std": 0.0, "min": 0.010000000000000002, "max": 0.010000000000000002, "all": [0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002]}, {"ticker": "KXLALIGA-26", "title": "Who won the 2025-26 La Liga (Spanish top-flight football)?", "mean": 0.0025000000000000005, "std": 0.0, "min": 0.0025000000000000005, "max": 0.0025000000000000005, "all": [0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005]}, {"ticker": "KXEREDIVISIEGAME-26MAY10BREHEE", "title": "Who won the Breda vs Heerenveen Eredivisie football match on May 10, 2026?", "mean": 0.03999999999999998, "std": 0.0, "min": 0.03999999999999998, "max": 0.03999999999999998, "all": [0.03999999999999998, 0.03999999999999998, 0.03999999999999998, 0.03999999999999998, 0.03999999999999998]}, {"ticker": "KXNBASERIES-26LALOKCR2", "title": "Who won the Los Angeles Lakers vs Oklahoma City NBA Round 2 playoff series in 20", "mean": 0.010000000000000018, "std": 0.0, "min": 0.010000000000000018, "max": 0.010000000000000018, "all": [0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018]}, {"ticker": "KXSERIEA-26", "title": "Who won the 2025-26 Serie A (Italian top-flight football)?", "mean": 0.0484, "std": 0.0, "min": 0.0484, "max": 0.0484, "all": [0.0484, 0.0484, 0.0484, 0.0484, 0.0484]}, {"ticker": "KXNHLCALDER-26", "title": "Who won the 2025-26 NHL Calder Memorial Trophy (Rookie of the Year)?", "mean": 0.0025000000000000005, "std": 0.0, "min": 0.0025000000000000005, "max": 0.0025000000000000005, "all": [0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005]}, {"ticker": "KXSURVIVORELIMINATION-26APR11", "title": "Which contestants were eliminated from Survivor Season 50 Episode 7?", "mean": 0.0025000000000000005, "std": 0.0, "min": 0.0025000000000000005, "max": 0.0025000000000000005, "all": [0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005]}, {"ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31", "title": "Who won Tournament of Champions Season 7 (Food Network)?", "mean": 0.0025000000000000005, "std": 0.0, "min": 0.0025000000000000005, "max": 0.0025000000000000005, "all": [0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005]}, {"ticker": "KXWVPRIMARY-01D26", "title": "Who won the 2026 Democratic primary for West Virginia's 1st Congressional Distri", "mean": 0.010000000000000002, "std": 0.0, "min": 0.010000000000000002, "max": 0.010000000000000002, "all": [0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002, 0.010000000000000002]}, {"ticker": "KXOHPRIMARY-15D26", "title": "Who won the 2026 Democratic primary for Ohio's 15th Congressional District?", "mean": 0.010000000000000018, "std": 0.0, "min": 0.010000000000000018, "max": 0.010000000000000018, "all": [0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018]}, {"ticker": "KXNEXTHUNGARYPM-26MAY01", "title": "Who became Prime Minister of Hungary after the 2026 election?", "mean": 0.010000000000000018, "std": 0.0, "min": 0.010000000000000018, "max": 0.010000000000000018, "all": [0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018, 0.010000000000000018]}, {"ticker": "KXCOLOMBIASENATE-26", "title": "Which coalition won the 2026 Colombia Senate election?", "mean": 0.03240000000000002, "std": 0.0, "min": 0.03240000000000002, "max": 0.03240000000000002, "all": [0.03240000000000002, 0.03240000000000002, 0.03240000000000002, 0.03240000000000002, 0.03240000000000002]}, {"ticker": "KXFEDCHAIRCOUNT-27", "title": "How many US Senators voted for Trump's Federal Reserve Chair pick (2027 confirma", "mean": 0.0025000000000000005, "std": 0.0, "min": 0.0025000000000000005, "max": 0.0025000000000000005, "all": [0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005, 0.0025000000000000005]}]</script>
+<script id="data-meta" type="application/json">{"mean": 0.03771881291547959, "std": 0.0009047565726253581}</script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script>
+const runs = JSON.parse(document.getElementById('data-runs').textContent);
+const spread = JSON.parse(document.getElementById('data-spread').textContent);
+const events = JSON.parse(document.getElementById('data-events').textContent);
+const meta = JSON.parse(document.getElementById('data-meta').textContent);
+
+// Plot 1: per-run mean Brier
+Plotly.newPlot('plot-runs', [{
+  type: 'bar',
+  x: runs.map(r => r.label),
+  y: runs.map(r => r.mean_brier),
+  marker: {
+    color: runs.map(r => r.label === 'canonical' ? '#1e6f3a' : '#2856a3'),
+  },
+  text: runs.map(r => r.mean_brier.toFixed(5)),
+  textposition: 'outside',
+  hovertemplate: '%{x}<br>Brier %{y:.5f}<br>n=' + runs[0].n + '<extra></extra>',
+}], {
+  margin: { l: 60, r: 20, t: 10, b: 40 },
+  yaxis: { title: 'mean single-binary Brier', gridcolor: '#eef0f5', range: [0, Math.max(...runs.map(r => r.mean_brier)) * 1.25] },
+  xaxis: { gridcolor: '#eef0f5' },
+  shapes: [
+    { type: 'line', x0: -0.5, x1: runs.length - 0.5, y0: meta.mean, y1: meta.mean,
+       line: { color: '#a02828', width: 1.5, dash: 'dash' } },
+    { type: 'rect', x0: -0.5, x1: runs.length - 0.5, y0: meta.mean - meta.std, y1: meta.mean + meta.std,
+       line: { width: 0 }, fillcolor: 'rgba(160, 40, 40, 0.08)' },
+  ],
+  annotations: [
+    { x: runs.length - 0.5, y: meta.mean, text: 'grand mean ' + meta.mean.toFixed(5),
+       showarrow: false, xanchor: 'right', yanchor: 'bottom', font: { color: '#a02828', size: 11 } },
+  ],
+  plot_bgcolor: 'white', paper_bgcolor: '#fafbfc',
+}, { responsive: true, displaylogo: false });
+
+// Plot 2: per-event p_yes spread (strip-plot style)
+const yLabels = spread.map(s => (s.title || s.ticker).substring(0, 60));
+const traces2 = [];
+// Range bar
+traces2.push({
+  type: 'bar', orientation: 'h',
+  x: spread.map(s => s.p_range),
+  y: yLabels,
+  base: spread.map(s => Math.min(...s.all_p)),
+  marker: { color: '#cbd5e1', line: { width: 0 } },
+  hovertemplate: '%{y}<br>spread %{x:.3f}<extra></extra>',
+  showlegend: false,
+});
+// Individual dots
+spread.forEach((s, i) => {
+  traces2.push({
+    type: 'scatter', mode: 'markers',
+    x: s.all_p,
+    y: Array(s.all_p.length).fill(yLabels[i]),
+    marker: { color: '#2856a3', size: 8, opacity: 0.75 },
+    hovertemplate: '%{y}<br>p_yes %{x:.3f}<extra></extra>',
+    showlegend: false,
+  });
+});
+Plotly.newPlot('plot-spread', traces2, {
+  margin: { l: 360, r: 20, t: 10, b: 40 },
+  xaxis: { title: 'p_yes across 5 reruns', gridcolor: '#eef0f5', range: [0, 1] },
+  yaxis: { autorange: 'reversed', tickfont: { size: 10 } },
+  plot_bgcolor: 'white', paper_bgcolor: '#fafbfc',
+}, { responsive: true, displaylogo: false });
+
+// Plot 3: per-event Brier jittered
+const sortedEvents = events.slice().sort((a, b) => a.mean - b.mean);
+const jx = [], jy = [], jtext = [];
+sortedEvents.forEach((e, i) => {
+  e.all.forEach(b => {
+    jx.push(i);
+    jy.push(b);
+    jtext.push((e.title || e.ticker) + '<br>Brier ' + b.toFixed(4));
+  });
+});
+Plotly.newPlot('plot-jitter', [{
+  type: 'scatter', mode: 'markers',
+  x: jx, y: jy, text: jtext,
+  marker: { color: '#2856a3', size: 7, opacity: 0.55 },
+  hovertemplate: '%{text}<extra></extra>',
+}], {
+  margin: { l: 60, r: 20, t: 10, b: 40 },
+  xaxis: { title: 'event index (sorted by mean Brier)', gridcolor: '#eef0f5' },
+  yaxis: { title: 'per-event Brier across 5 runs', gridcolor: '#eef0f5' },
+  plot_bgcolor: 'white', paper_bgcolor: '#fafbfc',
+}, { responsive: true, displaylogo: false });
+</script>
+
+</body>
+</html>

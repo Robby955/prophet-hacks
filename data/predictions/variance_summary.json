@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-05-17T02:32:41Z",
+  "n_runs": 5,
+  "n_events": 26,
+  "per_run_brier": [
+    0.0382,
+    0.03822,
+    0.03822,
+    0.03782,
+    0.03613
+  ],
+  "mean": 0.03772,
+  "std": 0.0009,
+  "min": 0.03613,
+  "max": 0.03822,
+  "canonical_production_brier": 0.03782,
+  "results": [
+    {
+      "run": 1,
+      "mean_brier": 0.0382,
+      "n": 26,
+      "elapsed_sec": 29.6
+    },
+    {
+      "run": 2,
+      "mean_brier": 0.03822,
+      "n": 26,
+      "elapsed_sec": 26.9
+    },
+    {
+      "run": 3,
+      "mean_brier": 0.03822,
+      "n": 26,
+      "elapsed_sec": 27.8
+    },
+    {
+      "run": 4,
+      "mean_brier": 0.03782,
+      "n": 26,
+      "elapsed_sec": 27.1
+    },
+    {
+      "run": 5,
+      "mean_brier": 0.03613,
+      "n": 26,
+      "elapsed_sec": 23.9
+    }
+  ]
+}

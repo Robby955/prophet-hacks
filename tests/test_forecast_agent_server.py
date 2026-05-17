@@ -11,9 +11,8 @@ def test_root_is_public_status_page() -> None:
 
     assert response.status_code == 200
     assert "ForecastingPath" in response.text
-    # Monitor status text was reworded to fit on the same line; only the
-    # access state words matter for the test.
-    assert ("restricted" in response.text) or ("public" in response.text)
+    assert "Public status" in response.text
+    assert "Open console" in response.text
 
 
 def test_root_does_not_expose_competition_internals() -> None:
@@ -48,8 +47,26 @@ def test_root_uses_bounded_public_layout() -> None:
     assert response.status_code == 200
     assert 'class="hero-shell"' in response.text
     assert 'class="hero-title"' in response.text
-    assert 'class="status-panel"' in response.text
+    assert 'class="run-window"' in response.text
     assert "<h1>ForecastingPath</h1>" not in response.text
+
+
+def test_root_avoids_disclosure_notice_copy() -> None:
+    client = TestClient(server.app)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    stale_public_copy = [
+        "PIN only",
+        "stay behind",
+        "detailed research console",
+        "Restricted observatory",
+        "Detailed traces",
+        "during active scoring",
+    ]
+    for term in stale_public_copy:
+        assert term not in response.text
 
 
 def test_observatory_requires_dashboard_auth_when_configured(monkeypatch) -> None:
@@ -330,6 +347,24 @@ def test_static_gallery_html_requires_dashboard_auth_when_configured(monkeypatch
     assert missing.status_code == 401
     assert present.status_code == 200
     assert "Side-by-side gallery" in present.text
+
+
+def test_static_experiment_html_requires_dashboard_auth_when_configured(monkeypatch) -> None:
+    monkeypatch.setenv("DASHBOARD_AUTH_TOKEN", "secret-token")
+    client = TestClient(server.app)
+
+    protected_paths = [
+        "/static/abstain_slider.html",
+        "/static/bootstrap_hist.html",
+        "/static/heatmap_resolved.html",
+        "/static/scatter_resolved.html",
+    ]
+    for path in protected_paths:
+        missing = client.get(path)
+        present = client.get(path, headers={"authorization": "Bearer secret-token"})
+
+        assert missing.status_code == 401
+        assert present.status_code == 200
 
 
 def test_dashboard_allows_local_access_without_token(monkeypatch) -> None:

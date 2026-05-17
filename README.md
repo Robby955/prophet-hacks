@@ -1,4 +1,4 @@
-# prophet-hacks · The Oracles
+# prophet-hacks: The Oracles
 
 Prophet Hacks 2026 forecasting agent. Team **CanadaHacks**, project **The Oracles**, forecasting track.
 
@@ -20,7 +20,7 @@ prediction, and a 5-model side-by-side gallery of ablation results.
 ./run.sh                  # boot local forecasting server on :8000
 ./run.sh smoke            # one-shot smoke against the live deploy
 ./run.sh backtest         # rerun the 26-event headline backtest (~$2)
-./run.sh test             # run the test suite (259 tests)
+./run.sh test             # run the test suite (260+ tests)
 ```
 
 See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
@@ -30,7 +30,7 @@ See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
 
 1. **Bug-fix dominance.** ~85% of our headline Brier improvement came from a one-line
    fix in the post-LLM longshot floor, not from a model upgrade. Post-processing safety
-   nets need boundary tests at the lowest *n* the pipeline admits — see
+   nets need boundary tests at the lowest *n* the pipeline admits. See
    `docs/DECISIONS.md` postmortem.
 2. **Scoring rule matters more than the model.** PA's CLI evaluator scores single-binary
    Brier; their published docs describe proper multi-class; their actual live scoring is a
@@ -39,19 +39,19 @@ See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
    treating ablation deltas as license to ship.
 3. **Schema discipline beats raw capability** for prompt-strict contracts of this shape.
    On the same retrieval + prompt + post-processing, GPT-5.5 and Gemini 3.1 Pro Preview
-   show multi-outcome Brier 18-46× worse than Opus 4.7 — failure mode is JSON-schema
-   noncompliance on outcome labels, not reasoning gaps. Public leaderboards don't predict
-   pipeline performance.
+   were materially worse than Opus 4.7 under both reported metrics. The failure mode was
+   JSON-schema noncompliance on outcome labels, not a general reasoning claim. Public
+   leaderboards don't predict pipeline performance.
 
 ## Two negative results worth keeping
 
 - **Adversarial-review prompts regress** on a calibrated production model.
   Two independent variants (two-call self-critique, one-call verification-field) both
   pull confident-and-correct predictions toward the middle, costing Brier where
-  production was right to be confident. Two prompts × two runs, same direction.
+  production was right to be confident. Two prompts across two runs, same direction.
 - **Small ablations need a CI bar.** Two intuitive production-candidate changes
   (adaptive retrieval count, exchanges-only source priority) failed paired-bootstrap
-  promotion gate at α=0.05 on n=26 (need |Δ| > 0.01 single-binary Brier to clear noise).
+  promotion gate at alpha=0.05 on n=26 (need |delta| > 0.01 single-binary Brier to clear noise).
   We did not ship them.
 
 ## Methodological discipline this project enforces
@@ -78,8 +78,8 @@ An evidence-grounded forecasting agent. For each event Prophet Arena hands us:
 6. Full pipeline trace (Brave query, raw model output, per-stage latency,
    fuzzy-match decisions, warnings) stored per call for `/predictions` audit.
 
-The hacky-prose words are not load-bearing. The detail above is exactly what
-runs in production at commit `e8c1beb9` (and whatever's newer at `/healthz.commit`).
+The details above are the production path. The currently deployed commit is
+available from `/healthz.commit`.
 
 ## Production
 
@@ -95,17 +95,15 @@ runs in production at commit `e8c1beb9` (and whatever's newer at `/healthz.commi
 `/dashboard`, `/compare`, `/compare-open` redirect to `/login` for browsers,
 return JSON 401 for API callers. `/predict` and `/healthz` stay public.
 
-## Results — 26-event sample-resolved backtest
+## Results: 26-event sample-resolved backtest
 
 Same pipeline (Brave + anchor prompt + 0.10 floor), swap the LLM:
 
-| Model | Mean Brier | Binary (n=14) | Multi (n=12) |
-| --- | --- | --- | --- |
 All numbers below are **single-binary Brier** matching PA's CLI
 evaluator (`prophet forecast evaluate`). Multi-class Brier numbers
-are documented in `submission/REPORT.md` §3 and `docs/FINDINGS.md` §2.
+are documented in `submission/REPORT.md` section 3 and `docs/FINDINGS.md` section 2.
 
-| Variant | Single-binary Brier ↓ |
+| Variant | Single-binary Brier (lower) |
 |---|---:|
 | **Claude Opus 4.7** (production) | **0.0378** |
 | Claude Opus 4.6 | 0.0391 |
@@ -119,7 +117,7 @@ are documented in `submission/REPORT.md` §3 and `docs/FINDINGS.md` §2.
 Production beats the previous Sonnet baseline by **40.7% relative**.
 Paired-bootstrap CI on the delta: **[0.0143, 0.0374]**
 (50K resamples, seed `20260516`, n=26). CI excludes zero;
-significant at α=0.05 under single-binary scoring.
+significant at alpha=0.05 under single-binary scoring.
 
 Production beats Opus 4.6 by 3.4% (0.0378 vs 0.0391). Under proper
 multi-class Brier (which PA's docs describe but the CLI doesn't
@@ -130,12 +128,12 @@ is in `docs/DECISIONS.md` 2026-05-17 entry.
 
 ### Honest decomposition of the win
 
-- The Sonnet→Opus 4.7 swap is the smaller half of the gain.
+- The Sonnet-to-Opus 4.7 swap is the smaller part of the gain.
 - The bigger half is fixing a **silent production bug** in
   `longshot_guard_floor`: old formula `max(0.05, 0.5/n)` returned 0.25 for
   binary events, silently clamping every binary prediction into
   `[0.25, 0.75]`. New formula caps at the Kalshi-paper threshold of 0.10.
-  ~6× Brier improvement on binary longshots alone.
+  about 6x Brier improvement on binary longshots alone.
 - Multi-outcome events were _mixed_ post-swap: Opus 4.7 is more confident
   than Sonnet, which helps when right (n=3 events) and hurts more when
   wrong (n=20). Net positive on this set but not on every event.
@@ -143,29 +141,29 @@ is in `docs/DECISIONS.md` 2026-05-17 entry.
 ### Why we kept Opus 4.7 over leaderboard-ranked alternatives
 
 Gemini 3.1 Pro Preview is the public Prophet Arena fixed-context leaderboard's
-#1. In our pipeline with our prompt and our scoring rule, it placed last —
-catastrophic multi-outcome JSON schema failures (emitting trailing commas,
+#1. In our pipeline with our prompt and our scoring rule, it placed last,
+with catastrophic multi-outcome JSON schema failures (emitting trailing commas,
 bogus keys, or probability mass on labels not in the outcome list).
 **The Opus 4.7 win on this dataset is dominated by schema compliance, not
 raw reasoning.** See `docs/DECISIONS.md` for the per-model autopsy.
 
 ## Engineering process
 
-- **Verify gate** (`./scripts/agent/verify.sh`) — pytest + smoke import +
-  dry-run. Used to silently swallow failures; now loud. **~200 tests**
+- **Verify gate** (`./scripts/agent/verify.sh`): pytest + smoke import +
+  dry-run. Used to silently swallow failures; now loud. **260+ tests**
   passing as of last verify.
-- **Preflight gate** (`scripts/preflight.sh`) — runs before any deploy:
-  verify green, working tree clean, HEAD = origin/main, upload-size
+- **Preflight gate** (`scripts/preflight.sh`): runs before any deploy.
+  Verify green, working tree clean, HEAD = origin/main, upload-size
   sanity (caught a real 18MB worktree bloat bug), prints live vs local
   SHA delta.
-- **Deploy wrapper** (`scripts/agent/deploy.sh`) — single safe path to
+- **Deploy wrapper** (`scripts/agent/deploy.sh`): single safe path to
   `railway up`. Pins commit SHA into `PROPHET_BUILD_COMMIT_SHA` env so
   `/healthz.commit` reflects what's actually serving.
-- **Pipeline trace** — every `/predict` call captures Brave query,
+- **Pipeline trace**: every `/predict` call captures Brave query,
   raw LLM output, parse-path, per-stage latency (ms), fuzzy-match
   decisions, warnings. Visible on `/predictions` (auth required), NOT
   sent back to PA.
-- **Decisions log** (`docs/DECISIONS.md`) — append-only, 12+ dated entries
+- **Decisions log** (`docs/DECISIONS.md`): append-only, 18+ dated entries
   including every bug postmortem.
 
 ## Install
@@ -258,7 +256,7 @@ python scripts/analyze_results.py \
 ```
 
 Per-variant predictions land in `data/predictions/`. The dashboard
-`/compare` route renders all of them in a 5-model × 26-event grid with
+`/compare` route renders all of them in a 5-model by 26-event grid with
 Brier color-coding.
 
 ## Forecast variants
@@ -268,7 +266,7 @@ Defined in `forecast_track.py`, served via `forecast_agent_server.py`'s
 
 | Variant | Description |
 | --- | --- |
-| **`multi_outcome_retrieval`** | **Production.** Brave → 5 chunks → Opus 4.7 + anchor prompt → 0.10 floor. |
+| **`multi_outcome_retrieval`** | **Production.** Brave to 5 chunks to Opus 4.7 + anchor prompt to 0.10 floor. |
 | `multi_outcome` | One Sonnet 4.6 multi-outcome call, no retrieval. Kalshi guard applied. |
 | `multi_outcome_sc3` | k=3 parallel `multi_outcome` calls, averaged per outcome. |
 | `single_llm` | One Sonnet 4.6 call, legacy binary `p_yes`. Server distributes across outcomes. |
@@ -296,13 +294,13 @@ Defined in `forecast_track.py`, served via `forecast_agent_server.py`'s
 
 ## Docs
 
-- **`docs/DECISIONS.md`** — append-only decision log. Read this to understand _why_ anything is the way it is. 12+ dated entries including every bug postmortem.
-- **`docs/HANDOFF.md`** — single-page state for picking up cold.
-- **`docs/AGENT_STATUS.md`** — multi-agent coordination + active task ownership.
-- **`docs/LIVE_OPERATIONS.md`** — production deploy / triage handoff.
-- **`docs/RUNBOOK.md`** — incident response patterns.
-- **`docs/STATUS.yaml`** — machine-readable status snapshot.
-- **`agent_protocol.md`** — coding-agent rules. Required reading before changes.
+- **`docs/DECISIONS.md`**: append-only decision log. Read this to understand _why_ anything is the way it is. 18+ dated entries including every bug postmortem.
+- **`docs/HANDOFF.md`**: single-page state for picking up cold.
+- **`docs/AGENT_STATUS.md`**: workstream coordination + active task ownership.
+- **`docs/LIVE_OPERATIONS.md`**: production deploy / triage handoff.
+- **`docs/RUNBOOK.md`**: incident response patterns.
+- **`docs/STATUS.yaml`**: machine-readable status snapshot.
+- **`agent_protocol.md`**: coding-agent rules. Required reading before changes.
 
 ## Verify before merging
 
@@ -312,7 +310,7 @@ PATH="$PWD/.venv/bin:$PATH" ./scripts/agent/verify.sh
 
 PATH prefix matters in shells where `python` isn't globally installed.
 Gate runs: pytest, smoke import, `agent.py --dry-run`. Failures are
-loud — no silent skips.
+loud, no silent skips.
 
 ## Trading-track skeleton (not the live submission path)
 
@@ -333,5 +331,5 @@ for hard caps and asserts at import time.
 ## License + credit
 
 Built by Rob Sneiderman for Prophet Hacks 2026.
-Multi-agent collaboration: Claude (this session) + Codex worked in parallel,
+Parallel implementation, evaluation, dashboard, and operations work was
 coordinated via `docs/AGENT_STATUS.md`.

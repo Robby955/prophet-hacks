@@ -25,7 +25,7 @@ First, ~85% of the headline improvement is attributable to a single
 bug-fix in the post-LLM longshot floor: the original formula
 clamped every binary prediction into [0.25, 0.75] regardless of
 model output. Second, the *scoring rule itself* materially changes
-the conclusions — under proper multi-class Brier (sum across all
+the conclusions: under proper multi-class Brier (sum across all
 outcomes per event, as Prophet Arena's published formula suggests),
 Opus 4.6 marginally outperforms Opus 4.7 (0.2500 vs 0.2558). Third,
 swapping the LLM across four alternative models (Opus 4.6, GPT-5.2,
@@ -49,7 +49,7 @@ events that close 2 days to 2 weeks out. Beating the market by a
 small margin in Brier produces a small positive total score;
 producing higher Brier than the market produces a negative score.
 Completion rate (fraction of webhook events the agent successfully
-returned a forecast on) is a multiplicative term — a 500 error on
+returned a forecast on) is a multiplicative term: a 500 error on
 10% of events scales the headline by 0.9.
 
 This rule differs from both of the offline metrics one would compute
@@ -106,7 +106,7 @@ The choice of 5-stage pipeline reflects a design constraint: every
 stage is a step we wanted observable in the per-call trace. The
 production endpoint records the Brave query, the deduplicated
 evidence URLs, the raw model output, the parser path taken, fuzzy
-outcome-label matches, per-stage latency, and any warnings — without
+outcome-label matches, per-stage latency, and any warnings, without
 any of those fields appearing in the response sent back to Prophet
 Arena.
 
@@ -119,7 +119,7 @@ trailing commas), regex-bounded outer object, regex-bounded outer
 object on cleaned text, regex-bounded inner `probabilities` map.
 Resolved outcome keys are then matched to canonical labels via a
 conservative four-pass match (exact, case-insensitive, whitespace-
-stripped, alphanumeric-only), deliberately *not* fuzzy substring —
+stripped, alphanumeric-only), deliberately *not* fuzzy substring;
 silently mapping the wrong outcome is worse than falling through to
 the uninformed prior.
 
@@ -185,7 +185,7 @@ would reflect the 1/n uniform fallback, not real model behavior.
 Single-binary is unaffected.
 
 **Honest framing.** Under PA's CLI metric, Opus 4.7 wins by **3.4%**
-over Opus 4.6 (0.0378 vs 0.0391) — a real but modest gap. Under
+over Opus 4.6 (0.0378 vs 0.0391), a real but modest gap. Under
 proper multi-class scoring, Opus 4.6 is marginally *better* (0.2500
 vs 0.2558). Model selection is metric-dependent on n=26. We hold
 Opus 4.7 in production because PA's CLI scoring is the only metric
@@ -197,14 +197,14 @@ multi-class.
 The two-tier failure mode is clearer on multi-outcome events.
 Opus 4.7, Opus 4.6, and GPT-5.2 cluster at multi-only Brier
 0.44–0.50. GPT-5.5 jumps to 0.66 and Gemini 3.1 Pro Preview to
-0.81 — 25× to 46× worse than production on the same rows. Inspection
+0.81, 25× to 46× worse than production on the same rows. Inspection
 of the per-call traces shows the bottom-tier failure mode is
 uniformly *JSON-schema noncompliance*: GPT-5.5 and Gemini emit
 probabilities for labels not in the supplied outcomes list, or
 malformed JSON the five-stage parser ultimately recovers to a
 probabilities-map-with-bad-keys. The downstream `_match_outcome_label`
 function correctly refuses to map invented keys onto valid outcomes,
-so redistributed mass goes to the uniform prior — which scores
+so redistributed mass goes to the uniform prior, which scores
 ~0.42 on multi-outcome events with a clear favorite.
 
 A control rerun with the same Gemini configuration *after* the
@@ -306,7 +306,7 @@ all retrieved URLs are flagged**. Examples:
 
 - The Masked Singer Season 14 (resolved 2026-04-03) cites
   `variety.com/.../the-masked-singer-season-14-finale-winner-ashlee-simpson-...`
-  — an article written *because* Ashlee Simpson won.
+  (an article written *because* Ashlee Simpson won).
 - NHL Calder Trophy (resolved 2026-05-14) cites
   `espn.com/.../who-won-nhl-rookie-year-winners-year-list`.
 - KXOHPRIMARY-15D26: 4 of 5 evidence URLs flagged.
@@ -399,7 +399,7 @@ The pattern, qualified by the corrected numbers:
 The strongest claim we can defend with n=26 is that *schema
 discipline is a real selection criterion*, GPT-5.5 and Gemini fail
 it on this pipeline, and the three top models pass it. We do not
-claim schema-compliance "dominates" model selection in general —
+claim schema-compliance "dominates" model selection in general:
 the top three are clustered tightly enough that the within-cluster
 choice depends on other factors. The implication for practitioners
 is that model choice should be validated empirically against the
@@ -438,9 +438,9 @@ price) cells, in the spirit of small-area-estimation borrowed-
 strength methods. On the same 26-event set the SAE variant scored
 mean Brier 0.1157 (single-binary), substantially worse than
 production. The variant remains in the repository as research
-scaffolding but is not promoted. The architectural assumption —
+scaffolding but is not promoted. The architectural assumption (that
 domain-level pooling stabilizes individual forecasts when sample
-sizes are small — runs into the practical problem that the
+sizes are small) runs into the practical problem that the
 calibration sample IS the evaluation sample, which either leaks
 or fails to learn. A non-leaking holdout (FutureSim-style replay)
 would be the right substrate.
@@ -465,7 +465,7 @@ Both patterns share a common failure mode: the adversarial-review
 prompt is overeager. It pulls confident-and-correct production
 predictions toward the middle, costing Brier on exactly the events
 where production was right to be confident. This is a real signal,
-not just noise — across two independent prompts and two independent
+not just noise; across two independent prompts and two independent
 runs the net direction is regression or near-zero. We do not promote
 either pattern. Open question for the next iteration: whether a
 confidence-aware critique (one that only revises low-confidence

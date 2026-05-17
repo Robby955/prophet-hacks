@@ -1,4 +1,4 @@
-# Findings — ForecastingPath / Prophet Hacks 2026
+# Findings · ForecastingPath / Prophet Hacks 2026
 
 *Author: Rob Sneiderman · Last updated: 2026-05-17*
 
@@ -8,7 +8,7 @@ single-page submission summary) and `docs/RESEARCH_NOTES.md` (the
 prior literature-survey of calibration techniques).
 
 Intended reader: someone evaluating the engineering and statistical
-work for technical depth — a hiring manager, a reviewer, a future
+work for technical depth: a hiring manager, a reviewer, a future
 self picking the project up after the event.
 
 Every number here maps to an on-disk artifact (commit, prediction
@@ -94,7 +94,7 @@ earlier draft claimed a "25× multi-outcome gap" between Opus 4.7 and
 alternatives; that was an artifact of comparing Opus 4.7's
 single-binary Brier (0.0177 multi-only) to alternatives' multi-class
 Brier (0.44–0.81). Under consistent multi-class scoring on the same
-events, Opus 4.7's multi-only Brier is 0.4551 — barely better than
+events, Opus 4.7's multi-only Brier is 0.4551, barely better than
 Opus 4.6 (0.4396, actually slightly better) and competitive with
 GPT-5.2 (0.4971).
 
@@ -130,8 +130,8 @@ the four non-production models (Opus 4.6, GPT-5.2, GPT-5.5, Gemini
 
 Each failure mode causes post-processing to fall back to the uniform
 1/n prior for that outcome and then redistribute via the longshot
-floor — correct behavior given corrupted input, but devastating for
-Brier on a multi-outcome event with a clear favorite.
+floor (correct behavior given corrupted input, but devastating for
+Brier on a multi-outcome event with a clear favorite).
 
 **Implication.** Opus 4.7's advantage on this dataset cannot be
 attributed to "the model is smarter." It is most consistent with
@@ -139,12 +139,12 @@ attributed to "the model is smarter." It is most consistent with
 have a distribution of failure modes none of which our parser fully
 recovers from."
 
-Parser hardening (`_parse_multi_outcome_json` — five-stage fallback)
+Parser hardening (`_parse_multi_outcome_json`, a five-stage fallback)
 and fuzzy outcome-label matching (`_match_outcome_label`) keep us
 functional if Opus 4.7 has a bad call. They do not rescue an
 inherently schema-noncompliant model, as verified by re-running the
 Gemini ablation after the hardening landed (Brier 0.4149 → 0.4259;
-net neutral — more parses succeed but the underlying probabilities
+net neutral: more parses succeed but the underlying probabilities
 remain wrong).
 
 ---
@@ -157,7 +157,7 @@ The original Kalshi longshot guard floor was
 floor = max(0.05, 0.5 / n_outcomes)
 ```
 
-For binary events (n=2) this evaluates to **0.25** — clamping every
+For binary events (n=2) this evaluates to **0.25**, clamping every
 binary prediction into [0.25, 0.75] regardless of model output. The
 bug was not in the LLM call or the prompt; it was in the
 post-processing safety net.
@@ -219,15 +219,15 @@ price) cells. They run in the offline-only variant
 `predict_multi_outcome_retrieval_sae`.
 
 Measured Brier on the 26-event sample-resolved set:
-**0.1157 vs production 0.0379** — substantially worse. The shrinkage
+**0.1157 vs production 0.0379**, substantially worse. The shrinkage
 parameters were not calibrated against a held-out set; live
 calibration against single-event resolutions during the eval window
 is not supported. The code stays in the repository as research
 scaffolding for a post-event paper, not promoted to production.
 
 This is a negative result worth keeping. The architectural assumption
-behind SAE here — that domain-level pooling stabilizes individual
-forecasts when sample sizes are small — runs into the practical
+behind SAE here (that domain-level pooling stabilizes individual
+forecasts when sample sizes are small) runs into the practical
 problem that the alpha calibration sample IS the eval sample, which
 either leaks or fails to learn.
 
@@ -295,7 +295,7 @@ Source: <https://github.com/Robby955/prophet-hacks>
 
 ---
 
-## Addendum — relevant outside work (2026-05-17)
+## Addendum: relevant outside work (2026-05-17)
 
 **FutureSim** (Goel et al., arXiv 2605.15188): a benchmark that
 replays real-world events chronologically (Jan-Mar 2026) to evaluate

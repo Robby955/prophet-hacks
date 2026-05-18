@@ -121,16 +121,16 @@ watcher process, used as the "is everything OK?" one-stop check
 before sleeping or before the event window opens.
 
 **Parallel workstreams.** Implementation, evaluation, dashboard, and
-ops work were coordinated through `docs/AGENT_STATUS.md` with explicit
-file-ownership claims. That kept parser hardening, offline research
-variants, dashboard work, and deploy tooling from colliding.
+ops work were coordinated with explicit file-ownership claims. That kept
+parser hardening, offline research variants, dashboard work, and deploy
+tooling from colliding.
 
 ## Challenges
 
 - **Deploy bloat.** Three Railway deploys failed silently with TLS
-  errors before we noticed `.claude/worktrees/` was uploading 18MB
-  of agent state to Railway. Fix: `.gitignore` the worktrees +
-  preflight `du -sh` check. Real engineering failure, real fix.
+  errors before local worktree state was accidentally included in the
+  Railway upload. Fix: ignore the worktrees plus preflight `du -sh`
+  check. Real engineering failure, real fix.
 - **A model that beat us on the leaderboard placed last in our
   pipeline.** See "what we learned" #2 above.
 - **A longshot floor formula that looked right but was wrong.** See
@@ -155,7 +155,7 @@ variants, dashboard work, and deploy tooling from colliding.
   `scripts/agent/deploy.sh`, `scripts/full_check.sh`)
 - **Tooling**: Anthropic Message Batches API harness for offline
   ablations at 50% discount (`scripts/batch_ablate.py`)
-- **Coordination**: `docs/AGENT_STATUS.md`, `docs/DECISIONS.md`
+- **Coordination**: explicit file-ownership notes, `docs/DECISIONS.md`
 
 ## Reproducibility
 

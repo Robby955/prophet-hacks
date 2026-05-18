@@ -6,10 +6,11 @@ This report is the single document a reader can open and understand:
 what we built, why we built it the way we did, what we measured, and
 what we still don't know. Companion files:
 
-- `docs/ROADMAP.md`: sprint plan with timeline and tasks.
+- `docs/INDEX.md`: canonical map of public docs and artifacts.
+- `docs/ROADMAP.md`: post-submit roadmap and operating priorities.
 - `docs/DECISIONS.md`: append-only decision log.
 - `docs/SUBMISSION.md`: execution guide for the submit-endpoint form.
-- `docs/STATUS.yaml` + `docs/STATUS.html`: machine-readable status.
+- `docs/LIVE_OPERATIONS.md`: production operations notes.
 - `static/summary.html` and `static/summary.pdf`: visual report.
 
 ## 1. The problem
@@ -212,9 +213,9 @@ engineering practice. Things worth a reviewer's attention:
 - **Decisions log** (`docs/DECISIONS.md`): append-only, 18+ dated
   entries, including every bug postmortem and every model-swap
   rationale.
-- **Workstream coordination** via `docs/AGENT_STATUS.md`. Parallel
-  implementation, evaluation, dashboard, and ops work used file-
-  ownership claims to avoid merge conflicts.
+- **Workstream coordination** via explicit file-ownership notes and the
+  append-only decision log. Parallel implementation, evaluation,
+  dashboard, and ops work avoided merge conflicts.
 
 ## 6. Open questions
 

@@ -105,10 +105,9 @@ Keep only points that remain true after live scoring.
 - `submission/PROJECT_STORY.md`
 - `docs/FINDINGS.md`
 - `docs/WORKSHOP_PAPER_DRAFT.md`
-- `docs/ADVERSARIAL_REVIEW.md`
+- `docs/RESEARCH_QUEUE.md`
 - `docs/DECISIONS.md`
 - `docs/RUNBOOK.md`
-- `docs/HANDOFF.md`
 - `docs/QUANT_PORTFOLIO_ARTIFACTS.md`
 - `output/playwright/` captures that are safe to publish
 - `data/predictions/` backtest outputs

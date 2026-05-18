@@ -4,9 +4,10 @@ One file, every Devpost field already filled in, in submission order.
 Paste each block into its labeled form field at
 https://prophethacks.devpost.com/submissions
 
-The PIN for any judge wanting to see the operator console is
-**176661**, but they do not need it — every load-bearing artifact
-(report, architecture, source, live endpoint) is publicly reachable.
+Public repository note: the dashboard PIN is redacted from this copy.
+Reviewer access, if needed, should be shared privately. Every
+load-bearing artifact (report, architecture, source, live endpoint) is
+publicly reachable.
 
 ---
 
@@ -60,7 +61,7 @@ Scale validation. We re-ran the same production variant on Prophet Arena's publi
 
 The auth-gated research console at agent.forecastingpath.com/observatory shows live prediction traces, a 5-model side-by-side gallery with per-event drill-down, a cross-model heatmap, an interactive abstain-policy slider that visualizes Prophet Arena's actual scoring rule, a bootstrap distribution histogram, an intra-model variance plot, and a step-by-step pipeline trace explorer for educational replay. The public root shows a sparse product page.
 
-We coordinated two AI agents in parallel via docs/AGENT_STATUS.md with explicit file-ownership claims. Zero merge conflicts. Methodology lessons live in docs/DECISIONS.md (append-only, 20+ dated entries) so any future iteration can see what was tried and rejected before being tried again.
+Parallel implementation and research workstreams were coordinated with explicit file-ownership claims. Zero merge conflicts. Methodology lessons live in docs/DECISIONS.md (append-only, 20+ dated entries) so any future iteration can see what was tried and rejected before being tried again.
 ```
 
 ## How I built it (Devpost "How we built it")
@@ -88,7 +89,7 @@ Testing: 270+ pytest cases. The verify gate (scripts/agent/verify.sh) was tighte
 
 - A methodology bug in the ablation harness. backtest_forecast.py dropped the per-outcome probabilities array from each saved prediction, keeping only p_yes. The summary-report generator then defaulted to a uniform 1/n distribution for multi-class scoring, producing apparent 25-times multi-outcome gaps that turned out to be metric-mixing across files. Fixed; postmortem in docs/DECISIONS.md.
 
-- Three Railway deploys failed silently with TLS BadRecordMac errors before we noticed .claude/worktrees/ was uploading 18MB of agent state on every push. Fix: .gitignore the worktrees plus preflight du -sh check.
+- Three Railway deploys failed silently with TLS BadRecordMac errors before we noticed local worktree state was being uploaded on every push. Fix: ignore the worktrees plus preflight du -sh check.
 
 - The scoring rule was not what we thought. Prophet Arena's CLI scores single-binary Brier; their published docs describe proper multi-class; their actual live scoring (confirmed mid-build in Discord) is a Brier skill score against snapshotted market prices. Three different metrics, three different model rankings on n=26. The right adjustment was to report all three and resist promoting any change on a metric the actual evaluator does not implement.
 
@@ -103,7 +104,7 @@ Testing: 270+ pytest cases. The verify gate (scripts/agent/verify.sh) was tighte
 - A backtest-leakage audit I ran on the same set I'm reporting from. 38.5% of the 26 resolved events have at least one post-resolution URL in evidence. The honest number is at the top of the summary report, not the appendix.
 - A 5-rerun variance estimate (sigma = 0.0009) that turns "scores 0.0378" into "scores 0.0377 +- 0.0009 across 5 reruns" and explains where the noise floor sits.
 - A scale validation on Prophet Arena's 1200-event Subset. The small-sample 0.0378 inflated to 0.1224 at 46x the size; 0.1224 with 95% CI [0.110, 0.135] is the credible expected magnitude on live PA.
-- Two AI agents (myself and Codex) coordinated through one repo over the weekend via append-only docs/DECISIONS.md and docs/AGENT_STATUS.md. Zero merge conflicts across roughly 80 commits.
+- Parallel implementation and research workstreams coordinated through one repo over the weekend via append-only docs/DECISIONS.md and explicit file-ownership notes. Zero merge conflicts across roughly 80 commits.
 ```
 
 ## What I learned
@@ -142,7 +143,7 @@ Architecture diagram:       https://forecastingpath.com/static/architecture.svg
 GitHub repository:          https://github.com/Robby955/prophet-hacks
 Health endpoint:            https://forecastingpath.com/healthz
 Video walkthrough:          https://youtu.be/1ON-WAurV_0
-Auth-gated research views:  https://agent.forecastingpath.com/observatory (PIN: 176661)
+Auth-gated research views:  https://agent.forecastingpath.com/observatory (private PIN shared separately)
 ```
 
 ## Demo video

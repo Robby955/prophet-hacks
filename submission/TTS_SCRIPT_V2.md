@@ -80,7 +80,7 @@ Voice: **energetic male**. Speed: **1.0×**. fish.audio default.
 
 ## Chunk 9 — Close (2:08–2:13, ~12 words)
 
-> Two AI agents coordinated through one repo over the weekend. Repo
+> Parallel workstreams coordinated through one repo over the weekend. Repo
 > and report linked. Thanks.
 
 ---
@@ -104,7 +104,7 @@ Three-outcome politics question. Who is Prime Minister of the United Kingdom on 
 
 Every dot is one resolved event. Predicted probability against actual outcome. The line is perfect calibration. We cluster near it on confident-and-correct, drift on confident-and-wrong. The backtest scored zero point oh three seven eight Brier. At twelve hundred event scale, zero point one two two four.
 
-Two AI agents coordinated through one repo over the weekend. Repo and report linked. Thanks.
+Parallel workstreams coordinated through one repo over the weekend. Repo and report linked. Thanks.
 ```
 
 ---

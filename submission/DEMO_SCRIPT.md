@@ -1,6 +1,6 @@
 # 60-90 second demo screen-record script — The Oracles
 
-**Use this order.** Five beats, target 75 seconds total. The TTS script at
+**Use this order.** Five beats, target 75 seconds total. The narration script at
 `submission/TTS_SCRIPT.md` is timed to
 match exactly these beats.
 
@@ -68,7 +68,7 @@ Stop recording. CapCut trim head+tail.
 
 ## Quick alternates if something fails on camera
 
-- If the live demo hangs >10s: cut to a still of the result page; the TTS
+- If the live demo hangs >10s: cut to a still of the result page; the narration
   script's beat 2 narration covers ~30s so you have airtime.
 - If Brave times out: the system falls back to no-retrieval. The probabilities
   are still returned; just narrate "and here it gracefully degrades without
@@ -89,7 +89,7 @@ Stop recording. CapCut trim head+tail.
 ## After recording
 
 - CapCut: trim head+tail to clean cursor settles.
-- Drop the fish.audio mp3 from `submission/TTS_SCRIPT.md` onto the audio
+- Drop the narration audio from `submission/TTS_SCRIPT.md` onto the audio
   track. Align the chunk boundaries to the beats above.
 - Export 1080p mp4, under 50MB.
 - Upload to Devpost form video field.

@@ -380,8 +380,8 @@ def _build_commit_sha() -> str:
     non-secret Railway variable before deploy. Fall back to Railway's own git
     env var, a local `.commit_sha`, then local git. Returns 'dev' if none found.
 
-    Surfaced on /healthz so anyone (curl, Codex, another agent, Rob)
-    can verify which code is live without Railway dashboard access.
+    Surfaced on /healthz so operators can verify which code is live
+    without Railway dashboard access.
     Fixes a class of "is the deploy actually current?" confusion that
     burned an hour 2026-05-16.
     """

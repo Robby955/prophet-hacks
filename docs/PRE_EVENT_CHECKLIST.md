@@ -41,7 +41,7 @@ kickoff.
 
 - [ ] `gh repo create Robby955/prophet-hacks --private --source=. --remote=origin --push`
 - [ ] `gh repo view Robby955/prophet-hacks --web` opens the new repo
-- [ ] (Optional) Codex login confirmed: `codex --version`; `gh auth status` as the Codex user can push
+- [ ] (Optional) collaborator CLI login confirmed; `gh auth status` can push
 
 ## What to do FIRST when kickoff starts
 

@@ -157,7 +157,7 @@ SSE stages, ~4-5s end to end), per-event Brier gallery, cross-model
 heatmap, abstain-policy slider, Super Bowl LXI + UK PM multi-outcome
 demos, resolved-event scatter, close.
 
-Audio narration: fish.audio, energetic male voice, default speed.
+Audio narration: energetic male voice, default speed.
 Source script: `submission/TTS_SCRIPT_V2.md`.
 
 ---

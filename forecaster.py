@@ -398,8 +398,8 @@ def _get_triage_model() -> str:
 
 _CONVICTION_THRESHOLD: float = 0.10
 # Float-precision pad. abs(0.60 - 0.5) evaluates to 0.09999999999999998,
-# so a naive `< 0.10` would reject the exact-bucket case. Codex Goal 3
-# spec is `>= 0.10`, so the boundary at 0.10 must be admitted.
+# so a naive `< 0.10` would reject the exact-bucket case. The production
+# rule is `>= 0.10`, so the boundary at 0.10 must be admitted.
 _CONVICTION_EPSILON: float = 1e-9
 
 

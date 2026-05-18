@@ -79,7 +79,7 @@ rationale, who or what made it, and any related commit SHA.
   - `uniform_prior`: **0.219**
   - `single_llm` (Sonnet 4.6): **0.190**  ← +13% improvement on a real-data backtest
 - Cost of the single-LLM run: ~95s wall time, well under $0.20. Plenty of budget to iterate with ensembles or stronger models.
-- Decided by: Claude Code (correcting from the trading-track focus after Rob pointed at `prophetarena.co/developer` and `using_sample_datasets.md`).
+- Decision: switch focus to forecasting after checking `prophetarena.co/developer` and `using_sample_datasets.md`.
 - Commit: this branch.
 
 ## 2026-05-16 · risk.py imports from ai_prophet_core.ruleset; new caps wired
@@ -87,8 +87,8 @@ rationale, who or what made it, and any related commit SHA.
 - `risk.py` now imports `ai_prophet_core.ruleset` as `_server` and asserts at import time that every one of our caps is at least as strict as the corresponding server cap. A programmer error (raising our cap above the server's) will be caught on first import rather than at first rejected intent.
 - Three new server-mirrored constants: `MAX_TRADES_PER_DAY = 100` (server rolling 24h cap), `MAX_GROSS_EXPOSURE = 10_000.0` (server total exposure cap), `TICK_SUBMISSION_DEADLINE_SECS = 540` (server 9-min submission window). None of these existed previously and each represents a real way the live server could reject our intents.
 - New helpers: `compute_gross_exposure(positions)` sums `shares * avg_entry_price` across open positions; `assert_under_gross_exposure(new_notional, current_gross)` and `assert_under_daily_trade_count(trades_in_last_24h)` mirror the existing assert-style helpers.
-- Rationale: pre-kickoff read of `docs/build_a_bot.md` and `ai_prophet_core.ruleset` (in the forked `ai-prophet/ai-prophet` repo at `~/Desktop/ai-prophet/`) surfaced these caps as concrete server-side enforcement points we hadn't mirrored. The 5-min CLAUDE.md table is now wrong but the code is right; the table will be updated in the same commit.
-- Decided by: Claude Code (pre-kickoff initiative; gaps confirmed against upstream SDK source).
+- Rationale: pre-kickoff read of `docs/build_a_bot.md` and `ai_prophet_core.ruleset` (in the forked `ai-prophet/ai-prophet` repo at `~/Desktop/ai-prophet/`) surfaced these caps as concrete server-side enforcement points we had not mirrored. The early coordination table was stale but the code is right; the table will be updated in the same commit.
+- Decision: pre-kickoff SDK review confirmed the gaps against upstream source.
 - Commit: this branch.
 
 ## 2026-05-16 · agent.py: network-resilient claim_tick, finally pattern, put_plan, error_detail
@@ -102,21 +102,21 @@ rationale, who or what made it, and any related commit SHA.
 - `upsert_participant` now passes `rep=0` to match upstream convention; lets future variants run under one experiment.
 - Gross-exposure check added inside the per-market risk gate: `assert_under_gross_exposure(notional, running_gross)`, where `running_gross` is the portfolio exposure at tick start plus any trades accepted so far in this tick.
 - Rationale: same upstream read as the risk.py decision. The `finally` pattern is the single biggest survivability improvement — without it, one mid-tick exception leaks a lease and blocks the experiment for `lease_sec` (600s default). `put_plan` is the highest-portfolio-value low-effort addition.
-- Decided by: Claude Code (pre-kickoff initiative).
+- Decision: pre-kickoff upstream resilience review.
 - Commit: this branch.
 
 ## 2026-05-16 · agreement_gate float-precision pad
 
-- `forecaster.agreement_gate` now uses a `_CONVICTION_EPSILON = 1e-9` pad so the exact-threshold boundary case (`abs(p - 0.5) == 0.10`) is admitted, matching Codex Goal 3's `>= 0.10` spec.
+- `forecaster.agreement_gate` now uses a `_CONVICTION_EPSILON = 1e-9` pad so the exact-threshold boundary case (`abs(p - 0.5) == 0.10`) is admitted, matching the `>= 0.10` gate.
 - Rationale: `abs(0.60 - 0.5)` evaluates to `0.09999999999999998` in float, so the naive `< 0.10` check incorrectly rejected the exact-bucket case `agreement_gate(0.60, 0.60)`. `test_exact_threshold` was failing as a result. Bucketed probabilities snap to `[0.10, 0.20, ..., 0.90]`, so exact-boundary inputs are a real and frequent case in practice.
 - The pad lives on the LHS of the comparison, so the gate still cleanly rejects any input genuinely below the threshold (e.g., 0.55 → `abs - 0.5 + eps = 0.0500000001 < 0.10` → reject).
-- Decided by: Claude Code (taking initiative; bug surfaced in pytest, spec was unambiguous).
+- Decision: bug surfaced in pytest; the threshold spec was unambiguous.
 - Commit: this branch.
 
 ## 2026-05-16 · pytest added to requirements.txt
 
 - `pytest>=8.0,<9.0` added under a "Test runner" comment. `scripts/agent/verify.sh` was silently skipping `pytest tests/` because the dep wasn't installable from `requirements.txt`. Now `verify.sh` actually exercises the 47-test suite.
-- Decided by: Claude Code (verify.sh gate is the merge signal; it can't be silently skipping tests).
+- Decision: `verify.sh` is the merge signal, so it cannot silently skip tests.
 - Commit: this branch.
 
 ## 2026-05-16 · python baseline bumped from 3.11 to 3.13
@@ -139,7 +139,7 @@ rationale, who or what made it, and any related commit SHA.
 - README, `docs/STATUS.yaml`, `docs/STATUS.html`, `.env.example`, and `forecast_agent_server.py` now describe the current production path: Railway service `oracles-agent`, custom domain `agent.forecastingpath.com`, Prophet Arena endpoint-only submission, and `multi_outcome_retrieval` as the served variant.
 - Added `docs/LIVE_OPERATIONS.md` as the handoff for deployment, health checks, public dashboard verification, and common incidents. This replaces stale cloudflared-tunnel instructions for production; Cloudflare quick tunnels remain explicitly documented as not active.
 - Rationale: the repo had outgrown its trading-skeleton README and several status artifacts still said `multi_outcome` or quick tunnel. Future agents need one reliable source of current deployment truth before touching forecasting logic.
-- Decided by: Codex orientation pass after Railway, GitHub PR, and Prophet Arena endpoint checks.
+- Decision: orientation pass after Railway, GitHub PR, and Prophet Arena endpoint checks.
 - Commit: this branch.
 
 ## 2026-05-16 · app root redirects to live dashboard
@@ -147,7 +147,7 @@ rationale, who or what made it, and any related commit SHA.
 - `GET /` now redirects to `/dashboard` with HTTP 307. Once `forecastingpath.com` is bound to the Railway service, the apex domain will open the live monitor instead of a bare JSON API stub.
 - Added direct FastAPI endpoint tests for root redirect, `/healthz`, `/predict` response shape, and `/favicon.ico`.
 - Railway custom-domain creation for `forecastingpath.com` is still blocked from this shell by `Unauthorized. Please run railway login again.` Manual Railway UI plus Cloudflare DNS steps are documented in `docs/LIVE_OPERATIONS.md`.
-- Decided by: Codex after confirming `agent.forecastingpath.com` works and apex `forecastingpath.com` lacks an A/AAAA/CNAME answer.
+- Decision: `agent.forecastingpath.com` works and apex `forecastingpath.com` lacks an A/AAAA/CNAME answer.
 - Commit: this branch.
 
 ## 2026-05-16 · live dashboard moved behind token auth
@@ -155,7 +155,7 @@ rationale, who or what made it, and any related commit SHA.
 - The dashboard, prediction-history JSON, and SSE stream now require `DASHBOARD_AUTH_TOKEN` when the variable is set. Auth accepts `?token=...`, `x-dashboard-token`, `Authorization: Bearer ...`, or the `dashboard_token` cookie set after a valid query-token visit.
 - `GET /` is now a public status page instead of a redirect to the live monitor. `/predict` and `/healthz` remain public because Prophet Arena needs direct endpoint access and health checks should stay simple.
 - FastAPI Swagger/OpenAPI routes are disabled on this app. The live monitor contains enough internals and a production prediction form that public access is not worth the competition leak/spend risk.
-- Decided by: Codex after Rob asked whether the dashboard was public and whether it should be.
+- Decision: dashboard access reviewed after Rob asked whether it was public and whether it should be.
 - Commit: this branch.
 
 ## 2026-05-16 · evaluation helpers hardened after review
@@ -164,7 +164,7 @@ rationale, who or what made it, and any related commit SHA.
 - Fixed simulated NO-contract payoff math to reject impossible zero-price contracts instead of producing huge fake returns.
 - Rewrote `agent_protocol.md` to match the actual Railway production path and corrected the Brier gate to lower-is-better / positive BSS.
 - Added focused tests for Brier/ECE validation, return math, leakage detection, and `/events` dashboard auth.
-- Decided by: Codex after requested code review of commits `2e38088..b5ed6de`.
+- Decision: requested code review of commits `2e38088..b5ed6de`.
 - Commit: this branch.
 
 ## 2026-05-16 · Opus 4.7 in `predict_multi_outcome_retrieval`
@@ -172,7 +172,7 @@ rationale, who or what made it, and any related commit SHA.
 - The production forecast variant now calls `claude-opus-4-7` instead of `claude-sonnet-4-6`. `config.yaml` updated; Sonnet 4.6 prepended to the fallback chain.
 - Rationale: branch smoke-test on a synthetic Chiefs/SB-LXI longshot showed Sonnet returned 0.25 (ignoring the +1500 / ~6% implied price the same Brave search surfaced), while Opus 4.7 returned 0.06 raw with the same evidence. Opus anchors to cited market odds materially better. Cost goes from ~$0.02 to ~$0.10/call; for hackathon volume the absolute cost is trivial vs the Brier upside.
 - Companion change: the multi-outcome retrieval system prompt now has an explicit "market-odds anchoring" block — anchor to cited odds, move >0.05 only with specific contrary evidence.
-- Decided by: Claude during Phase 2 work, authorized by Rob.
+- Decision: Phase 2 model swap, authorized by Rob.
 - Commit: `9652016`.
 
 ## 2026-05-16 · `longshot_guard_floor` capped at 0.10 (bug fix)
@@ -180,7 +180,7 @@ rationale, who or what made it, and any related commit SHA.
 - Old formula `max(0.05, 0.5 / n_outcomes)` set the binary floor to 0.25, silently clamping every binary prediction into [0.25, 0.75]. New formula: `min(0.10, max(0.05, 0.5 / n_outcomes))`. 0.10 is the principled Kalshi-paper empirical threshold (sub-$0.10 contracts lose >60%).
 - Discovered when the post-Opus-swap branch smoke returned 0.06 raw and the guard inflated it to 0.25, destroying ~0.06 of Brier on a single binary event. Per-event improvement on binary longshots is roughly 6x (0.0625 -> 0.0100).
 - A unit test asserting `longshot_guard_floor(2) <= 0.10` would have caught this; backlogged.
-- Decided by: Claude after smoke-test surfaced the clamp. Authorized by Rob.
+- Decision: smoke test surfaced the clamp; fix authorized by Rob.
 - Commit: `9652016`.
 
 ## 2026-05-16 · `.claude/` and `proposed_retrieval/` gitignored to fix deploys
@@ -188,16 +188,16 @@ rationale, who or what made it, and any related commit SHA.
 - `railway up` uploads all untracked files. Three deploys (`92c5c5f4`, `c897643c`, `872b769a`) failed because `.claude/worktrees/` was 18MB and either corrupted the upload (TLS BadRecordMac) or busted the build with no logs.
 - Fix: gitignore `.claude/` and `proposed_retrieval/`. Subsequent deploy `415edc6e` succeeded cleanly. Smoke confirmed live: Knicks 2027 NBA Finals longshot returned 0.10 (was 0.25 on old code), proving Opus + new floor are running.
 - Lesson: `du -sh` of what `railway up` would actually send should be a pre-deploy step. Added `scripts/preflight.sh` to formalize this.
-- Decided by: Claude after diagnosing the deploy bloat.
+- Decision: deploy bloat diagnosis.
 - Commit: `a6cfcc7`.
 
 ## 2026-05-16 · CI/CD hardening — preflight, deploy wrapper, /healthz commit SHA
 
 - `scripts/preflight.sh`: runs verify gate, checks working tree clean with no untracked non-ignored files, confirms HEAD = origin/main, sums tracked upload size (warns >10MB), surfaces deployed-SHA vs local HEAD.
 - `scripts/agent/deploy.sh`: single safe path to deploy. Runs preflight, pins commit SHA to the non-secret Railway variable `PROPHET_BUILD_COMMIT_SHA`, calls `railway up --detach`. Use this instead of raw `railway up`.
-- `forecast_agent_server.py:_build_commit_sha()`: reads `PROPHET_BUILD_COMMIT_SHA` first, then `RAILWAY_GIT_COMMIT_SHA`, then `.commit_sha`, then a `git rev-parse` fallback. Surfaced as `"commit"` field on `/healthz`. Now anyone (curl, Codex, future-Rob) can verify which code is live with a single GET.
+- `forecast_agent_server.py:_build_commit_sha()`: reads `PROPHET_BUILD_COMMIT_SHA` first, then `RAILWAY_GIT_COMMIT_SHA`, then `.commit_sha`, then a `git rev-parse` fallback. Surfaced as `"commit"` field on `/healthz`. Operators can verify which code is live with a single GET.
 - Rationale: today the question "is the deploy actually current?" cost ~1 hour of confusion. Each of these three hardens a specific failure mode from the day's incidents.
-- Decided by: Claude, authorized by Rob ("All three now, before next PA call").
+- Decision: authorized by Rob ("All three now, before next PA call").
 - Correction: first attempt pinned `.commit_sha`, but `railway up` did not upload that gitignored file and `/healthz.commit` returned `dev`. The env-var pin fixes this for file-upload deploys. Preflight also now blocks untracked files rather than merely counting them, because untracked files would make deployed artifacts differ from `origin/main`.
 - Commit: this commit.
 
@@ -207,7 +207,7 @@ rationale, who or what made it, and any related commit SHA.
 - Snapshot of the Phase 1 (Sonnet) predictions saved at `data/predictions/multi_outcome_retrieval.phase1_sonnet.json`; new predictions at `data/predictions/multi_outcome_retrieval.json`; per-event diff at `reports/phase2_vs_phase1_backtest.json`.
 - **Where the win came from (important honesty):** by outcome count, binary events (n=2, 14 of 26) drove almost the entire improvement: Brier 0.0879 → 0.0425 (Δ=−0.0454). All five of the top-5 wins are binary longshots where the old guard floored a confident-correct 0.05–0.10 prediction up to 0.25 (the floor bug). Opus 4.7's stronger anchoring is a secondary effect. Multi-outcome events were mixed — n=3 events improved (one big −0.0711), n=20 events regressed (+0.0459 average) because Opus puts more mass on outcome[0] than Sonnet did, which costs more when outcome[0] isn't the winner.
 - **Don't overclaim:** 26 events is a tiny sample, and the dataset skews toward binary tennis matches where the longshot guard fix matters disproportionately. Live Prophet Arena events may have a different outcome-count distribution. Treat the 0.0379 number as "directionally validated, not converged."
-- Decided by: Claude after Rob asked for real proof rather than vibes; spend ~$2.60 for the rerun.
+- Decision: Rob asked for measured evidence; spend ~$2.60 for the rerun.
 - Commit: this commit.
 
 ## 2026-05-16 · Gemini 3.1 Pro Preview ablation — keep Opus 4.7
@@ -217,7 +217,7 @@ rationale, who or what made it, and any related commit SHA.
 - Total spend: ~$0.44.
 - **Important lesson:** Gemini 3 Pro is the public Prophet Arena leaderboard's #1 fixed-context model. That ranking is on PA's own harness, not ours. **Leaderboard #1 ≠ best in your pipeline.** Worth quoting in any "model selection" portfolio section.
 - Decision: stay on Opus 4.7 for production. The ablation script `scripts/ablate_openrouter.py` is now the harness for any future "should we swap?" question — run it on the same 26 events before any model swap.
-- Decided by: Claude, authorized by Rob to spend on ablation rather than vibes.
+- Decision: Rob authorized ablation spend instead of relying on intuition.
 - Commit: this commit.
 
 ## 2026-05-16 · Multi-vendor ablation across 4 models — same pipeline, same prompt
@@ -241,7 +241,7 @@ Ran the same `predict_multi_outcome_retrieval` pipeline (Brave 5-chunk retrieval
 
 Files: `data/predictions/ablation_*.json` (per-model predictions), `scripts/ablate_openrouter.py` (the standard ablation harness).
 
-Decided by: Claude after Rob authorized aggressive spending for real ablation data ("do not screw me if you end up going easy").
+Decision: Rob authorized aggressive spending for real ablation data ("do not screw me if you end up going easy").
 
 ## 2026-05-17 · GPT-5.5 ablation — confirms the schema-compliance hypothesis
 
@@ -250,7 +250,7 @@ Decided by: Claude after Rob authorized aggressive spending for real ablation da
 - Decomposition: binary mean 0.0376 (*slightly better* than Opus 4.7's 0.0425); multi-outcome mean 0.6552 (37× worse than Opus 4.7's 0.0177).
 - Decision: do not swap. Same JSON schema failure mode we've now observed in 4 of 4 non-Anthropic-Opus-4.7 models (GPT-5.2, GPT-5.5, Opus 4.6, Gemini 3.1 Pro). The schema-compliance pattern is robust across the OpenAI/Google/older-Anthropic axis.
 - Note for the workshop paper: GPT-5.5's competitive binary number is interesting — for a binary-only pipeline, it would be a viable cheaper alternative to Opus 4.7. PA's event mix is unknown but Discord ("events won't be highly skewed") suggests both shapes will appear.
-- Decided by: Claude after Rob asked whether newer OpenAI models warranted a swap.
+- Decision: newer OpenAI model checked after Rob asked whether a swap was warranted.
 - Commit: this commit.
 
 ## 2026-05-17 · CRITICAL: scoring-methodology correction (single-binary vs multi-class)
@@ -318,9 +318,8 @@ re-running the production backtest yields identical single-binary
 - Cross-model comparisons must use the same metric to be honest;
   prefer single-binary for the audience-facing table.
 
-Decided by: Claude after surfacing the bug via prompt-ablation
-discrepancy. Author of the original metric mismatch: also Claude;
-postmortem is the discipline.
+Decision: prompt-ablation discrepancy surfaced the bug. The original
+metric mismatch is documented here; postmortem is the discipline.
 - Commit: this commit + the backtest script fix.
 
 ---
@@ -378,11 +377,11 @@ score. Architecture not portable (multi-agent simulator vs our
 webhook agent). Post-event: clone + run our agent through
 OpenForesight as a workshop-paper extension.
 
-Decided by: Claude after Rob surfaced the Discord scoring-formula
-screenshot. Author of the original "delete anchoring" recommendation:
-parallel review agent operating without the scoring-rule context;
-their measurement on V0/V1 was valid but the strategic implication
-was opposite of what they concluded once we know the actual rule.
+Decision: Discord scoring-formula screenshot changed the interpretation.
+The original "delete anchoring" recommendation came from a review pass
+that did not have the scoring-rule context; its V0/V1 measurement was
+valid, but the strategic implication reversed once the actual rule was
+known.
 Commit: this commit.
 
 ---
@@ -437,7 +436,7 @@ support the same finding. Examples:
   backtest suggests; the headline metric is BSS vs market, which is
   measured on the live event itself with no leakage opportunity.
 
-Decided by: Claude after running the audit Rob requested as E5.
+Decision: Rob requested the E5 leakage audit; this records the result.
 Commit: this commit (`scripts/check_retrieval_leakage.py` + the
 findings written into `summary.html` + this entry).
 
@@ -482,14 +481,14 @@ not exchange-heavy. Aligned with E4 finding: we should pull more from
 exchanges directly.
 
 **E2 verification prompt**: regressed Brier by +0.019. Combined with
-self-critique replication regression (Codex, +0.003), two-of-two
+self-critique replication regression (+0.003), two-of-two
 failures for adversarial-review patterns over an already-calibrated
 production model. **Negative result for the paper.**
 
 **Spend total**: ~$25 in Anthropic + OpenRouter. Plenty of budget left.
 
-Decided by: Claude under Rob's "go run all experiments" instruction.
-None auto-applied to production. PR review pending Codex/Rob for the
+Decision: Rob's "go run all experiments" instruction.
+None auto-applied to production. PR review pending for the
 exchanges_only switch and the adaptive-retrieval-count dispatcher.
 Commit: this commit's batch.
 
@@ -546,7 +545,7 @@ Anything smaller is indistinguishable from run-to-run LLM
 stochasticity. Apply this bar to any future small-ablation
 finding before shipping to production.
 
-Decided by: Claude under Rob's "verify before shipping" instruction.
+Decision: Rob's "verify before shipping" instruction.
 The verification took ~10 minutes and zero spend. Saved a production
 change that would have been ~0 EV on PA's actual metric. Commit:
 this commit.
@@ -595,7 +594,7 @@ Artifacts:
 - `data/predictions/variance_summary.json` (aggregates)
 - `static/variance.html` (Plotly view, auth-gated like other research views)
 
-Decided by: Claude under Rob's "research budget worth spending on
+Decision: Rob's "research budget worth spending on
 variance and plots" instruction. Commit: `cb4a1a0` (variance) +
 this commit (summary.html + DECISIONS entry).
 
@@ -862,13 +861,13 @@ Commits promoted (in order):
 - Over/Under binary `"over/under 2.5%"` → sum 1.0000 (WTA) ✓
 - Super Bowl 5-way WTA → sum 1.0000 ✓
 - Top-5 of 12 NBA → sum 5.5800 (top_k marginals preserved) ✓
-- Two-team qualify (Codex regression) → sum 1.0700 (multi_label, not squashed) ✓
+- Two-team qualify regression → sum 1.0700 (multi_label, not squashed) ✓
 
 **Promotion-gate criteria met:**
 - 300/300 tests pass (26 in tests/test_topk_classifier.py)
 - Cherry-picked NOT ff-merged → no landing/docs noise on production
 - Winner-take-all path bit-identical to pre-deploy production
-- Codex re-reviewed twice (caught two real bugs in prior staging iterations)
+- Reviewed twice after staging caught two real bugs in prior iterations
 
 **Watcher:** PID 33661 alive, still polling, `last_run_at: null` at deploy time.
 

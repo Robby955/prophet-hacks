@@ -1,4 +1,4 @@
-# fish.audio TTS script V2 — matched to Rob's recorded 2:13 video
+# Demo narration script V2 - matched to Rob's recorded 2:13 video
 
 Replaces the 75-second V1. Beats match Rob's actual recorded layout:
 
@@ -15,7 +15,7 @@ Replaces the 75-second V1. Beats match Rob's actual recorded layout:
 | 1:50 – 2:08 | Resolved-event scatter plot |
 | 2:08 – 2:13 | Brief summary / close |
 
-Voice: **energetic male**. Speed: **1.0×**. fish.audio default.
+Voice: **energetic male**. Speed: **1.0×**.
 
 ---
 
@@ -85,7 +85,7 @@ Voice: **energetic male**. Speed: **1.0×**. fish.audio default.
 
 ---
 
-## Single plain-prose block (paste this verbatim into fish.audio)
+## Single plain-prose block
 
 ```
 The Oracles. A live forecasting endpoint for Prophet Arena, built for Prophet Hacks twenty twenty-six.
@@ -142,7 +142,7 @@ Drop the generated mp3 onto the audio track. Use these markers:
 - **1:50**: Chunk 8 start (scatter)
 - **2:08**: Chunk 9 start (close)
 
-If fish.audio's pacing produces a slightly different total length, you
+If the narration pacing produces a slightly different total length, you
 have two levers: CapCut "Speed" on the audio track (0.95×–1.05×), or
 trim silence between chunks. Don't pitch-shift.
 
@@ -150,6 +150,5 @@ trim silence between chunks. Don't pitch-shift.
 
 - Voice peak: -6 dB to -12 dB
 - No music. If you must, ducked to -24 dB under voice.
-- No reverb, no "studio" filter. fish.audio's raw output reads as a
-  real person.
-- CapCut "Voice clarity" preset is fine. Anything more sounds AI.
+- No reverb and no "studio" filter. Keep the narration natural.
+- CapCut "Voice clarity" preset is fine.

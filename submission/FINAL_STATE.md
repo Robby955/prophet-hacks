@@ -91,14 +91,14 @@ Open these tabs in order **after signing in once**
 | 5 | `https://agent.forecastingpath.com/static/abstain_slider.html` | 1:05–1:15 |
 
 Click cue for Tab 2: pre-select **Super Bowl LXI** preset, then **Run
-live demo** at 0:10. The pipeline takes ~3-6 seconds; the TTS narration
+live demo** at 0:10. The pipeline takes ~3-6 seconds; the narration
 covers the wait.
 
 Full beat-by-beat: `submission/DEMO_SCRIPT.md`.
 
-### 3. Generate the TTS audio (5 min)
+### 3. Generate the narration audio (5 min)
 
-- Open fish.audio (you already chose energetic male voice).
+- Open the narration tool.
 - Paste the **single plain-prose block** at the bottom of
   `submission/TTS_SCRIPT.md` verbatim.
 - Generate, download mp3.
@@ -163,14 +163,14 @@ preset cards, stage timeline, output panel.
 **Q: What if the live demo fails on camera?**
 
 Three fallbacks in DEMO_SCRIPT.md. Short version: Brave timeout =
-narrate the graceful degrade, demo hang = cut to result page (TTS
+narrate the graceful degrade, demo hang = cut to result page (narration
 covers the airtime), cookie expired = stop the take, re-auth off-camera,
 restart.
 
 ## Files Rob should know about
 
 - `submission/DEMO_SCRIPT.md` — video beats
-- `submission/TTS_SCRIPT.md` — fish.audio prose + CapCut alignment
+- `submission/TTS_SCRIPT.md` — narration prose + CapCut alignment
 - `submission/DEVPOST_PASTE.md` — Devpost form copy-paste
 - `submission/PROJECT_STORY.md` — Devpost "Inspiration / What I built /
   Challenges / Built with" detailed copy

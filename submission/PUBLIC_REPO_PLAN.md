@@ -17,9 +17,9 @@ private/public-flipped repo is the canonical source.
 ## Why not just clean the existing repo
 
 - 80+ commits with weekend-paced messages, agent-coordination noise,
-  Codex chatter, and several "fix typo" follow-ups. Not bad, but reads
+  coordination chatter, and several "fix typo" follow-ups. Not bad, but reads
   as hackathon work rather than portfolio work.
-- Some commits reference Codex, AGENT_STATUS.md, internal worktree
+- Some commits reference internal coordination notes, worktree
   paths, and other coordination ephemera that's irrelevant to a reader.
 - The fresh-repo version can land as 1 well-scoped initial commit plus
   any follow-ups for post-event improvements (FutureSim chronological

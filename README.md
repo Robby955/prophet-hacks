@@ -10,10 +10,12 @@ Prophet Hacks 2026 forecasting agent. Team **CanadaHacks**, project **The Oracle
 ## TL;DR
 
 Retrieval-augmented Claude Opus 4.7 forecasting agent with a Kalshi-paper longshot floor.
-Mean Brier **0.0378** single-binary on a 26-event PA backtest (40.8% reduction over a
-Sonnet 4.6 baseline; 95% paired-bootstrap CI [0.014, 0.037], excludes zero). Production
-runs as a FastAPI service on Railway with auth-gated research dashboard, JSONL trace per
-prediction, and a 5-model side-by-side gallery of ablation results.
+Production runs as a FastAPI service on Railway with per-prediction JSONL traces,
+an auth-gated research dashboard, and reproducible ablation scripts. Offline evaluation
+is intentionally labeled as replay evidence, not a proven live market edge: the 26-event
+resolved replay scores **0.0378** single-binary Brier, while the larger 1200-event
+resolved replay scores **0.1224** and is the more credible scale check before live PA
+results arrive.
 
 ## Architecture
 
@@ -29,7 +31,7 @@ diagram.
 ```bash
 ./run.sh                  # boot local forecasting server on :8000
 ./run.sh smoke            # one-shot smoke against the live deploy
-./run.sh backtest         # rerun the 26-event headline backtest (~$2)
+./run.sh backtest         # rerun the 26-event resolved replay (~$2)
 ./run.sh test             # run the test suite (260+ tests)
 ```
 
@@ -38,7 +40,7 @@ See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
 
 ## Three findings worth keeping
 
-1. **Bug-fix dominance.** ~85% of our headline Brier improvement came from a one-line
+1. **Bug-fix dominance.** ~85% of the small-set Brier improvement came from a one-line
    fix in the post-LLM longshot floor, not from a model upgrade. Post-processing safety
    nets need boundary tests at the lowest *n* the pipeline admits. See
    `docs/DECISIONS.md` postmortem.
@@ -69,9 +71,11 @@ See `.env.example` for required keys. Only `ANTHROPIC_API_KEY` is mandatory;
 
 All ablation deltas are evaluated against a paired-bootstrap CI (50K resamples, pinned
 seed). The promotion rule: a candidate can move production only if (a) the single-binary
-delta is practically large on n=26, (b) the 95% CI excludes zero, and (c) the change
-doesn't conflict with the live market-baseline scoring rule. Directional improvements
-that fail this gate are kept as research notes and visualizations, not shipped.
+delta is practically large on n=26, (b) the 95% CI excludes zero on the replay, and
+(c) the change doesn't conflict with the live market-baseline scoring rule. Directional
+improvements that fail this gate are kept as research notes and visualizations, not
+shipped. Live Team Brier versus Market Brier is the decisive evidence; offline replay
+scores are not presented as final market-beating proof.
 Workshop-paper-style writeup in `docs/WORKSHOP_PAPER_DRAFT.md`.
 
 ## What this is
@@ -139,11 +143,12 @@ significant at alpha=0.05 under single-binary scoring.
 ### Scale-up: Subset-1200 (HuggingFace `prophetarena/Prophet-Arena-Subset-1200`)
 
 We replayed the production pipeline against PA's 1200-event resolved set
-(46x our headline sample). Headline came in at **Brier 0.1224**, 95%
-bootstrap CI **[0.110, 0.135]**. The 0.0378 number is hindsight-rich on a
-small, well-indexed slice; 0.1224 is the more credible expected magnitude
-on the live distribution. Both numbers are real on different samples;
-**Subset-1200 is the one we expect to roughly match live PA performance.**
+(46x the 26-event sample). The larger replay came in at **Brier 0.1224**,
+95% bootstrap CI **[0.110, 0.135]**. The 0.0378 number is hindsight-rich on
+a small, well-indexed slice; 0.1224 is the more conservative scale check.
+Both numbers are real on different samples. The live PA run remains the
+decisive test because its events arrive unresolved and are scored against
+snapshotted market prices.
 
 Production beats Opus 4.6 by 3.4% (0.0378 vs 0.0391). Under proper
 multi-class Brier (which PA's docs describe but the CLI doesn't

@@ -184,9 +184,9 @@ _ORDERED_THRESHOLD_PATTERNS = (
 # Recognized binary mutually-exclusive outcome pairs. Order within the
 # pair does not matter — we compare as a sorted set. Any 2-outcome list
 # whose labels match one of these pairs is winner-take-all by construction.
-# Per Codex review 2026-05-18: we DO NOT short-circuit all len==2 lists,
-# because "Which of Team A and Team B will qualify?" is binary in shape
-# but multi-label in semantics (both can qualify simultaneously).
+# Do not short-circuit all len==2 lists: "Which of Team A and Team B
+# will qualify?" is binary in shape but multi-label in semantics because
+# both can qualify simultaneously.
 _BINARY_MUTEX_PAIRS = frozenset(
     frozenset(pair)
     for pair in (
@@ -230,7 +230,7 @@ def _classify_event_semantics(event: dict) -> tuple[str, int | None]:
       ("multi_label", None)       — independent yes/no per outcome
       ("ordered_threshold", None) — cumulative/over-under, no sum-to-1
 
-    Decision order (Codex re-review 2026-05-18, narrowed binary shortcut):
+    Decision order:
       1. RECOGNIZED binary mutually-exclusive pairs short-circuit to
          winner_take_all. Only ["Yes","No"], ["True","False"], ["Over",
          "Under"], ["Above","Below"], ["Higher","Lower"] qualify. Other

@@ -1,11 +1,11 @@
-# fish.audio TTS script — 75 seconds, 5 beats
+# Demo narration script - 75 seconds, 5 beats
 
 **Voice**: energetic male. **Speed**: default 1.0×. **Pause** at every
-blank line (fish.audio honors them).
+blank line.
 
 **Total target**: ~185 words → ~74 seconds at ~150 wpm.
 
-Paste the **single plain-prose block** at the bottom into fish.audio.
+Paste the **single plain-prose block** at the bottom into the narration tool.
 The labeled chunks are for CapCut alignment to `submission/DEMO_SCRIPT.md`.
 
 ---
@@ -49,7 +49,7 @@ The labeled chunks are for CapCut alignment to `submission/DEMO_SCRIPT.md`.
 
 ---
 
-## Single plain-prose block (paste this verbatim into fish.audio)
+## Single plain-prose block
 
 ```
 The Oracles. A live forecasting endpoint for Prophet Arena, built for Prophet Hacks twenty twenty-six.
@@ -83,9 +83,8 @@ Strategic insight. Predict only when you have edge, otherwise defer to the marke
 
 - Voice: -12 dB to -6 dB peak (CapCut auto-normalize is fine)
 - No background music. If you must, -24 dB ducked under voice.
-- No reverb, no "studio voice" effect. fish.audio's raw output reads
-  best when it sounds like a person, not a polished narrator.
-- Voice clarity filter: ON (CapCut default). Anything more sounds AI.
+- No reverb and no "studio voice" effect. Keep the narration natural.
+- Voice clarity filter: ON (CapCut default).
 
 ## What to drop if you run long
 

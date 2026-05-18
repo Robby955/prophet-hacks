@@ -32,5 +32,5 @@ Submission support:
 - `submission/DEVPOST_PASTE.md`: submitted Devpost copy, with private access
   details redacted in the public repository.
 - `submission/DEMO_SCRIPT.md`: screen-recording plan.
-- `submission/TTS_SCRIPT.md` and `submission/TTS_SCRIPT_V2.md`: narration
-  scripts used during the demo-video pass.
+- `submission/TTS_SCRIPT.md` and `submission/TTS_SCRIPT_V2.md`: demo narration
+  scripts.

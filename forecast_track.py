@@ -150,6 +150,101 @@ def apply_longshot_guard(
     return floored
 
 
+# --- top-K / multi-label event-semantics classifier ---------------------
+# Per Anri's Discord clarification (2026-05-17 22:30 CT): top-K and
+# multi-label events are scored with marginal probabilities that can sum
+# to K, not normalized to 1. apply_longshot_guard above renormalizes when
+# sum lands in [0.5, 1.5] which is wrong for those events. The classifier
+# below picks the right post-processing branch.
+
+_TOP_K_PATTERNS = (
+    re.compile(r"\btop[\s\-]?(\d+)\b", re.IGNORECASE),
+    re.compile(r"\bfinish(?:es|ing)?\s+(?:in\s+)?(?:the\s+)?top[\s\-]?(\d+)\b", re.IGNORECASE),
+    re.compile(r"\bwhich\s+(\d+)\s+of\b", re.IGNORECASE),
+    re.compile(r"\bselect\s+(\d+)\b", re.IGNORECASE),
+)
+
+_MULTI_LABEL_KEYWORDS = (
+    "qualify", "qualifies", "qualifying", "qualified",
+    "make playoffs", "make the playoffs", "make the playoff",
+    "advance to", "advances to",
+    "be nominated", "nominees", "nominated",
+    "make the cut",
+    "all that apply", "select all",
+)
+
+_ORDERED_THRESHOLD_PATTERNS = (
+    re.compile(r"\bover/under\b", re.IGNORECASE),
+    re.compile(r"\bat\s+least\s+\d", re.IGNORECASE),
+    re.compile(r"\bat\s+most\s+\d", re.IGNORECASE),
+    re.compile(r"\bmore\s+than\s+\d", re.IGNORECASE),
+    re.compile(r"\bfewer\s+than\s+\d", re.IGNORECASE),
+)
+
+
+def _classify_event_semantics(event: dict) -> tuple[str, int | None]:
+    """Return (semantics, target_sum) for the event's scoring shape.
+
+    Returns one of:
+      ("winner_take_all", 1)      — default, sums to 1, current behavior
+      ("top_k", K)                — top-K, marginal probabilities sum ~K
+      ("multi_label", None)       — independent yes/no per outcome
+      ("ordered_threshold", None) — cumulative/over-under, no sum-to-1
+
+    The classifier inspects the event title + subtitle + description. It
+    does NOT inspect outcomes (some top-K events have outcomes that look
+    like winner-take-all on the surface).
+
+    Falls back to winner_take_all on ambiguity; the cost of a false
+    negative is current production behavior. The cost of a false positive
+    (calling something top-K when it isn't) is preserving non-normalized
+    probabilities the server would otherwise normalize — neutral-to-mild
+    under the Discord rule that the server does NOT renormalize.
+    """
+    text = " ".join(
+        str(event.get(field) or "")
+        for field in ("title", "subtitle", "description", "rules")
+    )
+    if not text.strip():
+        return ("winner_take_all", 1)
+    for pat in _TOP_K_PATTERNS:
+        m = pat.search(text)
+        if m:
+            try:
+                k = int(m.group(1))
+                if k >= 2:
+                    return ("top_k", k)
+            except (ValueError, IndexError):
+                continue
+    lower = text.lower()
+    for kw in _MULTI_LABEL_KEYWORDS:
+        if kw in lower:
+            return ("multi_label", None)
+    for pat in _ORDERED_THRESHOLD_PATTERNS:
+        if pat.search(text):
+            return ("ordered_threshold", None)
+    return ("winner_take_all", 1)
+
+
+def apply_longshot_guard_topk(
+    probabilities: list[dict], n_outcomes: int,
+) -> list[dict]:
+    """Top-K / multi-label / ordered-threshold post-processor.
+
+    Floors each per-outcome probability at the longshot threshold AND
+    caps each at P_YES_MAX. Does NOT renormalize — preserves the marginal
+    interpretation P(outcome in winning set). Use this when the event is
+    NOT winner-take-all (per Anri Discord 2026-05-17 22:30 CT).
+    """
+    if not probabilities:
+        return probabilities
+    floor = longshot_guard_floor(n_outcomes)
+    return [
+        {"market": p["market"], "probability": min(P_YES_MAX, max(floor, float(p["probability"])))}
+        for p in probabilities
+    ]
+
+
 def _yes_outcome(event: dict) -> str | None:
     """The first listed outcome is the implicit YES condition.
 
@@ -1469,7 +1564,21 @@ def _predict_multi_outcome_retrieval_impl(event: dict, *, apply_sae: bool = Fals
         trace["sae"] = sae_trace
         rationale = f"sae shrinkage toward 1/{n}: {rationale}"[:300]
 
-    guarded = apply_longshot_guard(prob_list, n)
+    # Branch on event semantics. Winner-take-all keeps the existing guard
+    # (floors + renormalizes when sum is in [0.5, 1.5]). Top-K / multi-label
+    # / ordered-threshold uses the topk guard which only floors+caps and
+    # never renormalizes — per Anri Discord 2026-05-17 22:30 CT.
+    semantics, target_sum = _classify_event_semantics(event)
+    sum_before = sum(float(p.get("probability", 0.0)) for p in prob_list)
+    if semantics == "winner_take_all":
+        guarded = apply_longshot_guard(prob_list, n)
+    else:
+        guarded = apply_longshot_guard_topk(prob_list, n)
+    sum_after = sum(float(p.get("probability", 0.0)) for p in guarded)
+    trace["outcome_semantics"] = semantics
+    trace["target_sum"] = target_sum
+    trace["probability_sum_before_guard"] = round(sum_before, 6)
+    trace["probability_sum_after_guard"] = round(sum_after, 6)
     trace["longshot_guard_applied"] = True
     trace["latency_ms"]["total"] = int((_time.time() - t_start) * 1000)
     out = {

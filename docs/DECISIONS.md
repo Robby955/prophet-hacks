@@ -750,3 +750,86 @@ Artifacts:
 - `data/predictions/measurement_4_5/multi_outcome_retrieval.json` (gitignored;
   reproducible via `python scripts/backtest_forecast.py --variants multi_outcome_retrieval --out-dir data/predictions/measurement_4_5`)
 - `data/predictions/measurement_4_5/backtest_summary.json` (same, gitignored)
+
+## 2026-05-17 22:30 CT — Discord confirmations from Anri + Sravya during eval window
+
+Three official rules surfaced after our submission. All are load-bearing.
+
+### Rule 1: top-K events use marginal probabilities, server does not normalize
+
+Quoted Discord question and Anri's reply:
+
+> Q: "For multi-outcome events where multiple outcomes can be 'correct'
+>    simultaneously (e.g., 'which 5 of these 26 will finish top 5'),
+>    should per-outcome probabilities be:
+>    (A) P(this is THE winner), summing to 1 across outcomes, or
+>    (B) P(this is in the winning set), summing to K?"
+> A (Anri): "We'll be doing B - we shouldn't be normalizing as the outcomes
+>            are not always mutually exclusive."
+
+**Implication for our code:** `forecast_track.py:apply_longshot_guard`
+currently renormalizes when probability sum lands in [0.5, 1.5]. For
+winner-take-all events that's correct; for top-K events that's a real
+bug — it squashes marginal probabilities toward sum=1 and destroys the
+intended scoring signal.
+
+**Action:** add `_classify_event_semantics(event)` and a top-K-aware
+guard branch. Winner-take-all path stays bit-identical to current
+production. Top-K / multi-label / ordered-threshold paths floor but do
+not renormalize.
+
+**Promotion gate:** if the new branch only activates on detected non-
+winner-take-all events, AND on winner-take-all the output bit-matches
+current production, we promote before first top-K PA call lands. Waiting
+for a top-K call to test would expose us to scoring on the bug.
+
+### Rule 2: ~200 events over the 14-day eval window, daily cadence
+
+Sravya, Discord:
+
+> "~200 events for evaluation. Based on our experience, this should be
+>  good enough to remove variance."
+
+Per-day average ~14 events. Likely bursty (sports finals weekends, Fed
+meetings, election days). Endpoint should accept burst traffic without
+queueing.
+
+### Rule 3: event close times range from 2 days to 2 weeks
+
+Anri: "the close time of these events will range from within 2 days to
+2 weeks." So events resolve continuously across the eval window, not all
+at the end. That means leaderboard updates throughout the 14 days, not
+just at close.
+
+### Rule 4: cost guidance is ~$0.30/forecast
+
+Sravya: "For reasonable agents, it's usually less than $0.3 per forecast
+(even using most advanced models), so the cost should be manageable."
+
+At 200 events × $0.30 = $60 max for the eval window. Our per-call cost
+is ~$0.05 (Brave + Opus 4.7), so 200 events ≈ $10. Plenty of headroom.
+
+### Rule 5: Anri-sanctioned abstain-to-market strategy
+
+Anri: "One potential implementation is to only make prediction when you
+are confident enough, otherwise you could just use the market probability
+as your prediction."
+
+**Implication for our code:** we already built and tested this as
+variant `predict_abstain_to_market` (see 2026-05-17 E1 ablation entry
+above). The bottleneck was Haiku price-extraction from Brave snippets
+not reliably finding market prices. If PA's live payload includes a
+snapshotted market-price field (the BSS scoring formula implies this),
+abstain-to-market becomes trivial — just read the field. Inspect the
+first PA payload to see whether market prices are present.
+
+### Operating implications
+
+1. **Endpoint mutability + measured-gate discipline continues.** The
+   2026-05-17 17:30 CT 4+5 regression entry stays the precedent.
+2. **Top-K classifier is now the highest-priority correctness fix.**
+   Stage first, test deterministic equivalence on winner-take-all, then
+   promote.
+3. **Watch the first PA payload for a market-price field.** If present,
+   wire abstain-to-market with a simple confidence threshold.
+4. **No prompt or model changes.** Contract correctness only.

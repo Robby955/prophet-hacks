@@ -833,3 +833,46 @@ first PA payload to see whether market prices are present.
 3. **Watch the first PA payload for a market-price field.** If present,
    wire abstain-to-market with a simple confidence threshold.
 4. **No prompt or model changes.** Contract correctness only.
+
+## 2026-05-18 00:40 CT — Top-K classifier + narrowed binary shortcut promoted to production
+
+Deploy SHA: `a1f899b0` (cherry-picked from staging `4dcf1c1d` — classifier
+commits only, no landing/audit/PDF moves).
+
+UTC: 2026-05-18 05:40:28Z.
+
+Commits promoted (in order):
+- `24c6abd` docs(decisions): log 2026-05-17 22:30 CT Discord confirmations
+- `1c6613e` feat(forecast): event-semantics classifier + top-K-aware guard
+- `e0fee2d` fix(classifier): binary outcomes short-circuit to winner_take_all
+- `a1f899b` fix(classifier): narrow binary shortcut to recognized mutex pairs only
+
+**What changed in production behavior:**
+- New: `_classify_event_semantics(event)` routes between `apply_longshot_guard`
+  (winner_take_all, sum→1) and `apply_longshot_guard_topk` (top_k / multi_label
+  / ordered_threshold, no renormalization).
+- Recognized mutex pairs (Yes/No, True/False, Over/Under, Above/Below,
+  Higher/Lower) short-circuit to winner_take_all even when title contains
+  threshold language.
+- Generic 2-outcome lists (Team A / Team B) fall through to the text classifier
+  and pick up multi_label semantics from "qualify" / "nominated" / etc.
+
+**Live smoke after deploy** (a1f899b0 @ 2026-05-18 05:40:28Z):
+- Yes/No binary `"at least 2 cuts"` → sum 1.0000 (WTA) ✓
+- Over/Under binary `"over/under 2.5%"` → sum 1.0000 (WTA) ✓
+- Super Bowl 5-way WTA → sum 1.0000 ✓
+- Top-5 of 12 NBA → sum 5.5800 (top_k marginals preserved) ✓
+- Two-team qualify (Codex regression) → sum 1.0700 (multi_label, not squashed) ✓
+
+**Promotion-gate criteria met:**
+- 300/300 tests pass (26 in tests/test_topk_classifier.py)
+- Cherry-picked NOT ff-merged → no landing/docs noise on production
+- Winner-take-all path bit-identical to pre-deploy production
+- Codex re-reviewed twice (caught two real bugs in prior staging iterations)
+
+**Watcher:** PID 33661 alive, still polling, `last_run_at: null` at deploy time.
+
+**Risk mitigation:** if PA's first batch shows a classifier mis-routing, the
+fix is one revert commit on `forecast_track.py` reverting to pre-`a1f899b0`
+behavior. Tagged `decisions_a1f899b0_2026-05-18T05:40:28Z` is the deploy
+anchor in this log.

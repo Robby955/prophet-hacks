@@ -241,7 +241,7 @@ Ran the same `predict_multi_outcome_retrieval` pipeline (Brave 5-chunk retrieval
 
 Files: `data/predictions/ablation_*.json` (per-model predictions), `scripts/ablate_openrouter.py` (the standard ablation harness).
 
-Decision: Rob authorized aggressive spending for real ablation data ("do not screw me if you end up going easy").
+Decision: Rob authorized an aggressive ablation budget so production choices were based on measured data rather than undersampled intuition.
 
 ## 2026-05-17 · GPT-5.5 ablation — confirms the schema-compliance hypothesis
 

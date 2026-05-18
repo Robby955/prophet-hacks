@@ -12,7 +12,7 @@ Prophet Hacks 2026 forecasting agent. Team **CanadaHacks**, project **The Oracle
 Retrieval-augmented Claude Opus 4.7 forecasting agent with a Kalshi-paper longshot floor.
 Production runs as a FastAPI service on Railway with per-prediction JSONL traces,
 an auth-gated research dashboard, and reproducible ablation scripts. Offline evaluation
-is intentionally labeled as replay evidence, not a proven live market edge: the 26-event
+is intentionally labeled as replay evidence, not final live evidence: the 26-event
 resolved replay scores **0.0378** single-binary Brier, while the larger 1200-event
 resolved replay scores **0.1224** and is the more credible scale check before live PA
 results arrive.
@@ -75,7 +75,7 @@ delta is practically large on n=26, (b) the 95% CI excludes zero on the replay, 
 (c) the change doesn't conflict with the live market-baseline scoring rule. Directional
 improvements that fail this gate are kept as research notes and visualizations, not
 shipped. Live Team Brier versus Market Brier is the decisive evidence; offline replay
-scores are not presented as final market-beating proof.
+scores are not presented as final market-baseline results.
 Workshop-paper-style writeup in `docs/WORKSHOP_PAPER_DRAFT.md`.
 
 ## What this is
@@ -318,6 +318,7 @@ Defined in `forecast_track.py`, served via `forecast_agent_server.py`'s
 | `risk.py` | Hard caps. Imports `ai_prophet_core.ruleset` and asserts at import time. |
 | `forecasting/` | Composable forecasting modules (Kalshi guards, SAE shrinkage, market blend, reliability tracking). Not all wired into production yet. |
 | `evaluation/` | Proper scoring rules (Brier, BSS, ECE, Murphy decomposition, no-leakage check). |
+| `research/` | Pre-event strategy notes and longer-form reference material. Not required to run the endpoint. |
 | `scripts/preflight.sh` | Pre-deploy gate. |
 | `scripts/agent/deploy.sh` | Safe deploy wrapper (preflight + commit SHA pin + `railway up`). |
 | `scripts/ablate_openrouter.py` | Swap-the-LLM ablation harness for any OpenRouter-hosted model. |

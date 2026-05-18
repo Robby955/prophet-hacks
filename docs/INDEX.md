@@ -26,6 +26,7 @@ Research and reproducibility:
 - `docs/QUANT_PORTFOLIO_ARTIFACTS.md`: portfolio-quality artifact checklist.
 - `docs/POST_EVENT_RETROSPECTIVE_TEMPLATE.md`: fill after live scoring.
 - `data/predictions/`: saved backtest and ablation outputs.
+- `research/`: pre-event strategy notes and longer-form reference material.
 
 Submission support:
 

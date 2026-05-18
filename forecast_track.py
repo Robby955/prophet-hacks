@@ -1280,7 +1280,7 @@ betting prices for any outcome (e.g. "+1500" implies ~6%, "-200" implies
 ~67%, "trading at 0.25" implies 25%), anchor your forecast for that
 outcome strongly to that number. Markets aggregate informed money;
 move more than 0.05 away from a cited market price only when you have
-specific contrary evidence in the snippets (not vibes, not narratives).
+specific contrary evidence in the snippets, not unanchored narrative signals.
 LLMs systematically overweight vivid low-probability stories; resist that.
 
 Rules:

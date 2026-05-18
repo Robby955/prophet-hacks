@@ -17,7 +17,8 @@ private/public-flipped repo is the canonical source.
 ## Why not just clean the existing repo
 
 - 80+ commits with weekend-paced messages, agent-coordination noise,
-  coordination chatter, and several "fix typo" follow-ups. Not bad, but reads
+  coordination chatter, and several "fix typo" follow-ups. Acceptable for a
+  hackathon repository, but it reads
   as hackathon work rather than portfolio work.
 - Some commits reference internal coordination notes, worktree
   paths, and other coordination ephemera that's irrelevant to a reader.

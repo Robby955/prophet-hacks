@@ -191,19 +191,24 @@ def _classify_event_semantics(event: dict) -> tuple[str, int | None]:
       ("multi_label", None)       — independent yes/no per outcome
       ("ordered_threshold", None) — cumulative/over-under, no sum-to-1
 
-    The classifier inspects the event title + subtitle + description. It
-    does NOT inspect outcomes (some top-K events have outcomes that look
-    like winner-take-all on the surface).
-
-    Falls back to winner_take_all on ambiguity; the cost of a false
-    negative is current production behavior. The cost of a false positive
-    (calling something top-K when it isn't) is preserving non-normalized
-    probabilities the server would otherwise normalize — neutral-to-mild
-    under the Discord rule that the server does NOT renormalize.
+    Decision order (Codex review 2026-05-18: binary outcomes ALWAYS win):
+      1. Binary mutually-exclusive outcome lists short-circuit to
+         winner_take_all even when the title contains threshold language.
+         Reason: a 2-outcome ["Yes","No"] / ["Over","Under"] event is
+         winner-take-all by construction; title threshold language is
+         describing the question, not the scoring shape.
+      2. Otherwise pattern-match title + subtitle + description + rules
+         (+ optional `question`) for top-K / multi-label / ordered-threshold.
+      3. Fall back to winner_take_all on ambiguity.
     """
+    # Binary short-circuit — any 2-outcome list is winner-take-all.
+    outcomes = event.get("outcomes") or []
+    if isinstance(outcomes, list) and len(outcomes) == 2:
+        return ("winner_take_all", 1)
+
     text = " ".join(
         str(event.get(field) or "")
-        for field in ("title", "subtitle", "description", "rules")
+        for field in ("title", "subtitle", "description", "rules", "question")
     )
     if not text.strip():
         return ("winner_take_all", 1)

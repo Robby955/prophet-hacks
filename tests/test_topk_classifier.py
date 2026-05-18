@@ -93,6 +93,75 @@ def test_classifier_reads_description_not_just_title() -> None:
 
 
 # ---------------------------------------------------------------------
+# Codex review fix (2026-05-18): binary outcomes short-circuit to
+# winner_take_all even when the title contains threshold language.
+# ---------------------------------------------------------------------
+
+def test_binary_yes_no_overrides_at_least_threshold_in_title() -> None:
+    """Title says 'at least 2', but outcomes are Yes/No — must be WTA."""
+    event = {
+        "title": "Will the Fed cut rates at least 2 times in 2026?",
+        "outcomes": ["Yes", "No"],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "winner_take_all"
+    assert target_sum == 1
+
+
+def test_binary_over_under_outcomes_are_winner_take_all() -> None:
+    """Title says 'over/under', outcomes are Over/Under — binary WTA."""
+    event = {
+        "title": "Will GDP growth be over/under 2.5% in Q4?",
+        "outcomes": ["Over", "Under"],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "winner_take_all"
+    assert target_sum == 1
+
+
+def test_binary_true_false_outcomes_are_winner_take_all() -> None:
+    event = {
+        "title": "Is it true that the S&P 500 closes above 7000 by Jan 1 2027?",
+        "outcomes": ["True", "False"],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "winner_take_all"
+
+
+def test_binary_above_below_outcomes_are_winner_take_all() -> None:
+    event = {
+        "title": "Will US CPI YoY be more than 3% in Q4?",
+        "outcomes": ["Above 3%", "Below 3%"],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "winner_take_all"
+
+
+def test_multi_outcome_threshold_keeps_ordered_threshold() -> None:
+    """Reverse regression: a 4-outcome event with 'at least N' in title
+    is NOT binary — it should still classify as ordered_threshold."""
+    event = {
+        "title": "How many times will the Fed cut rates in 2026? At least 1, at least 2, at least 3, or at least 4?",
+        "outcomes": ["At least 1", "At least 2", "At least 3", "At least 4"],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "ordered_threshold"
+
+
+def test_classifier_reads_question_field_too() -> None:
+    """Some events use a `question` field instead of (or in addition to)
+    title. The classifier should inspect it."""
+    event = {
+        "title": "NBA top-5",
+        "question": "Which 5 of these 12 teams finish in the top 5?",
+        "outcomes": [f"Team {i}" for i in range(12)],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "top_k"
+    assert target_sum == 5
+
+
+# ---------------------------------------------------------------------
 # apply_longshot_guard_topk — floors + caps, never renormalizes
 # ---------------------------------------------------------------------
 

@@ -162,6 +162,59 @@ def test_classifier_reads_question_field_too() -> None:
 
 
 # ---------------------------------------------------------------------
+# Codex re-review (2026-05-18): the binary short-circuit must be narrow.
+# Only recognized mutually-exclusive PAIRS bypass the text classifier.
+# Generic 2-outcome lists (Team A / Team B) must still classify by text.
+# ---------------------------------------------------------------------
+
+def test_two_team_qualify_is_multi_label_not_winner_take_all() -> None:
+    """Both teams can qualify simultaneously — multi_label, not WTA.
+    The binary short-circuit must NOT fire just because len==2."""
+    event = {
+        "title": "Which of Team A and Team B will qualify for the playoffs?",
+        "outcomes": ["Team A", "Team B"],
+    }
+    semantics, target_sum = ft._classify_event_semantics(event)
+    assert semantics == "multi_label", f"expected multi_label, got {semantics}"
+    assert target_sum is None
+
+
+def test_two_team_qualify_with_real_names() -> None:
+    event = {
+        "title": "Which of Celtics and Knicks will qualify for the conference finals?",
+        "outcomes": ["Celtics", "Knicks"],
+    }
+    semantics, _ = ft._classify_event_semantics(event)
+    assert semantics == "multi_label"
+
+
+def test_two_nominee_event_is_multi_label() -> None:
+    event = {
+        "title": "Which of the two finalists will be nominated for Best Picture?",
+        "outcomes": ["Movie A", "Movie B"],
+    }
+    semantics, _ = ft._classify_event_semantics(event)
+    assert semantics == "multi_label"
+
+
+def test_binary_pair_helper_recognizes_yes_no_variants() -> None:
+    """The helper is case-insensitive and tolerates surrounding whitespace."""
+    assert ft._is_recognized_binary_mutex(["Yes", "No"])
+    assert ft._is_recognized_binary_mutex(["yes", "no"])
+    assert ft._is_recognized_binary_mutex(["NO", "YES"])  # order-insensitive
+    assert ft._is_recognized_binary_mutex(["True", "False"])
+    assert ft._is_recognized_binary_mutex(["Over", "Under"])
+    assert ft._is_recognized_binary_mutex(["Higher", "Lower"])
+    assert ft._is_recognized_binary_mutex(["Above 3%", "Below 3%"])  # trailing suffix ok
+    # Negatives:
+    assert not ft._is_recognized_binary_mutex(["Team A", "Team B"])
+    assert not ft._is_recognized_binary_mutex(["Celtics", "Knicks"])
+    assert not ft._is_recognized_binary_mutex(["Yes", "No", "Maybe"])  # not binary
+    assert not ft._is_recognized_binary_mutex(["Yes"])
+    assert not ft._is_recognized_binary_mutex([])
+
+
+# ---------------------------------------------------------------------
 # apply_longshot_guard_topk — floors + caps, never renormalizes
 # ---------------------------------------------------------------------
 

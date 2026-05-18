@@ -181,6 +181,45 @@ _ORDERED_THRESHOLD_PATTERNS = (
     re.compile(r"\bfewer\s+than\s+\d", re.IGNORECASE),
 )
 
+# Recognized binary mutually-exclusive outcome pairs. Order within the
+# pair does not matter — we compare as a sorted set. Any 2-outcome list
+# whose labels match one of these pairs is winner-take-all by construction.
+# Per Codex review 2026-05-18: we DO NOT short-circuit all len==2 lists,
+# because "Which of Team A and Team B will qualify?" is binary in shape
+# but multi-label in semantics (both can qualify simultaneously).
+_BINARY_MUTEX_PAIRS = frozenset(
+    frozenset(pair)
+    for pair in (
+        ("yes", "no"),
+        ("true", "false"),
+        ("over", "under"),
+        ("above", "below"),
+        ("higher", "lower"),
+    )
+)
+
+
+def _is_recognized_binary_mutex(outcomes: list[str]) -> bool:
+    """Is `outcomes` a recognized binary mutually-exclusive pair?
+
+    Case-insensitive. Strips whitespace + optional trailing numeric/unit
+    suffixes so "Above 3%" matches "above". The outcome strings must
+    START with one of the recognized tokens.
+    """
+    if not isinstance(outcomes, list) or len(outcomes) != 2:
+        return False
+    normalized = []
+    for o in outcomes:
+        if not isinstance(o, str):
+            return False
+        first_word = o.strip().lower().split(None, 1)[0] if o.strip() else ""
+        # Strip trailing punctuation like ":" or "."
+        first_word = first_word.rstrip(":.,;")
+        if not first_word:
+            return False
+        normalized.append(first_word)
+    return frozenset(normalized) in _BINARY_MUTEX_PAIRS
+
 
 def _classify_event_semantics(event: dict) -> tuple[str, int | None]:
     """Return (semantics, target_sum) for the event's scoring shape.
@@ -191,19 +230,18 @@ def _classify_event_semantics(event: dict) -> tuple[str, int | None]:
       ("multi_label", None)       — independent yes/no per outcome
       ("ordered_threshold", None) — cumulative/over-under, no sum-to-1
 
-    Decision order (Codex review 2026-05-18: binary outcomes ALWAYS win):
-      1. Binary mutually-exclusive outcome lists short-circuit to
-         winner_take_all even when the title contains threshold language.
-         Reason: a 2-outcome ["Yes","No"] / ["Over","Under"] event is
-         winner-take-all by construction; title threshold language is
-         describing the question, not the scoring shape.
+    Decision order (Codex re-review 2026-05-18, narrowed binary shortcut):
+      1. RECOGNIZED binary mutually-exclusive pairs short-circuit to
+         winner_take_all. Only ["Yes","No"], ["True","False"], ["Over",
+         "Under"], ["Above","Below"], ["Higher","Lower"] qualify. Other
+         2-outcome lists fall through (e.g. "Team A"/"Team B" can both
+         qualify; that's multi_label, not WTA).
       2. Otherwise pattern-match title + subtitle + description + rules
-         (+ optional `question`) for top-K / multi-label / ordered-threshold.
+         + question for top-K / multi-label / ordered-threshold.
       3. Fall back to winner_take_all on ambiguity.
     """
-    # Binary short-circuit — any 2-outcome list is winner-take-all.
     outcomes = event.get("outcomes") or []
-    if isinstance(outcomes, list) and len(outcomes) == 2:
+    if _is_recognized_binary_mutex(outcomes):
         return ("winner_take_all", 1)
 
     text = " ".join(

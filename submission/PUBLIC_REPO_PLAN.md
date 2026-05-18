@@ -80,8 +80,8 @@ private/public-flipped repo is the canonical source.
 
 ### Coordination ephemera
 
-- `docs/AGENT_STATUS.md`, `docs/CODEX_GOALS.md`, `docs/OVERNIGHT_TASKS.md`,
-  `docs/HANDOFF.md` — internal multi-agent coordination, irrelevant outside
+- Any internal coordination handoff files, if present, that are irrelevant
+  outside the original working repo
 - `.claude/`, any worktree leftovers
 - `AGENTS.md` (if not already gitignored)
 

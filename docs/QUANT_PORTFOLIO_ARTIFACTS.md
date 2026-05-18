@@ -21,13 +21,11 @@ Do this after the event closes and before flipping repository visibility.
 - **Submission artifacts:** `submission/REPORT.md`,
   `submission/PROJECT_STORY.md`, and `docs/SUBMISSION.md`.
 - **Research artifacts:** `docs/FINDINGS.md`,
-  `docs/WORKSHOP_PAPER_DRAFT.md`, and
-  `docs/ADVERSARIAL_REVIEW.md`.
+  `docs/WORKSHOP_PAPER_DRAFT.md`, and `docs/RESEARCH_QUEUE.md`.
 - **Decision record:** `docs/DECISIONS.md`, including rejected
   experiments and bug postmortems. Do not rewrite history to make the
   path look cleaner than it was.
 - **Operations record:** `docs/RUNBOOK.md`, `docs/LIVE_OPERATIONS.md`,
-  `docs/HANDOFF.md`, `docs/AGENT_STATUS.md`,
   `scripts/full_check.sh`, `scripts/preflight.sh`, and
   `scripts/agent/deploy.sh`.
 - **Evaluation inputs and outputs:** `data/resolved.json`,

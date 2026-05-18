@@ -1,7 +1,7 @@
 # 60-90 second demo screen-record script — The Oracles
 
-**Use this order** (per Codex's recommendation). Five beats, target 75
-seconds total. The TTS script at `submission/TTS_SCRIPT.md` is timed to
+**Use this order.** Five beats, target 75 seconds total. The TTS script at
+`submission/TTS_SCRIPT.md` is timed to
 match exactly these beats.
 
 Browser at **1440×900**. macOS Screen Recording or QuickTime → File →
@@ -11,7 +11,7 @@ over the browser. Do not stitch screenshots.
 ## Pre-flight (off-camera, do once)
 
 1. Sign in once at `https://forecastingpath.com/login?next=/dashboard?record=1`
-   with PIN `176661`. Cookie persists. Do NOT record this step.
+   with the private dashboard PIN. Cookie persists. Do NOT record this step.
 2. Open these five tabs in this order, all already loaded:
    - **Tab 1**: `https://forecastingpath.com/` (public landing)
    - **Tab 2**: `https://forecastingpath.com/dashboard?record=1` (live demo, recording layout)

@@ -1,4 +1,8 @@
-# Final state + roadmap — Sun 2026-05-17, pre-submit
+# Final state + roadmap - Sun 2026-05-17, pre-submit
+
+Public repository note: this is a historical pre-submit handoff. The
+dashboard PIN is redacted from this copy and should be shared privately
+only when reviewer access is required.
 
 Everything below is freeze-frame as of commit `3221215` deployed to
 `agent.forecastingpath.com`. Read this top-to-bottom before you start the
@@ -47,8 +51,8 @@ recording.
 2. **Small n on the headline backtest (n=26).** The Subset-1200 number is
    the credible expected magnitude. Both are reported, but a hostile
    reviewer could nitpick.
-3. **Demo video has to be re-recorded.** Codex's Playwright capture is
-   unusable. Plan + scripts are ready, you have to actually do it.
+3. **Demo video has to be re-recorded.** The automated Playwright capture
+   is unusable. Plan + scripts are ready, you have to actually do it.
 
 **Chances read (subjective):**
 
@@ -76,7 +80,7 @@ recording.
 ### 2. Record the 60-90 sec video (15 min including retakes)
 
 Open these tabs in order **after signing in once**
-(`https://forecastingpath.com/login?next=/dashboard?record=1`, PIN `176661`):
+(`https://forecastingpath.com/login?next=/dashboard?record=1`, private PIN):
 
 | Tab | URL | Time on screen |
 |---|---|---|

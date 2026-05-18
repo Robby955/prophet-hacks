@@ -317,7 +317,7 @@ is **one event every 10 minutes, sequential.** That gives us a
 - **Do not** change `PROPHET_AGENT_VARIANT` on Railway.
 - **Do not** deploy a new commit unless you have a measured + tested
   Brier improvement on the same 26-event backtest with a paired-
-  bootstrap CI excluding zero. The CI bar is the gate, not vibes —
+  bootstrap CI excluding zero. The CI bar is the gate, not intuition:
   see 2026-05-17 DECISIONS entry: **on n=26, |Δ| > 0.01 single-binary
   Brier is the minimum to clear significance at α=0.05.** Anything
   smaller is run-to-run LLM stochasticity. We rejected E3 and E4

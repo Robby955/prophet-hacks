@@ -349,6 +349,11 @@ observability work. It's **not** what's served at `agent.forecastingpath.com`.
 Per [Jibang Wu's Discord clarification 2026-05-16](https://prophetarena.co/developer)
 teams cannot enter both tracks; we chose forecasting.
 
+# Disclaimer
+
+This work represents an independent project. No affiliation by any institution is implied.
+
+
 ```bash
 python agent.py --slug smoke --dry-run        # no API calls
 python agent.py --slug <slug> --once           # one tick and exit

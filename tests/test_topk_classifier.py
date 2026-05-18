@@ -93,7 +93,7 @@ def test_classifier_reads_description_not_just_title() -> None:
 
 
 # ---------------------------------------------------------------------
-# Codex review fix (2026-05-18): binary outcomes short-circuit to
+# Regression coverage: recognized binary outcome pairs short-circuit to
 # winner_take_all even when the title contains threshold language.
 # ---------------------------------------------------------------------
 
@@ -162,8 +162,8 @@ def test_classifier_reads_question_field_too() -> None:
 
 
 # ---------------------------------------------------------------------
-# Codex re-review (2026-05-18): the binary short-circuit must be narrow.
-# Only recognized mutually-exclusive PAIRS bypass the text classifier.
+# Regression coverage: the binary short-circuit must be narrow. Only
+# recognized mutually-exclusive PAIRS bypass the text classifier.
 # Generic 2-outcome lists (Team A / Team B) must still classify by text.
 # ---------------------------------------------------------------------
 

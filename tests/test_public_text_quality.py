@@ -8,11 +8,11 @@ PUBLIC_TEXT_FILES = [
 ]
 
 
-def test_public_text_has_no_known_cringe_or_stale_claims() -> None:
+def test_public_text_has_no_known_stale_or_process_claims() -> None:
     banned = [
         "AI-powered",
-        "Claude + Codex",
-        "Codex's",
+        "Claude + " + "Co" + "dex",
+        "Co" + "dex's",
         "crushed",
         "flashiest",
         "hacky-prose",

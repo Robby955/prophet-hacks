@@ -384,5 +384,333 @@
       "notes": "ForexFactory calendar listed the revised May release for May 22 at 10:00 ET; prior final April reading was 49.8."
     },
     "notes": "Forward calibration candidate; crisp scheduled macro release."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-TOR-NYY-20260520",
+    "market_ticker": "SHADOW-MLB-TOR-NYY-20260520",
+    "title": "Who will win the Toronto Blue Jays at New York Yankees MLB game on May 20, 2026?",
+    "description": "Toronto Blue Jays visit New York Yankees on Wednesday, May 20, 2026 at Yankee Stadium. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-20T23:05:00Z",
+    "outcomes": ["Toronto Blue Jays", "New York Yankees"],
+    "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.mlb.com/schedule/2026-05-20",
+        "https://polymarket.com/sports/mlb/mlb-tor-nyy-2026-05-20",
+        "https://www.covers.com/sport/baseball/mlb/matchup/370307/odds"
+      ],
+      "notes": "Official schedule plus market/odds pages. Weather or postponement could delay resolution."
+    },
+    "notes": "Forward calibration candidate; resolves within roughly 48 hours."
+  },
+  {
+    "event_ticker": "SHADOW-NBA-SAS-OKC-G2-20260520",
+    "market_ticker": "SHADOW-NBA-SAS-OKC-G2-20260520",
+    "title": "Who will win Game 2 between the San Antonio Spurs and Oklahoma City Thunder on May 20, 2026?",
+    "description": "San Antonio Spurs visit Oklahoma City Thunder in Game 2 of the 2026 NBA Western Conference Finals. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-21T00:30:00Z",
+    "outcomes": ["San Antonio Spurs", "Oklahoma City Thunder"],
+    "rules": "Resolve to the NBA team that wins Game 2. Overtime counts.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.nba.com/news/2026-nba-playoffs-schedule",
+        "https://polymarket.com/event/nba-sas-okc-2026-05-20/nba-sas-okc-2026-05-20",
+        "https://www.covers.com/sport/basketball/nba/matchup/380228/odds"
+      ],
+      "notes": "Official playoff schedule plus active market/odds pages. Series and injury news can move quickly."
+    },
+    "notes": "Forward calibration candidate; playoff game with clean binary result."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-LAD-SD-20260520",
+    "market_ticker": "SHADOW-MLB-LAD-SD-20260520",
+    "title": "Who will win the Los Angeles Dodgers at San Diego Padres MLB game on May 20, 2026?",
+    "description": "Los Angeles Dodgers visit San Diego Padres on Wednesday, May 20, 2026 at Petco Park. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-21T00:40:00Z",
+    "outcomes": ["Los Angeles Dodgers", "San Diego Padres"],
+    "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.mlb.com/schedule/2026-05-20",
+        "https://polymarket.com/sports/mlb/mlb-lad-sd-2026-05-20",
+        "https://www.covers.com/sport/baseball/mlb/matchup/369803/odds"
+      ],
+      "notes": "Official schedule plus market/odds pages. Market volume may be thin; use market-relative scoring cautiously."
+    },
+    "notes": "Forward calibration candidate; marquee divisional matchup."
+  },
+  {
+    "event_ticker": "SHADOW-NHL-MTL-CAR-G1-20260521",
+    "market_ticker": "SHADOW-NHL-MTL-CAR-G1-20260521",
+    "title": "Who will win Game 1 between the Montreal Canadiens and Carolina Hurricanes on May 21, 2026?",
+    "description": "Montreal Canadiens visit Carolina Hurricanes in Game 1 of the 2026 NHL Eastern Conference Final. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-22T00:00:00Z",
+    "outcomes": ["Montreal Canadiens", "Carolina Hurricanes"],
+    "rules": "Resolve to the NHL team that wins Game 1. Playoff overtime counts.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.nhl.com/news/topic/playoffs/2026-stanley-cup-playoffs-conference-finals-schedule-television-results",
+        "https://www.covers.com/sport/hockey/nhl/odds"
+      ],
+      "notes": "Official conference-finals schedule plus NHL odds page. Use game-specific odds once fully populated."
+    },
+    "notes": "Forward calibration candidate; confirmed playoff opener."
+  },
+  {
+    "event_ticker": "SHADOW-NBA-CLE-NYK-G2-20260521",
+    "market_ticker": "SHADOW-NBA-CLE-NYK-G2-20260521",
+    "title": "Who will win Game 2 between the Cleveland Cavaliers and New York Knicks on May 21, 2026?",
+    "description": "Cleveland Cavaliers visit New York Knicks in Game 2 of the 2026 NBA Eastern Conference Finals. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-22T00:00:00Z",
+    "outcomes": ["Cleveland Cavaliers", "New York Knicks"],
+    "rules": "Resolve to the NBA team that wins Game 2. Overtime counts.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.nba.com/game/0042500302",
+        "https://www.nba.com/news/2026-nba-playoffs-schedule",
+        "https://www.oddschecker.com/us/basketball/nba/cleveland-cavaliers-at-new-york-knicks"
+      ],
+      "notes": "Official NBA game/schedule pages plus odds page. Game 1 result may reshape priors before close."
+    },
+    "notes": "Forward calibration candidate; clean playoff game result."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-GSV-NYL-20260521",
+    "market_ticker": "SHADOW-WNBA-GSV-NYL-20260521",
+    "title": "Who will win the Golden State Valkyries at New York Liberty WNBA game on May 21, 2026?",
+    "description": "Golden State Valkyries visit New York Liberty on Thursday, May 21, 2026. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-22T00:00:00Z",
+    "outcomes": ["Golden State Valkyries", "New York Liberty"],
+    "rules": "Resolve to the WNBA team credited with the official game win. Overtime counts.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.wnba.com/game/1022600035/GSV-vs-NYL",
+        "https://www.covers.com/sport/basketball/wnba/matchup/373877/odds"
+      ],
+      "notes": "Official WNBA game page plus odds page. Some WNBA book lines may be sparse early."
+    },
+    "notes": "Forward calibration candidate; clean binary result."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-GSV-IND-20260522",
+    "market_ticker": "SHADOW-WNBA-GSV-IND-20260522",
+    "title": "Who will win the Golden State Valkyries at Indiana Fever WNBA game on May 22, 2026?",
+    "description": "Golden State Valkyries visit Indiana Fever on Friday, May 22, 2026. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-22T23:30:00Z",
+    "outcomes": ["Golden State Valkyries", "Indiana Fever"],
+    "rules": "Resolve to the WNBA team credited with the official game win. Overtime counts.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.wnba.com/game/gsv-vs-ind-1022600039",
+        "https://valkyries.wnba.com/news/gameday-preview-20260522",
+        "https://polymarket.com/sports/wnba/wnba-gsv-ind-2026-05-22"
+      ],
+      "notes": "Official matchup plus team preview and market page. Monitor day-of injury reports if scoring market-relative edge."
+    },
+    "notes": "Forward calibration candidate; clean binary result."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-TLT-UP-AFTER-FOMC-MINUTES-20260520",
+    "market_ticker": "SHADOW-FIN-TLT-UP-AFTER-FOMC-MINUTES-20260520",
+    "title": "Will TLT close higher on May 20, 2026 after the FOMC minutes release?",
+    "description": "Forecast whether iShares 20+ Year Treasury Bond ETF (TLT) will close above its May 19 adjusted close after the May 20, 2026 FOMC minutes release.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-20T20:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if TLT's May 20, 2026 regular-session adjusted close is greater than its May 19, 2026 regular-session adjusted close. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+        "https://finance.yahoo.com/quote/TLT/history/"
+      ],
+      "notes": "Fixed Fed release and fixed market close. Not isolated from other rates or geopolitical news."
+    },
+    "notes": "Forward calibration candidate; financial reaction to scheduled event."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-HOUSING-STARTS-GT-1502K-20260521",
+    "market_ticker": "SHADOW-MACRO-HOUSING-STARTS-GT-1502K-20260521",
+    "title": "Will April 2026 US housing starts exceed 1.502 million SAAR?",
+    "description": "Forecast whether the April 2026 US housing starts release scheduled for May 21, 2026 reports headline starts above the March 2026 level of 1.502 million SAAR.",
+    "category": "Macro",
+    "close_time": "2026-05-21T12:30:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first Census/HUD headline housing starts SAAR for April 2026 is greater than 1.502 million. Resolve No if it is less than or equal to 1.502 million.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.census.gov/construction/nrc/pdf/newresconst.pdf",
+        "https://www.census.gov/economic-indicators/calendar-listview.html"
+      ],
+      "notes": "Official monthly release and calendar. Housing starts are noisy and can be revised; use first release only."
+    },
+    "notes": "Forward calibration candidate; crisp scheduled macro release."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-NVDA-NEXT-DAY-UP-20260521",
+    "market_ticker": "SHADOW-FIN-NVDA-NEXT-DAY-UP-20260521",
+    "title": "Will NVDA close higher on May 21, 2026 after its Q1 FY2027 earnings release?",
+    "description": "Forecast whether NVIDIA (NVDA) May 21, 2026 regular-session adjusted close will be above its May 20, 2026 adjusted close after the scheduled after-close earnings report.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if NVDA's May 21, 2026 adjusted close is greater than its May 20, 2026 adjusted close. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Sets-Conference-Call-for-First-Quarter-Financial-Results/default.aspx",
+        "https://finance.yahoo.com/quote/NVDA/history/"
+      ],
+      "notes": "Confirmed after-close report. Broad-market AI/semiconductor tape can dominate the next-day reaction."
+    },
+    "notes": "Forward calibration candidate; earnings reaction."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-CRM-NEXT-DAY-UP-20260528",
+    "market_ticker": "SHADOW-FIN-CRM-NEXT-DAY-UP-20260528",
+    "title": "Will CRM close higher on May 28, 2026 after its Q1 FY2027 earnings release?",
+    "description": "Forecast whether Salesforce (CRM) May 28, 2026 regular-session adjusted close will be above its May 27, 2026 adjusted close after the scheduled after-close earnings report.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-28T20:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if CRM's May 28, 2026 adjusted close is greater than its May 27, 2026 adjusted close. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://investor.salesforce.com/news/news-details/2026/Salesforce-Announces-Date-of-First-Quarter-Fiscal-2027-Earnings-Release-and-Webcast/default.aspx",
+        "https://finance.yahoo.com/quote/CRM/history/"
+      ],
+      "notes": "Confirmed after-close report. SaaS-sector tape can affect next-day reaction."
+    },
+    "notes": "Forward calibration candidate; earnings reaction."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-DURABLE-GOODS-POSITIVE-20260528",
+    "market_ticker": "SHADOW-MACRO-DURABLE-GOODS-POSITIVE-20260528",
+    "title": "Will April 2026 US durable goods headline new orders be positive month over month?",
+    "description": "Forecast whether the April 2026 US advance durable goods headline new orders release scheduled for May 28, 2026 reports a positive month-over-month change.",
+    "category": "Macro",
+    "close_time": "2026-05-28T12:30:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first Census advance durable goods headline new orders percent change is greater than 0.0%. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.census.gov/economic-indicators/calendar-listview.html",
+        "https://www.census.gov/manufacturing/m3/adv/current/index.html"
+      ],
+      "notes": "Official scheduled numeric release. Aircraft orders can dominate the headline."
+    },
+    "notes": "Forward calibration candidate; scheduled macro release."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-Q1-GDP-SECOND-GE-2P0-20260528",
+    "market_ticker": "SHADOW-MACRO-Q1-GDP-SECOND-GE-2P0-20260528",
+    "title": "Will the Q1 2026 US real GDP second estimate be at least 2.0 percent SAAR?",
+    "description": "Forecast whether BEA's Q1 2026 real GDP second estimate scheduled for May 28, 2026 reports annualized growth of at least 2.0 percent.",
+    "category": "Macro",
+    "close_time": "2026-05-28T12:30:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first BEA Q1 2026 real GDP second-estimate annualized growth rate is greater than or equal to 2.0%. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.bea.gov/index.php/news/schedule",
+        "https://bea.gov/news/2026/gdp-advance-estimate-1st-quarter-2026"
+      ],
+      "notes": "Official BEA schedule and advance GDP reference. Use first second-estimate release, ignoring later revisions."
+    },
+    "notes": "Forward calibration candidate; scheduled macro revision."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-PCE-YOY-GE-3P5-20260528",
+    "market_ticker": "SHADOW-MACRO-PCE-YOY-GE-3P5-20260528",
+    "title": "Will April 2026 headline PCE inflation be at least 3.5 percent year over year?",
+    "description": "Forecast whether BEA's April 2026 Personal Income and Outlays release reports headline PCE price index inflation of at least 3.5 percent year over year.",
+    "category": "Macro",
+    "close_time": "2026-05-28T12:30:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first BEA April 2026 headline PCE price index year-over-year figure is greater than or equal to 3.5%. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.bea.gov/index.php/news/schedule",
+        "https://bea.gov/data/personal-consumption-expenditures-price-index"
+      ],
+      "notes": "Official BEA release and PCE data page. This is headline PCE, not core PCE."
+    },
+    "notes": "Forward calibration candidate; scheduled inflation release."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-GOODS-DEFICIT-WIDER-879B-20260529",
+    "market_ticker": "SHADOW-MACRO-GOODS-DEFICIT-WIDER-879B-20260529",
+    "title": "Will the April 2026 US advance goods trade deficit be wider than 87.9 billion dollars?",
+    "description": "Forecast whether the April 2026 Advance Economic Indicators release scheduled for May 29, 2026 reports a goods trade deficit wider than 87.9 billion dollars.",
+    "category": "Macro",
+    "close_time": "2026-05-29T12:30:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first Census advance goods-trade deficit for April 2026 is greater than 87.9 billion dollars in deficit magnitude. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.census.gov/econ/indicators/release_schedule.html",
+        "https://www.census.gov/econ/indicators/advance_report.pdf"
+      ],
+      "notes": "Official schedule and March advance report reference. Goods-only advance estimate."
+    },
+    "notes": "Forward calibration candidate; scheduled macro release."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-GE-77500-20260531",
+    "market_ticker": "SHADOW-CRYPTO-BTC-GE-77500-20260531",
+    "title": "Will Bitcoin be at or above 77500 USD at 00:00 UTC on May 31, 2026?",
+    "description": "Forecast whether BTC-USD will be at least 77500 at 00:00 UTC on May 31, 2026.",
+    "category": "Crypto",
+    "close_time": "2026-05-31T00:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if Coinbase BTC-USD 1-minute candle close ending at 2026-05-31T00:00:00Z is greater than or equal to 77500. Resolve No if it is below 77500. Void locally if the candle is unavailable.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/bitcoin",
+        "https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles"
+      ],
+      "notes": "Exact timestamp and liquid exchange reference. Exchange-specific price."
+    },
+    "notes": "Forward calibration candidate; longer crypto threshold."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-JOLTS-OPENINGS-GE-6P9M-20260602",
+    "market_ticker": "SHADOW-MACRO-JOLTS-OPENINGS-GE-6P9M-20260602",
+    "title": "Will April 2026 US JOLTS job openings be at least 6.9 million?",
+    "description": "Forecast whether the April 2026 JOLTS release scheduled for June 2, 2026 reports total nonfarm job openings of at least 6.9 million.",
+    "category": "Macro",
+    "close_time": "2026-06-02T14:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first BLS April 2026 total nonfarm job openings, seasonally adjusted, is greater than or equal to 6.9 million. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T06:30:00Z",
+      "source_urls": [
+        "https://www.bls.gov/schedule/news_release/current_year.asp",
+        "https://www.bls.gov/news.release/pdf/jolts.pdf"
+      ],
+      "notes": "Official BLS schedule and JOLTS release reference. Revisions ignored."
+    },
+    "notes": "Forward calibration candidate; longer-horizon labor-market release."
   }
 ]

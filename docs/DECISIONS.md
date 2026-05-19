@@ -875,3 +875,41 @@ Commits promoted (in order):
 fix is one revert commit on `forecast_track.py` reverting to pre-`a1f899b0`
 behavior. Tagged `decisions_a1f899b0_2026-05-18T05:40:28Z` is the deploy
 anchor in this log.
+
+## 2026-05-19 · search-provider bake-off isolates leakage as the Brier inflator
+
+First ablation that swaps the **retrieval source** instead of the LLM. Same
+Opus 4.7, same prompt, same dedupe + longshot guard; only the search call
+changes. Harness: `scripts/ablate_search_provider.py` (plugs into
+`bootstrap_brier_ci.py` like every other variant). Run on the 26-event
+sample-resolved set.
+
+- **brave** (control, unfiltered): mean Brier **0.0377**, retrieval leakage 21.3%
+  (23 / 108 evidence URLs carry post-resolution markers).
+- **brave_fresh** (Brave `freshness` capped at each event's `close_time − 1d`):
+  mean Brier **0.1179**, leakage **11.5%** (13 / 113 URLs).
+
+Paired bootstrap CI (brave_fresh vs brave, n=26, 20k resamples): mean delta
+**−0.0802**, 95% CI **[−0.136, −0.030]**, Pr(improvement ≤ 0) = **1.0000**.
+
+**Finding:** removing post-resolution leakage from retrieval degrades backtest
+Brier by **3.1×** (0.038 → 0.118), unambiguously (CI excludes zero). This is an
+independent, mechanism-level confirmation of the 2026-05-17 Subset-1200 result
+that "0.0378 was hindsight-inflated 3.2×" — same factor, different method. The
+inflation lives in the retrieval, not the model.
+
+**Implications:**
+1. The honest out-of-sample estimate is the leakage-disciplined **~0.118**, not
+   0.038. Every audience-facing surface that pins 0.0378 as the headline should
+   lead with the date-disciplined number and label 0.038 as best-case-with-hindsight.
+2. This does **not** require a production change. Live PA events are unresolved
+   at query time, so post-resolution leakage is structurally impossible on live
+   traffic — production already gets the "fresh" condition for free. The fix is
+   to our **backtest methodology**: report `brave_fresh` as the primary number.
+3. "Is Brave best?" was the wrong question — provider relevance wasn't the
+   bottleneck; retrieval date-discipline was. Provider bake-off vs Tavily/Exa/
+   Serper still pending (needs keys in `~/Desktop/variables.txt`), but the
+   leakage axis matters more than the relevance axis for honest numbers.
+
+Prediction files: `data/predictions/ablation_search_{brave,brave_fresh}.json`.
+No production code touched.

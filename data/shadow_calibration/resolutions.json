@@ -1,7 +1,31 @@
 {
+  "SHADOW-FIN-GLD-CLOSE-ABOVE-419-20260519": {
+    "auto_resolved_at": "2026-05-19T21:48:24Z",
+    "notes": "auto-resolved: GLD close 411.5 vs threshold 419.0",
+    "observed": 411.5,
+    "resolved_at": "2026-05-19T20:00:00Z",
+    "source": "yahoo finance chart API (daily close)",
+    "winner": "No"
+  },
+  "SHADOW-FIN-QQQ-CLOSE-ABOVE-706-20260519": {
+    "auto_resolved_at": "2026-05-19T21:48:24Z",
+    "notes": "auto-resolved: QQQ close 701.530029296875 vs threshold 706.0",
+    "observed": 701.530029296875,
+    "resolved_at": "2026-05-19T20:00:00Z",
+    "source": "yahoo finance chart API (daily close)",
+    "winner": "No"
+  },
+  "SHADOW-FIN-SPY-CLOSE-ABOVE-739-20260519": {
+    "auto_resolved_at": "2026-05-19T21:48:24Z",
+    "notes": "auto-resolved: SPY close 733.72998046875 vs threshold 739.0",
+    "observed": 733.72998046875,
+    "resolved_at": "2026-05-19T20:00:00Z",
+    "source": "yahoo finance chart API (daily close)",
+    "winner": "No"
+  },
   "SHADOW-NHL-MTL-BUF-G7-20260518": {
-    "winner": "Buffalo Sabres",
+    "notes": "User-reported result. Not scored because no clean pregame shadow forecast was logged.",
     "resolved_at": "2026-05-19T02:30:00Z",
-    "notes": "User-reported result. Not scored because no clean pregame shadow forecast was logged."
+    "winner": "Buffalo Sabres"
   }
 }

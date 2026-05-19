@@ -5,6 +5,7 @@ __pycache__/
 .env.*
 !.env.example
 logs/*.jsonl
+logs/*.html
 trace/*
 !trace/.gitkeep
 reports/

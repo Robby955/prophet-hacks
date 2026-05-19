@@ -1,0 +1,75 @@
+[
+  {
+    "event_ticker": "SHADOW-NHL-MTL-BUF-G7-20260518",
+    "market_ticker": "SHADOW-NHL-MTL-BUF-G7-20260518",
+    "title": "Who will win Game 7 between the Montreal Canadiens and Buffalo Sabres on May 18, 2026?",
+    "description": "Montreal Canadiens visit Buffalo Sabres in Game 7 of their 2026 Stanley Cup Playoffs second-round series at KeyBank Center on May 18, 2026. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-18T23:30:00Z",
+    "outcomes": ["Montreal Canadiens", "Buffalo Sabres"],
+    "rules": "Resolve to the NHL team that wins Game 7. Overtime counts.",
+    "market_snapshot": {
+      "as_of": "2026-05-18T23:00:00Z",
+      "source_urls": [
+        "https://www.fanduel.com/research/sabres-vs-canadiens-nhl-playoffs-second-round-game-7-prediction-nhl-odds-5-18-2026",
+        "https://sports.betmgm.com/en/blog/nhl/sabres-vs-canadiens-game-7-odds-prediction-bm30/"
+      ],
+      "notes": "Pregame sources showed Buffalo as a slight favorite, roughly -114 to -118. This row was added after scheduled puck drop, so use it as an in-game/shadow smoke unless a pregame timestamped run exists."
+    },
+    "notes": "Example raised during live calibration discussion. Not a clean pregame calibration row if first logged after 2026-05-18T23:30:00Z."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-TOR-NYY-20260519",
+    "market_ticker": "SHADOW-MLB-TOR-NYY-20260519",
+    "title": "Who will win the Toronto Blue Jays at New York Yankees MLB game on May 19, 2026?",
+    "description": "Toronto Blue Jays visit New York Yankees on Tuesday, May 19, 2026 at Yankee Stadium. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-19T23:05:00Z",
+    "outcomes": ["Toronto Blue Jays", "New York Yankees"],
+    "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
+    "market_snapshot": {
+      "source_urls": [
+        "https://www.mlb.com/schedule/2026-05-19",
+        "https://www.covers.com/sport/baseball/mlb/odds"
+      ],
+      "notes": "Market odds should be captured before first pitch and added to this row or the JSONL record."
+    },
+    "notes": "Forward calibration candidate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-LAD-SD-20260519",
+    "market_ticker": "SHADOW-MLB-LAD-SD-20260519",
+    "title": "Who will win the Los Angeles Dodgers at San Diego Padres MLB game on May 19, 2026?",
+    "description": "Los Angeles Dodgers visit San Diego Padres on Tuesday, May 19, 2026 at Petco Park. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-20T01:40:00Z",
+    "outcomes": ["Los Angeles Dodgers", "San Diego Padres"],
+    "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
+    "market_snapshot": {
+      "source_urls": [
+        "https://www.mlb.com/schedule/2026-05-19",
+        "https://www.covers.com/sport/baseball/mlb/odds"
+      ],
+      "notes": "Market odds should be captured before first pitch and added to this row or the JSONL record."
+    },
+    "notes": "Forward calibration candidate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-SF-AZ-20260519",
+    "market_ticker": "SHADOW-MLB-SF-AZ-20260519",
+    "title": "Who will win the San Francisco Giants at Arizona Diamondbacks MLB game on May 19, 2026?",
+    "description": "San Francisco Giants visit Arizona Diamondbacks on Tuesday, May 19, 2026 at Chase Field. Forecast the game winner.",
+    "category": "Sports",
+    "close_time": "2026-05-20T01:40:00Z",
+    "outcomes": ["San Francisco Giants", "Arizona Diamondbacks"],
+    "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
+    "market_snapshot": {
+      "source_urls": [
+        "https://www.mlb.com/schedule/2026-05-19",
+        "https://www.covers.com/sport/baseball/mlb/odds"
+      ],
+      "notes": "Market odds should be captured before first pitch and added to this row or the JSONL record."
+    },
+    "notes": "Forward calibration candidate."
+  }
+]

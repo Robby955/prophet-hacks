@@ -251,5 +251,138 @@
       "notes": "Public schedule and odds pages list Game 1 for May 20 at 8:00 PM ET. Capture odds again before puck drop if using for market-relative scoring."
     },
     "notes": "Forward calibration candidate; resolves within roughly 48 hours."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-739-20260519",
+    "market_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-739-20260519",
+    "title": "Will SPY close above 739.00 on May 19, 2026?",
+    "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on Tuesday, May 19, 2026 will be strictly greater than 739.00.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-19T20:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if SPY's official regular-session close on May 19, 2026 is strictly greater than 739.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/SPY/",
+        "https://finance.yahoo.com/quote/SPY/history/"
+      ],
+      "notes": "Threshold set near the latest quoted SPY level available during queue construction; use official close for resolution."
+    },
+    "notes": "Forward calibration candidate; same-day financial threshold."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-706-20260519",
+    "market_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-706-20260519",
+    "title": "Will QQQ close above 706.00 on May 19, 2026?",
+    "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on Tuesday, May 19, 2026 will be strictly greater than 706.00.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-19T20:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if QQQ's official regular-session close on May 19, 2026 is strictly greater than 706.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/QQQ/",
+        "https://finance.yahoo.com/quote/QQQ/history/"
+      ],
+      "notes": "Threshold set near the latest quoted QQQ level available during queue construction; use official close for resolution."
+    },
+    "notes": "Forward calibration candidate; same-day financial threshold."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-419-20260519",
+    "market_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-419-20260519",
+    "title": "Will GLD close above 419.00 on May 19, 2026?",
+    "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on Tuesday, May 19, 2026 will be strictly greater than 419.00.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-19T20:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if GLD's official regular-session close on May 19, 2026 is strictly greater than 419.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/GLD/",
+        "https://finance.yahoo.com/quote/GLD/history/"
+      ],
+      "notes": "Threshold set near the latest quoted GLD level available during queue construction; use official close for resolution."
+    },
+    "notes": "Forward calibration candidate; same-day financial threshold."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-ABOVE-77000-20260520",
+    "market_ticker": "SHADOW-CRYPTO-BTC-ABOVE-77000-20260520",
+    "title": "Will Bitcoin be above 77000 USD at 00:00 UTC on May 20, 2026?",
+    "description": "Forecast whether the BTC-USD reference price will be strictly greater than 77000 at 00:00 UTC on May 20, 2026.",
+    "category": "Crypto",
+    "close_time": "2026-05-20T00:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if BTC-USD is strictly greater than 77000 at 2026-05-20T00:00:00Z using a major reference quote such as Yahoo Finance or Coinbase. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/BTC-USD/",
+        "https://www.coinbase.com/price/bitcoin"
+      ],
+      "notes": "Short-horizon crypto threshold near the latest quoted BTC level available during queue construction."
+    },
+    "notes": "Forward calibration candidate; resolves in under 24 hours."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2150-20260520",
+    "market_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2150-20260520",
+    "title": "Will Ethereum be above 2150 USD at 00:00 UTC on May 20, 2026?",
+    "description": "Forecast whether the ETH-USD reference price will be strictly greater than 2150 at 00:00 UTC on May 20, 2026.",
+    "category": "Crypto",
+    "close_time": "2026-05-20T00:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if ETH-USD is strictly greater than 2150 at 2026-05-20T00:00:00Z using a major reference quote such as Yahoo Finance or Coinbase. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/ETH-USD/",
+        "https://www.coinbase.com/price/ethereum"
+      ],
+      "notes": "Short-horizon crypto threshold near the latest quoted ETH level available during queue construction."
+    },
+    "notes": "Forward calibration candidate; resolves in under 24 hours."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-JOBLESS-CLAIMS-LE-210K-20260521",
+    "market_ticker": "SHADOW-MACRO-JOBLESS-CLAIMS-LE-210K-20260521",
+    "title": "Will US initial jobless claims be 210K or lower on May 21, 2026?",
+    "description": "Forecast whether the US initial jobless claims release scheduled for May 21, 2026 at 12:30 UTC will report 210,000 claims or fewer.",
+    "category": "Macro",
+    "close_time": "2026-05-21T12:30:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first reported seasonally adjusted US initial jobless claims value for the May 21, 2026 release is less than or equal to 210,000. Resolve No if it is greater than 210,000.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://www.investing.com/economic-calendar/initial-jobless-claims-294",
+        "https://www.dol.gov/ui/data.pdf"
+      ],
+      "notes": "Investing.com calendar listed the May 21 release at 12:30 UTC with forecast 210K and previous 211K during queue construction."
+    },
+    "notes": "Forward calibration candidate; crisp scheduled macro release."
+  },
+  {
+    "event_ticker": "SHADOW-MACRO-UMICH-SENTIMENT-GE-50-20260522",
+    "market_ticker": "SHADOW-MACRO-UMICH-SENTIMENT-GE-50-20260522",
+    "title": "Will the May 2026 final University of Michigan Consumer Sentiment reading be at least 50.0?",
+    "description": "Forecast whether the final May 2026 University of Michigan Consumer Sentiment index reading scheduled for May 22, 2026 at 14:00 UTC will be at least 50.0.",
+    "category": "Macro",
+    "close_time": "2026-05-22T14:00:00Z",
+    "outcomes": ["Yes", "No"],
+    "rules": "Resolve Yes if the first published final May 2026 University of Michigan Consumer Sentiment index is greater than or equal to 50.0. Resolve No if it is below 50.0.",
+    "market_snapshot": {
+      "as_of": "2026-05-19T05:30:00Z",
+      "source_urls": [
+        "https://www.forexfactory.com/calendar/54-us-revised-uom-consumer-sentiment",
+        "https://data.sca.isr.umich.edu/"
+      ],
+      "notes": "ForexFactory calendar listed the revised May release for May 22 at 10:00 ET; prior final April reading was 49.8."
+    },
+    "notes": "Forward calibration candidate; crisp scheduled macro release."
   }
 ]

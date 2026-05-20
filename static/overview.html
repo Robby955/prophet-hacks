@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Oracles - project overview</title>
+<style>
+  :root{
+    --bg:#fbfcfe; --panel:#ffffff; --ink:#10151c; --muted:#646e7e; --line:#e7ebf0;
+    --accent:#2856a3; --accent-soft:#eef3fb; --good:#0f7a4d; --bad:#b3261e; --warn:#9a6700;
+    --shadow:0 1px 2px rgba(16,21,28,.04),0 4px 16px rgba(16,21,28,.05);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);
+    background-image:radial-gradient(900px 360px at 78% -8%,#eef3fb 0,transparent 60%);}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px 90px}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  code,.mono{font-family:var(--mono);font-size:.86em}
+
+  /* top bar */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:18px 0 16px;margin-bottom:8px;flex-wrap:wrap}
+  .brand{font-weight:750;font-size:16px;letter-spacing:-.01em}
+  .brand .dim{color:var(--muted);font-weight:500}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;
+    color:var(--warn);background:#fff8e8;border:1px solid #f1e2b8;border-radius:999px;padding:5px 11px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--warn);display:inline-block}
+
+  /* hero */
+  .hero{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:24px 26px;box-shadow:var(--shadow);margin-bottom:10px}
+  .hero h1{margin:0 0 4px;font-size:23px;letter-spacing:-.02em}
+  .hero p.sub{margin:0 0 18px;color:var(--muted);font-size:13.5px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:680px){.stats{grid-template-columns:1fr}}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fcfdff;min-width:0}
+  .stat .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .stat .v{font-family:var(--mono);font-size:30px;font-weight:680;line-height:1.1;margin:6px 0 2px;letter-spacing:-.02em}
+  .stat .n{font-size:12.5px;color:var(--muted)}
+  .v.bad{color:var(--bad)} .v.dim{color:var(--muted)}
+
+  h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+    margin:34px 4px 12px;font-weight:750}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:680px){.g2,.g3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 17px;box-shadow:var(--shadow);min-width:0}
+  .card h3{margin:0 0 5px;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card p{margin:0;color:var(--muted);font-size:13px}
+  .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .t-live{background:#e6f6ee;color:var(--good)} .t-eng{background:var(--accent-soft);color:var(--accent)}
+  .t-neg{background:#fdecea;color:var(--bad)} .t-pend{background:#fff4d6;color:var(--warn)}
+
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:#fafbfd}
+  td.mono{font-family:var(--mono);font-size:12px}
+  ul{margin:8px 0 0;padding-left:18px} li{margin:4px 0;font-size:13.5px;color:#27313f}
+
+  .note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:10px;
+    padding:13px 16px;font-size:13.5px;margin-top:14px}
+  .foot{color:var(--muted);font-size:12px;margin-top:42px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="bar">
+    <div class="brand">The Oracles <span class="dim">/ ForecastingPath</span></div>
+    <span class="pill"><span class="dot"></span> Live: healthy (a1f899b0) &nbsp;|&nbsp; No real PA traffic yet</span>
+  </div>
+
+  <section class="hero">
+    <h1>Project overview</h1>
+    <p class="sub">Team CanadaHacks &middot; Prophet Hacks forecasting track &middot; snapshot 2026-05-19 &middot; hand-maintained</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="k">Honest backtest Brier</div>
+        <div class="v">0.118</div>
+        <div class="n">leakage-free retrieval, date-capped at each event's close. Best estimate of live skill.</div>
+      </div>
+      <div class="stat">
+        <div class="k">Hindsight Brier</div>
+        <div class="v dim">0.038</div>
+        <div class="n">unfiltered retrieval. Best-case-with-hindsight. Not the headline.</div>
+      </div>
+      <div class="stat">
+        <div class="k">Leakage inflation</div>
+        <div class="v bad">3.1x</div>
+        <div class="n">paired CI [-0.136, -0.030], Pr&#8203;(&le;0)=1.0, n=26. Confirms Subset-1200.</div>
+      </div>
+    </div>
+  </section>
+
+  <h2>Code map</h2>
+  <div class="grid g2">
+    <div class="card"><h3><code>forecast_agent_server.py</code> <span class="tag t-live">LIVE</span></h3><p>FastAPI endpoint on Railway: <code>POST /predict</code>, health routes, dashboards, observatory, traces. The deployed surface.</p></div>
+    <div class="card"><h3><code>forecast_track.py</code> <span class="tag t-eng">ENGINE</span></h3><p>All forecaster variants, Brave retrieval, source ranking, longshot guard, event-semantics router. Production calls <code>predict_multi_outcome_retrieval</code>.</p></div>
+    <div class="card"><h3><code>forecaster.py</code> &middot; <code>agent.py</code></h3><p>Skeleton forecast helpers and the trading-track agent. Not on the live forecast path; kept for reference.</p></div>
+    <div class="card"><h3>support modules</h3><p><code>risk.py</code>, <code>market_filter.py</code>, <code>logger.py</code>, <code>chat_completions_adapter.py</code> - sizing, filtering, logging, OpenAI-compatible shim.</p></div>
+  </div>
+
+  <h2>Forecaster variants <span style="text-transform:none;color:var(--muted);font-weight:500">(forecast_track.py)</span></h2>
+  <table>
+    <tr><th>variant</th><th>what it is</th><th style="text-align:right">status</th></tr>
+    <tr><td class="mono">multi_outcome_retrieval</td><td>Brave evidence + Opus 4.7 + market-anchor prompt + longshot guard + top-K classifier</td><td style="text-align:right"><span class="tag t-live">PRODUCTION</span></td></tr>
+    <tr><td class="mono">uniform_prior</td><td>deterministic 1/N, no model call</td><td style="text-align:right"><span class="tag t-eng">baseline</span></td></tr>
+    <tr><td class="mono">opus_47 / 46 / gpt55 / gpt52 / single_llm</td><td>single-model forecasters across vendors</td><td style="text-align:right"><span class="tag t-eng">ablation</span></td></tr>
+    <tr><td class="mono">ensemble_logit / leaderboard</td><td>logit-mean across models / leaderboard ensemble</td><td style="text-align:right"><span class="tag t-eng">ablation</span></td></tr>
+    <tr><td class="mono">multi_outcome / sc3</td><td>per-outcome forecast / self-consistency k=3</td><td style="text-align:right"><span class="tag t-eng">ablation</span></td></tr>
+    <tr><td class="mono">hybrid_routed</td><td>binary to GPT-5.5, multi to multi_outcome</td><td style="text-align:right"><span class="tag t-eng">research</span></td></tr>
+    <tr><td class="mono">multi_outcome_retrieval_sae</td><td>empirical-Bayes shrinkage over (domain x horizon x price)</td><td style="text-align:right"><span class="tag t-neg">negative*</span></td></tr>
+  </table>
+
+  <h2>Experiment ledger <span style="text-transform:none;color:var(--muted);font-weight:500">- measure first, merge second</span></h2>
+  <table>
+    <tr><th>experiment</th><th style="text-align:right">verdict</th></tr>
+    <tr><td>Search-provider bake-off (leakage axis) - <b>today</b></td><td style="text-align:right">retrieval leakage = 3.1x inflation; honest 0.118</td></tr>
+    <tr><td>Top-K event-semantics classifier</td><td style="text-align:right"><span class="tag t-live">shipped</span> a1f899b0</td></tr>
+    <tr><td>Opus 4.7 + market anchor; 0.10 longshot floor cap</td><td style="text-align:right"><span class="tag t-live">shipped</span></td></tr>
+    <tr><td>Multi-vendor swap (Gemini / GPT-5.5 / GPT-5.2)</td><td style="text-align:right">keep Opus 4.7</td></tr>
+    <tr><td>Retrieval count sweep 3 / 5 / 8</td><td style="text-align:right"><span class="tag t-neg">failed gate</span></td></tr>
+    <tr><td>Verification prompt / self-critique / ensemble-of-6</td><td style="text-align:right"><span class="tag t-neg">regressed</span></td></tr>
+    <tr><td>Abstain-to-market (price from snippets)</td><td style="text-align:right"><span class="tag t-pend">no-op (0/26 had price)</span></td></tr>
+    <tr><td>SAE shrinkage</td><td style="text-align:right"><span class="tag t-neg">0.1157</span> - re-open vs honest*</td></tr>
+    <tr><td>Subset-1200 scale validation</td><td style="text-align:right">0.1224 honest, n=1200</td></tr>
+  </table>
+
+  <h2>Open lanes</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Analysis <span class="tag t-eng">Claude</span></h3>
+      <ul>
+        <li>Re-baseline all surfaces to honest 0.118</li>
+        <li>Re-run SAE / abstain vs the leakage-free baseline (may flip the negative)</li>
+        <li>Real multi-prompt sweep with bootstrap CIs</li>
+      </ul></div>
+    <div class="card"><h3>Frontend / infra <span class="tag t-eng">Codex</span></h3>
+      <ul>
+        <li>Honest-vs-hindsight panel + per-provider leakage %</li>
+        <li>Daily auto-resolve + score loop to grow resolved-n</li>
+        <li>Provider sweep (Tavily / Exa / Serper) once keys land</li>
+      </ul></div>
+  </div>
+  <div class="note"><b>Non-negotiables:</b> production change needs |delta| &gt; 0.01 single-binary Brier and a 95% paired-bootstrap CI excluding zero &middot; shadow loop is research-only &middot; mid-window deploys get a DECISIONS.md entry (SHA + UTC) &middot; coordinate before touching <code>forecast_track.py</code> / <code>forecast_agent_server.py</code> / <code>data/resolved.json</code>.</div>
+
+  <h2>Where to read more</h2>
+  <div class="grid g3">
+    <div class="card"><h3>State</h3><p><code>docs/HANDOFF.md</code> - cold-start state + work lanes</p></div>
+    <div class="card"><h3>Decisions</h3><p><code>docs/DECISIONS.md</code> - append-only log (newest at bottom)</p></div>
+    <div class="card"><h3>Findings</h3><p><code>docs/FINDINGS.md</code> &middot; <code>RESEARCH_QUEUE.md</code> &middot; <code>FORWARD_RESEARCH_PLAN.md</code></p></div>
+  </div>
+
+  <p class="foot">* SAE / abstain were rejected against the hindsight-inflated 0.038; against the honest 0.118 they are roughly competitive, so they are flagged for re-evaluation. This page is a hand-maintained snapshot; numbers trace to DECISIONS.md and <code>data/predictions/</code>. The Oracles &middot; ForecastingPath &middot; honest backtest, leakage-audited.</p>
+
+</div>
+</body>
+</html>

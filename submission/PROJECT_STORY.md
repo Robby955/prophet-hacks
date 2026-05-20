@@ -45,28 +45,53 @@ The full per-prediction trace lives at the PIN-protected `/dashboard`.
 
 1. **Retrieval was the bigger win than model choice.** Same prompt
    without Brave scored Brier 0.19. Adding retrieval, market-odds
-   anchoring, and the corrected longshot floor scored **0.0378** on
-   the 26-event sample-resolved backtest. The Sonnet-to-Opus swap is
-   the smaller part of the measured Phase 2 gain; evidence and
-   post-processing discipline carry most of the result.
+   anchoring, and the corrected longshot floor scored a
+   leakage-disciplined **0.118** single-binary Brier on the 26-event
+   sample-resolved backtest. The Sonnet-to-Opus swap is the smaller
+   part of the gain; evidence and post-processing discipline carry
+   most of the result.
 
-   We also ran a 46x scale-up validation on PA's public 1200-event
-   resolved dataset (`Prophet-Arena-Subset-1200` on HuggingFace).
-   That headline came in at **Brier 0.1224** with 95% bootstrap CI
-   [0.110, 0.135]. The 0.0378 number is hindsight-rich on a small,
-   well-indexed slice; the 0.1224 is the more credible expected
-   magnitude on the live distribution. We report both because they
-   are real on different samples; the Subset-1200 number is the one
-   we expect to roughly match live PA performance.
+   The unfiltered backtest reported 0.038, and we could have led with
+   that. We didn't, because we audited it. A 46x scale-up on PA's
+   public 1200-event resolved dataset (`Prophet-Arena-Subset-1200` on
+   HuggingFace) came in at **Brier 0.1224**, 95% bootstrap CI
+   [0.110, 0.135] - three times the small-set number. So we built a
+   retrieval ablation to find out why, and it confirmed the 0.038 was
+   hindsight-inflated 3.1x by post-resolution leakage in the search
+   results (see #2). We report **0.118** as the honest headline and
+   keep 0.038 only as a best-case-with-hindsight bound. The two clean
+   routes - date-disciplined `brave_fresh` (0.118) and Subset-1200
+   (0.1224) - agree on the magnitude.
 
-2. **Public leaderboards don't predict pipeline performance.**
+2. **The leakage audit is the result we are proudest of.** We built a
+   search-provider / freshness ablation
+   (`scripts/ablate_search_provider.py`) that holds the model, prompt,
+   dedupe, and longshot guard constant and swaps only the retrieval
+   source. The honest arm (`brave_fresh`) date-caps Brave to each
+   event's close time so post-resolution sources cannot leak in.
+   Result: Brier degrades from 0.038 to **0.118** (3.1x), retrieval
+   leakage drops 21.3% -> 11.5%, and a paired bootstrap CI
+   (n=26, 20K resamples) gives mean delta **-0.080**, 95% CI
+   **[-0.136, -0.030]**, **Pr(improvement <= 0) = 1.0**. The inflation
+   lives in the retrieval, not the model. Two channels, both bounded:
+   *retrieval leakage* (capped by date-restricting search - and
+   structurally impossible on live PA traffic, where events are
+   unresolved at query time) and *model-parametric leakage* (bounded
+   by Opus 4.7's ~Jan 2026 knowledge cutoff, so post-cutoff events are
+   parametric-clean). `scripts/diagnostics.py` adds the
+   confidence-conditional finding: >=0.8 confidence -> Brier ~0.02,
+   but 0.5-0.7 -> ~0.26 (worse than a coin), overall ECE 0.226  - 
+   which motivates abstaining to the market price near a 0.7
+   confidence threshold.
+
+3. **Public leaderboards don't predict pipeline performance.**
    Gemini 3.1 Pro tops the PA fixed-context board. In our pipeline
    with our prompt and our scoring rule, it was materially worse
    than Opus 4.7 under both reported metrics (single-binary Brier
    0.0983; multi-class Brier 0.4773), largely because it emitted
    probabilities for outcome keys that were not in the supplied list.
 
-3. **Boundary cases are where calibration dies.** Two real bugs:
+4. **Boundary cases are where calibration dies.** Two real bugs:
    - The longshot floor was `max(0.05, 0.5/n)`, which equals **0.25**
      for binary events. Every binary prediction was silently clamped
      into `[0.25, 0.75]`. New formula `min(0.10, max(0.05, 0.5/n))`
@@ -77,7 +102,7 @@ The full per-prediction trace lives at the PIN-protected `/dashboard`.
      the exact-bucket case the spec explicitly admitted. Two-line
      fix, one boundary test.
 
-4. **Schema compliance is part of the result.** The weakest
+5. **Schema compliance is part of the result.** The weakest
    alternatives failed around multi-outcome JSON: keys that didn't
    match outcome labels, malformed nesting, and smart-quote
    contamination. We shipped a 5-stage parser, fuzzy outcome-label
@@ -85,7 +110,7 @@ The full per-prediction trace lives at the PIN-protected `/dashboard`.
    fallback). The verify gate is now loud after silently swallowing
    pytest failures for a full session, fixed by `a46a0e6`.
 
-5. **Server-authoritative rules.** `risk.py` imports
+6. **Server-authoritative rules.** `risk.py` imports
    `ai_prophet_core.ruleset` and asserts at import time that our caps
    <= server caps. Any future drift fails on `import risk`, not at
    first rejected request.
@@ -154,7 +179,12 @@ tooling from colliding.
 - **CI/CD**: bash scripts (`scripts/preflight.sh`,
   `scripts/agent/deploy.sh`, `scripts/full_check.sh`)
 - **Tooling**: Anthropic Message Batches API harness for offline
-  ablations at 50% discount (`scripts/batch_ablate.py`)
+  ablations at 50% discount (`scripts/batch_ablate.py`); a
+  leakage-free evaluation firehose - `scripts/generate_sports_slate.py`
+  (keyless ESPN pregame slates), `scripts/auto_resolve_sports.py` +
+  `scripts/auto_resolve_finance.py` (keyless auto-resolution),
+  `scripts/diagnostics.py` (stratified Brier + reliability + ECE), and
+  `scripts/ablate_search_provider.py` (retrieval bake-off)
 - **Coordination**: explicit file-ownership notes, `docs/DECISIONS.md`
 
 ## Reproducibility
@@ -169,11 +199,11 @@ cp .env.example .env  # fill in ANTHROPIC_API_KEY + BRAVE_SEARCH_API_KEY
 PROPHET_AGENT_VARIANT=multi_outcome_retrieval \
   uvicorn forecast_agent_server:app --host 127.0.0.1 --port 8000
 
-# Reproduce the headline backtest number:
-python scripts/backtest_forecast.py \
-  --events data/resolved.json \
-  --actuals data/actuals.json \
-  --variants multi_outcome_retrieval
+# Reproduce the headline (leakage-disciplined 0.118) backtest:
+python scripts/ablate_search_provider.py --providers brave,brave_fresh
+python scripts/diagnostics.py \
+  --pred data/predictions/ablation_search_brave_fresh.json \
+  --label brave_fresh
 
 # End-to-end audit against your local instance:
 ./scripts/full_check.sh --host http://localhost:8000
@@ -192,9 +222,13 @@ promotion gate":
   Mid-window deploys get tagged in `docs/DECISIONS.md` with SHA + UTC
   timestamp so the post-event retrospective can attribute live Brier
   deltas to specific changes.
-- **Run on a non-leaking benchmark.** The 26-event resolved set has
-  retrieval leakage (38.5% post-resolution URLs). Re-run on FutureSim's
-  OpenForesight chronological-replay benchmark.
+- **Grow the leakage-free firehose.** The retrieval leakage in the
+  26-event set is exactly what the freshness ablation measured (3.1x
+  inflation). The shadow-event pipeline (keyless ESPN pregame slates +
+  auto-resolution) now generates clean, forecast-before-resolve events
+  daily; the next step is widening it beyond the sports-heavy mix
+  (forward shadow set so far: n=11, mean winner Brier 0.256) so the
+  honest number rests on a larger, category-balanced sample.
 - **Wire abstain-to-market in production.** When PA's live payload
   arrives with snapshotted Polymarket/Kalshi prices, use the
   `pnl_alpha_vs_market` metric in `evaluation/brier.py` to gate when

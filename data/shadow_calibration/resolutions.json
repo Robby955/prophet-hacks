@@ -23,6 +23,62 @@
     "source": "yahoo finance chart API (daily close)",
     "winner": "No"
   },
+  "SHADOW-MLB-ATL-MIA-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:06Z",
+    "notes": "auto-resolved: final Miami Marlins 4 - Atlanta Braves 8",
+    "resolved_at": "2026-05-19T22:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Atlanta Braves"
+  },
+  "SHADOW-MLB-BAL-TB-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:07Z",
+    "notes": "auto-resolved: final Tampa Bay Rays 4 - Baltimore Orioles 1",
+    "resolved_at": "2026-05-19T22:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Tampa Bay Rays"
+  },
+  "SHADOW-MLB-BOS-KC-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:09Z",
+    "notes": "auto-resolved: final Kansas City Royals 1 - Boston Red Sox 7",
+    "resolved_at": "2026-05-19T23:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Boston Red Sox"
+  },
+  "SHADOW-MLB-CIN-PHI-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:08Z",
+    "notes": "auto-resolved: final Philadelphia Phillies 1 - Cincinnati Reds 4",
+    "resolved_at": "2026-05-19T22:45:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Cincinnati Reds"
+  },
+  "SHADOW-MLB-CLE-DET-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:07Z",
+    "notes": "auto-resolved: final Detroit Tigers 3 - Cleveland Guardians 4",
+    "resolved_at": "2026-05-19T22:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Cleveland Guardians"
+  },
+  "SHADOW-MLB-HOU-MIN-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:10Z",
+    "notes": "auto-resolved: final Minnesota Twins 1 - Houston Astros 2",
+    "resolved_at": "2026-05-19T23:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Houston Astros"
+  },
+  "SHADOW-MLB-TOR-NYY-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:04Z",
+    "notes": "auto-resolved: final New York Yankees 5 - Toronto Blue Jays 4",
+    "resolved_at": "2026-05-19T23:05:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "New York Yankees"
+  },
+  "SHADOW-NBA-CLE-NYK-G1-20260519": {
+    "auto_resolved_at": "2026-05-20T03:30:10Z",
+    "notes": "auto-resolved: final New York Knicks 115 - Cleveland Cavaliers 104",
+    "resolved_at": "2026-05-20T00:00:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "New York Knicks"
+  },
   "SHADOW-NHL-MTL-BUF-G7-20260518": {
     "notes": "User-reported result. Not scored because no clean pregame shadow forecast was logged.",
     "resolved_at": "2026-05-19T02:30:00Z",

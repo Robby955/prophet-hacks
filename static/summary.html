@@ -23,12 +23,13 @@
   td { font-variant-numeric: tabular-nums; }
   .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
           margin-right: 0.55em; vertical-align: middle; }
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
            gap: 0.7em; margin: 1em 0 1.4em; }
-  .kpi { background: #f3f4f6; border-radius: 6px; padding: 0.7em 0.9em; }
+  .kpi { background: #f3f4f6; border-radius: 6px; padding: 0.7em 0.9em; min-width: 0; }
   .kpi .lbl { color: var(--muted); font-size: 0.78em; text-transform: uppercase;
                 letter-spacing: 0.04em; font-weight: 700; }
-  .kpi .val { font-size: 1.35em; font-weight: 700; margin-top: 0.15em; }
+  .kpi .val { font-size: 1.35em; font-weight: 700; margin-top: 0.15em;
+                overflow-wrap: anywhere; }
   figure { margin: 1em 0; }
   figure img { width: 100%; height: auto; border-radius: 6px;
                 border: 1px solid var(--border); }
@@ -63,8 +64,21 @@
   <div class="kpi"><div class="lbl">Live URL</div><div class="val" style="font-size:0.95em">agent.forecastingpath.com</div></div>
   <div class="kpi"><div class="lbl">Variant</div><div class="val" style="font-size:0.95em">multi_outcome_retrieval</div></div>
   <div class="kpi"><div class="lbl">Model</div><div class="val" style="font-size:0.95em">claude-opus-4-7</div></div>
-  <div class="kpi"><div class="lbl">Brier (prod)</div><div class="val">0.0378</div></div>
-  <div class="kpi"><div class="lbl">vs random</div><div class="val">85%</div></div>
+  <div class="kpi"><div class="lbl">Honest binary Brier</div><div class="val">0.118</div></div>
+  <div class="kpi"><div class="lbl">Best-case w/ hindsight</div><div class="val" style="color:#6b7280">0.038</div></div>
+</div>
+
+<div style="margin:0 0 1.4em;padding:0.85em 1.1em;border:1px solid #e5e7eb;border-left:4px solid var(--accent);border-radius:6px;background:#f4f7fb;font-size:0.92em">
+  <strong>Leakage audit (read this first).</strong> Our headline number is the
+  leakage-disciplined binary Brier <strong>0.118</strong> (<code>brave_fresh</code>:
+  retrieval date-capped to each event's close, so no post-resolution articles can
+  be cited). The far lower <strong>0.038</strong> seen on a naive replay is
+  best-case-with-hindsight: unfiltered retrieval surfaced future information.
+  We measured this directly &mdash; a paired bootstrap (n=26) puts the gap at mean
+  &minus;0.080, 95% CI [&minus;0.136, &minus;0.030], Pr(improvement &le; 0) = 1.0
+  &mdash; a <strong>3.1&times;</strong> hindsight inflation. Retrieval leakage falls
+  from 21.3% (unfiltered) to 11.5% (date-capped). We report the disciplined number
+  on purpose; the rigor is the point.
 </div>
 
 <h2>Pipeline architecture</h2>
@@ -75,7 +89,7 @@
 <table>
   <thead><tr>
     <th>Model</th>
-    <th>Single-binary (PA CLI)</th>
+    <th>Single-binary (PA CLI) &mdash; best-case w/ hindsight</th>
     <th>Multi-class (proper)</th>
     <th>Multi-only (n=12)</th>
     <th>n (bin+multi)</th>
@@ -118,30 +132,30 @@
             <td>0.8115</td>
             <td>14 + 12</td>
         </tr>
-  <tr><td><em>random 0.5 baseline</em></td><td>0.2500</td><td>—</td><td>—</td><td>—</td></tr>
-  <tr><td><em>uniform 1/n prior</em></td><td>0.2190</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td><em>random 0.5 baseline</em></td><td>0.2500</td><td> - </td><td> - </td><td> - </td></tr>
+  <tr><td><em>uniform 1/n prior</em></td><td>0.2190</td><td> - </td><td> - </td><td> - </td></tr>
   </tbody>
 </table>
-<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set.
+<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set. <strong>The single-binary column is best-case-with-hindsight</strong> (unfiltered retrieval; see leakage audit above) &mdash; every row got the same hindsight benefit, so the <em>cross-model ranking holds</em>, but the honest absolute number for production is the date-disciplined <strong>0.118</strong>, not 0.038.
 <br><br>
-<strong>Two metrics shown:</strong> PA's CLI evaluator (<code>prophet forecast evaluate</code>) implements <em>single-binary</em> Brier on <code>(p_yes − 1{outcomes[0] won})²</code>; PA's docs describe <em>proper multi-class</em> Brier summed across all outcomes. We report both. The earlier draft of this report mixed metrics across rows — postmortem in <code>docs/DECISIONS.md</code> 2026-05-17 entry. Under single-binary (the verifiable metric), Opus 4.7 wins by ~3.4% over Opus 4.6. Under multi-class, Opus 4.6 is marginally better (0.2500 vs 0.2558).</p>
+<strong>Two metrics shown:</strong> PA's CLI evaluator (<code>prophet forecast evaluate</code>) implements <em>single-binary</em> Brier on <code>(p_yes − 1{outcomes[0] won})²</code>; PA's docs describe <em>proper multi-class</em> Brier summed across all outcomes. We report both. The earlier draft of this report mixed metrics across rows - postmortem in <code>docs/DECISIONS.md</code> 2026-05-17 entry. Under single-binary (the verifiable metric), Opus 4.7 wins by ~3.4% over Opus 4.6. Under multi-class, Opus 4.6 is marginally better (0.2500 vs 0.2558).</p>
 
-<h2>Where the win came from — floor fix vs model swap</h2>
+<h2>Where the win came from - floor fix vs model swap</h2>
 <div class="results">
   <table>
-    <thead><tr><th>Variant</th><th>Mean Brier</th><th>Δ from baseline</th></tr></thead>
+    <thead><tr><th>Variant</th><th>Mean Brier</th><th>delta from baseline</th></tr></thead>
     <tbody>
       <tr><td>Sonnet 4.6 + old floor (clamps binary to 0.25)</td><td class="brier">0.0639</td><td>baseline</td></tr>
       <tr><td>Sonnet 4.6 + new floor (caps at 0.10)</td><td class="brier">0.0418</td><td>−0.0221 (85% of the gap)</td></tr>
-      <tr class="highlight"><td><strong>Opus 4.7 + new floor (production)</strong></td><td class="brier">0.0379</td><td>−0.0260 (full gap)</td></tr>
+      <tr class="highlight"><td><strong>Opus 4.7 + new floor (production)</strong></td><td class="brier">0.038</td><td>−0.0260 (full gap)</td></tr>
     </tbody>
   </table>
-  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet→Opus swap accounts for the remaining ~15%. Numbers come from the paired-bootstrap replay script (<code>scripts/bootstrap_brier_ci.py</code>) with a pinned seed.</p>
+  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet->Opus swap accounts for the remaining ~15%. Numbers come from the paired-bootstrap replay script (<code>scripts/bootstrap_brier_ci.py</code>) with a pinned seed. <em>Absolute Brier values in this table are best-case-with-hindsight (unfiltered retrieval); both arms leaked equally, so the <strong>delta</strong> is still valid. The honest disciplined production number is 0.118.</em></p>
 </div>
 
-<h2>Statistical significance — paired-bootstrap on the headline delta</h2>
+<h2>Statistical significance - paired-bootstrap on the headline delta</h2>
 <div class="results">
-  <p>The Phase 2 improvement (0.0639 → 0.0379) on n=26 paired events:</p>
+  <p>The Phase 2 improvement (0.0639 -> 0.038) on n=26 paired events:</p>
   <table>
     <tbody>
       <tr><td>Mean Brier improvement</td><td class="brier">0.0260</td></tr>
@@ -150,7 +164,7 @@
       <tr><td>Random seed</td><td>20260516</td></tr>
     </tbody>
   </table>
-  <p class="note">CI excludes zero on this replay. Standard caveat applies: n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI.</p>
+  <p class="note">CI excludes zero on this replay. This is the model-swap delta on the (leaky) replay condition, not an absolute live estimate &mdash; the honest production binary Brier is 0.118. Standard caveat applies: n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI.</p>
 </div>
 
 <h2>Scale-up validation on Subset-1200 (most credible number)</h2>
@@ -158,25 +172,26 @@
 <table>
   <thead><tr><th>Backtest</th><th style="text-align:right">n</th><th style="text-align:right">mean Brier</th><th style="text-align:right">95% bootstrap CI</th><th style="text-align:right">leakage rate</th></tr></thead>
   <tbody>
-    <tr><td>sample-resolved (the published headline)</td><td style="text-align:right">26</td><td style="text-align:right"><strong>0.0378</strong></td><td style="text-align:right">[0.0143, 0.0374]*</td><td style="text-align:right">38.5% / 23.8%</td></tr>
-    <tr><td><strong>Subset-1200 (scale validation)</strong></td><td style="text-align:right">1200</td><td style="text-align:right"><strong>0.1224</strong></td><td style="text-align:right">[0.1102, 0.1351]</td><td style="text-align:right">21.8% / 7.0%</td></tr>
+    <tr><td>sample-resolved, unfiltered retrieval (best-case w/ hindsight)</td><td style="text-align:right">26</td><td style="text-align:right;color:#6b7280">0.038</td><td style="text-align:right">[0.0143, 0.0374]*</td><td style="text-align:right">21.3% &rarr; 11.5%</td></tr>
+    <tr><td><strong>sample-resolved, date-capped retrieval (honest headline)</strong></td><td style="text-align:right">26</td><td style="text-align:right"><strong>0.118</strong></td><td style="text-align:right">delta CI [&minus;0.136, &minus;0.030]</td><td style="text-align:right">11.5%</td></tr>
+    <tr><td><strong>Subset-1200 (scale validation, honest)</strong></td><td style="text-align:right">1200</td><td style="text-align:right"><strong>0.1224</strong></td><td style="text-align:right">[0.1102, 0.1351]</td><td style="text-align:right">21.8% / 7.0%</td></tr>
   </tbody>
 </table>
-<p class="meta">*CI on the Sonnet-to-Opus delta, not on the absolute Brier. <strong>Honest reading:</strong> the 0.0378 sample-resolved headline was inflated by ~3.2x because the 26 events disproportionately matched well-indexed, post-resolution-rich web pages (38.5% leakage rate). The Subset-1200 number (0.1224) is the more conservative scale check because (a) the sample is 46x larger, (b) the leakage rate is roughly half (21.8%), and (c) it covers many more event types and tickers. We do not replace the 0.0378 number in earlier sections because it is what the local <code>prophet forecast evaluate</code> CLI computed and is verifiable; we add this 0.1224 number alongside it as the scale-validated complement. Both are real on different samples, and live PA scoring is the decisive test.</p>
+<p class="meta">*CI on the Sonnet-to-Opus delta, not on the absolute Brier. <strong>Honest reading:</strong> the 0.038 unfiltered replay was best-case-with-hindsight &mdash; a paired search-provider bake-off (same model, same prompt; only the retrieval freshness cap changes) shows that date-capping retrieval to each event's close moves binary Brier from 0.038 to <strong>0.118</strong>, a <strong>3.1&times;</strong> hindsight inflation (paired bootstrap n=26: mean delta &minus;0.080, 95% CI [&minus;0.136, &minus;0.030], Pr(improvement &le; 0) = 1.0). The Subset-1200 number (0.1224) is an independent scale check at 46x the sample and lands almost exactly on the date-capped 26-event number &mdash; two methods, same ~0.12 honest estimate. Live PA scoring is structurally leakage-free (events are unresolved at query time), so production already runs in the honest regime; this fix is to our <em>backtest methodology</em>, not the agent.</p>
 <p class="meta"><strong>Distribution texture (n=1200):</strong> median Brier 0.010, IQR [0.010, 0.144]. The pipeline produces near-perfect predictions on most events and catastrophic ones on a long tail. That shape implies (a) most "wins" are floored 0.9 picks on the favored outcome, (b) a confident-and-wrong tail dominates the mean. Parse-error rate at scale: 0.58% (vs 0% on the curated 26). Raw: <code>data/predictions/subset_1200.json</code>, summary: <code>data/predictions/subset_1200_summary.json</code>.</p>
 
 <h2>Backtest leakage disclosure (important)</h2>
-<p class="meta"><strong>10 of 26 events (38.5%) in our resolved backtest have at least one evidence URL whose path contains post-resolution markers</strong> (word-boundaried "won", "winner", "champion", "final", "results"). Examples: the Masked Singer event (resolved 2026-04-03) cites a Variety URL with <code>/the-masked-singer-season-14-finale-winner-ashlee-simpson-...</code> — that article was written <em>because</em> Ashlee Simpson won. The NHL Calder event cites an ESPN URL <code>/who-won-nhl-rookie-year-winners-year-list</code>. Across all variants, 23.8% of retrieved URLs are flagged. Audit script: <code>scripts/check_retrieval_leakage.py</code>; raw data: <code>data/predictions/leakage_audit.json</code>.</p>
-<p class="meta"><strong>What this means.</strong> The headline Brier 0.0378 is best-case-with-hindsight, not expected live performance. On resolved-event replay, retrieval can surface post-resolution evidence. The same leakage applies to every alternative-model ablation; <em>cross-model rankings remain useful</em> because all variants got the same hindsight benefit equally. Absolute Brier numbers are inflated similarly across all rows. Live PA scoring will be a different distribution: events arrive unresolved, so Brave returns only forecasting articles, base rates, and market quotes, not post-resolution recaps. This validates the FutureSim methodology (Goel et al. 2026): chronological replay is required to avoid this exact contamination.</p>
+<p class="meta"><strong>10 of 26 events (38.5%) in our resolved backtest have at least one evidence URL whose path contains post-resolution markers</strong> (word-boundaried "won", "winner", "champion", "final", "results"). Examples: the Masked Singer event (resolved 2026-04-03) cites a Variety URL with <code>/the-masked-singer-season-14-finale-winner-ashlee-simpson-...</code> - that article was written <em>because</em> Ashlee Simpson won. The NHL Calder event cites an ESPN URL <code>/who-won-nhl-rookie-year-winners-year-list</code>. Across all variants, 23.8% of retrieved URLs are flagged. Audit script: <code>scripts/check_retrieval_leakage.py</code>; raw data: <code>data/predictions/leakage_audit.json</code>.</p>
+<p class="meta"><strong>What this means.</strong> The naive replay Brier 0.038 is best-case-with-hindsight, not expected live performance &mdash; which is exactly why our headline is the date-disciplined <strong>0.118</strong> instead. On resolved-event replay, unfiltered retrieval can surface post-resolution evidence. The same leakage applies to every alternative-model ablation; <em>cross-model rankings remain useful</em> because all variants got the same hindsight benefit equally. Absolute Brier numbers are inflated similarly across all rows. Live PA scoring will be a different distribution: events arrive unresolved, so Brave returns only forecasting articles, base rates, and market quotes, not post-resolution recaps. This validates the FutureSim methodology (Goel et al. 2026): chronological replay is required to avoid this exact contamination.</p>
 
 <h2>How Prophet Arena actually scores us</h2>
-<p class="meta">Per PA organizers (Discord, 2026-05-16): <strong>Total score = (team avg Brier − market avg Brier) × completion rate</strong>. Higher is better; a lower Brier than the market produces a positive score. Markets are snapshotted Kalshi/Polymarket prices at prediction time on events closing 2 days to 2 weeks out. <em>You only win by beating the market.</em></p>
-<p class="meta"><strong>Implications baked into our agent</strong>: (1) the market-odds-anchoring block in the system prompt is strategically protective — anchoring to cited market prices gives approximately market Brier when our model lacks edge; (2) post-LLM longshot floor caps overconfidence on contracts &lt;$0.10 (Kalshi paper: &gt;60% buyer loss); (3) exception boundary on <code>/predict</code> is the priority guard for <em>completion rate</em>, which multiplies the final score.</p>
+<p class="meta">Per PA organizers (Discord, 2026-05-16): <strong>Total score = (team avg Brier − market avg Brier) x completion rate</strong>. Higher is better; a lower Brier than the market produces a positive score. Markets are snapshotted Kalshi/Polymarket prices at prediction time on events closing 2 days to 2 weeks out. <em>You only win by beating the market.</em></p>
+<p class="meta"><strong>Implications baked into our agent</strong>: (1) the market-odds-anchoring block in the system prompt is strategically protective - anchoring to cited market prices gives approximately market Brier when our model lacks edge; (2) post-LLM longshot floor caps overconfidence on contracts &lt;$0.10 (Kalshi paper: &gt;60% buyer loss); (3) exception boundary on <code>/predict</code> is the priority guard for <em>completion rate</em>, which multiplies the final score.</p>
 
-<h2>Brier Skill Score (BSS) — production vs alternatives</h2>
-<p class="meta"><strong>BSS = 1 − Brier_model / Brier_baseline</strong>. Here baseline is random (Brier = 0.25). BSS = 1 is perfect; BSS &gt; 0 beats the baseline. Live PA scoring substitutes market-implied Brier as the baseline — those numbers come once PA calls land. Code: <code>evaluation/brier.py:brier_skill_score</code>.</p>
+<h2>Brier Skill Score (BSS) - production vs alternatives</h2>
+<p class="meta"><strong>BSS = 1 − Brier_model / Brier_baseline</strong>. Here baseline is random (Brier = 0.25). BSS = 1 is perfect; BSS &gt; 0 beats the baseline. <strong>Brier values below are best-case-with-hindsight</strong> (unfiltered retrieval); they overstate BSS, but all variants are inflated equally so the ranking holds. The honest production binary Brier (0.118) gives BSS ≈ 0.53 vs random. Live PA scoring substitutes market-implied Brier as the baseline - those numbers come once PA calls land. Code: <code>evaluation/brier.py:brier_skill_score</code>.</p>
 <table>
-  <thead><tr><th>Variant</th><th style="text-align:right">Brier</th><th style="text-align:right">BSS vs random</th></tr></thead>
+  <thead><tr><th>Variant</th><th style="text-align:right">Brier (hindsight)</th><th style="text-align:right">BSS vs random</th></tr></thead>
   <tbody>
     <tr><td><strong>Opus 4.7 (production)</strong></td><td style="text-align:right"><strong>0.0378</strong></td><td style="text-align:right"><strong>0.849</strong></td></tr>
     <tr><td>Opus 4.6</td><td style="text-align:right">0.0391</td><td style="text-align:right">0.844</td></tr>
@@ -186,16 +201,16 @@
     <tr><td>GPT-5.5</td><td style="text-align:right">0.0920</td><td style="text-align:right">0.632</td></tr>
   </tbody>
 </table>
-<p class="meta">All variants beat random; production wins by 0.005 BSS over Opus 4.6 on n=26. <strong>The hard test is BSS &gt; 0 against live Kalshi/Polymarket prices</strong> — pending PA's first call.</p>
+<p class="meta">All variants beat random; production wins by 0.005 BSS over Opus 4.6 on n=26. <strong>The hard test is BSS &gt; 0 against live Kalshi/Polymarket prices</strong> - pending PA's first call.</p>
 
 <h2>Intra-model variance: 5 fresh reruns of production</h2>
-<p class="meta">"Production scores 0.0378" hides LLM stochasticity. We re-ran the production variant 5 times on the same 26 events. Same prompt, same retrieval, fresh model calls. Result: <strong>0.0377 ± 0.0009</strong> (range [0.03613, 0.03822]; canonical file 0.03782 sits well inside ± 1 σ of the grand mean). Coefficient of variation 2.4%. The Phase 2 improvement (0.026 Brier) is ~25× larger than this noise floor, which is why the paired-bootstrap CI on the Sonnet → Opus delta excludes zero. Future small ablations with |Δ| &lt; 0.005 should be treated as noise candidates and re-verified before claiming a production-worthy improvement. Interactive: <a href="variance.html">variance.html</a>.</p>
+<p class="meta">A single replay number hides LLM stochasticity. We re-ran the production variant 5 times on the same 26 events (unfiltered-retrieval / best-case-with-hindsight condition). Same prompt, same retrieval, fresh model calls. Result: <strong>0.0377 ± 0.0009</strong> (range [0.03613, 0.03822]; canonical file 0.03782 sits well inside ± 1 σ of the grand mean). Coefficient of variation 2.4%. (This measures run-to-run noise on the hindsight replay; the honest headline is 0.118.) The Phase 2 improvement (0.026 Brier) is ~25x larger than this noise floor, which is why the paired-bootstrap CI on the Sonnet -> Opus delta excludes zero. Future small ablations with |delta| &lt; 0.005 should be treated as noise candidates and re-verified before claiming a production-worthy improvement. Interactive: <a href="variance.html">variance.html</a>.</p>
 
 <h2>Ensemble-of-6: a negative result on its own pipeline</h2>
 <p class="meta">Free test using the 5 variance reruns + canonical. For each event, average the per-outcome probabilities across all 6 runs (mean) and recompute Brier. <strong>Result: 0.03770 ensemble vs 0.03774 grand mean = -0.00003 delta.</strong> Inside the noise floor (sigma 0.00081 across runs). Median ensemble actually scores worse (0.03821) than arithmetic mean. Translation: production calibration is already stable enough that ensembling adds cost without reducing Brier. Ensembling pays off when per-run variance is larger than the systematic prediction error; here it isn't. Raw: <code>data/predictions/ensemble_5.json</code>, summary: <code>data/predictions/ensemble_5_summary.json</code>.</p>
 
 <h2>Brier decomposition (Murphy 1973): REL - RES + UNC</h2>
-<p class="meta">Same prediction files, decomposed. <strong>REL down</strong> (lower better) = miscalibration; <strong>RES up</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance. GPT-5.5 is better calibrated by REL than production in this sample, but has lower RES, so its direct Brier is worse.</p>
+<p class="meta">Same prediction files (unfiltered-retrieval / best-case-with-hindsight condition), decomposed. <strong>REL down</strong> (lower better) = miscalibration; <strong>RES up</strong> (higher better) = discrimination between winners and losers; <strong>UNC</strong> = irreducible base-rate variance. GPT-5.5 is better calibrated by REL than production in this sample, but has lower RES, so its direct Brier is worse. On the honest date-capped retrieval, calibration is conditional: when production is confident (>=0.8) binary Brier is ~0.02 (excellent), but in the uncertain band (0.5-0.7) binary Brier is ~0.26 (worse than a coin flip), and overall ECE is 0.226 &mdash; the honest 0.118 headline reflects that uncertain-band cost.</p>
 <table>
   <thead><tr><th>Variant</th><th style="text-align:right">REL</th><th style="text-align:right">RES</th><th style="text-align:right">UNC</th><th style="text-align:right">Brier</th></tr></thead>
   <tbody><tr><td><strong>Opus 4.7 (production)</strong></td><td style='text-align:right'>0.03742</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.03782</td></tr><tr><td>Opus 4.6</td><td style='text-align:right'>0.03879</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.03913</td></tr><tr><td>GPT-5.2</td><td style='text-align:right'>0.04335</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.04384</td></tr><tr><td>GPT-5.5</td><td style='text-align:right'>0.02465</td><td style='text-align:right'>0.18185</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.09196</td></tr><tr><td>Gemini 3.1 Pro</td><td style='text-align:right'>0.04965</td><td style='text-align:right'>0.21262</td><td style='text-align:right'>0.24852</td><td style='text-align:right'>0.08732</td></tr></tbody>
@@ -232,13 +247,13 @@
 <h2>Findings worth keeping</h2>
 <ul>
   <li><strong>The win is JSON schema compliance, not raw reasoning.</strong>
-    Three of four alternative LLMs in this table had Brier ≥ 0.22, dominated by
+    Three of four alternative LLMs in this table had Brier >= 0.22, dominated by
     catastrophic multi-outcome JSON failures (trailing commas, bogus outcome keys).
     Opus 4.7 followed our schema reliably; the alternatives didn't.</li>
   <li><strong>A silent production bug accounted for most of the Phase 2 win.</strong>
-    Old longshot floor: <code>max(0.05, 0.5/n)</code> → 0.25 for binary events,
+    Old longshot floor: <code>max(0.05, 0.5/n)</code> -> 0.25 for binary events,
     clamping every binary prediction into [0.25, 0.75]. New: capped at the
-    Kalshi-paper 0.10 threshold. ~6× per-event Brier improvement on binary
+    Kalshi-paper 0.10 threshold. ~6x per-event Brier improvement on binary
     longshots. Caught by smoke-testing against a synthetic Chiefs/SB-LXI event.</li>
   <li><strong>"Leaderboard #1 ≠ best in your pipeline."</strong>
     Gemini 3.1 Pro Preview is the public PA fixed-context leaderboard top.
@@ -253,14 +268,16 @@
 
 <h2>Sample size honesty</h2>
 <p class="meta">26 events is a small sample, skewed toward binary tennis matches.
-The 0.0379 number is directionally validated, not converged. Live Prophet Arena
-performance may differ by category mix; the multi-vendor evidence is the most
-generalizable finding here. Full per-event detail at
+The honest 0.118 binary Brier is directionally validated (and corroborated by the
+0.1224 Subset-1200 scale check), not converged. Live Prophet Arena
+performance may differ by category mix; the multi-vendor evidence and the
+leakage audit are the most generalizable findings here. Full per-event detail at
 <a href="/compare">/compare</a> (PIN required).</p>
 
 <footer>
   Built by Rob Sneiderman · Team CanadaHacks · Project <em>The Oracles</em> · Prophet Hacks 2026.
   Source: <a href="https://github.com/Robby955/prophet-hacks">github.com/Robby955/prophet-hacks</a>.
+  <br><a href="/">home</a> · The Oracles · ForecastingPath · honest backtest, leakage-audited (binary Brier 0.118).
 </footer>
 
 </div>

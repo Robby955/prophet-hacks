@@ -28,13 +28,20 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 
 <header>
   <h1>Intra-model variance · production Opus 4.7 across 5 reruns</h1>
-  <p class="sub">The headline "production scores 0.0378 single-binary Brier" hides
-     run-to-run LLM stochasticity. We re-ran <code>predict_multi_outcome_retrieval</code>
-     five times on the same 26 events. Same prompt, same retrieval, fresh LLM calls.
-     The grand mean is <strong>0.03772</strong> with a standard deviation of
-     <strong>0.00090</strong>. The canonical production file (the one PA's CLI
-     scored) reported 0.03782, well within one standard deviation of the grand mean.
-     Read this as: <strong>production Brier = 0.0377 ± 0.0009</strong>.</p>
+  <p class="sub">This page isolates run-to-run LLM stochasticity. We re-ran
+     <code>predict_multi_outcome_retrieval</code> five times on the same 26 events.
+     Same prompt, same retrieval, fresh LLM calls. The grand mean is
+     <strong>0.03772</strong> with a standard deviation of <strong>0.00090</strong>;
+     the canonical file (0.03782) sits well within one standard deviation. Read this
+     as a <strong>noise floor of ± 0.0009</strong> on the replay metric.</p>
+  <p class="sub" style="background:#f4f7fb;border-left:4px solid #2856a3;border-radius:6px;padding:8px 11px;color:#1a1f2c">
+     <strong>Leakage note:</strong> these reruns use unfiltered retrieval, so the ~0.038
+     level is <em>best-case-with-hindsight</em> (retrieval can surface post-resolution
+     articles). Our honest headline is the leakage-disciplined binary Brier
+     <strong>0.118</strong> &mdash; date-capping retrieval to each event's close moves
+     the number from 0.038 to 0.118, a 3.1&times; hindsight inflation (paired bootstrap
+     n=26, 95% CI [&minus;0.136, &minus;0.030]). What this page shows is that the
+     ±0.0009 stochastic noise is tiny next to that 0.080 leakage gap.</p>
   <p class="links">
     <a href="/static/summary.html">→ summary report</a> ·
     <a href="/static/gallery_resolved.html">→ side-by-side gallery</a> ·
@@ -44,10 +51,10 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 </header>
 
 <div class="kpis">
-  <div class="kpi"><div class="lbl">Grand mean (5 runs)</div><div class="val">0.03772</div></div>
-  <div class="kpi"><div class="lbl">Standard deviation</div><div class="val">0.00090</div></div>
-  <div class="kpi"><div class="lbl">Range</div><div class="val">[0.0361, 0.0382]</div></div>
-  <div class="kpi"><div class="lbl">Canonical file</div><div class="val">0.03782</div></div>
+  <div class="kpi"><div class="lbl">Honest binary Brier</div><div class="val">0.118</div></div>
+  <div class="kpi"><div class="lbl">Std dev (run-to-run noise)</div><div class="val">0.00090</div></div>
+  <div class="kpi"><div class="lbl">Grand mean (5 runs, hindsight)</div><div class="val" style="color:#6a7388">0.03772</div></div>
+  <div class="kpi"><div class="lbl">Canonical file (hindsight)</div><div class="val" style="color:#6a7388">0.03782</div></div>
 </div>
 
 <section>
@@ -80,7 +87,7 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
   <p>Built by <code>scripts/build_variance_plot.py</code> from
      <code>data/predictions/variance_run_*.json</code>. Variance ablation harness:
      <code>scripts/ablate_variance.py</code>.</p>
-  <p style="margin-top:6px;color:#6a7388">The Oracles · Team CanadaHacks · Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> · Prophet Hacks 2026</p>
+  <p style="margin-top:6px;color:#6a7388"><a href="/">home</a> · The Oracles · ForecastingPath · honest backtest, leakage-audited (binary Brier 0.118) · Team CanadaHacks · Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> · Prophet Hacks 2026</p>
 </footer>
 
 <script id="data-runs" type="application/json">[{"label": "canonical", "mean_brier": 0.03781923076923078, "n": 26}, {"label": "run 1", "mean_brier": 0.038200000000000005, "n": 26}, {"label": "run 2", "mean_brier": 0.03822255460588796, "n": 26}, {"label": "run 3", "mean_brier": 0.03822255460588795, "n": 26}, {"label": "run 4", "mean_brier": 0.03781923076923078, "n": 26}, {"label": "run 5", "mean_brier": 0.03612972459639127, "n": 26}]</script>

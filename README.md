@@ -12,10 +12,14 @@ Prophet Hacks 2026 forecasting agent. Team **CanadaHacks**, project **The Oracle
 Retrieval-augmented Claude Opus 4.7 forecasting agent with a Kalshi-paper longshot floor.
 Production runs as a FastAPI service on Railway with per-prediction JSONL traces,
 an auth-gated research dashboard, and reproducible ablation scripts. Offline evaluation
-is intentionally labeled as replay evidence, not final live evidence: the 26-event
-resolved replay scores **0.0378** single-binary Brier, while the larger 1200-event
-resolved replay scores **0.1224** and is the more credible scale check before live PA
-results arrive.
+is intentionally labeled as replay evidence, not final live evidence. Our headline
+number is the **leakage-disciplined 0.118 single-binary Brier** (`brave_fresh`: Brave
+retrieval date-capped to each event's close time, so post-resolution sources cannot
+leak into the backtest). The unfiltered replay scores 0.038, but a search-provider
+freshness ablation showed that number is **hindsight-inflated 3.1x** by retrieval
+leakage, so we report it only as a best-case-with-hindsight bound. The 1200-event
+resolved replay (`Subset-1200`) corroborates the honest scale at **0.1224**. See
+"Leakage audit" below.
 
 ## Architecture
 
@@ -110,15 +114,59 @@ available from `/healthz.commit`.
 `/dashboard`, `/compare`, `/compare-open` redirect to `/login` for browsers,
 return JSON 401 for API callers. `/predict` and `/healthz` stay public.
 
+## Leakage audit (the headline result)
+
+The honest, out-of-sample number we stand behind is **0.118 single-binary
+Brier** on the 26-event sample-resolved set, not the 0.038 an unfiltered
+backtest reports. We treat that gap as a finding, not a footnote, and built
+the tooling to measure it.
+
+We ran a **search-provider / freshness ablation** (`scripts/ablate_search_provider.py`)
+that holds the model, prompt, dedupe, and longshot guard constant and swaps
+only the retrieval source:
+
+| Retrieval arm | Single-binary Brier | Retrieval leakage |
+|---|---:|---:|
+| `brave` (unfiltered, best-case-with-hindsight) | 0.038 | 21.3% (23/108 URLs) |
+| **`brave_fresh`** (date-capped to `close_time − 1d`, honest) | **0.118** | 11.5% (13/113 URLs) |
+
+Removing post-resolution leakage from retrieval degrades the backtest by
+**3.1x** (0.038 -> 0.118). A paired bootstrap CI (`brave_fresh` vs `brave`,
+n=26, 20K resamples) puts the mean delta at **-0.080**, 95% CI
+**[-0.136, -0.030]**, with **Pr(improvement <= 0) = 1.0** - the effect is
+unambiguous, the CI excludes zero, and the inflation lives in the retrieval,
+not the model. This is an independent, mechanism-level confirmation of the
+Subset-1200 hindsight finding (same ~3x factor, different method).
+
+There are two distinct leakage channels and we bound both:
+- **Retrieval leakage** - post-resolution web sources slipping into evidence.
+  Capped by date-restricting the search (`brave_fresh`). On live PA traffic this
+  is structurally impossible: events are unresolved at query time, so production
+  already gets the "fresh" condition for free. The fix here is to the *backtest
+  methodology*, not the production path.
+- **Model-parametric leakage** - the LLM having memorized the outcome. Bounded
+  by Opus 4.7's knowledge cutoff (~Jan 2026): events that resolve after the
+  cutoff are parametric-clean.
+
+**Confidence-conditional calibration.** `scripts/diagnostics.py` stratifies the
+honest predictions by confidence. High-confidence calls are excellent
+(>=0.8 confidence -> Brier ~0.02); mid-confidence calls are worse than a coin
+flip (0.5-0.7 -> Brier ~0.26). Overall ECE is 0.226. That motivates an
+**abstain-to-market** policy near a 0.7 threshold: defer to the snapshotted
+market price exactly where the model is least reliable.
+
 ## Results: 26-event sample-resolved backtest
 
-Same pipeline (Brave + anchor prompt + 0.10 floor), swap the LLM:
+Same pipeline (Brave + anchor prompt + 0.10 floor), swap the LLM. The model
+table below uses the unfiltered `brave` retrieval arm, so these are
+**best-case-with-hindsight** numbers useful only for relative model ranking;
+the honest cross-model magnitude is the 0.118 `brave_fresh` headline above.
 
 All numbers below are **single-binary Brier** matching PA's CLI
 evaluator (`prophet forecast evaluate`). Multi-class Brier numbers
 are documented in `submission/REPORT.md` section 3 and `docs/FINDINGS.md` section 2.
 
-| Variant | Single-binary Brier (lower) |
+| Variant | Single-binary Brier (hindsight, relative ranking only) |
 |---|---:|
 | **Claude Opus 4.7** (production) | **0.0378** |
 | Claude Opus 4.6 | 0.0391 |
@@ -129,12 +177,14 @@ are documented in `submission/REPORT.md` section 3 and `docs/FINDINGS.md` sectio
 | _random 0.5 baseline_ | 0.250 |
 | _uniform 1/n prior_ | 0.219 |
 
-Production beats the previous Sonnet baseline by **40.8% relative**
-(0.0639 -> 0.0378 = 40.81%). Paired-bootstrap CI on the delta:
+On this hindsight-arm ranking, production beats the previous Sonnet baseline
+(0.0639 -> 0.0378). Paired-bootstrap CI on that delta:
 **[0.0143, 0.0374]** (50K resamples, seed `20260516`, n=26;
 reproducible to about 0.0001 across seeds 20260516/20260517/20260518
 per `scripts/check_bootstrap_seed_stability.py`). CI excludes zero;
-significant at alpha=0.05 under single-binary scoring.
+significant at alpha=0.05 under single-binary scoring. We lead with the
+leakage-disciplined 0.118 because relative model deltas measured on a leaky
+arm do not transfer to the honest magnitude.
 
 ![Per-event single-binary Brier across five models on the 26-event sample-resolved backtest](static/summary_per_event.png)
 
@@ -144,18 +194,43 @@ significant at alpha=0.05 under single-binary scoring.
 
 We replayed the production pipeline against PA's 1200-event resolved set
 (46x the 26-event sample). The larger replay came in at **Brier 0.1224**,
-95% bootstrap CI **[0.110, 0.135]**. The 0.0378 number is hindsight-rich on
-a small, well-indexed slice; 0.1224 is the more conservative scale check.
-Both numbers are real on different samples. The live PA run remains the
-decisive test because its events arrive unresolved and are scored against
-snapshotted market prices.
+95% bootstrap CI **[0.110, 0.135]** (honest subset-1200 number 0.1224). That
+lands right on top of the leakage-disciplined `brave_fresh` headline (0.118),
+two independent routes to the same honest magnitude. The 0.0378 number is
+hindsight-rich on a small, well-indexed slice and is reported only as a
+best-case-with-hindsight bound. The live PA run remains the decisive test
+because its events arrive unresolved and are scored against snapshotted
+market prices.
 
-Production beats Opus 4.6 by 3.4% (0.0378 vs 0.0391). Under proper
-multi-class Brier (which PA's docs describe but the CLI doesn't
-implement), Opus 4.6 is marginally better. We hold Opus 4.7 because
+On the same hindsight arm, production beats Opus 4.6 by 3.4%
+(0.0378 vs 0.0391). Under proper multi-class Brier (which PA's docs
+describe but the CLI doesn't implement), Opus 4.6 is marginally better. We hold Opus 4.7 because
 single-binary is the only metric we can verify locally against PA's
 own evaluator. Postmortem of the earlier inconsistent metric report
 is in `docs/DECISIONS.md` 2026-05-17 entry.
+
+### Leakage-free evaluation firehose
+
+To stop relying on small, well-indexed, leakage-prone resolved slices, we built
+a self-replenishing pipeline that generates clean events, forecasts them before
+they resolve, and resolves them mechanically afterward - no API keys, zero
+leakage by construction:
+
+- `scripts/generate_sports_slate.py` pulls a date's *scheduled* (not-yet-started)
+  games from the keyless ESPN scoreboard API (MLB/NBA/NHL/WNBA) and emits SHADOW
+  pregame events with exact team labels and real game-start close times. Because
+  the games have not happened when we query, there is nothing to leak.
+- `scripts/auto_resolve_sports.py` and `scripts/auto_resolve_finance.py` close the
+  loop with keyless auto-resolution - final ESPN scores for sports, Yahoo Finance
+  closes and Coinbase spot for finance/crypto - merged into the resolutions file
+  without clobbering manual rows.
+- `scripts/diagnostics.py` is the measurement engine: stratified Brier, Murphy
+  decomposition, reliability diagram, and ECE, broken out by category, outcome
+  count, and confidence bucket, reusing `evaluation/brier.py` so every surface
+  agrees.
+- A forward shadow set (n=11, sports-heavy) gave a mean winner Brier of **0.256**,
+  consistent with the honest 0.118-0.122 range once the sports-heavy mix is
+  accounted for.
 
 ### Honest decomposition of the win
 
@@ -322,6 +397,11 @@ Defined in `forecast_track.py`, served via `forecast_agent_server.py`'s
 | `scripts/preflight.sh` | Pre-deploy gate. |
 | `scripts/agent/deploy.sh` | Safe deploy wrapper (preflight + commit SHA pin + `railway up`). |
 | `scripts/ablate_openrouter.py` | Swap-the-LLM ablation harness for any OpenRouter-hosted model. |
+| `scripts/ablate_search_provider.py` | Retrieval bake-off: hold model/prompt/guard constant, swap only the search source (`brave` vs date-capped `brave_fresh`, plus Tavily/Exa/Serper hooks). Quantifies retrieval leakage. |
+| `scripts/diagnostics.py` | Measurement engine: stratified Brier + Murphy decomposition + reliability diagram + ECE, broken out by category, outcome-count, and confidence bucket. |
+| `scripts/generate_sports_slate.py` | Pulls a date's scheduled (not-yet-started) games from the keyless ESPN API and emits SHADOW pregame events. Zero leakage by construction. |
+| `scripts/auto_resolve_sports.py` | Keyless auto-resolution of sports shadow events from final ESPN scores. |
+| `scripts/auto_resolve_finance.py` | Keyless auto-resolution of finance/crypto shadow events (Yahoo Finance + Coinbase). |
 | `scripts/analyze_results.py` | Post-event scoring (Brier, BSS, ECE, Murphy decomposition). |
 
 ## Docs

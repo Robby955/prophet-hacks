@@ -6,7 +6,10 @@
     "description": "Montreal Canadiens visit Buffalo Sabres in Game 7 of their 2026 Stanley Cup Playoffs second-round series at KeyBank Center on May 18, 2026. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-18T23:30:00Z",
-    "outcomes": ["Montreal Canadiens", "Buffalo Sabres"],
+    "outcomes": [
+      "Montreal Canadiens",
+      "Buffalo Sabres"
+    ],
     "rules": "Resolve to the NHL team that wins Game 7. Overtime counts.",
     "market_snapshot": {
       "as_of": "2026-05-18T23:00:00Z",
@@ -25,7 +28,10 @@
     "description": "Toronto Blue Jays visit New York Yankees on Tuesday, May 19, 2026 at Yankee Stadium. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T23:05:00Z",
-    "outcomes": ["Toronto Blue Jays", "New York Yankees"],
+    "outcomes": [
+      "Toronto Blue Jays",
+      "New York Yankees"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -43,7 +49,10 @@
     "description": "Los Angeles Dodgers visit San Diego Padres on Tuesday, May 19, 2026 at Petco Park. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-20T01:40:00Z",
-    "outcomes": ["Los Angeles Dodgers", "San Diego Padres"],
+    "outcomes": [
+      "Los Angeles Dodgers",
+      "San Diego Padres"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -61,7 +70,10 @@
     "description": "San Francisco Giants visit Arizona Diamondbacks on Tuesday, May 19, 2026 at Chase Field. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-20T01:40:00Z",
-    "outcomes": ["San Francisco Giants", "Arizona Diamondbacks"],
+    "outcomes": [
+      "San Francisco Giants",
+      "Arizona Diamondbacks"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -79,7 +91,10 @@
     "description": "Atlanta Braves visit Miami Marlins on Tuesday, May 19, 2026 at loanDepot park. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T22:40:00Z",
-    "outcomes": ["Atlanta Braves", "Miami Marlins"],
+    "outcomes": [
+      "Atlanta Braves",
+      "Miami Marlins"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -97,7 +112,10 @@
     "description": "Baltimore Orioles visit Tampa Bay Rays on Tuesday, May 19, 2026 at George M. Steinbrenner Field. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T22:40:00Z",
-    "outcomes": ["Baltimore Orioles", "Tampa Bay Rays"],
+    "outcomes": [
+      "Baltimore Orioles",
+      "Tampa Bay Rays"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -115,7 +133,10 @@
     "description": "Cleveland Guardians visit Detroit Tigers on Tuesday, May 19, 2026 at Comerica Park. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T22:40:00Z",
-    "outcomes": ["Cleveland Guardians", "Detroit Tigers"],
+    "outcomes": [
+      "Cleveland Guardians",
+      "Detroit Tigers"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -133,7 +154,10 @@
     "description": "Cincinnati Reds visit Philadelphia Phillies on Tuesday, May 19, 2026 at Citizens Bank Park. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T22:45:00Z",
-    "outcomes": ["Cincinnati Reds", "Philadelphia Phillies"],
+    "outcomes": [
+      "Cincinnati Reds",
+      "Philadelphia Phillies"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -151,7 +175,10 @@
     "description": "Boston Red Sox visit Kansas City Royals on Tuesday, May 19, 2026 at Kauffman Stadium. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T23:40:00Z",
-    "outcomes": ["Boston Red Sox", "Kansas City Royals"],
+    "outcomes": [
+      "Boston Red Sox",
+      "Kansas City Royals"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -169,7 +196,10 @@
     "description": "Houston Astros visit Minnesota Twins on Tuesday, May 19, 2026 at Target Field. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-19T23:40:00Z",
-    "outcomes": ["Houston Astros", "Minnesota Twins"],
+    "outcomes": [
+      "Houston Astros",
+      "Minnesota Twins"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "source_urls": [
@@ -187,7 +217,10 @@
     "description": "Cleveland Cavaliers visit New York Knicks in Game 1 of the 2026 NBA Eastern Conference Finals at Madison Square Garden. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-20T00:00:00Z",
-    "outcomes": ["Cleveland Cavaliers", "New York Knicks"],
+    "outcomes": [
+      "Cleveland Cavaliers",
+      "New York Knicks"
+    ],
     "rules": "Resolve to the NBA team that wins Game 1. Overtime counts.",
     "market_snapshot": {
       "source_urls": [
@@ -205,7 +238,10 @@
     "description": "Toronto Tempo visit Phoenix Mercury on Tuesday, May 19, 2026. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-20T02:00:00Z",
-    "outcomes": ["Toronto Tempo", "Phoenix Mercury"],
+    "outcomes": [
+      "Toronto Tempo",
+      "Phoenix Mercury"
+    ],
     "rules": "Resolve to the WNBA team credited with the official game win. Overtime counts.",
     "market_snapshot": {
       "source_urls": [
@@ -223,7 +259,10 @@
     "description": "SC Freiburg face Aston Villa in the UEFA Europa League final at Besiktas Park in Istanbul on Wednesday, May 20, 2026. Forecast the trophy winner.",
     "category": "Sports",
     "close_time": "2026-05-20T19:00:00Z",
-    "outcomes": ["SC Freiburg", "Aston Villa"],
+    "outcomes": [
+      "SC Freiburg",
+      "Aston Villa"
+    ],
     "rules": "Resolve to the club that wins the 2026 UEFA Europa League final. Extra time and penalties count.",
     "market_snapshot": {
       "source_urls": [
@@ -241,7 +280,10 @@
     "description": "Vegas Golden Knights visit Colorado Avalanche in Game 1 of the 2026 NHL Western Conference Final at Ball Arena. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-21T00:00:00Z",
-    "outcomes": ["Vegas Golden Knights", "Colorado Avalanche"],
+    "outcomes": [
+      "Vegas Golden Knights",
+      "Colorado Avalanche"
+    ],
     "rules": "Resolve to the NHL team that wins Game 1. Overtime counts.",
     "market_snapshot": {
       "source_urls": [
@@ -259,7 +301,10 @@
     "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on Tuesday, May 19, 2026 will be strictly greater than 739.00.",
     "category": "Financial Markets",
     "close_time": "2026-05-19T20:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if SPY's official regular-session close on May 19, 2026 is strictly greater than 739.00. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -278,7 +323,10 @@
     "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on Tuesday, May 19, 2026 will be strictly greater than 706.00.",
     "category": "Financial Markets",
     "close_time": "2026-05-19T20:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if QQQ's official regular-session close on May 19, 2026 is strictly greater than 706.00. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -297,7 +345,10 @@
     "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on Tuesday, May 19, 2026 will be strictly greater than 419.00.",
     "category": "Financial Markets",
     "close_time": "2026-05-19T20:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if GLD's official regular-session close on May 19, 2026 is strictly greater than 419.00. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -316,7 +367,10 @@
     "description": "Forecast whether the BTC-USD reference price will be strictly greater than 77000 at 00:00 UTC on May 20, 2026.",
     "category": "Crypto",
     "close_time": "2026-05-20T00:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if BTC-USD is strictly greater than 77000 at 2026-05-20T00:00:00Z using a major reference quote such as Yahoo Finance or Coinbase. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -335,7 +389,10 @@
     "description": "Forecast whether the ETH-USD reference price will be strictly greater than 2150 at 00:00 UTC on May 20, 2026.",
     "category": "Crypto",
     "close_time": "2026-05-20T00:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if ETH-USD is strictly greater than 2150 at 2026-05-20T00:00:00Z using a major reference quote such as Yahoo Finance or Coinbase. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -354,7 +411,10 @@
     "description": "Forecast whether the US initial jobless claims release scheduled for May 21, 2026 at 12:30 UTC will report 210,000 claims or fewer.",
     "category": "Macro",
     "close_time": "2026-05-21T12:30:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first reported seasonally adjusted US initial jobless claims value for the May 21, 2026 release is less than or equal to 210,000. Resolve No if it is greater than 210,000.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -373,7 +433,10 @@
     "description": "Forecast whether the final May 2026 University of Michigan Consumer Sentiment index reading scheduled for May 22, 2026 at 14:00 UTC will be at least 50.0.",
     "category": "Macro",
     "close_time": "2026-05-22T14:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first published final May 2026 University of Michigan Consumer Sentiment index is greater than or equal to 50.0. Resolve No if it is below 50.0.",
     "market_snapshot": {
       "as_of": "2026-05-19T05:30:00Z",
@@ -392,7 +455,10 @@
     "description": "Toronto Blue Jays visit New York Yankees on Wednesday, May 20, 2026 at Yankee Stadium. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-20T23:05:00Z",
-    "outcomes": ["Toronto Blue Jays", "New York Yankees"],
+    "outcomes": [
+      "Toronto Blue Jays",
+      "New York Yankees"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -412,7 +478,10 @@
     "description": "San Antonio Spurs visit Oklahoma City Thunder in Game 2 of the 2026 NBA Western Conference Finals. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-21T00:30:00Z",
-    "outcomes": ["San Antonio Spurs", "Oklahoma City Thunder"],
+    "outcomes": [
+      "San Antonio Spurs",
+      "Oklahoma City Thunder"
+    ],
     "rules": "Resolve to the NBA team that wins Game 2. Overtime counts.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -432,7 +501,10 @@
     "description": "Los Angeles Dodgers visit San Diego Padres on Wednesday, May 20, 2026 at Petco Park. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-21T00:40:00Z",
-    "outcomes": ["Los Angeles Dodgers", "San Diego Padres"],
+    "outcomes": [
+      "Los Angeles Dodgers",
+      "San Diego Padres"
+    ],
     "rules": "Resolve to the MLB team credited with the official game win. Extra innings count. If postponed before becoming official, use the completed makeup result.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -452,7 +524,10 @@
     "description": "Montreal Canadiens visit Carolina Hurricanes in Game 1 of the 2026 NHL Eastern Conference Final. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-22T00:00:00Z",
-    "outcomes": ["Montreal Canadiens", "Carolina Hurricanes"],
+    "outcomes": [
+      "Montreal Canadiens",
+      "Carolina Hurricanes"
+    ],
     "rules": "Resolve to the NHL team that wins Game 1. Playoff overtime counts.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -471,7 +546,10 @@
     "description": "Cleveland Cavaliers visit New York Knicks in Game 2 of the 2026 NBA Eastern Conference Finals. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-22T00:00:00Z",
-    "outcomes": ["Cleveland Cavaliers", "New York Knicks"],
+    "outcomes": [
+      "Cleveland Cavaliers",
+      "New York Knicks"
+    ],
     "rules": "Resolve to the NBA team that wins Game 2. Overtime counts.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -491,7 +569,10 @@
     "description": "Golden State Valkyries visit New York Liberty on Thursday, May 21, 2026. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-22T00:00:00Z",
-    "outcomes": ["Golden State Valkyries", "New York Liberty"],
+    "outcomes": [
+      "Golden State Valkyries",
+      "New York Liberty"
+    ],
     "rules": "Resolve to the WNBA team credited with the official game win. Overtime counts.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -510,7 +591,10 @@
     "description": "Golden State Valkyries visit Indiana Fever on Friday, May 22, 2026. Forecast the game winner.",
     "category": "Sports",
     "close_time": "2026-05-22T23:30:00Z",
-    "outcomes": ["Golden State Valkyries", "Indiana Fever"],
+    "outcomes": [
+      "Golden State Valkyries",
+      "Indiana Fever"
+    ],
     "rules": "Resolve to the WNBA team credited with the official game win. Overtime counts.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -530,7 +614,10 @@
     "description": "Forecast whether iShares 20+ Year Treasury Bond ETF (TLT) will close above its May 19 adjusted close after the May 20, 2026 FOMC minutes release.",
     "category": "Financial Markets",
     "close_time": "2026-05-20T20:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if TLT's May 20, 2026 regular-session adjusted close is greater than its May 19, 2026 regular-session adjusted close. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -549,7 +636,10 @@
     "description": "Forecast whether the April 2026 US housing starts release scheduled for May 21, 2026 reports headline starts above the March 2026 level of 1.502 million SAAR.",
     "category": "Macro",
     "close_time": "2026-05-21T12:30:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first Census/HUD headline housing starts SAAR for April 2026 is greater than 1.502 million. Resolve No if it is less than or equal to 1.502 million.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -568,7 +658,10 @@
     "description": "Forecast whether NVIDIA (NVDA) May 21, 2026 regular-session adjusted close will be above its May 20, 2026 adjusted close after the scheduled after-close earnings report.",
     "category": "Financial Markets",
     "close_time": "2026-05-21T20:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if NVDA's May 21, 2026 adjusted close is greater than its May 20, 2026 adjusted close. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -587,7 +680,10 @@
     "description": "Forecast whether Salesforce (CRM) May 28, 2026 regular-session adjusted close will be above its May 27, 2026 adjusted close after the scheduled after-close earnings report.",
     "category": "Financial Markets",
     "close_time": "2026-05-28T20:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if CRM's May 28, 2026 adjusted close is greater than its May 27, 2026 adjusted close. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -606,7 +702,10 @@
     "description": "Forecast whether the April 2026 US advance durable goods headline new orders release scheduled for May 28, 2026 reports a positive month-over-month change.",
     "category": "Macro",
     "close_time": "2026-05-28T12:30:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first Census advance durable goods headline new orders percent change is greater than 0.0%. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -625,7 +724,10 @@
     "description": "Forecast whether BEA's Q1 2026 real GDP second estimate scheduled for May 28, 2026 reports annualized growth of at least 2.0 percent.",
     "category": "Macro",
     "close_time": "2026-05-28T12:30:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first BEA Q1 2026 real GDP second-estimate annualized growth rate is greater than or equal to 2.0%. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -644,7 +746,10 @@
     "description": "Forecast whether BEA's April 2026 Personal Income and Outlays release reports headline PCE price index inflation of at least 3.5 percent year over year.",
     "category": "Macro",
     "close_time": "2026-05-28T12:30:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first BEA April 2026 headline PCE price index year-over-year figure is greater than or equal to 3.5%. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -663,7 +768,10 @@
     "description": "Forecast whether the April 2026 Advance Economic Indicators release scheduled for May 29, 2026 reports a goods trade deficit wider than 87.9 billion dollars.",
     "category": "Macro",
     "close_time": "2026-05-29T12:30:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first Census advance goods-trade deficit for April 2026 is greater than 87.9 billion dollars in deficit magnitude. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -682,7 +790,10 @@
     "description": "Forecast whether BTC-USD will be at least 77500 at 00:00 UTC on May 31, 2026.",
     "category": "Crypto",
     "close_time": "2026-05-31T00:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if Coinbase BTC-USD 1-minute candle close ending at 2026-05-31T00:00:00Z is greater than or equal to 77500. Resolve No if it is below 77500. Void locally if the candle is unavailable.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -701,7 +812,10 @@
     "description": "Forecast whether the April 2026 JOLTS release scheduled for June 2, 2026 reports total nonfarm job openings of at least 6.9 million.",
     "category": "Macro",
     "close_time": "2026-06-02T14:00:00Z",
-    "outcomes": ["Yes", "No"],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
     "rules": "Resolve Yes if the first BLS April 2026 total nonfarm job openings, seasonally adjusted, is greater than or equal to 6.9 million. Resolve No otherwise.",
     "market_snapshot": {
       "as_of": "2026-05-19T06:30:00Z",
@@ -712,5 +826,383 @@
       "notes": "Official BLS schedule and JOLTS release reference. Revisions ignored."
     },
     "notes": "Forward calibration candidate; longer-horizon labor-market release."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-CIN-PHI-20260520",
+    "market_ticker": "SHADOW-MLB-CIN-PHI-20260520",
+    "title": "Who will win the Cincinnati Reds at Philadelphia Phillies MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Cincinnati Reds at Philadelphia Phillies MLB game scheduled 2026-05-20T17:05:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Cincinnati Reds",
+      "Philadelphia Phillies"
+    ],
+    "close_time": "2026-05-20T17:05:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815421/reds-phillies",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-BAL-TB-20260520",
+    "market_ticker": "SHADOW-MLB-BAL-TB-20260520",
+    "title": "Who will win the Baltimore Orioles at Tampa Bay Rays MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Baltimore Orioles at Tampa Bay Rays MLB game scheduled 2026-05-20T17:10:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Baltimore Orioles",
+      "Tampa Bay Rays"
+    ],
+    "close_time": "2026-05-20T17:10:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815420/orioles-rays",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-HOU-MIN-20260520",
+    "market_ticker": "SHADOW-MLB-HOU-MIN-20260520",
+    "title": "Who will win the Houston Astros at Minnesota Twins MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Houston Astros at Minnesota Twins MLB game scheduled 2026-05-20T17:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Houston Astros",
+      "Minnesota Twins"
+    ],
+    "close_time": "2026-05-20T17:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815426/astros-twins",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-TEX-COL-20260520",
+    "market_ticker": "SHADOW-MLB-TEX-COL-20260520",
+    "title": "Who will win the Texas Rangers at Colorado Rockies MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Texas Rangers at Colorado Rockies MLB game scheduled 2026-05-20T19:10:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Texas Rangers",
+      "Colorado Rockies"
+    ],
+    "close_time": "2026-05-20T19:10:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815429/rangers-rockies",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-SF-ARI-20260520",
+    "market_ticker": "SHADOW-MLB-SF-ARI-20260520",
+    "title": "Who will win the San Francisco Giants at Arizona Diamondbacks MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the San Francisco Giants at Arizona Diamondbacks MLB game scheduled 2026-05-20T19:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "San Francisco Giants",
+      "Arizona Diamondbacks"
+    ],
+    "close_time": "2026-05-20T19:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815433/giants-diamondbacks",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-CHW-SEA-20260520",
+    "market_ticker": "SHADOW-MLB-CHW-SEA-20260520",
+    "title": "Who will win the Chicago White Sox at Seattle Mariners MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Chicago White Sox at Seattle Mariners MLB game scheduled 2026-05-20T20:10:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Chicago White Sox",
+      "Seattle Mariners"
+    ],
+    "close_time": "2026-05-20T20:10:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815431/white-sox-mariners",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-ATL-MIA-20260520",
+    "market_ticker": "SHADOW-MLB-ATL-MIA-20260520",
+    "title": "Who will win the Atlanta Braves at Miami Marlins MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Atlanta Braves at Miami Marlins MLB game scheduled 2026-05-20T22:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Atlanta Braves",
+      "Miami Marlins"
+    ],
+    "close_time": "2026-05-20T22:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815419/braves-marlins",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-CLE-DET-20260520",
+    "market_ticker": "SHADOW-MLB-CLE-DET-20260520",
+    "title": "Who will win the Cleveland Guardians at Detroit Tigers MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Cleveland Guardians at Detroit Tigers MLB game scheduled 2026-05-20T22:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Cleveland Guardians",
+      "Detroit Tigers"
+    ],
+    "close_time": "2026-05-20T22:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815422/guardians-tigers",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-NYM-WSH-20260520",
+    "market_ticker": "SHADOW-MLB-NYM-WSH-20260520",
+    "title": "Who will win the New York Mets at Washington Nationals MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the New York Mets at Washington Nationals MLB game scheduled 2026-05-20T22:45:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "New York Mets",
+      "Washington Nationals"
+    ],
+    "close_time": "2026-05-20T22:45:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815423/mets-nationals",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-BOS-KC-20260520",
+    "market_ticker": "SHADOW-MLB-BOS-KC-20260520",
+    "title": "Who will win the Boston Red Sox at Kansas City Royals MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Boston Red Sox at Kansas City Royals MLB game scheduled 2026-05-20T23:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Boston Red Sox",
+      "Kansas City Royals"
+    ],
+    "close_time": "2026-05-20T23:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815425/red-sox-royals",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-MIL-CHC-20260520",
+    "market_ticker": "SHADOW-MLB-MIL-CHC-20260520",
+    "title": "Who will win the Milwaukee Brewers at Chicago Cubs MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Milwaukee Brewers at Chicago Cubs MLB game scheduled 2026-05-20T23:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Milwaukee Brewers",
+      "Chicago Cubs"
+    ],
+    "close_time": "2026-05-20T23:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815427/brewers-cubs",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-PIT-STL-20260520",
+    "market_ticker": "SHADOW-MLB-PIT-STL-20260520",
+    "title": "Who will win the Pittsburgh Pirates at St. Louis Cardinals MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Pittsburgh Pirates at St. Louis Cardinals MLB game scheduled 2026-05-20T23:45:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Pittsburgh Pirates",
+      "St. Louis Cardinals"
+    ],
+    "close_time": "2026-05-20T23:45:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815428/pirates-cardinals",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-ATH-LAA-20260520",
+    "market_ticker": "SHADOW-MLB-ATH-LAA-20260520",
+    "title": "Who will win the Athletics at Los Angeles Angels MLB game on 2026-05-20?",
+    "description": "Resolves to the winner of the Athletics at Los Angeles Angels MLB game scheduled 2026-05-21T01:38:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Athletics",
+      "Los Angeles Angels"
+    ],
+    "close_time": "2026-05-21T01:38:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815430/athletics-angels",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-NBA-SA-OKC-20260520",
+    "market_ticker": "SHADOW-NBA-SA-OKC-20260520",
+    "title": "Who will win the San Antonio Spurs at Oklahoma City Thunder NBA game on 2026-05-20?",
+    "description": "Resolves to the winner of the San Antonio Spurs at Oklahoma City Thunder NBA game scheduled 2026-05-21T00:30:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "San Antonio Spurs",
+      "Oklahoma City Thunder"
+    ],
+    "close_time": "2026-05-21T00:30:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/nba/game/_/gameId/401873198/spurs-thunder",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-NHL-VGK-COL-20260520",
+    "market_ticker": "SHADOW-NHL-VGK-COL-20260520",
+    "title": "Who will win the Vegas Golden Knights at Colorado Avalanche NHL game on 2026-05-20?",
+    "description": "Resolves to the winner of the Vegas Golden Knights at Colorado Avalanche NHL game scheduled 2026-05-21T00:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Vegas Golden Knights",
+      "Colorado Avalanche"
+    ],
+    "close_time": "2026-05-21T00:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:31:59Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/nhl/game/_/gameId/401872903/golden-knights-avalanche",
+        "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-POR-IND-20260520",
+    "market_ticker": "SHADOW-WNBA-POR-IND-20260520",
+    "title": "Who will win the Portland Fire at Indiana Fever WNBA game on 2026-05-20?",
+    "description": "Resolves to the winner of the Portland Fire at Indiana Fever WNBA game scheduled 2026-05-20T23:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Portland Fire",
+      "Indiana Fever"
+    ],
+    "close_time": "2026-05-20T23:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:32:00Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/wnba/game/_/gameId/401856921/fire-fever",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-DAL-CHI-20260520",
+    "market_ticker": "SHADOW-WNBA-DAL-CHI-20260520",
+    "title": "Who will win the Dallas Wings at Chicago Sky WNBA game on 2026-05-20?",
+    "description": "Resolves to the winner of the Dallas Wings at Chicago Sky WNBA game scheduled 2026-05-21T01:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Dallas Wings",
+      "Chicago Sky"
+    ],
+    "close_time": "2026-05-21T01:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:32:00Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/wnba/game/_/gameId/401856922/wings-sky",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-CON-SEA-20260520",
+    "market_ticker": "SHADOW-WNBA-CON-SEA-20260520",
+    "title": "Who will win the Connecticut Sun at Seattle Storm WNBA game on 2026-05-20?",
+    "description": "Resolves to the winner of the Connecticut Sun at Seattle Storm WNBA game scheduled 2026-05-21T02:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Connecticut Sun",
+      "Seattle Storm"
+    ],
+    "close_time": "2026-05-21T02:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T03:32:00Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/wnba/game/_/gameId/401856923/sun-storm",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=20260520"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
   }
 ]

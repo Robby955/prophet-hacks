@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Diagnostics — brave_fresh (honest)</title>
+<style>
+body{font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#1b1f24;background:#f7f8fa;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:26px 20px 70px}
+h1{font-size:22px;margin:0 0 2px} .sub{color:#5b6470;font-size:13px;margin:0 0 16px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#5b6470;margin:26px 0 10px;border-bottom:1px solid #e3e7ec;padding-bottom:6px}
+.cards{display:flex;gap:12px;flex-wrap:wrap} .card{background:#fff;border:1px solid #e3e7ec;border-radius:10px;padding:12px 16px;min-width:150px}
+.big{font-size:26px;font-weight:700;font-family:ui-monospace,Menlo,monospace}
+.muted{color:#5b6470;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid #e3e7ec;border-radius:8px;overflow:hidden}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid #eef1f4} th{font-size:11px;text-transform:uppercase;color:#5b6470}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.flex{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.banner{border-left:4px solid #9a6700;background:#fff8e8;border-radius:8px;padding:11px 15px;font-size:13.5px;margin:0 0 6px}
+svg text{font-size:10px;fill:#5b6470}
+</style></head><body><div class=wrap>
+<h1>Forecast diagnostics — brave_fresh (honest)</h1>
+<p class=sub>26 resolved events (14 binary, 12 multi) · hand-run snapshot · numbers from evaluation/brier.py</p>
+
+<div class=banner><b>Largest systematic residual:</b> ECE=0.226 | mean(pred−actual)=+0.011 → roughly calibrated | worst category: Elections (binary Brier 0.171, n=3)</div>
+
+<div class=cards>
+  <div class=card><div class=muted>binary Brier</div><div class=big>0.118</div></div>
+  <div class=card><div class=muted>multiclass Brier</div><div class=big>0.505</div></div>
+  <div class=card><div class=muted>ECE (calibration error)</div><div class=big>0.226</div></div>
+</div>
+
+<h2>Reliability diagram <span style="text-transform:none;color:#5b6470;font-weight:400">— dot on the line = calibrated; above = under-confident; below = over-confident</span></h2>
+<div class=flex>
+<svg width="360" height="360" style="background:#fff;border:1px solid #e3e7ec;border-radius:8px">
+  <line x1="44" y1="316" x2="44" y2="44" stroke="#eee"/><line x1="44" y1="316" x2="316" y2="316" stroke="#eee"/><line x1="112" y1="316" x2="112" y2="44" stroke="#eee"/><line x1="44" y1="248" x2="316" y2="248" stroke="#eee"/><line x1="180" y1="316" x2="180" y2="44" stroke="#eee"/><line x1="44" y1="180" x2="316" y2="180" stroke="#eee"/><line x1="248" y1="316" x2="248" y2="44" stroke="#eee"/><line x1="44" y1="112" x2="316" y2="112" stroke="#eee"/><line x1="316" y1="316" x2="316" y2="44" stroke="#eee"/><line x1="44" y1="44" x2="316" y2="44" stroke="#eee"/>
+  <line x1="44" y1="316" x2="316" y2="44" stroke="#b3261e" stroke-dasharray="4 3"/>
+  <path d="M58.9,316.0L73.9,316.0L103.8,316.0L168.2,44.0L189.8,261.6L230.4,316.0L268.7,44.0L288.8,44.0" fill=none stroke="#1a4d8f" stroke-width=1.5/>
+  <circle cx="58.9" cy="316.0" r="11" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="73.9" cy="316.0" r="5" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="103.8" cy="316.0" r="5" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="168.2" cy="44.0" r="7" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="189.8" cy="261.6" r="9" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="230.4" cy="316.0" r="5" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="268.7" cy="44.0" r="9" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/><circle cx="288.8" cy="44.0" r="7" fill="#1a4d8f" fill-opacity="0.35" stroke="#1a4d8f"/>
+  <text x="180" y="346" text-anchor=middle>predicted probability →</text>
+  <text x="14" y="180" text-anchor=middle transform="rotate(-90 14 180)">empirical frequency →</text>
+</svg>
+<div style="flex:1;min-width:280px">
+<p class=muted>Murphy decomposition (binary): reliability <b>0.1112</b> (lower=better) · resolution <b>0.1760</b> (higher=better) · uncertainty 0.2296</p>
+<table><tr><th>confidence</th><th>n</th><th>Brier</th><th>winner p</th></tr><tr><td>0.5-0.6</td><td>8</td><td class=mono>0.261</td><td class=mono>0.449</td></tr><tr><td>0.6-0.7</td><td>1</td><td class=mono>0.470</td><td class=mono>0.315</td></tr><tr><td>0.7-0.8</td><td>0</td><td></td><td></td></tr><tr><td>0.8-0.9</td><td>7</td><td class=mono>0.025</td><td class=mono>0.846</td></tr><tr><td>0.9-1.0</td><td>3</td><td class=mono>0.007</td><td class=mono>0.617</td></tr></table>
+</div>
+</div>
+
+<h2>By category</h2>
+<table><tr><th>category</th><th>n</th><th>binary Brier</th><th>multi Brier</th><th>mean conf</th></tr><tr><td>Elections</td><td>3</td><td class=mono>0.171</td><td class=mono>0.341</td><td class=mono>0.802</td></tr><tr><td>Sports</td><td>16</td><td class=mono>0.141</td><td class=mono>0.428</td><td class=mono>0.607</td></tr><tr><td>Entertainment</td><td>4</td><td class=mono>0.064</td><td class=mono>0.987</td><td class=mono>0.382</td></tr><tr><td>Politics</td><td>3</td><td class=mono>0.014</td><td class=mono>0.436</td><td class=mono>0.527</td></tr></table>
+
+<h2>Binary vs multi</h2>
+<table><tr><th>kind</th><th>n</th><th>binary Brier</th><th>multi Brier</th><th>winner p</th></tr><tr><td>binary</td><td>14</td><td class=mono>0.170</td><td class=mono>0.340</td><td class=mono>0.652</td></tr><tr><td>multi</td><td>12</td><td class=mono>0.057</td><td class=mono>0.698</td><td class=mono>0.327</td></tr></table>
+
+</div></body></html>

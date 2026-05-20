@@ -46,3 +46,6 @@ docs/DEPLOYMENT_TOPOLOGY.md
 # Large local asset + stray file (keep out of deploy bundle)
 TheOracles.gif
 /37
+
+# Local research artifacts (strategy docs - keep out of public repo + deploy)
+research/*.pdf

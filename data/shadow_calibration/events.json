@@ -2006,5 +2006,419 @@
       "notes": "Grid rung at +3.0% of the 2122.86 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
     },
     "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-WX-NYC-HIGH-GT-59-20260521",
+    "market_ticker": "SHADOW-WX-NYC-HIGH-GT-59-20260521",
+    "title": "Will the high temperature at New York City (Central Park, NY) on 2026-05-21 exceed 59F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 will be strictly greater than 59F. The NWS daytime forecast high at queue time was 63F, so this threshold sits -4F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 (local calendar date) is strictly greater than 59F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/OKX/34,45/forecast",
+        "https://api.weather.gov/points/40.7831,-73.9712"
+      ],
+      "notes": "NWS daytime forecast high 63F at queue time; threshold -4F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-NYC-HIGH-GT-62-20260521",
+    "market_ticker": "SHADOW-WX-NYC-HIGH-GT-62-20260521",
+    "title": "Will the high temperature at New York City (Central Park, NY) on 2026-05-21 exceed 62F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 will be strictly greater than 62F. The NWS daytime forecast high at queue time was 63F, so this threshold sits -1F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 (local calendar date) is strictly greater than 62F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/OKX/34,45/forecast",
+        "https://api.weather.gov/points/40.7831,-73.9712"
+      ],
+      "notes": "NWS daytime forecast high 63F at queue time; threshold -1F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-NYC-HIGH-GT-63-20260521",
+    "market_ticker": "SHADOW-WX-NYC-HIGH-GT-63-20260521",
+    "title": "Will the high temperature at New York City (Central Park, NY) on 2026-05-21 exceed 63F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 will be strictly greater than 63F. The NWS daytime forecast high at queue time was 63F, so this threshold sits +0F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 (local calendar date) is strictly greater than 63F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/OKX/34,45/forecast",
+        "https://api.weather.gov/points/40.7831,-73.9712"
+      ],
+      "notes": "NWS daytime forecast high 63F at queue time; threshold +0F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-NYC-HIGH-GT-65-20260521",
+    "market_ticker": "SHADOW-WX-NYC-HIGH-GT-65-20260521",
+    "title": "Will the high temperature at New York City (Central Park, NY) on 2026-05-21 exceed 65F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 will be strictly greater than 65F. The NWS daytime forecast high at queue time was 63F, so this threshold sits +2F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 (local calendar date) is strictly greater than 65F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/OKX/34,45/forecast",
+        "https://api.weather.gov/points/40.7831,-73.9712"
+      ],
+      "notes": "NWS daytime forecast high 63F at queue time; threshold +2F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-NYC-HIGH-GT-68-20260521",
+    "market_ticker": "SHADOW-WX-NYC-HIGH-GT-68-20260521",
+    "title": "Will the high temperature at New York City (Central Park, NY) on 2026-05-21 exceed 68F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 will be strictly greater than 68F. The NWS daytime forecast high at queue time was 63F, so this threshold sits +5F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at New York City (Central Park, NY) on 2026-05-21 (local calendar date) is strictly greater than 68F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/OKX/34,45/forecast",
+        "https://api.weather.gov/points/40.7831,-73.9712"
+      ],
+      "notes": "NWS daytime forecast high 63F at queue time; threshold +5F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-ORD-HIGH-GT-56-20260521",
+    "market_ticker": "SHADOW-WX-ORD-HIGH-GT-56-20260521",
+    "title": "Will the high temperature at Chicago (O'Hare, IL) on 2026-05-21 exceed 56F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 will be strictly greater than 56F. The NWS daytime forecast high at queue time was 60F, so this threshold sits -4F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 (local calendar date) is strictly greater than 56F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/LOT/66,77/forecast",
+        "https://api.weather.gov/points/41.9742,-87.9073"
+      ],
+      "notes": "NWS daytime forecast high 60F at queue time; threshold -4F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-ORD-HIGH-GT-59-20260521",
+    "market_ticker": "SHADOW-WX-ORD-HIGH-GT-59-20260521",
+    "title": "Will the high temperature at Chicago (O'Hare, IL) on 2026-05-21 exceed 59F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 will be strictly greater than 59F. The NWS daytime forecast high at queue time was 60F, so this threshold sits -1F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 (local calendar date) is strictly greater than 59F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/LOT/66,77/forecast",
+        "https://api.weather.gov/points/41.9742,-87.9073"
+      ],
+      "notes": "NWS daytime forecast high 60F at queue time; threshold -1F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-ORD-HIGH-GT-60-20260521",
+    "market_ticker": "SHADOW-WX-ORD-HIGH-GT-60-20260521",
+    "title": "Will the high temperature at Chicago (O'Hare, IL) on 2026-05-21 exceed 60F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 will be strictly greater than 60F. The NWS daytime forecast high at queue time was 60F, so this threshold sits +0F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 (local calendar date) is strictly greater than 60F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/LOT/66,77/forecast",
+        "https://api.weather.gov/points/41.9742,-87.9073"
+      ],
+      "notes": "NWS daytime forecast high 60F at queue time; threshold +0F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-ORD-HIGH-GT-62-20260521",
+    "market_ticker": "SHADOW-WX-ORD-HIGH-GT-62-20260521",
+    "title": "Will the high temperature at Chicago (O'Hare, IL) on 2026-05-21 exceed 62F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 will be strictly greater than 62F. The NWS daytime forecast high at queue time was 60F, so this threshold sits +2F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 (local calendar date) is strictly greater than 62F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/LOT/66,77/forecast",
+        "https://api.weather.gov/points/41.9742,-87.9073"
+      ],
+      "notes": "NWS daytime forecast high 60F at queue time; threshold +2F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-ORD-HIGH-GT-65-20260521",
+    "market_ticker": "SHADOW-WX-ORD-HIGH-GT-65-20260521",
+    "title": "Will the high temperature at Chicago (O'Hare, IL) on 2026-05-21 exceed 65F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 will be strictly greater than 65F. The NWS daytime forecast high at queue time was 60F, so this threshold sits +5F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Chicago (O'Hare, IL) on 2026-05-21 (local calendar date) is strictly greater than 65F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/LOT/66,77/forecast",
+        "https://api.weather.gov/points/41.9742,-87.9073"
+      ],
+      "notes": "NWS daytime forecast high 60F at queue time; threshold +5F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-MIA-HIGH-GT-84-20260521",
+    "market_ticker": "SHADOW-WX-MIA-HIGH-GT-84-20260521",
+    "title": "Will the high temperature at Miami (MIA, FL) on 2026-05-21 exceed 84F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 will be strictly greater than 84F. The NWS daytime forecast high at queue time was 88F, so this threshold sits -4F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 (local calendar date) is strictly greater than 84F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/MFL/106,51/forecast",
+        "https://api.weather.gov/points/25.7959,-80.2871"
+      ],
+      "notes": "NWS daytime forecast high 88F at queue time; threshold -4F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-MIA-HIGH-GT-87-20260521",
+    "market_ticker": "SHADOW-WX-MIA-HIGH-GT-87-20260521",
+    "title": "Will the high temperature at Miami (MIA, FL) on 2026-05-21 exceed 87F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 will be strictly greater than 87F. The NWS daytime forecast high at queue time was 88F, so this threshold sits -1F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 (local calendar date) is strictly greater than 87F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/MFL/106,51/forecast",
+        "https://api.weather.gov/points/25.7959,-80.2871"
+      ],
+      "notes": "NWS daytime forecast high 88F at queue time; threshold -1F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-MIA-HIGH-GT-88-20260521",
+    "market_ticker": "SHADOW-WX-MIA-HIGH-GT-88-20260521",
+    "title": "Will the high temperature at Miami (MIA, FL) on 2026-05-21 exceed 88F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 will be strictly greater than 88F. The NWS daytime forecast high at queue time was 88F, so this threshold sits +0F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 (local calendar date) is strictly greater than 88F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/MFL/106,51/forecast",
+        "https://api.weather.gov/points/25.7959,-80.2871"
+      ],
+      "notes": "NWS daytime forecast high 88F at queue time; threshold +0F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-MIA-HIGH-GT-90-20260521",
+    "market_ticker": "SHADOW-WX-MIA-HIGH-GT-90-20260521",
+    "title": "Will the high temperature at Miami (MIA, FL) on 2026-05-21 exceed 90F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 will be strictly greater than 90F. The NWS daytime forecast high at queue time was 88F, so this threshold sits +2F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 (local calendar date) is strictly greater than 90F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/MFL/106,51/forecast",
+        "https://api.weather.gov/points/25.7959,-80.2871"
+      ],
+      "notes": "NWS daytime forecast high 88F at queue time; threshold +2F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "event_ticker": "SHADOW-WX-MIA-HIGH-GT-93-20260521",
+    "market_ticker": "SHADOW-WX-MIA-HIGH-GT-93-20260521",
+    "title": "Will the high temperature at Miami (MIA, FL) on 2026-05-21 exceed 93F?",
+    "description": "Forecast whether the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 will be strictly greater than 93F. The NWS daytime forecast high at queue time was 88F, so this threshold sits +5F from forecast. Resolves from the NWS observed daily high for the station on the local calendar date.",
+    "category": "Weather",
+    "close_time": "2026-05-22T06:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if the NWS observed daily maximum temperature at Miami (MIA, FL) on 2026-05-21 (local calendar date) is strictly greater than 93F. Resolve No otherwise. Use the official NWS observed daily high.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:08:31Z",
+      "source_urls": [
+        "https://api.weather.gov/gridpoints/MFL/106,51/forecast",
+        "https://api.weather.gov/points/25.7959,-80.2871"
+      ],
+      "notes": "NWS daytime forecast high 88F at queue time; threshold +5F from forecast to keep the event uncertain. Resolve from observed daily high, not the forecast."
+    },
+    "notes": "Weather threshold calibration candidate; non-sports domain. Needs the dedicated NWS observed-high resolver (not auto_resolve_finance)."
+  },
+  {
+    "title": "Will President Trump's RealClearPolitics job-approval average be above 37.0% on May 26, 2026?",
+    "description": "Resolves Yes if the RealClearPolitics Trump job-approval polling average is strictly greater than 37.0% as of 2026-05-26. Current average is roughly 37-40%.",
+    "category": "Politics",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "close_time": "2026-05-26T23:59:00Z",
+    "rules": "Resolve Yes if the RealClearPolitics Trump job-approval average > 37.0% on 2026-05-26; else No.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:10:49Z",
+      "source_urls": [
+        "https://www.realclearpolling.com/polls/approval/donald-trump/approval-rating"
+      ],
+      "notes": "RCP approval ~37-40% mid-May 2026; thresholds span the uncertain band. Manual resolution from RCP average."
+    },
+    "notes": "Politics approval-threshold calibration candidate; mirrors PA approval-rating events. Manual resolution.",
+    "event_ticker": "SHADOW-POLI-TRUMP-APPROVAL-GT-37-20260526",
+    "market_ticker": "SHADOW-POLI-TRUMP-APPROVAL-GT-37-20260526"
+  },
+  {
+    "title": "Will President Trump's RealClearPolitics job-approval average be above 39.0% on May 26, 2026?",
+    "description": "Resolves Yes if the RealClearPolitics Trump job-approval polling average is strictly greater than 39.0% as of 2026-05-26. Current average is roughly 37-40%.",
+    "category": "Politics",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "close_time": "2026-05-26T23:59:00Z",
+    "rules": "Resolve Yes if the RealClearPolitics Trump job-approval average > 39.0% on 2026-05-26; else No.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:10:49Z",
+      "source_urls": [
+        "https://www.realclearpolling.com/polls/approval/donald-trump/approval-rating"
+      ],
+      "notes": "RCP approval ~37-40% mid-May 2026; thresholds span the uncertain band. Manual resolution from RCP average."
+    },
+    "notes": "Politics approval-threshold calibration candidate; mirrors PA approval-rating events. Manual resolution.",
+    "event_ticker": "SHADOW-POLI-TRUMP-APPROVAL-GT-39-20260526",
+    "market_ticker": "SHADOW-POLI-TRUMP-APPROVAL-GT-39-20260526"
+  },
+  {
+    "title": "Will President Trump's RealClearPolitics job-approval average be above 41.0% on May 26, 2026?",
+    "description": "Resolves Yes if the RealClearPolitics Trump job-approval polling average is strictly greater than 41.0% as of 2026-05-26. Current average is roughly 37-40%.",
+    "category": "Politics",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "close_time": "2026-05-26T23:59:00Z",
+    "rules": "Resolve Yes if the RealClearPolitics Trump job-approval average > 41.0% on 2026-05-26; else No.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:10:49Z",
+      "source_urls": [
+        "https://www.realclearpolling.com/polls/approval/donald-trump/approval-rating"
+      ],
+      "notes": "RCP approval ~37-40% mid-May 2026; thresholds span the uncertain band. Manual resolution from RCP average."
+    },
+    "notes": "Politics approval-threshold calibration candidate; mirrors PA approval-rating events. Manual resolution.",
+    "event_ticker": "SHADOW-POLI-TRUMP-APPROVAL-GT-41-20260526",
+    "market_ticker": "SHADOW-POLI-TRUMP-APPROVAL-GT-41-20260526"
+  },
+  {
+    "title": "Will 'Choosin' Texas' by Ella Langley be the No. 1 song on the Billboard Hot 100 chart dated May 30, 2026?",
+    "description": "Resolves Yes if 'Choosin' Texas' by Ella Langley is No. 1 on the Billboard Hot 100 dated 2026-05-30. It has been No. 1 for ~10 weeks as of the May 23 chart.",
+    "category": "Entertainment",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "close_time": "2026-05-30T23:59:00Z",
+    "rules": "Resolve Yes if 'Choosin' Texas' (Ella Langley) is the No. 1 Billboard Hot 100 single on the chart dated 2026-05-30; else No.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T22:10:49Z",
+      "source_urls": [
+        "https://www.billboard.com/charts/hot-100/"
+      ],
+      "notes": "Incumbent No. 1 for ~10 weeks as of May 23 chart. Manual resolution from Billboard."
+    },
+    "notes": "Entertainment chart-incumbency calibration candidate; mirrors PA Top-Song events. Manual resolution.",
+    "event_ticker": "SHADOW-ENT-BILLBOARD-CHOOSINTEXAS-NO1-20260530",
+    "market_ticker": "SHADOW-ENT-BILLBOARD-CHOOSINTEXAS-NO1-20260530"
   }
 ]

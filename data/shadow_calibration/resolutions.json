@@ -39,6 +39,14 @@
     "source": "yahoo finance chart API (daily close)",
     "winner": "No"
   },
+  "SHADOW-FIN-TLT-UP-AFTER-FOMC-MINUTES-20260520": {
+    "auto_resolved_at": "2026-05-20T21:56:41Z",
+    "notes": "auto-resolved: TLT close 83.91000366210938 vs prior 83.0199966430664 (2026-05-19)",
+    "observed": 83.91000366210938,
+    "resolved_at": "2026-05-20T20:00:00Z",
+    "source": "yahoo finance chart API (daily close)",
+    "winner": "Yes"
+  },
   "SHADOW-MLB-ATL-MIA-20260519": {
     "auto_resolved_at": "2026-05-20T03:30:06Z",
     "notes": "auto-resolved: final Miami Marlins 4 - Atlanta Braves 8",
@@ -50,6 +58,13 @@
     "auto_resolved_at": "2026-05-20T03:30:07Z",
     "notes": "auto-resolved: final Tampa Bay Rays 4 - Baltimore Orioles 1",
     "resolved_at": "2026-05-19T22:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Tampa Bay Rays"
+  },
+  "SHADOW-MLB-BAL-TB-20260520": {
+    "auto_resolved_at": "2026-05-20T21:56:38Z",
+    "notes": "auto-resolved: final Tampa Bay Rays 5 - Baltimore Orioles 3",
+    "resolved_at": "2026-05-20T17:10:00Z",
     "source": "ESPN scoreboard API",
     "winner": "Tampa Bay Rays"
   },
@@ -67,6 +82,13 @@
     "source": "ESPN scoreboard API",
     "winner": "Cincinnati Reds"
   },
+  "SHADOW-MLB-CIN-PHI-20260520": {
+    "auto_resolved_at": "2026-05-20T21:56:37Z",
+    "notes": "auto-resolved: final Philadelphia Phillies 4 - Cincinnati Reds 9",
+    "resolved_at": "2026-05-20T17:05:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Cincinnati Reds"
+  },
   "SHADOW-MLB-CLE-DET-20260519": {
     "auto_resolved_at": "2026-05-20T03:30:07Z",
     "notes": "auto-resolved: final Detroit Tigers 3 - Cleveland Guardians 4",
@@ -80,6 +102,13 @@
     "resolved_at": "2026-05-19T23:40:00Z",
     "source": "ESPN scoreboard API",
     "winner": "Houston Astros"
+  },
+  "SHADOW-MLB-HOU-MIN-20260520": {
+    "auto_resolved_at": "2026-05-20T21:56:38Z",
+    "notes": "auto-resolved: final Minnesota Twins 4 - Houston Astros 1",
+    "resolved_at": "2026-05-20T17:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Minnesota Twins"
   },
   "SHADOW-MLB-LAD-SD-20260519": {
     "auto_resolved_at": "2026-05-20T05:10:28Z",

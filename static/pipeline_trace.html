@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pipeline trace · Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32?</title>
+<title>Pipeline trace - Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32?</title>
 <style>
 body { font: 14px/1.5 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }
 header { max-width: 1000px; margin: 0 auto 14px; }
@@ -35,25 +35,32 @@ header .links a:hover { text-decoration: underline; }
 .stage-body table.probs th { background: #f4f6fa; padding: 6px 10px; text-align: left; font-size: 11px; text-transform: uppercase; color: #475066; }
 .stage-body table.probs td { padding: 5px 10px; border-bottom: 1px solid #eef0f5; font-variant-numeric: tabular-nums; }
 .stage-body table.probs tr.winner { background: #f3faf5; }
-.stage-body table.probs tr.winner td:first-child::before { content: '✓ '; color: #1e6f3a; font-weight: 700; }
+.stage-body table.probs tr.winner td:first-child::before { content: '* '; color: #1e6f3a; font-weight: 700; }
 .winner-tag { background: #d8efc7; color: #1e6f3a; padding: 2px 9px; border-radius: 10px; font-size: 12px; }
 footer { max-width: 1000px; margin: 16px auto; color: #6a7388; font-size: 12px; }
 footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+header .nav-home { margin: 0 0 6px; font-size: 13px; }
+header .nav-home a { color: #2856a3; text-decoration: none; }
+header .nav-home a:hover { text-decoration: underline; }
+.site-footer { max-width: 1000px; margin: 28px auto 8px; padding-top: 12px; border-top: 1px solid #d8dde8; color: #6a7388; font-size: 12px; }
+.site-footer a { color: #2856a3; text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Pipeline trace · Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32?</h1>
+  <p class="nav-home"><a href="/">&lt;- home</a></p>
+  <h1>Pipeline trace - Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32?</h1>
   <div class="cache-banner"><strong>Cached example:</strong> this is the 2026-05-12 Najzer vs Ebster match replayed from disk. For a live walkthrough of a fresh prediction, use the <code>/demo/start</code> SSE stream on the dashboard.</div>
   <div class="read-panel"><strong>What you're looking at:</strong> a replay of one full forecast lifecycle; good behavior means each stage produces a clear artifact, and the final card links the probability distribution back to the resolved outcome.</div>
-  <p class="sub">Step-by-step replay of how the production agent forecast a single resolved event. Each card shows one pipeline stage's input → output, with real data from the cached prediction. The live <code>/observatory</code> view shows the same shape for every PA call as it lands.</p>
+  <p class="sub">Step-by-step replay of how the production agent forecast a single resolved event. Each card shows one pipeline stage's input -> output, with real data from the cached prediction. The live <code>/observatory</code> view shows the same shape for every PA call as it lands.</p>
   <p class="links">
-    <a href="/static/scatter_resolved.html">→ per-event scatter</a> ·
-    <a href="/static/heatmap_resolved.html">→ cross-model heatmap</a> ·
-    <a href="/static/abstain_slider.html">→ abstain slider</a> ·
-    <a href="/static/gallery_resolved.html">→ side-by-side gallery</a> ·
-    <a href="/static/summary.html">→ summary report</a> ·
-    <a href="/">→ home</a>
+    <a href="/static/scatter_resolved.html">-> per-event scatter</a> -
+    <a href="/static/heatmap_resolved.html">-> cross-model heatmap</a> -
+    <a href="/static/abstain_slider.html">-> abstain slider</a> -
+    <a href="/static/gallery_resolved.html">-> side-by-side gallery</a> -
+    <a href="/static/summary.html">-> summary report</a> -
+    <a href="/">-> home</a>
   </p>
 </header>
 <div class="timeline">
@@ -62,7 +69,7 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
   <div class="stage-marker" style="background:#2856a3"><span>1</span></div>
   <div class="stage-card">
     <div class="stage-header"><strong>Receive webhook</strong> <span class="from">Prophet Arena</span></div>
-    <div class="stage-body"><p><strong>Event:</strong> Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32?</p><p><strong>Category:</strong> Sports · <strong>Outcomes:</strong> 2 · <strong>Close time:</strong> 2026-05-13T09:58:49Z</p><p><strong>Resolution rule:</strong> If Kaja Najzer wins the Najzer vs Ebster professional tennis match in the 2026 W15 Klagenfurt Round of 32 after a ball has been played, then the market resolves to Yes.</p><details><summary>Outcomes list (2)</summary><ul><li>Kaja Najzer</li><li>Anna Lena Ebster</li></ul></details></div>
+    <div class="stage-body"><p><strong>Event:</strong> Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32?</p><p><strong>Category:</strong> Sports - <strong>Outcomes:</strong> 2 - <strong>Close time:</strong> 2026-05-13T09:58:49Z</p><p><strong>Resolution rule:</strong> If Kaja Najzer wins the Najzer vs Ebster professional tennis match in the 2026 W15 Klagenfurt Round of 32 after a ball has been played, then the market resolves to Yes.</p><details><summary>Outcomes list (2)</summary><ul><li>Kaja Najzer</li><li>Anna Lena Ebster</li></ul></details></div>
   </div>
 </div>
 
@@ -85,8 +92,8 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 <div class="stage">
   <div class="stage-marker" style="background:#1e6f3a"><span>4</span></div>
   <div class="stage-card">
-    <div class="stage-header"><strong>Forecast</strong> <span class="from">Anthropic Opus 4.7 · single call</span></div>
-    <div class="stage-body"><p>System prompt enforces calibration scale (0.50 = no view → 0.90 = near-certain), market-odds anchoring, and strict-JSON output.</p><p><strong>Model's rationale (returned with the probabilities):</strong></p><blockquote>Evidence [2] states Ebster defeated Najzer.</blockquote></div>
+    <div class="stage-header"><strong>Forecast</strong> <span class="from">Anthropic Opus 4.7 - single call</span></div>
+    <div class="stage-body"><p>System prompt enforces calibration scale (0.50 = no view -> 0.90 = near-certain), market-odds anchoring, and strict-JSON output.</p><p><strong>Model's rationale (returned with the probabilities):</strong></p><blockquote>Evidence [2] states Ebster defeated Najzer.</blockquote></div>
   </div>
 </div>
 
@@ -94,15 +101,15 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
   <div class="stage-marker" style="background:#475066"><span>5</span></div>
   <div class="stage-card">
     <div class="stage-header"><strong>Parse JSON</strong> <span class="from">_parse_multi_outcome_json()</span></div>
-    <div class="stage-body"><p>5-stage parser ladder: direct → clean → regex outer → regex outer cleaned → regex inner map. For this event: parsed 2 per-outcome probabilities cleanly.</p></div>
+    <div class="stage-body"><p>5-stage parser ladder: direct -> clean -> regex outer -> regex outer cleaned -> regex inner map. For this event: parsed 2 per-outcome probabilities cleanly.</p></div>
   </div>
 </div>
 
 <div class="stage">
   <div class="stage-marker" style="background:#475066"><span>6</span></div>
   <div class="stage-card">
-    <div class="stage-header"><strong>Match outcome labels</strong> <span class="from">_match_outcome_label() · 4-pass</span></div>
-    <div class="stage-body"><p>4-pass canonical match: exact → case-insensitive → whitespace-stripped → alphanumeric-only. No fuzzy substring (silently mapping the wrong outcome is worse than uninformed prior).</p><p class='hint'>This event: all 2 model-emitted labels mapped to canonical outcomes successfully.</p></div>
+    <div class="stage-header"><strong>Match outcome labels</strong> <span class="from">_match_outcome_label() - 4-pass</span></div>
+    <div class="stage-body"><p>4-pass canonical match: exact -> case-insensitive -> whitespace-stripped -> alphanumeric-only. No fuzzy substring (silently mapping the wrong outcome is worse than uninformed prior).</p><p class='hint'>This event: all 2 model-emitted labels mapped to canonical outcomes successfully.</p></div>
   </div>
 </div>
 
@@ -110,7 +117,7 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
   <div class="stage-marker" style="background:#a05818"><span>7</span></div>
   <div class="stage-card">
     <div class="stage-header"><strong>Longshot floor + renormalize</strong> <span class="from">apply_longshot_guard(probs, n_outcomes)</span></div>
-    <div class="stage-body"><p>Each per-outcome probability floored at <code>min(0.10, max(0.05, 0.5/n))</code>; Kalshi paper says &gt;60% buyer loss below 10¢ contracts. After floor, renormalize from the above-floor entries only.</p></div>
+    <div class="stage-body"><p>Each per-outcome probability floored at <code>min(0.10, max(0.05, 0.5/n))</code>; Kalshi paper says &gt;60% buyer loss below 10c contracts. After floor, renormalize from the above-floor entries only.</p></div>
   </div>
 </div>
 
@@ -118,13 +125,15 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
   <div class="stage-marker" style="background:#2856a3"><span>8</span></div>
   <div class="stage-card">
     <div class="stage-header"><strong>Return to Prophet Arena</strong> <span class="from">POST /predict response</span></div>
-    <div class="stage-body"><p><strong>Final per-outcome distribution (sorted by probability):</strong></p><table class='probs'><thead><tr><th>outcome</th><th>p</th></tr></thead><tbody><tr class="winner"><td>Anna Lena Ebster</td><td>90.0%</td></tr><tr class=""><td>Kaja Najzer</td><td>10.0%</td></tr></tbody></table><p style='margin-top:12px'><strong>Actual winner: <span class='winner-tag'>Anna Lena Ebster</span></strong> · single-binary Brier loss on this event: <strong>0.0100</strong></p></div>
+    <div class="stage-body"><p><strong>Final per-outcome distribution (sorted by probability):</strong></p><table class='probs'><thead><tr><th>outcome</th><th>p</th></tr></thead><tbody><tr class="winner"><td>Anna Lena Ebster</td><td>90.0%</td></tr><tr class=""><td>Kaja Najzer</td><td>10.0%</td></tr></tbody></table><p style='margin-top:12px'><strong>Actual winner: <span class='winner-tag'>Anna Lena Ebster</span></strong> - single-binary Brier loss on this event: <strong>0.0100</strong></p></div>
   </div>
 </div>
 
 </div>
 <footer>
-  <p>Built by <code>scripts/build_d5_pipeline_trace.py</code>. Source: <code>data/predictions/multi_outcome_retrieval.json</code> + <code>data/resolved.json</code> + <code>data/actuals.json</code>. Live equivalent: <code>/observatory</code> · <code>/demo/start</code> (SSE) when logged in.</p>
+  <p>Built by <code>scripts/build_d5_pipeline_trace.py</code>. Source: <code>data/predictions/multi_outcome_retrieval.json</code> + <code>data/resolved.json</code> + <code>data/actuals.json</code>. Live equivalent: <code>/observatory</code> - <code>/demo/start</code> (SSE) when logged in.</p>
 </footer>
+
+<div class="site-footer">The Oracles - ForecastingPath - honest backtest, leakage-audited - <a href="/">home</a></div>
 </body>
 </html>

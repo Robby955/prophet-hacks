@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abstain-to-market slider · ForecastingPath</title>
+<title>Abstain-to-market slider - ForecastingPath</title>
 <style>
 body { font: 14px/1.45 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }
 header { max-width: 1100px; margin: 0 auto 14px; }
@@ -12,53 +12,61 @@ header h1 { font-size: 22px; margin: 0 0 6px; }
 header .sub { color: #475066; margin: 4px 0; font-size: 13px; max-width: 900px; }
 header .links { font-size: 13px; margin-top: 6px; }
 header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
+header .links a:hover { text-decoration: underline; }
+header .nav-home { margin: 0 0 6px; font-size: 13px; }
+header .nav-home a { color: #2856a3; text-decoration: none; }
+header .nav-home a:hover { text-decoration: underline; }
 .control-row { max-width: 1100px; margin: 12px auto; display: flex; align-items: center; gap: 16px; background: white; padding: 14px 18px; border: 1px solid #d0d6e1; border-radius: 8px; }
 .control-row label { font-weight: 600; font-size: 13px; }
 .control-row label .hint { color: #6a7388; font-weight: 400; margin-left: 4px; }
 .control-row input[type="range"] { flex: 1; }
 .control-row output { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 50px; color: #2856a3; }
-.kpis { max-width: 1100px; margin: 8px auto 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.kpi { background: white; border: 1px solid #d0d6e1; border-radius: 8px; padding: 10px 14px; }
-.kpi .lbl { color: #6a7388; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; }
-.kpi .val { font-size: 1.35em; font-weight: 700; margin-top: 0.2em; font-variant-numeric: tabular-nums; }
+.kpis { max-width: 1100px; margin: 8px auto 12px; display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 8px; }
+.kpi { background: white; border: 1px solid #d0d6e1; border-radius: 8px; padding: 10px 14px; min-width: 0; }
+.kpi .lbl { color: #6a7388; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; overflow-wrap: anywhere; }
+.kpi .val { font-size: 1.35em; font-weight: 700; margin-top: 0.2em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 #plot { max-width: 1100px; margin: 0 auto; background: white; border: 1px solid #e6e9f0; border-radius: 8px; }
 .event-list { max-width: 1100px; margin: 12px auto; }
 .event-tbl { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-variant-numeric: tabular-nums; }
 .event-tbl thead th { background: #f4f6fa; padding: 8px 12px; text-align: left; font-size: 12px; text-transform: uppercase; color: #475066; }
 .event-tbl tbody td { padding: 6px 12px; border-bottom: 1px solid #eef0f5; font-size: 13px; }
-.event-tbl .ev-title { max-width: 480px; }
+.event-tbl .ev-title { max-width: 480px; overflow-wrap: anywhere; }
 .event-tbl .act-trade { color: #1e6f3a; font-weight: 600; }
 .event-tbl .act-abstain { color: #6a7388; font-style: italic; }
 footer { max-width: 1100px; margin: 12px auto; color: #6a7388; font-size: 12px; }
 footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+.site-footer { max-width: 1100px; margin: 28px auto 8px; padding-top: 12px; border-top: 1px solid #d8dde8; color: #6a7388; font-size: 12px; }
+.site-footer a { color: #2856a3; text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <header>
+  <p class="nav-home"><a href="/">&lt;- home</a></p>
   <h1>Abstain-to-market policy slider</h1>
   <div class="read-panel"><strong>What you're looking at:</strong> move the threshold to decide when the endpoint should use its own forecast; lower Brier is better, and the table below shows exactly which events switch between trade and abstain.</div>
-  <p class="sub">PA scoring rule: <strong>(team Brier − market Brier) × completion rate</strong>. Jibang Wu (PA, Discord 2026-05-16): "<em>only make a prediction when you are confident enough, otherwise just use the market probability.</em>"</p>
-  <p class="sub">This page visualizes that policy on our 26 resolved events. <strong>Slide the threshold</strong> to control how confident the model has to be (distance from 0.5) before we trade. Below threshold → fall back to 0.5 (proxy for market price; PA-live this would be the actual snapshotted market). The chart updates live.</p>
+  <p class="sub">PA scoring rule: <strong>(team Brier - market Brier) x completion rate</strong>. Jibang Wu (PA, Discord 2026-05-16): "<em>only make a prediction when you are confident enough, otherwise just use the market probability.</em>"</p>
+  <p class="sub">This page visualizes that policy on our 26 resolved events. <strong>Slide the threshold</strong> to control how confident the model has to be (distance from 0.5) before we trade. Below threshold -> fall back to 0.5 (proxy for market price; PA-live this would be the actual snapshotted market). The chart updates live.</p>
   <p class="links">
-    <a href="/static/scatter_resolved.html">→ per-event scatter</a> ·
-    <a href="/static/gallery_resolved.html">→ side-by-side gallery</a> ·
-    <a href="/static/summary.html">→ summary report</a> ·
-    <a href="/">→ home</a>
+    <a href="/static/scatter_resolved.html">-> per-event scatter</a> -
+    <a href="/static/gallery_resolved.html">-> side-by-side gallery</a> -
+    <a href="/static/summary.html">-> summary report</a> -
+    <a href="/">-> home</a>
   </p>
 </header>
 
 <div class="control-row">
-  <label for="threshold">Confidence threshold <span class="hint">|p − 0.5| ≥</span></label>
+  <label for="threshold">Confidence threshold <span class="hint">|p - 0.5| &gt;=</span></label>
   <input type="range" id="threshold" min="0" max="0.49" step="0.01" value="0.10"/>
   <output for="threshold" id="threshold-val">0.10</output>
 </div>
 
 <div class="kpis">
-  <div class="kpi"><div class="lbl">Mean Brier (policy)</div><div class="val" id="kpi-brier">—</div></div>
-  <div class="kpi"><div class="lbl">Δ vs always-trade</div><div class="val" id="kpi-delta">—</div></div>
-  <div class="kpi"><div class="lbl">Events traded</div><div class="val" id="kpi-traded">—</div></div>
-  <div class="kpi"><div class="lbl">Events abstained</div><div class="val" id="kpi-abstained">—</div></div>
+  <div class="kpi"><div class="lbl">Mean Brier (policy)</div><div class="val" id="kpi-brier">-</div></div>
+  <div class="kpi"><div class="lbl">delta vs always-trade</div><div class="val" id="kpi-delta">-</div></div>
+  <div class="kpi"><div class="lbl">Events traded</div><div class="val" id="kpi-traded">-</div></div>
+  <div class="kpi"><div class="lbl">Events abstained</div><div class="val" id="kpi-abstained">-</div></div>
 </div>
 
 <div id="plot" style="height: 480px;"></div>
@@ -68,6 +76,8 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 <footer>
   <p>Built by <code>scripts/build_d3_abstain_slider.py</code>. Source: <code>data/predictions/multi_outcome_retrieval.json</code> + <code>data/actuals.json</code>. Brier = single-binary; abstain fallback is 0.5 as a proxy for "the live market" (PA-live this is snapshotted Kalshi/Polymarket prices). Slide to see how policy choice maps to expected score.</p>
 </footer>
+
+<div class="site-footer">The Oracles - ForecastingPath - honest backtest, leakage-audited - <a href="/">home</a></div>
 
 <script id="pairs-data" type="application/json">[{"ticker": "KXLALIGA-26", "title": "Who won the 2025-26 La Liga (Spanish top-flight football)?", "p": 0.05, "outcome": 0}, {"ticker": "KXLIGAPORTUGAL-26", "title": "Who won the 2025-26 Liga Portugal (Portuguese top-flight football)?", "p": 0.05, "outcome": 0}, {"ticker": "KXNHLCALDER-26", "title": "Who won the 2025-26 NHL Calder Memorial Trophy (Rookie of the Year)?", "p": 0.05, "outcome": 0}, {"ticker": "KXTOURNAMENTOFCHAMPIONS-26DEC31", "title": "Who won Tournament of Champions Season 7 (Food Network)?", "p": 0.05, "outcome": 0}, {"ticker": "KXSURVIVORELIMINATION-26APR11", "title": "Which contestants were eliminated from Survivor Season 50 Episode 7?", "p": 0.05, "outcome": 0}, {"ticker": "KXTHEMASKEDSINGER-27JAN01", "title": "Who won The Masked Singer Season 14?", "p": 0.05, "outcome": 0}, {"ticker": "KXFEDCHAIRCOUNT-27", "title": "How many US Senators voted for Trump's Federal Reserve Chair pick (2027 confirma", "p": 0.05, "outcome": 0}, {"ticker": "KXITFWMATCH-26MAY12NAJEBS", "title": "Who won the Najzer vs Ebster tennis match in the 2026 W15 Klagenfurt Round of 32", "p": 0.1, "outcome": 0}, {"ticker": "KXATPCHALLENGERMATCH-26MAY10ROCJOH", "title": "Who won the Rocha vs Johns ATP Challenger tennis match on May 10, 2026?", "p": 0.1, "outcome": 0}, {"ticker": "KXATPCHALLENGERMATCH-26MAY05PERLAL", "title": "Who won the Perez vs Lalami Laaroussi ATP Challenger tennis match on May 5, 2026", "p": 0.1, "outcome": 0}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08DURWOR", "title": "Who won the Worcestershire vs Durham 2026 County Championship cricket match?", "p": 0.1, "outcome": 0}, {"ticker": "KXWVPRIMARY-01D26", "title": "Who won the 2026 Democratic primary for West Virginia's 1st Congressional Distri", "p": 0.1, "outcome": 0}, {"ticker": "KXVRASCOTUSVOTE-26", "title": "How many Supreme Court justices voted in favor of Louisiana in Louisiana v. Call", "p": 0.1, "outcome": 0}, {"ticker": "KXSERIEA-26", "title": "Who won the 2025-26 Serie A (Italian top-flight football)?", "p": 0.22, "outcome": 0}, {"ticker": "KXROASTSUBJECT-30JAN01", "title": "Who was Netflix's next live roast subject after Tom Brady?", "p": 0.4999999999999998, "outcome": 1}, {"ticker": "KXWTACHALLENGERMATCH-26MAY05WATOKA", "title": "Who won the Watson vs Okamura WTA Challenger tennis match on May 5, 2026?", "p": 0.5, "outcome": 1}, {"ticker": "KXATPCHALLENGERMATCH-26MAY05BAXARC", "title": "Who won the Bax vs Arcon ATP Challenger tennis match on May 5, 2026?", "p": 0.55, "outcome": 1}, {"ticker": "KXEREDIVISIEGAME-26MAY10BREHEE", "title": "Who won the Breda vs Heerenveen Eredivisie football match on May 10, 2026?", "p": 0.8, "outcome": 1}, {"ticker": "KXCOLOMBIASENATE-26", "title": "Which coalition won the 2026 Colombia Senate election?", "p": 0.82, "outcome": 1}, {"ticker": "KXLIGUE1-26", "title": "Who won the 2025-26 Ligue 1 (French top-flight football)?", "p": 0.85, "outcome": 1}, {"ticker": "KXCRICKETTESTMATCH-26MAY08PAKBAN", "title": "Who won the Bangladesh vs Pakistan men's Test cricket match starting May 8, 2026", "p": 0.8999999999999999, "outcome": 1}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08SOMGLA", "title": "Who won the Glamorgan vs Somerset 2026 County Championship cricket match?", "p": 0.8999999999999999, "outcome": 1}, {"ticker": "KXCOUNTYCHAMPMATCH-26MAY08LEISUS", "title": "Who won the Sussex vs Leicestershire 2026 County Championship cricket match?", "p": 0.8999999999999999, "outcome": 1}, {"ticker": "KXNBASERIES-26LALOKCR2", "title": "Who won the Los Angeles Lakers vs Oklahoma City NBA Round 2 playoff series in 20", "p": 0.8999999999999999, "outcome": 1}, {"ticker": "KXNEXTHUNGARYPM-26MAY01", "title": "Who became Prime Minister of Hungary after the 2026 election?", "p": 0.8999999999999999, "outcome": 1}, {"ticker": "KXOHPRIMARY-15D26", "title": "Who won the 2026 Democratic primary for Ohio's 15th Congressional District?", "p": 0.8999999999999999, "outcome": 1}]</script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -132,7 +142,7 @@ function render(thr) {
   }];
   const layout = {
     margin: { l: 60, r: 20, t: 10, b: 50 },
-    xaxis: { title: 'abstain threshold |p_model − 0.5|', gridcolor: '#eef0f5' },
+    xaxis: { title: 'abstain threshold |p_model - 0.5|', gridcolor: '#eef0f5' },
     yaxis: { title: 'mean Brier (policy on n=26)', gridcolor: '#eef0f5' },
     legend: { x: 0.55, y: 0.98, bgcolor: 'rgba(255,255,255,0.85)' },
     plot_bgcolor: 'white',

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Calibration overlay · ForecastingPath</title>
+<title>Calibration overlay - ForecastingPath</title>
 <style>
 body { font: 14px/1.45 -apple-system, system-ui, sans-serif; color: #1a1f2c; background: #fafbfc; margin: 0; padding: 20px 28px; }
 header { max-width: 1100px; margin: 0 auto 14px; }
@@ -13,22 +13,29 @@ header .sub { color: #475066; margin: 4px 0; font-size: 13px; max-width: 980px; 
 header .links { font-size: 13px; margin-top: 6px; }
 header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
 header .links a:hover { text-decoration: underline; }
+header .nav-home { margin: 0 0 6px; font-size: 13px; }
+header .nav-home a { color: #2856a3; text-decoration: none; }
+header .nav-home a:hover { text-decoration: underline; }
 #plot { max-width: 1100px; margin: 0 auto; background: white; border: 1px solid #e6e9f0; border-radius: 8px; }
 footer { max-width: 1100px; margin: 12px auto; color: #6a7388; font-size: 12px; }
 footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+.site-footer { max-width: 1100px; margin: 28px auto 8px; padding-top: 12px; border-top: 1px solid #d8dde8; color: #6a7388; font-size: 12px; }
+.site-footer a { color: #2856a3; text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Calibration overlay — 5 models on the same 26 events</h1>
+  <p class="nav-home"><a href="/">&lt;- home</a></p>
+  <h1>Calibration overlay - 5 models on the same 26 events</h1>
   <div class="read-panel"><strong>What you're looking at:</strong> reliability diagram for each model. The diagonal is perfect calibration. A model whose line sits on the diagonal predicts probabilities that match empirical hit rates; deviation up = under-confident, deviation down = over-confident. Bubble size = number of events in that probability bin.</div>
   <p class="sub">Reliability diagram (Murphy 1973) for each model variant on the 26-event resolved set. Five probability bins on the x-axis (0.0-0.2, 0.2-0.4, ..., 0.8-1.0); empirical hit rate on the y-axis; bubble size = number of events in that bin. Perfectly calibrated = points on the y=x diagonal.</p>
   <p class="links">
-    <a href="/static/summary.html">→ summary report</a> ·
-    <a href="/static/gallery_resolved.html">→ side-by-side gallery</a> ·
-    <a href="/static/scatter_resolved.html">→ per-event scatter</a> ·
-    <a href="/">→ home</a>
+    <a href="/static/summary.html">-> summary report</a> -
+    <a href="/static/gallery_resolved.html">-> side-by-side gallery</a> -
+    <a href="/static/scatter_resolved.html">-> per-event scatter</a> -
+    <a href="/">-> home</a>
   </p>
 </header>
 
@@ -36,8 +43,10 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
 
 <footer>
   <p>Built by <code>scripts/build_d_calibration_overlay.py</code>. Source: <code>data/predictions/multi_outcome_retrieval.json</code> + <code>data/predictions/ablation_*.json</code> + <code>data/actuals.json</code>. Bins: equal-width, 5 buckets. Murphy decomposition (REL / RES / UNC) on the same data lives in <a href="/static/summary.html">the summary report</a>.</p>
-  <p style="margin-top:6px;color:#6a7388">The Oracles · Team CanadaHacks · Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> · Prophet Hacks 2026</p>
+  <p style="margin-top:6px;color:#6a7388">The Oracles - Team CanadaHacks - Rob Sneiderman <a href="https://github.com/Robby955">@Robby955</a> - Prophet Hacks 2026</p>
 </footer>
+
+<div class="site-footer">The Oracles - ForecastingPath - honest backtest, leakage-audited - <a href="/">home</a></div>
 
 <script id="curves-data" type="application/json">[{"name": "Opus 4.7 (production)", "color": "#1e6f3a", "x": [0.07307692307692308, 0.22, 0.5166666666666666, 0.8744444444444444], "y": [0.0, 0.0, 1.0, 1.0], "n": [13, 1, 3, 9]}, {"name": "Opus 4.6", "color": "#0d9488", "x": [0.07538461538461538, 0.25, 0.5416666666666666, 0.75, 0.8828571428571428], "y": [0.0, 0.0, 1.0, 1.0, 1.0], "n": [13, 1, 3, 2, 7]}, {"name": "GPT-5.2", "color": "#7c3aed", "x": [0.07825396825396826, 0.5299999999999999, 0.7000000000000001, 0.8833333333333333], "y": [0.0, 1.0, 1.0, 1.0], "n": [14, 3, 3, 6]}, {"name": "GPT-5.5", "color": "#ea580c", "x": [0.07480134680134681, 0.28, 0.52, 0.62, 0.875], "y": [0.13333333333333333, 0.0, 1.0, 1.0, 1.0], "n": [15, 1, 1, 1, 8]}, {"name": "Gemini 3.1 Pro", "color": "#dc2626", "x": [0.07476190476190477, 0.475, 0.7, 0.8833333333333333], "y": [0.06666666666666667, 1.0, 1.0, 1.0], "n": [15, 4, 1, 6]}]</script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>

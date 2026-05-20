@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ForecastingPath · Summary Report</title>
 <style>
   :root {
@@ -40,6 +41,13 @@
   footer { margin-top: 2em; padding-top: 1em; border-top: 1px solid var(--border);
             color: var(--muted); font-size: 0.85em; text-align: center; }
   @media print { body { padding: 0; background: #fff; } .page { box-shadow: none; } }
+  html, body { overflow-x: hidden; }
+  img, svg { max-width: 100%; height: auto; }
+  @media (max-width: 640px) {
+    body { padding: 1em 0.6em; }
+    .page { padding: 1.2em 1em; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  }
 </style>
 </head><body>
 <div class="page">
@@ -97,7 +105,7 @@
   <tbody>
   <tr>
             <td><span class="dot" style="background:#1d4ed8"></span><strong>Opus 4.7 (production)</strong></td>
-            <td>0.0378</td>
+            <td>0.038</td>
             <td>0.2558</td>
             <td>0.4551</td>
             <td>14 + 12</td>
@@ -193,7 +201,7 @@
 <table>
   <thead><tr><th>Variant</th><th style="text-align:right">Brier (hindsight)</th><th style="text-align:right">BSS vs random</th></tr></thead>
   <tbody>
-    <tr><td><strong>Opus 4.7 (production)</strong></td><td style="text-align:right"><strong>0.0378</strong></td><td style="text-align:right"><strong>0.849</strong></td></tr>
+    <tr><td><strong>Opus 4.7 (production)</strong></td><td style="text-align:right"><strong>0.038</strong></td><td style="text-align:right"><strong>0.849</strong></td></tr>
     <tr><td>Opus 4.6</td><td style="text-align:right">0.0391</td><td style="text-align:right">0.844</td></tr>
     <tr><td>GPT-5.2</td><td style="text-align:right">0.0438</td><td style="text-align:right">0.825</td></tr>
     <tr><td>Sonnet 4.6 (prev prod)</td><td style="text-align:right">0.0639</td><td style="text-align:right">0.744</td></tr>

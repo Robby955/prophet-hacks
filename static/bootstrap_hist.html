@@ -19,6 +19,9 @@ header .links a { color: #2856a3; text-decoration: none; margin-right: 12px; }
 #plot { max-width: 1100px; margin: 0 auto; background: white; border: 1px solid #e6e9f0; border-radius: 8px; }
 footer { max-width: 1100px; margin: 12px auto; color: #6a7388; font-size: 12px; }
 footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+
+html,body{overflow-x:hidden}
+img,svg{max-width:100%;height:auto}
 </style>
 </head>
 <body>
@@ -28,7 +31,7 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
   <div class="read-panel"><strong>What you're looking at:</strong> each bar is one paired-bootstrap resample of the Brier improvement; the result is strongest when the blue interval stays to the right of zero, and the hover labels expose the resample counts.</div>
   <p class="sub">50,000 paired bootstrap resamples of per-event Brier improvement (baseline − model). Bars = distribution shape; shaded band = 95% confidence interval; vertical line = observed mean. The CI excludes zero, so the production model significantly improves over baseline on this dataset at α=0.05. Hover for counts at each bin.</p>
   <p class="sub" style="background:#f4f7fb;border-left:4px solid #2856a3;border-radius:6px;padding:8px 11px;color:#1a1f2c">
-     <strong>Leakage note:</strong> this is the model-swap <em>delta</em> (Sonnet → Opus),
+     <strong>Leakage note:</strong> this is the model-swap <em>delta</em> (Sonnet to Opus),
      computed on the unfiltered-retrieval replay where both arms got the same hindsight
      benefit &mdash; so the delta is valid even though the absolute level (~0.038) is
      best-case-with-hindsight. Our honest headline binary Brier is the
@@ -37,11 +40,11 @@ footer code { background: #eef0f5; padding: 1px 4px; border-radius: 3px; font-si
      a separate paired bootstrap, n=26, gives that gap's 95% CI as
      [&minus;0.136, &minus;0.030]).</p>
   <p class="links">
-    <a href="/static/scatter_resolved.html">→ per-event scatter</a> ·
-    <a href="/static/heatmap_resolved.html">→ cross-model heatmap</a> ·
-    <a href="/static/abstain_slider.html">→ abstain slider</a> ·
-    <a href="/static/summary.html">→ summary report</a> ·
-    <a href="/">→ home</a>
+    <a href="/static/scatter_resolved.html">per-event scatter</a> ·
+    <a href="/static/heatmap_resolved.html">cross-model heatmap</a> ·
+    <a href="/static/abstain_slider.html">abstain slider</a> ·
+    <a href="/static/summary.html">summary report</a> ·
+    <a href="/">home</a>
   </p>
 </header>
 

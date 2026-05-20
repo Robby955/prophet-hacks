@@ -1204,5 +1204,807 @@
       ]
     },
     "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-CLE-DET-20260521",
+    "market_ticker": "SHADOW-MLB-CLE-DET-20260521",
+    "title": "Who will win the Cleveland Guardians at Detroit Tigers MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the Cleveland Guardians at Detroit Tigers MLB game scheduled 2026-05-21T17:10:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Cleveland Guardians",
+      "Detroit Tigers"
+    ],
+    "close_time": "2026-05-21T17:10:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815435/guardians-tigers",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-PIT-STL-20260521",
+    "market_ticker": "SHADOW-MLB-PIT-STL-20260521",
+    "title": "Who will win the Pittsburgh Pirates at St. Louis Cardinals MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the Pittsburgh Pirates at St. Louis Cardinals MLB game scheduled 2026-05-21T17:15:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Pittsburgh Pirates",
+      "St. Louis Cardinals"
+    ],
+    "close_time": "2026-05-21T17:15:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815438/pirates-cardinals",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-NYM-WSH-20260521",
+    "market_ticker": "SHADOW-MLB-NYM-WSH-20260521",
+    "title": "Who will win the New York Mets at Washington Nationals MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the New York Mets at Washington Nationals MLB game scheduled 2026-05-21T20:05:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "New York Mets",
+      "Washington Nationals"
+    ],
+    "close_time": "2026-05-21T20:05:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815436/mets-nationals",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-ATL-MIA-20260521",
+    "market_ticker": "SHADOW-MLB-ATL-MIA-20260521",
+    "title": "Who will win the Atlanta Braves at Miami Marlins MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the Atlanta Braves at Miami Marlins MLB game scheduled 2026-05-21T22:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Atlanta Braves",
+      "Miami Marlins"
+    ],
+    "close_time": "2026-05-21T22:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815434/braves-marlins",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-TOR-NYY-20260521",
+    "market_ticker": "SHADOW-MLB-TOR-NYY-20260521",
+    "title": "Who will win the Toronto Blue Jays at New York Yankees MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the Toronto Blue Jays at New York Yankees MLB game scheduled 2026-05-21T23:05:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Toronto Blue Jays",
+      "New York Yankees"
+    ],
+    "close_time": "2026-05-21T23:05:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815437/blue-jays-yankees",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-ATH-LAA-20260521",
+    "market_ticker": "SHADOW-MLB-ATH-LAA-20260521",
+    "title": "Who will win the Athletics at Los Angeles Angels MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the Athletics at Los Angeles Angels MLB game scheduled 2026-05-22T01:38:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Athletics",
+      "Los Angeles Angels"
+    ],
+    "close_time": "2026-05-22T01:38:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815439/athletics-angels",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-MLB-COL-ARI-20260521",
+    "market_ticker": "SHADOW-MLB-COL-ARI-20260521",
+    "title": "Who will win the Colorado Rockies at Arizona Diamondbacks MLB game on 2026-05-21?",
+    "description": "Resolves to the winner of the Colorado Rockies at Arizona Diamondbacks MLB game scheduled 2026-05-22T01:40:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Colorado Rockies",
+      "Arizona Diamondbacks"
+    ],
+    "close_time": "2026-05-22T01:40:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/mlb/game/_/gameId/401815440/rockies-diamondbacks",
+        "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-NBA-CLE-NY-20260521",
+    "market_ticker": "SHADOW-NBA-CLE-NY-20260521",
+    "title": "Who will win the Cleveland Cavaliers at New York Knicks NBA game on 2026-05-21?",
+    "description": "Resolves to the winner of the Cleveland Cavaliers at New York Knicks NBA game scheduled 2026-05-22T00:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Cleveland Cavaliers",
+      "New York Knicks"
+    ],
+    "close_time": "2026-05-22T00:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:26Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/nba/game/_/gameId/401873342/cavaliers-knicks",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-NHL-MTL-CAR-20260521",
+    "market_ticker": "SHADOW-NHL-MTL-CAR-20260521",
+    "title": "Who will win the Montreal Canadiens at Carolina Hurricanes NHL game on 2026-05-21?",
+    "description": "Resolves to the winner of the Montreal Canadiens at Carolina Hurricanes NHL game scheduled 2026-05-22T00:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Montreal Canadiens",
+      "Carolina Hurricanes"
+    ],
+    "close_time": "2026-05-22T00:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/nhl/game/_/gameId/401873383/canadiens-hurricanes",
+        "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-GS-NY-20260521",
+    "market_ticker": "SHADOW-WNBA-GS-NY-20260521",
+    "title": "Who will win the Golden State Valkyries at New York Liberty WNBA game on 2026-05-21?",
+    "description": "Resolves to the winner of the Golden State Valkyries at New York Liberty WNBA game scheduled 2026-05-22T00:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Golden State Valkyries",
+      "New York Liberty"
+    ],
+    "close_time": "2026-05-22T00:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/wnba/game/_/gameId/401856924/valkyries-liberty",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-TOR-MIN-20260521",
+    "market_ticker": "SHADOW-WNBA-TOR-MIN-20260521",
+    "title": "Who will win the Toronto Tempo at Minnesota Lynx WNBA game on 2026-05-21?",
+    "description": "Resolves to the winner of the Toronto Tempo at Minnesota Lynx WNBA game scheduled 2026-05-22T00:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Toronto Tempo",
+      "Minnesota Lynx"
+    ],
+    "close_time": "2026-05-22T00:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/wnba/game/_/gameId/401856925/tempo-lynx",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-WNBA-LA-PHX-20260521",
+    "market_ticker": "SHADOW-WNBA-LA-PHX-20260521",
+    "title": "Who will win the Los Angeles Sparks at Phoenix Mercury WNBA game on 2026-05-21?",
+    "description": "Resolves to the winner of the Los Angeles Sparks at Phoenix Mercury WNBA game scheduled 2026-05-22T02:00:00Z. No draws.",
+    "category": "Sports",
+    "outcomes": [
+      "Los Angeles Sparks",
+      "Phoenix Mercury"
+    ],
+    "close_time": "2026-05-22T02:00:00Z",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "notes": "Pregame slate auto-generated from ESPN schedule.",
+      "source_urls": [
+        "https://www.espn.com/wnba/game/_/gameId/401856926/sparks-mercury",
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=20260521"
+      ]
+    },
+    "notes": "Forward calibration candidate; auto-generated pregame slate."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-712-20260521",
+    "market_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-712-20260521",
+    "title": "Will SPY close above 712.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on 2026-05-21 will be strictly greater than 712.00. Threshold is -3.0% from the 733.73 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if SPY's official regular-session close on 2026-05-21 is strictly greater than 712.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/SPY/",
+        "https://finance.yahoo.com/quote/SPY/history/"
+      ],
+      "notes": "Grid rung at -3.0% of the 733.73 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-726-20260521",
+    "market_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-726-20260521",
+    "title": "Will SPY close above 726.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on 2026-05-21 will be strictly greater than 726.00. Threshold is -1.1% from the 733.73 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if SPY's official regular-session close on 2026-05-21 is strictly greater than 726.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/SPY/",
+        "https://finance.yahoo.com/quote/SPY/history/"
+      ],
+      "notes": "Grid rung at -1.1% of the 733.73 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-734-20260521",
+    "market_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-734-20260521",
+    "title": "Will SPY close above 734.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on 2026-05-21 will be strictly greater than 734.00. Threshold is +0.0% from the 733.73 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if SPY's official regular-session close on 2026-05-21 is strictly greater than 734.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/SPY/",
+        "https://finance.yahoo.com/quote/SPY/history/"
+      ],
+      "notes": "Grid rung at +0.0% of the 733.73 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-741-20260521",
+    "market_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-741-20260521",
+    "title": "Will SPY close above 741.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on 2026-05-21 will be strictly greater than 741.00. Threshold is +1.0% from the 733.73 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if SPY's official regular-session close on 2026-05-21 is strictly greater than 741.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/SPY/",
+        "https://finance.yahoo.com/quote/SPY/history/"
+      ],
+      "notes": "Grid rung at +1.0% of the 733.73 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-756-20260521",
+    "market_ticker": "SHADOW-FIN-SPY-CLOSE-ABOVE-756-20260521",
+    "title": "Will SPY close above 756.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR S&P 500 ETF Trust (SPY) official regular-session close on 2026-05-21 will be strictly greater than 756.00. Threshold is +3.0% from the 733.73 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if SPY's official regular-session close on 2026-05-21 is strictly greater than 756.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/SPY/",
+        "https://finance.yahoo.com/quote/SPY/history/"
+      ],
+      "notes": "Grid rung at +3.0% of the 733.73 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-680-20260521",
+    "market_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-680-20260521",
+    "title": "Will QQQ close above 680.00 on 2026-05-21?",
+    "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on 2026-05-21 will be strictly greater than 680.00. Threshold is -3.1% from the 701.53 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if QQQ's official regular-session close on 2026-05-21 is strictly greater than 680.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/QQQ/",
+        "https://finance.yahoo.com/quote/QQQ/history/"
+      ],
+      "notes": "Grid rung at -3.1% of the 701.53 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-695-20260521",
+    "market_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-695-20260521",
+    "title": "Will QQQ close above 695.00 on 2026-05-21?",
+    "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on 2026-05-21 will be strictly greater than 695.00. Threshold is -0.9% from the 701.53 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if QQQ's official regular-session close on 2026-05-21 is strictly greater than 695.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/QQQ/",
+        "https://finance.yahoo.com/quote/QQQ/history/"
+      ],
+      "notes": "Grid rung at -0.9% of the 701.53 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-702-20260521",
+    "market_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-702-20260521",
+    "title": "Will QQQ close above 702.00 on 2026-05-21?",
+    "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on 2026-05-21 will be strictly greater than 702.00. Threshold is +0.1% from the 701.53 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if QQQ's official regular-session close on 2026-05-21 is strictly greater than 702.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/QQQ/",
+        "https://finance.yahoo.com/quote/QQQ/history/"
+      ],
+      "notes": "Grid rung at +0.1% of the 701.53 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-709-20260521",
+    "market_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-709-20260521",
+    "title": "Will QQQ close above 709.00 on 2026-05-21?",
+    "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on 2026-05-21 will be strictly greater than 709.00. Threshold is +1.1% from the 701.53 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if QQQ's official regular-session close on 2026-05-21 is strictly greater than 709.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/QQQ/",
+        "https://finance.yahoo.com/quote/QQQ/history/"
+      ],
+      "notes": "Grid rung at +1.1% of the 701.53 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-723-20260521",
+    "market_ticker": "SHADOW-FIN-QQQ-CLOSE-ABOVE-723-20260521",
+    "title": "Will QQQ close above 723.00 on 2026-05-21?",
+    "description": "Forecast whether the Invesco QQQ Trust (QQQ) official regular-session close on 2026-05-21 will be strictly greater than 723.00. Threshold is +3.1% from the 701.53 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if QQQ's official regular-session close on 2026-05-21 is strictly greater than 723.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/QQQ/",
+        "https://finance.yahoo.com/quote/QQQ/history/"
+      ],
+      "notes": "Grid rung at +3.1% of the 701.53 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-399-20260521",
+    "market_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-399-20260521",
+    "title": "Will GLD close above 399.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on 2026-05-21 will be strictly greater than 399.00. Threshold is -3.0% from the 411.50 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if GLD's official regular-session close on 2026-05-21 is strictly greater than 399.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/GLD/",
+        "https://finance.yahoo.com/quote/GLD/history/"
+      ],
+      "notes": "Grid rung at -3.0% of the 411.50 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-407-20260521",
+    "market_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-407-20260521",
+    "title": "Will GLD close above 407.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on 2026-05-21 will be strictly greater than 407.00. Threshold is -1.1% from the 411.50 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if GLD's official regular-session close on 2026-05-21 is strictly greater than 407.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/GLD/",
+        "https://finance.yahoo.com/quote/GLD/history/"
+      ],
+      "notes": "Grid rung at -1.1% of the 411.50 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-412-20260521",
+    "market_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-412-20260521",
+    "title": "Will GLD close above 412.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on 2026-05-21 will be strictly greater than 412.00. Threshold is +0.1% from the 411.50 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if GLD's official regular-session close on 2026-05-21 is strictly greater than 412.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/GLD/",
+        "https://finance.yahoo.com/quote/GLD/history/"
+      ],
+      "notes": "Grid rung at +0.1% of the 411.50 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-416-20260521",
+    "market_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-416-20260521",
+    "title": "Will GLD close above 416.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on 2026-05-21 will be strictly greater than 416.00. Threshold is +1.1% from the 411.50 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if GLD's official regular-session close on 2026-05-21 is strictly greater than 416.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/GLD/",
+        "https://finance.yahoo.com/quote/GLD/history/"
+      ],
+      "notes": "Grid rung at +1.1% of the 411.50 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-424-20260521",
+    "market_ticker": "SHADOW-FIN-GLD-CLOSE-ABOVE-424-20260521",
+    "title": "Will GLD close above 424.00 on 2026-05-21?",
+    "description": "Forecast whether the SPDR Gold Shares ETF (GLD) official regular-session close on 2026-05-21 will be strictly greater than 424.00. Threshold is +3.0% from the 411.50 level quoted at queue time.",
+    "category": "Financial Markets",
+    "close_time": "2026-05-21T20:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if GLD's official regular-session close on 2026-05-21 is strictly greater than 424.00. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://finance.yahoo.com/quote/GLD/",
+        "https://finance.yahoo.com/quote/GLD/history/"
+      ],
+      "notes": "Grid rung at +3.0% of the 411.50 level quoted via the Yahoo chart API at queue time; use the official close for resolution."
+    },
+    "notes": "Threshold-grid calibration candidate; same-day financial close. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-ABOVE-74767-20260521",
+    "market_ticker": "SHADOW-CRYPTO-BTC-ABOVE-74767-20260521",
+    "title": "Will Bitcoin be above 74767 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the BTC-USD reference price will be above 74767 at 00:00 UTC on 2026-05-21. Threshold is -3.0% from the 77079.72 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if BTC-USD is > 74767 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/bitcoin",
+        "https://finance.yahoo.com/quote/BTC-USD/"
+      ],
+      "notes": "Grid rung at -3.0% of the 77079.72 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-GE-76309-20260521",
+    "market_ticker": "SHADOW-CRYPTO-BTC-GE-76309-20260521",
+    "title": "Will Bitcoin be at or above 76309 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the BTC-USD reference price will be at or above 76309 at 00:00 UTC on 2026-05-21. Threshold is -1.0% from the 77079.72 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if BTC-USD is >= 76309 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/bitcoin",
+        "https://finance.yahoo.com/quote/BTC-USD/"
+      ],
+      "notes": "Grid rung at -1.0% of the 77079.72 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-ABOVE-77080-20260521",
+    "market_ticker": "SHADOW-CRYPTO-BTC-ABOVE-77080-20260521",
+    "title": "Will Bitcoin be above 77080 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the BTC-USD reference price will be above 77080 at 00:00 UTC on 2026-05-21. Threshold is +0.0% from the 77079.72 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if BTC-USD is > 77080 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/bitcoin",
+        "https://finance.yahoo.com/quote/BTC-USD/"
+      ],
+      "notes": "Grid rung at +0.0% of the 77079.72 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-GE-77851-20260521",
+    "market_ticker": "SHADOW-CRYPTO-BTC-GE-77851-20260521",
+    "title": "Will Bitcoin be at or above 77851 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the BTC-USD reference price will be at or above 77851 at 00:00 UTC on 2026-05-21. Threshold is +1.0% from the 77079.72 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if BTC-USD is >= 77851 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/bitcoin",
+        "https://finance.yahoo.com/quote/BTC-USD/"
+      ],
+      "notes": "Grid rung at +1.0% of the 77079.72 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-BTC-ABOVE-79392-20260521",
+    "market_ticker": "SHADOW-CRYPTO-BTC-ABOVE-79392-20260521",
+    "title": "Will Bitcoin be above 79392 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the BTC-USD reference price will be above 79392 at 00:00 UTC on 2026-05-21. Threshold is +3.0% from the 77079.72 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if BTC-USD is > 79392 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/bitcoin",
+        "https://finance.yahoo.com/quote/BTC-USD/"
+      ],
+      "notes": "Grid rung at +3.0% of the 77079.72 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2059-20260521",
+    "market_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2059-20260521",
+    "title": "Will Ethereum be above 2059 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the ETH-USD reference price will be above 2059 at 00:00 UTC on 2026-05-21. Threshold is -3.0% from the 2122.86 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if ETH-USD is > 2059 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/ethereum",
+        "https://finance.yahoo.com/quote/ETH-USD/"
+      ],
+      "notes": "Grid rung at -3.0% of the 2122.86 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-ETH-GE-2102-20260521",
+    "market_ticker": "SHADOW-CRYPTO-ETH-GE-2102-20260521",
+    "title": "Will Ethereum be at or above 2102 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the ETH-USD reference price will be at or above 2102 at 00:00 UTC on 2026-05-21. Threshold is -1.0% from the 2122.86 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if ETH-USD is >= 2102 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/ethereum",
+        "https://finance.yahoo.com/quote/ETH-USD/"
+      ],
+      "notes": "Grid rung at -1.0% of the 2122.86 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2123-20260521",
+    "market_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2123-20260521",
+    "title": "Will Ethereum be above 2123 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the ETH-USD reference price will be above 2123 at 00:00 UTC on 2026-05-21. Threshold is +0.0% from the 2122.86 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if ETH-USD is > 2123 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/ethereum",
+        "https://finance.yahoo.com/quote/ETH-USD/"
+      ],
+      "notes": "Grid rung at +0.0% of the 2122.86 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-ETH-GE-2144-20260521",
+    "market_ticker": "SHADOW-CRYPTO-ETH-GE-2144-20260521",
+    "title": "Will Ethereum be at or above 2144 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the ETH-USD reference price will be at or above 2144 at 00:00 UTC on 2026-05-21. Threshold is +1.0% from the 2122.86 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if ETH-USD is >= 2144 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/ethereum",
+        "https://finance.yahoo.com/quote/ETH-USD/"
+      ],
+      "notes": "Grid rung at +1.0% of the 2122.86 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
+  },
+  {
+    "event_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2187-20260521",
+    "market_ticker": "SHADOW-CRYPTO-ETH-ABOVE-2187-20260521",
+    "title": "Will Ethereum be above 2187 USD at 00:00 UTC on 2026-05-21?",
+    "description": "Forecast whether the ETH-USD reference price will be above 2187 at 00:00 UTC on 2026-05-21. Threshold is +3.0% from the 2122.86 spot quoted at queue time.",
+    "category": "Crypto",
+    "close_time": "2026-05-21T00:00:00Z",
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "rules": "Resolve Yes if ETH-USD is > 2187 at 2026-05-21T00:00:00Z using a major reference quote such as Coinbase or Yahoo Finance. Resolve No otherwise.",
+    "market_snapshot": {
+      "as_of": "2026-05-20T05:11:27Z",
+      "source_urls": [
+        "https://www.coinbase.com/price/ethereum",
+        "https://finance.yahoo.com/quote/ETH-USD/"
+      ],
+      "notes": "Grid rung at +3.0% of the 2122.86 Coinbase spot quoted at queue time; resolves at a precise UTC timestamp."
+    },
+    "notes": "Threshold-grid calibration candidate; short-horizon crypto. Grid spans easy->hard to cover the 0.5-0.9 band."
   }
 ]

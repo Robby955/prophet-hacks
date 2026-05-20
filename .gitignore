@@ -39,3 +39,10 @@ prophet_hacks_research_monitoring_playbook_v4.pdf
 .playwright-cli/
 output/
 data/predictions/measurement_*/
+
+# Internal-only docs (local, never published to the public repo)
+docs/STATE_AND_IDEAS.md
+docs/DEPLOYMENT_TOPOLOGY.md
+# Large local asset + stray file (keep out of deploy bundle)
+TheOracles.gif
+/37

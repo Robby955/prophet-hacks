@@ -72,8 +72,26 @@ def test_too_few_parts_returns_none() -> None:
 
 
 def test_no_recognized_kind_returns_none() -> None:
-    # No UP / GE / ABOVE token and a numeric threshold present -> unparseable kind.
-    assert fin.parse_spec(_event("SHADOW-FIN-SPY-BELOW-739-20260519")) is None
+    # No UP / GE / ABOVE / BELOW / BETWEEN token -> unparseable kind.
+    assert fin.parse_spec(_event("SHADOW-FIN-SPY-SIDEWAYS-739-20260519")) is None
+
+
+def test_below_parses_as_lt() -> None:
+    spec = fin.parse_spec(_event("SHADOW-FIN-SPY-CLOSE-BELOW-730-20260522"))
+    assert spec is not None and spec["kind"] == "lt" and spec["threshold"] == 730.0
+
+
+def test_between_parses_as_interval() -> None:
+    spec = fin.parse_spec(_event("SHADOW-FIN-SPY-BETWEEN-731-735-20260522"))
+    assert spec is not None and spec["kind"] == "between"
+    assert spec["threshold"] == 731.0 and spec["hi"] == 735.0
+
+
+def test_winner_for_below_and_between() -> None:
+    assert fin._winner_for("lt", 720.0, 730.0) == "Yes"
+    assert fin._winner_for("lt", 740.0, 730.0) == "No"
+    assert fin._winner_for("between", 733.0, 731.0, 735.0) == "Yes"
+    assert fin._winner_for("between", 736.0, 731.0, 735.0) == "No"
 
 
 def test_empty_or_missing_ticker_returns_none() -> None:

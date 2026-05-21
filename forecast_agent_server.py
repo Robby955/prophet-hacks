@@ -914,10 +914,15 @@ def root() -> str:
       </div>
     </div>
     <div class="demo-grid">
-      <a class="demo-link" href="/login?next=/dashboard"><span>Demo</span><strong>Pipeline console</strong><em>Run the staged forecast demo and watch the live feed.</em></a>
-      <a class="demo-link" href="/login?next=/observatory"><span>Ops</span><strong>Observatory</strong><em>Current commit, run history, and first-call review.</em></a>
-      <a class="demo-link" href="/login?next=/static/abstain_slider.html"><span>Strategy</span><strong>Confidence slider</strong><em>Move the threshold and see how scoring changes.</em></a>
-      <a class="demo-link" href="/login?next=/static/scatter_resolved.html"><span>Results</span><strong>Event map</strong><em>Resolved-event losses, comparisons, and drilldowns.</em></a>
+      <a class="demo-link" href="/static/summary.html"><span>Report</span><strong>Summary report</strong><em>Honest leakage-disciplined Brier (0.118), methodology, and results.</em></a>
+      <a class="demo-link" href="/static/overview.html"><span>Overview</span><strong>Project overview</strong><em>Code map, variants, experiment ledger, and roadmap.</em></a>
+      <a class="demo-link" href="/static/diagnostics.html"><span>Calibration</span><strong>Reliability diagram</strong><em>Stratified Brier, ECE, and confidence-conditional skill.</em></a>
+      <a class="demo-link" href="/static/gallery_resolved.html"><span>Results</span><strong>Prediction gallery</strong><em>Side-by-side resolved-event forecasts and drilldowns.</em></a>
+      <a class="demo-link" href="/static/calibration_overlay.html"><span>Calibration</span><strong>Calibration overlay</strong><em>Multi-model reliability curves on the resolved set.</em></a>
+      <a class="demo-link" href="/static/abstain_slider.html"><span>Strategy</span><strong>Confidence slider</strong><em>Move the threshold and see how scoring changes.</em></a>
+      <a class="demo-link" href="/static/scatter_resolved.html"><span>Results</span><strong>Event map</strong><em>Resolved-event losses, comparisons, and drilldowns.</em></a>
+      <a class="demo-link" href="/login?next=/dashboard"><span>Demo (PIN)</span><strong>Pipeline console</strong><em>Run the staged forecast demo and watch the live feed.</em></a>
+      <a class="demo-link" href="/login?next=/observatory"><span>Ops (PIN)</span><strong>Observatory</strong><em>Current commit, run history, and first-call review.</em></a>
     </div>
   </section>
 </main>

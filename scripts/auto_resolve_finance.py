@@ -87,13 +87,18 @@ def parse_spec(event: dict[str, Any]) -> dict[str, Any] | None:
     except ValueError:
         return None
 
-    numeric = [t for t in middle if t.replace(".", "", 1).isdigit()]
-    threshold = float(numeric[0]) if numeric else None
+    numeric = [float(t) for t in middle if t.replace(".", "", 1).isdigit()]
+    threshold = numeric[0] if numeric else None
+    hi = numeric[1] if len(numeric) > 1 else None
 
-    if "UP" in middle and threshold is None:
+    if "BETWEEN" in middle and hi is not None:
+        kind = "between"  # lo <= px <= hi (narrow-interval shape PA uses)
+    elif "UP" in middle and threshold is None:
         kind = "next_day_up"
     elif "GE" in middle:
         kind = "ge"  # >=
+    elif "BELOW" in middle:
+        kind = "lt"  # <
     elif "ABOVE" in middle:
         kind = "gt"  # >
     else:
@@ -105,9 +110,24 @@ def parse_spec(event: dict[str, Any]) -> dict[str, Any] | None:
         "symbol": symbol,
         "kind": kind,
         "threshold": threshold,
+        "hi": hi,
         "event_date": event_date,
         "close_time": event.get("close_time"),
     }
+
+
+def _winner_for(kind: str, px: float, thr: float, hi: float | None = None) -> str:
+    if kind == "ge":
+        return "Yes" if px >= thr else "No"
+    if kind == "lt":
+        return "Yes" if px < thr else "No"
+    if kind == "between":
+        return "Yes" if (thr <= px <= hi) else "No"
+    return "Yes" if px > thr else "No"  # gt
+
+
+def _thr_desc(kind: str, thr: float, hi: float | None = None) -> str:
+    return {"ge": f">= {thr}", "lt": f"< {thr}", "between": f"in [{thr}, {hi}]"}.get(kind, f"> {thr}")
 
 
 # --------------------------------------------------------------------------
@@ -182,10 +202,9 @@ def resolve_one(spec: dict[str, Any]) -> dict[str, Any] | None:
             winner = "Yes" if close_px > prev_px else "No"
             note = f"{spec['symbol']} close {close_px} vs prior {prev_px} ({prior[-1]})"
             observed = close_px
-        else:  # gt / ge against threshold
-            thr = spec["threshold"]
-            winner = "Yes" if (close_px >= thr if kind == "ge" else close_px > thr) else "No"
-            note = f"{spec['symbol']} close {close_px} vs threshold {thr}"
+        else:  # threshold comparison (gt / ge / lt / between)
+            winner = _winner_for(kind, close_px, spec["threshold"], spec.get("hi"))
+            note = f"{spec['symbol']} close {close_px} vs {_thr_desc(kind, spec['threshold'], spec.get('hi'))}"
             observed = close_px
         source = "yahoo finance chart API (daily close)"
 
@@ -193,9 +212,8 @@ def resolve_one(spec: dict[str, Any]) -> dict[str, Any] | None:
         price, src_note = fetch_crypto_price(spec["symbol"], spec["close_time"])
         if price is None:
             return None
-        thr = spec["threshold"]
-        winner = "Yes" if (price >= thr if kind == "ge" else price > thr) else "No"
-        note = f"{spec['symbol']} {price} vs threshold {thr} ({src_note})"
+        winner = _winner_for(kind, price, spec["threshold"], spec.get("hi"))
+        note = f"{spec['symbol']} {price} vs {_thr_desc(kind, spec['threshold'], spec.get('hi'))} ({src_note})"
         observed = price
         source = src_note
 

@@ -44,6 +44,7 @@ data/predictions/measurement_*/
 docs/STATE_AND_IDEAS.md
 docs/DEPLOYMENT_TOPOLOGY.md
 docs/SDK_CONTRIBUTION_PLAN.md
+docs/LEAKAGE_AUDIT_WRITEUP.md
 # Large local asset + stray file (keep out of deploy bundle)
 TheOracles.gif
 /37

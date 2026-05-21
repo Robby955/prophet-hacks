@@ -8,30 +8,32 @@
 #   3. Local HEAD vs deployed SHA
 #   4. /healthz returns expected shape (variant, commit, status)
 #   5. Brave Search reliability monitor (retrieval dependency healthy)
-#   6. /predict end-to-end with a synthetic event (live API call, ~$0.10)
+#   6. Optional /predict end-to-end smoke (live API call, ~$0.10)
 #   7. /login serves the PIN form (auth surface up)
 #   8. /dashboard redirects browser visitors to /login (auth gate works)
 #   9. /predictions returns JSON 401 to API callers (auth gate works)
-#  10. Static artifact auth/public behavior is correct
+#  10. Public static artifacts are reachable and honestly framed
 #  11. Watcher process alive (mac notifications working)
 #
 # Pass criteria: every check prints "OK". Non-zero exit otherwise.
 #
 # Usage:
-#   ./scripts/full_check.sh                 # against production
+#   ./scripts/full_check.sh                 # no-predict production check
 #   ./scripts/full_check.sh --host http://localhost:8000  # against local
+#   ./scripts/full_check.sh --with-smoke    # also call /predict once
 
 set -uo pipefail
 
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd -P)"
 HOST="https://agent.forecastingpath.com"
-SKIP_SMOKE_CALL=""
+SKIP_SMOKE_CALL=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --host) HOST="$2"; shift 2;;
     --skip-smoke) SKIP_SMOKE_CALL=1; shift;;
+    --with-smoke) SKIP_SMOKE_CALL=""; shift;;
     *) shift;;
   esac
 done
@@ -118,8 +120,8 @@ else
   fail "Brave Search unhealthy/degraded (exit $BRAVE_CODE): $BRAVE_SUMMARY"
 fi
 
-# 6. /predict end-to-end smoke (live API call, ~$0.10)
-echo "[6/11] /predict end-to-end smoke"
+# 6. Optional /predict end-to-end smoke (live API call, ~$0.10)
+echo "[6/11] optional /predict end-to-end smoke"
 if [[ -z "$SKIP_SMOKE_CALL" ]]; then
   SMOKE='{"event_ticker":"FULL-CHECK","market_ticker":"FULL-CHECK","title":"Will the test pass?","category":"Test","close_time":"2027-01-01T00:00:00Z","outcomes":["Yes","No"]}'
   RESP=$(curl -s -X POST "$HOST/predict" \
@@ -140,13 +142,13 @@ print('OK')
     fail "/predict response invalid: $(echo "$RESP" | head -c 200)"
   fi
 else
-  echo "  (skipped, --skip-smoke)"
+  echo "  (skipped by default; pass --with-smoke to call /predict once)"
 fi
 
 # 7. /login serves the PIN form
 echo "[7/11] /login PIN form"
 LOGIN_BODY=$(curl -s --max-time 5 "$HOST/login")
-if echo "$LOGIN_BODY" | grep -q "Sign in" && echo "$LOGIN_BODY" | grep -q 'name="pin"'; then
+if grep -q "Sign in" <<< "$LOGIN_BODY" && grep -q 'name="pin"' <<< "$LOGIN_BODY"; then
   ok "/login serves PIN entry form"
 else
   fail "/login response unexpected: $(echo "$LOGIN_BODY" | head -c 100)"
@@ -172,24 +174,19 @@ else
   fail "/predictions unexpected code $CODE"
 fi
 
-# 10. Static artifacts: research HTML is auth-gated; PDF remains public
-echo "[10/11] static artifact auth/public behavior"
+# 10. Static artifacts: judge-facing HTML + PDF remain public.
+echo "[10/11] public static artifact behavior"
+SUMMARY_BODY=$(curl -s -L --max-time 10 "$HOST/static/summary.html")
 CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HOST/static/summary.html")
-if [[ "$CODE" == "401" || "$CODE" == "303" || "$CODE" == "302" ]]; then
-  ok "/static/summary.html unauthenticated code=$CODE"
+if [[ "$CODE" == "200" ]]; then
+  ok "/static/summary.html serves 200"
 else
-  fail "/static/summary.html should be auth-gated, got code $CODE"
+  fail "/static/summary.html should be public, got code $CODE"
 fi
-if [[ -n "${DASHBOARD_AUTH_TOKEN:-}" ]]; then
-  CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-    -H "x-dashboard-token: $DASHBOARD_AUTH_TOKEN" "$HOST/static/summary.html")
-  if [[ "$CODE" == "200" ]]; then
-    ok "/static/summary.html authenticated serves 200"
-  else
-    fail "/static/summary.html authenticated unexpected code $CODE"
-  fi
+if grep -q "0.118" <<< "$SUMMARY_BODY" && grep -qi "best-case" <<< "$SUMMARY_BODY"; then
+  ok "/static/summary.html carries honest 0.118 framing"
 else
-  echo "  $(red WARN) DASHBOARD_AUTH_TOKEN not set; skipping authenticated summary.html check"
+  fail "/static/summary.html missing honest 0.118/best-case framing"
 fi
 CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$HOST/static/summary.pdf")
 if [[ "$CODE" == "200" ]]; then

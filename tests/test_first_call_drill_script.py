@@ -8,6 +8,9 @@ def test_first_call_drill_is_zero_spend_and_checks_expected_surfaces() -> None:
     assert 'curl -sS --max-time 10 "$HOST/healthz"' in script
     assert 'grep -q \'class="run-window"\'' in script
     assert "PIN only|stay behind|Detailed traces|Restricted observatory" in script
+    assert "judge-facing static research HTML is public" in script
+    assert "should be public for judges" in script
+    assert "0\\\\.118|leakage|best-case" in script
     assert "/static/abstain_slider.html" in script
     assert "/static/pipeline_trace.html" in script
     assert '"$HOST/predictions" -H "x-dashboard-token: $TOKEN"' in script

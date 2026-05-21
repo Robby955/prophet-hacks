@@ -1,6 +1,6 @@
 # Findings · ForecastingPath / Prophet Hacks 2026
 
-*Author: Rob Sneiderman · Last updated: 2026-05-17*
+*Author: Rob Sneiderman · Last updated: 2026-05-20*
 
 Empirical and methodological findings from building the
 ForecastingPath agent. Separate from `submission/REPORT.md` (the
@@ -13,6 +13,15 @@ self picking the project up after the event.
 
 Every number here maps to an on-disk artifact (commit, prediction
 file, test). Nothing is speculative.
+
+**2026-05-19 leakage-audit update.** The honest headline is now the
+leakage-disciplined **0.118 single-binary Brier** from the date-capped
+`brave_fresh` retrieval arm. The lower 0.038/0.0379 replay numbers in
+this document are retained only as **best-case-with-hindsight** or
+relative model-ranking evidence. A search-provider freshness bake-off
+held the model, prompt, dedupe, and longshot guard constant and changed
+only retrieval freshness; Brier moved from 0.038 to 0.118, a 3.1x
+hindsight inflation with paired-bootstrap CI [-0.136, -0.030].
 
 ---
 
@@ -38,7 +47,7 @@ cross-model agreement analysis since outcomes are unresolved.
 
 ---
 
-## 2. Headline result
+## 2. Hindsight-arm model ranking, not the honest absolute headline
 
 | Variant (LLM only swap; pipeline identical) | Mean Brier ↓ | Binary (n=14) | Multi-outcome (n=12) |
 |---|---:|---:|---:|
@@ -47,9 +56,11 @@ single-binary Brier on `(p_yes - 1{outcomes[0] won})²`. PA's published
 docs describe multi-class Brier (sum across outcomes per event); the
 CLI does not implement that. Both reported below; primary headline
 is single-binary because that's what we can verify locally against
-PA's own evaluator.
+PA's own evaluator. The table below uses the unfiltered replay arm and
+is useful for relative model ranking only. The honest production-scale
+number is the date-capped 0.118 result described above.
 
-| Variant | Single-binary ↓ | Multi-class ↓ | Multi-only (n=12) |
+| Variant | Single-binary ↓ (hindsight arm) | Multi-class ↓ | Multi-only (n=12) |
 |---|---:|---:|---:|
 | **Claude Opus 4.7 (production)** | **0.0378** | 0.2558 | 0.4551 |
 | Claude Opus 4.6 | 0.0391 | **0.2500** | 0.4396 |
@@ -69,7 +80,8 @@ fallback, not real model behavior. Single-binary is unaffected.
 [0.0143, 0.0374], 50,000 resamples, seed `20260516`, n=26 paired
 events. CI excludes zero; significant at α=0.05.
 
-**Phase 2 decomposition** (same paired-bootstrap branch):
+**Phase 2 decomposition** (same unfiltered replay arm; relative
+attribution only, not the honest 0.118 magnitude):
 
 | Variant | Mean Brier |
 |---|---:|
@@ -219,8 +231,10 @@ price) cells. They run in the offline-only variant
 `predict_multi_outcome_retrieval_sae`.
 
 Measured Brier on the 26-event sample-resolved set:
-**0.1157 vs production 0.0379**, substantially worse. The shrinkage
-parameters were not calibrated against a held-out set; live
+**0.1157 vs hindsight-arm production 0.0379**. Against the honest
+0.118 baseline it is roughly competitive, but this is not a promotion
+signal because the shrinkage parameters were not calibrated against a
+held-out set; live
 calibration against single-event resolutions during the eval window
 is not supported. The code stays in the repository as research
 scaffolding for a post-event paper, not promoted to production.
@@ -235,9 +249,10 @@ either leaks or fails to learn.
 
 ## 7. Sample-size honesty
 
-n=26 is small. The 95% Brier-difference confidence interval between
-Opus 4.7 (0.0379) and Sonnet 4.6 (0.0639) is wide; a paired-bootstrap
-CI on the delta would be informative future work.
+n=26 is small. The paired-bootstrap CI between Opus 4.7 and Sonnet 4.6
+on the hindsight arm excludes zero, but that only supports the relative
+model/post-processing delta. It does not make 0.0379 an honest expected
+live magnitude.
 
 The dataset is also binary-skewed (16/26 sports matchups). The
 multi-outcome Brier numbers (n=12) carry less weight per row.
@@ -246,9 +261,10 @@ skew works *against* the magnitude of the headline result for
 Opus 4.7; a balanced eval set would likely widen the production
 lead, not narrow it.
 
-Live Prophet Arena performance is the only true test. The 0.0379
-number establishes directional plausibility under controlled
-conditions; it does not establish convergence.
+Live Prophet Arena performance is the only true test. The date-capped
+0.118 result and the 0.1224 Subset-1200 run are the credible expected
+magnitude before live scores arrive; 0.0379 is a best-case-with-hindsight
+bound.
 
 ---
 
@@ -304,8 +320,8 @@ accuracy was 25%, many had worse Brier skill score than making no
 prediction at all."
 
 Relevance to this work:
-- Reinforces that LLM forecasting is genuinely hard. Our 0.0379 on
-  n=26 should not be over-claimed as a generalization; FutureSim's
+- Reinforces that LLM forecasting is genuinely hard. Our 0.118 honest
+  n=26 estimate should not be over-claimed as converged; FutureSim's
   larger eval shows even SOTA agents struggle.
 - The "worse Brier skill score than no prediction" finding maps to
   what our parser-hardening + outcomes-safety-net work prevents

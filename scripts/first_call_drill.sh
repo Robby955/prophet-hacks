@@ -26,7 +26,7 @@ Usage: ./scripts/first_call_drill.sh [--host URL] [--token DASHBOARD_TOKEN]
 Checks:
   - /healthz shape and commit
   - public root has the run preview and no stale disclosure copy
-  - static research HTML is auth-gated
+  - judge-facing static research HTML is public and honestly framed
   - /predictions shape when a token is available
   - demo routes require auth without starting a demo run
   - local watcher process is alive
@@ -81,19 +81,19 @@ ROOT=$(curl -sS -L --max-time 10 "$HOST/" 2>/tmp/first_call_root.err)
 if [[ -z "$ROOT" ]]; then
   fail "root empty response: $(cat /tmp/first_call_root.err 2>/dev/null)"
 else
-  if echo "$ROOT" | grep -q 'class="run-window"' && echo "$ROOT" | grep -q "Open console"; then
+  if grep -q 'class="run-window"' <<< "$ROOT" && grep -q "Open console" <<< "$ROOT"; then
     ok "public root has run preview and console link"
   else
     fail "public root missing run preview or console link"
   fi
-  if echo "$ROOT" | grep -Eq "PIN only|stay behind|Detailed traces|Restricted observatory|Brave Search|GPT-5.5|Gemini"; then
+  if grep -Eq "PIN only|stay behind|Detailed traces|Restricted observatory|Brave Search|GPT-5.5|Gemini" <<< "$ROOT"; then
     fail "public root exposes stale disclosure or internal model copy"
   else
     ok "public root has no stale disclosure/internal model copy"
   fi
 fi
 
-echo "[3/6] static research auth gates"
+echo "[3/6] public static research pages"
 for path in \
   /static/summary.html \
   /static/gallery_resolved.html \
@@ -103,11 +103,22 @@ for path in \
   /static/bootstrap_hist.html \
   /static/pipeline_trace.html
 do
+  BODY=$(curl -sS -L --max-time 10 "$HOST$path" 2>/tmp/first_call_static.err)
+  if [[ -z "$BODY" ]]; then
+    fail "$path empty response: $(cat /tmp/first_call_static.err 2>/dev/null)"
+    continue
+  fi
   CODE=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 "$HOST$path")
-  if [[ "$CODE" == "401" || "$CODE" == "303" || "$CODE" == "302" ]]; then
-    ok "$path unauthenticated code=$CODE"
+  if [[ "$CODE" == "200" ]]; then
+    ok "$path public code=200"
   else
-    fail "$path should be auth-gated, got code=$CODE"
+    fail "$path should be public for judges, got code=$CODE"
+    continue
+  fi
+  if grep -Eiq "0\\.118|leakage|best-case" <<< "$BODY"; then
+    ok "$path carries honest framing"
+  else
+    fail "$path missing 0.118/leakage/best-case framing"
   fi
 done
 

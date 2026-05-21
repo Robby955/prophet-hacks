@@ -12,11 +12,20 @@ def test_full_check_includes_brave_health_step() -> None:
     assert 'echo "[11/11] watcher process alive"' in script
 
 
-def test_full_check_expects_static_research_html_auth_gate() -> None:
+def test_full_check_expects_public_static_research_artifacts() -> None:
     script = Path("scripts/full_check.sh").read_text()
 
-    assert 'echo "[10/11] static artifact auth/public behavior"' in script
+    assert 'echo "[10/11] public static artifact behavior"' in script
     assert '"$HOST/static/summary.html"' in script
-    assert 'should be auth-gated' in script
-    assert 'x-dashboard-token: $DASHBOARD_AUTH_TOKEN' in script
+    assert 'should be public' in script
+    assert "0.118" in script
+    assert "best-case" in script
     assert '"/static/summary.pdf serves 200"' in script
+
+
+def test_full_check_skips_predict_by_default() -> None:
+    script = Path("scripts/full_check.sh").read_text()
+
+    assert 'SKIP_SMOKE_CALL=1' in script
+    assert '--with-smoke' in script
+    assert 'pass --with-smoke to call /predict once' in script

@@ -60,8 +60,8 @@ BOOTSTRAP_CI = {
 }
 # Headline decomposition (Codex PR #6): Sonnet 4.6 run with the NEW floor
 # formula scored 0.041838; production Opus 4.7 scored 0.037912.
-# So the floor-bug fix accounts for ~85% of the 0.0639 → 0.0379 gap;
-# the model swap accounts for ~15%.
+# Those are unfiltered replay numbers, useful for relative attribution
+# only. The honest headline is the date-capped 0.118 brave_fresh arm.
 DECOMPOSITION = {
     "phase1_sonnet_old_floor": 0.063939,
     "sonnet_new_floor":        0.041838,
@@ -229,7 +229,8 @@ def _compute_summary() -> dict[str, Any]:
 
         per_model[label] = {
             "color": color,
-            # Primary headline = single-binary (matches PA CLI evaluator)
+            # Ranking metric = single-binary (matches PA CLI evaluator).
+            # Absolute headline comes from the date-capped 0.118 retrieval arm.
             "mean_brier": (sum(single_binary_all) / len(single_binary_all))
                           if single_binary_all else None,
             # Secondary diagnostic = proper multi-class
@@ -430,7 +431,7 @@ def _render_html(s: dict[str, Any]) -> str:
   <tr><td><em>uniform 1/n prior</em></td><td>{s['baselines']['uniform_prior']:.4f}</td><td>—</td><td>—</td><td>—</td></tr>
   </tbody>
 </table>
-<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set.
+<p class="meta">Lower is better. Pipeline (Brave retrieval, market-odds anchor prompt, 0.10 longshot floor) is identical across all rows; only the LLM call swaps. 26-event sample-resolved set. These single-binary values are best-case-with-hindsight on unfiltered retrieval; the honest production magnitude is 0.118 on the date-capped brave_fresh arm.
 <br><br>
 <strong>Two metrics shown:</strong> PA's CLI evaluator (<code>prophet forecast evaluate</code>) implements <em>single-binary</em> Brier on <code>(p_yes − 1{{outcomes[0] won}})²</code>; PA's docs describe <em>proper multi-class</em> Brier summed across all outcomes. We report both. The earlier draft of this report mixed metrics across rows — postmortem in <code>docs/DECISIONS.md</code> 2026-05-17 entry. Under single-binary (the verifiable metric), Opus 4.7 wins by ~3.4% over Opus 4.6. Under multi-class, Opus 4.6 is marginally better (0.2500 vs 0.2558).</p>
 
@@ -444,12 +445,12 @@ def _render_html(s: dict[str, Any]) -> str:
       <tr class="highlight"><td><strong>Opus 4.7 + new floor (production)</strong></td><td class="brier">{phase2_opus_new_floor:.4f}</td><td>−{delta_total:.4f} (full gap)</td></tr>
     </tbody>
   </table>
-  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet→Opus swap accounts for the remaining ~15%. Numbers from Codex's paired-bootstrap branch (`scripts/bootstrap_brier_ci.py`), pinned-seed reproducible.</p>
+  <p class="note">The longshot-floor bug fix accounts for roughly <strong>85% of the Phase 2 improvement</strong>; the Sonnet->Opus swap accounts for the remaining ~15%. These are unfiltered replay deltas, useful for relative attribution only. The honest disciplined production number is 0.118.</p>
 </div>
 
-<h2>Statistical significance — paired-bootstrap on the headline delta</h2>
+<h2>Statistical significance - paired-bootstrap on the replay delta</h2>
 <div class="results">
-  <p>The Phase 2 improvement (0.0639 → 0.0379) on n=26 paired events:</p>
+  <p>The Phase 2 improvement (0.0639 -> 0.0379) on n=26 paired events, measured on the unfiltered replay arm:</p>
   <table>
     <tbody>
       <tr><td>Mean Brier improvement</td><td class="brier">{boot_mean:.4f}</td></tr>
@@ -458,7 +459,7 @@ def _render_html(s: dict[str, Any]) -> str:
       <tr><td>Random seed</td><td>{boot_seed}</td></tr>
     </tbody>
   </table>
-  <p class="note">CI excludes zero; the delta is significant at α=0.05 on this dataset. Standard caveat applies — n=26 is small and binary-skewed (16/26 sports matchups). A balanced-mix eval would likely widen the CI but not change the sign.</p>
+  <p class="note">CI excludes zero for this relative delta. It is not an absolute live estimate; the honest production binary Brier is 0.118. Standard caveat applies: n=26 is small and binary-skewed (16/26 sports matchups).</p>
 </div>
 
 <h2>Brier decomposition (Murphy 1973): REL - RES + UNC</h2>
@@ -520,9 +521,10 @@ def _render_html(s: dict[str, Any]) -> str:
 
 <h2>Sample size honesty</h2>
 <p class="meta">26 events is a small sample, skewed toward binary tennis matches.
-The 0.0379 number is directionally validated, not converged. Live Prophet Arena
-performance may differ by category mix; the multi-vendor evidence is the most
-generalizable finding here. Full per-event detail at
+The honest 0.118 binary Brier is directionally validated and corroborated by the
+0.1224 Subset-1200 scale check, not converged. Live Prophet Arena performance
+may differ by category mix; the multi-vendor evidence and leakage audit are the
+most generalizable findings here. Full per-event detail at
 <a href="/compare">/compare</a> (PIN required).</p>
 
 <footer>

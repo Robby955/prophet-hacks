@@ -158,13 +158,14 @@
 </section>
 
 <section>
-  <h2>Backtest result on 26 resolved Prophet Arena events</h2>
-  <p><span class="big num">0.0379</span> mean Brier — production pipeline (Claude Opus 4.7 + Brave retrieval + market-odds anchor + 0.10 longshot floor).</p>
-  <p class="meta">95% paired-bootstrap CI <strong>[0.0143, 0.0374]</strong> on the improvement vs the Sonnet 4.6 baseline (n=26, 50,000 resamples, seed pinned). Interval excludes zero.</p>
+  <h2>Honest backtest result on 26 resolved Prophet Arena events</h2>
+  <p><span class="big num">0.118</span> single-binary Brier - date-capped Brave retrieval (<code>brave_fresh</code>), production model and longshot floor held constant.</p>
+  <p class="meta">The unfiltered replay scores about 0.038, but that arm is best-case-with-hindsight: retrieval can surface post-resolution articles. The paired freshness bake-off moved Brier from 0.038 to 0.118, a 3.1x hindsight inflation with 95% CI [-0.136, -0.030] on the retrieval-freshness delta.</p>
 
   <div class="ladder">
-    <div class="bar us"><div class="l">Opus 4.7 (prod)</div><div class="v" style="height: 14px">0.0379</div></div>
-    <div class="bar"><div class="l">Sonnet 4.6</div><div class="v" style="height: 24px">0.0639</div></div>
+    <div class="bar us"><div class="l">Opus 4.7 honest</div><div class="v" style="height: 45px">0.118</div></div>
+    <div class="bar"><div class="l">Opus 4.7 hindsight</div><div class="v" style="height: 14px; background:#e5e7eb; color:#374151">0.038</div></div>
+    <div class="bar"><div class="l">Sonnet 4.6 hindsight</div><div class="v" style="height: 24px">0.0639</div></div>
     <div class="bar"><div class="l">Opus 4.6</div><div class="v" style="height: 84px">0.226</div></div>
     <div class="bar"><div class="l">GPT-5.2</div><div class="v" style="height: 96px">0.258</div></div>
     <div class="bar"><div class="l">GPT-5.5</div><div class="v" style="height: 120px">0.323</div></div>
@@ -172,7 +173,7 @@
     <div class="bar"><div class="l">uniform 1/n</div><div class="v" style="height: 82px; background:#e5e7eb; color:#374151">0.219</div></div>
     <div class="bar"><div class="l">random 0.5</div><div class="v" style="height: 94px; background:#e5e7eb; color:#374151">0.250</div></div>
   </div>
-  <p class="meta">Same pipeline; only the LLM call swaps. Lower is better. The gap on multi-outcome events is dominated by JSON schema compliance, not reasoning quality.</p>
+  <p class="meta">Lower is better. Cross-model rows are historical hindsight-arm comparisons for relative ranking only; the honest production magnitude is the date-disciplined 0.118.</p>
 </section>
 
 <section>

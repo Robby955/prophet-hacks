@@ -1,4 +1,12 @@
 {
+  "SHADOW-CRYPTO-BTC-ABOVE-74767-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:43Z",
+    "notes": "auto-resolved: BTC 77475.98 vs threshold 74767.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 77475.98,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "Yes"
+  },
   "SHADOW-CRYPTO-BTC-ABOVE-77000-20260520": {
     "auto_resolved_at": "2026-05-20T05:10:43Z",
     "notes": "auto-resolved: BTC 76767.48 vs threshold 77000.0 (coinbase candle open @ 2026-05-20T00:00:00Z)",
@@ -7,12 +15,84 @@
     "source": "coinbase candle open @ 2026-05-20T00:00:00Z",
     "winner": "No"
   },
+  "SHADOW-CRYPTO-BTC-ABOVE-77080-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:43Z",
+    "notes": "auto-resolved: BTC 77475.98 vs threshold 77080.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 77475.98,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "Yes"
+  },
+  "SHADOW-CRYPTO-BTC-ABOVE-79392-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: BTC 77475.98 vs threshold 79392.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 77475.98,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "No"
+  },
+  "SHADOW-CRYPTO-BTC-GE-76309-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:43Z",
+    "notes": "auto-resolved: BTC 77475.98 vs threshold 76309.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 77475.98,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "Yes"
+  },
+  "SHADOW-CRYPTO-BTC-GE-77851-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: BTC 77475.98 vs threshold 77851.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 77475.98,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "No"
+  },
+  "SHADOW-CRYPTO-ETH-ABOVE-2059-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: ETH 2127.48 vs threshold 2059.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 2127.48,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "Yes"
+  },
+  "SHADOW-CRYPTO-ETH-ABOVE-2123-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: ETH 2127.48 vs threshold 2123.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 2127.48,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "Yes"
+  },
   "SHADOW-CRYPTO-ETH-ABOVE-2150-20260520": {
     "auto_resolved_at": "2026-05-20T05:10:43Z",
     "notes": "auto-resolved: ETH 2110.05 vs threshold 2150.0 (coinbase candle open @ 2026-05-20T00:00:00Z)",
     "observed": 2110.05,
     "resolved_at": "2026-05-20T00:00:00Z",
     "source": "coinbase candle open @ 2026-05-20T00:00:00Z",
+    "winner": "No"
+  },
+  "SHADOW-CRYPTO-ETH-ABOVE-2187-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: ETH 2127.48 vs threshold 2187.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 2127.48,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "No"
+  },
+  "SHADOW-CRYPTO-ETH-GE-2102-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: ETH 2127.48 vs threshold 2102.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 2127.48,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
+    "winner": "Yes"
+  },
+  "SHADOW-CRYPTO-ETH-GE-2144-20260521": {
+    "auto_resolved_at": "2026-05-21T04:44:44Z",
+    "notes": "auto-resolved: ETH 2127.48 vs threshold 2144.0 (coinbase candle open @ 2026-05-21T00:00:00Z)",
+    "observed": 2127.48,
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "coinbase candle open @ 2026-05-21T00:00:00Z",
     "winner": "No"
   },
   "SHADOW-FIN-GLD-CLOSE-ABOVE-419-20260519": {
@@ -47,10 +127,24 @@
     "source": "yahoo finance chart API (daily close)",
     "winner": "Yes"
   },
+  "SHADOW-MLB-ATH-LAA-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:40Z",
+    "notes": "auto-resolved: final Los Angeles Angels 5 - Athletics 6",
+    "resolved_at": "2026-05-21T01:38:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Athletics"
+  },
   "SHADOW-MLB-ATL-MIA-20260519": {
     "auto_resolved_at": "2026-05-20T03:30:06Z",
     "notes": "auto-resolved: final Miami Marlins 4 - Atlanta Braves 8",
     "resolved_at": "2026-05-19T22:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Atlanta Braves"
+  },
+  "SHADOW-MLB-ATL-MIA-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:36Z",
+    "notes": "auto-resolved: final Miami Marlins 1 - Atlanta Braves 9",
+    "resolved_at": "2026-05-20T22:40:00Z",
     "source": "ESPN scoreboard API",
     "winner": "Atlanta Braves"
   },
@@ -75,6 +169,20 @@
     "source": "ESPN scoreboard API",
     "winner": "Boston Red Sox"
   },
+  "SHADOW-MLB-BOS-KC-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:38Z",
+    "notes": "auto-resolved: final Kansas City Royals 3 - Boston Red Sox 4",
+    "resolved_at": "2026-05-20T23:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Boston Red Sox"
+  },
+  "SHADOW-MLB-CHW-SEA-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:35Z",
+    "notes": "auto-resolved: final Seattle Mariners 5 - Chicago White Sox 4",
+    "resolved_at": "2026-05-20T20:10:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Seattle Mariners"
+  },
   "SHADOW-MLB-CIN-PHI-20260519": {
     "auto_resolved_at": "2026-05-20T03:30:08Z",
     "notes": "auto-resolved: final Philadelphia Phillies 1 - Cincinnati Reds 4",
@@ -93,6 +201,13 @@
     "auto_resolved_at": "2026-05-20T03:30:07Z",
     "notes": "auto-resolved: final Detroit Tigers 3 - Cleveland Guardians 4",
     "resolved_at": "2026-05-19T22:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Cleveland Guardians"
+  },
+  "SHADOW-MLB-CLE-DET-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:36Z",
+    "notes": "auto-resolved: final Detroit Tigers 2 - Cleveland Guardians 3",
+    "resolved_at": "2026-05-20T22:40:00Z",
     "source": "ESPN scoreboard API",
     "winner": "Cleveland Guardians"
   },
@@ -117,12 +232,54 @@
     "source": "ESPN scoreboard API",
     "winner": "Los Angeles Dodgers"
   },
+  "SHADOW-MLB-LAD-SD-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:33Z",
+    "notes": "auto-resolved: final San Diego Padres 0 - Los Angeles Dodgers 4",
+    "resolved_at": "2026-05-21T00:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Los Angeles Dodgers"
+  },
+  "SHADOW-MLB-MIL-CHC-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:38Z",
+    "notes": "auto-resolved: final Chicago Cubs 0 - Milwaukee Brewers 5",
+    "resolved_at": "2026-05-20T23:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Milwaukee Brewers"
+  },
+  "SHADOW-MLB-NYM-WSH-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:37Z",
+    "notes": "auto-resolved: final Washington Nationals 8 - New York Mets 4",
+    "resolved_at": "2026-05-20T22:45:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Washington Nationals"
+  },
+  "SHADOW-MLB-PIT-STL-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:39Z",
+    "notes": "auto-resolved: final St. Louis Cardinals 0 - Pittsburgh Pirates 7",
+    "resolved_at": "2026-05-20T23:45:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Pittsburgh Pirates"
+  },
+  "SHADOW-MLB-SF-ARI-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:34Z",
+    "notes": "auto-resolved: final Arizona Diamondbacks 6 - San Francisco Giants 3",
+    "resolved_at": "2026-05-20T19:40:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Arizona Diamondbacks"
+  },
   "SHADOW-MLB-SF-AZ-20260519": {
     "auto_resolved_at": "2026-05-20T05:10:29Z",
     "notes": "auto-resolved: final Arizona Diamondbacks 5 - San Francisco Giants 3",
     "resolved_at": "2026-05-20T01:40:00Z",
     "source": "ESPN scoreboard API",
     "winner": "Arizona Diamondbacks"
+  },
+  "SHADOW-MLB-TEX-COL-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:34Z",
+    "notes": "auto-resolved: final Colorado Rockies 4 - Texas Rangers 5",
+    "resolved_at": "2026-05-20T19:10:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Texas Rangers"
   },
   "SHADOW-MLB-TOR-NYY-20260519": {
     "auto_resolved_at": "2026-05-20T03:30:04Z",
@@ -131,6 +288,13 @@
     "source": "ESPN scoreboard API",
     "winner": "New York Yankees"
   },
+  "SHADOW-MLB-TOR-NYY-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:31Z",
+    "notes": "auto-resolved: final New York Yankees 1 - Toronto Blue Jays 2",
+    "resolved_at": "2026-05-20T23:05:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Toronto Blue Jays"
+  },
   "SHADOW-NBA-CLE-NYK-G1-20260519": {
     "auto_resolved_at": "2026-05-20T03:30:10Z",
     "notes": "auto-resolved: final New York Knicks 115 - Cleveland Cavaliers 104",
@@ -138,10 +302,59 @@
     "source": "ESPN scoreboard API",
     "winner": "New York Knicks"
   },
+  "SHADOW-NBA-SA-OKC-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:40Z",
+    "notes": "auto-resolved: final Oklahoma City Thunder 122 - San Antonio Spurs 113",
+    "resolved_at": "2026-05-21T00:30:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Oklahoma City Thunder"
+  },
+  "SHADOW-NBA-SAS-OKC-G2-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:32Z",
+    "notes": "auto-resolved: final Oklahoma City Thunder 122 - San Antonio Spurs 113",
+    "resolved_at": "2026-05-21T00:30:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Oklahoma City Thunder"
+  },
   "SHADOW-NHL-MTL-BUF-G7-20260518": {
     "notes": "User-reported result. Not scored because no clean pregame shadow forecast was logged.",
     "resolved_at": "2026-05-19T02:30:00Z",
     "winner": "Buffalo Sabres"
+  },
+  "SHADOW-NHL-VGK-COL-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:41Z",
+    "notes": "auto-resolved: final Colorado Avalanche 2 - Vegas Golden Knights 4",
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Vegas Golden Knights"
+  },
+  "SHADOW-NHL-VGK-COL-G1-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:30Z",
+    "notes": "auto-resolved: final Colorado Avalanche 2 - Vegas Golden Knights 4",
+    "resolved_at": "2026-05-21T00:00:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Vegas Golden Knights"
+  },
+  "SHADOW-WNBA-CON-SEA-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:43Z",
+    "notes": "auto-resolved: final Seattle Storm 78 - Connecticut Sun 80",
+    "resolved_at": "2026-05-21T02:00:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Connecticut Sun"
+  },
+  "SHADOW-WNBA-DAL-CHI-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:42Z",
+    "notes": "auto-resolved: final Chicago Sky 89 - Dallas Wings 99",
+    "resolved_at": "2026-05-21T01:00:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Dallas Wings"
+  },
+  "SHADOW-WNBA-POR-IND-20260520": {
+    "auto_resolved_at": "2026-05-21T04:44:42Z",
+    "notes": "auto-resolved: final Indiana Fever 90 - Portland Fire 73",
+    "resolved_at": "2026-05-20T23:00:00Z",
+    "source": "ESPN scoreboard API",
+    "winner": "Indiana Fever"
   },
   "SHADOW-WNBA-TOR-PHX-20260519": {
     "auto_resolved_at": "2026-05-20T05:10:30Z",
